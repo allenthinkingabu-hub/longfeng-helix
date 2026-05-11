@@ -10,7 +10,15 @@
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { filesClient } from '@longfeng/api-contracts';
+import { useMutation } from '@tanstack/react-query';
+import {
+  filesClient,
+  questionsClient,
+  type PresignResponse,
+  type FileCompleteResponse,
+  type CreateQuestionReq,
+  type CreateQuestionResp,
+} from '@longfeng/api-contracts';
 import { TEST_IDS } from '@longfeng/testids';
 import { track } from '@longfeng/telemetry';
 import s from './Capture.module.css';
@@ -20,6 +28,46 @@ import s from './Capture.module.css';
 const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
 const DRAFT_KEY = 'lf:capture:draft:v1';
 const DRAFT_TTL_MS = 7 * 24 * 3600 * 1000;
+const IDEMPOTENCY_KEY_STORAGE = 'lf:capture:idemKey:v1';
+const STUDENT_ID_STORAGE = 'lf:auth:studentId';
+const DEFAULT_STUDENT_ID = 1; // dev fallback; real id comes from JWT/profile
+
+/**
+ * Per-upload-attempt idempotency key.
+ * SC-01 spec §9 弱网断点续传 · TC-01.02: a retry of the same logical attempt
+ * (same image / same subject) MUST reuse the same key so the backend dedupes
+ * by X-Idempotency-Key and returns the cached qid instead of creating a
+ * second wrong_item row.
+ *
+ * We rotate the key on every successful upload (so the next photo gets a fresh
+ * one) but keep it across in-flight retries.
+ */
+function getOrCreateIdempotencyKey(): string {
+  try {
+    const existing = localStorage.getItem(IDEMPOTENCY_KEY_STORAGE);
+    if (existing) return existing;
+  } catch { /* noop */ }
+  const fresh = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+    ? crypto.randomUUID()
+    : `idem-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  try { localStorage.setItem(IDEMPOTENCY_KEY_STORAGE, fresh); } catch { /* noop */ }
+  return fresh;
+}
+
+function clearIdempotencyKey(): void {
+  try { localStorage.removeItem(IDEMPOTENCY_KEY_STORAGE); } catch { /* noop */ }
+}
+
+function resolveStudentId(): number {
+  try {
+    const raw = localStorage.getItem(STUDENT_ID_STORAGE);
+    if (raw) {
+      const n = Number(raw);
+      if (Number.isFinite(n) && n > 0) return n;
+    }
+  } catch { /* noop */ }
+  return DEFAULT_STUDENT_ID;
+}
 
 type Subject = 'math' | 'physics' | 'chemistry' | 'english' | 'chinese';
 type Mode = 'photo' | 'multi' | 'file';
@@ -99,7 +147,26 @@ export const CapturePage: React.FC = () => {
     safeSet(DRAFT_KEY, JSON.stringify(d));
   }, []);
 
-  // ── Upload ────────────────────────────────────────────────────
+  // ── Upload chain · per FRONTEND_GUIDANCE rule 2 (useMutation only, no raw fetch) ──
+  // SC-01-E02b · presign → PUT OSS → complete → POST /api/wb/questions (拿 qid)
+  // P03 navigation uses real qid; taskId placeholder reused until E02c wires /api/ai/analyze.
+  const presignMut = useMutation<PresignResponse, unknown, { mime: string; size: number }>({
+    mutationFn: (vars) => filesClient.presign(vars),
+  });
+  const directUploadMut = useMutation<void, unknown, { uploadUrl: string; file: File }>({
+    mutationFn: ({ uploadUrl, file }) => filesClient.directUpload(uploadUrl, file),
+  });
+  const completeMut = useMutation<FileCompleteResponse, unknown, string>({
+    mutationFn: (fileKey) => filesClient.complete(fileKey),
+  });
+  const createPendingMut = useMutation<
+    CreateQuestionResp,
+    unknown,
+    { req: CreateQuestionReq; idempotencyKey: string }
+  >({
+    mutationFn: ({ req, idempotencyKey }) => questionsClient.createPending(req, idempotencyKey),
+  });
+
   const handleFile = useCallback(async (file: File) => {
     if (file.size > MAX_BYTES) {
       setErrorMsg('图片过大（最大 10MB）');
@@ -108,23 +175,40 @@ export const CapturePage: React.FC = () => {
     setState('UPLOADING');
     setUploadPct(0);
     setErrorMsg(null);
+    const idemKey = getOrCreateIdempotencyKey();
     try {
-      const presign = await filesClient.presign({ mime: file.type, size: file.size });
+      track('wb_capture_upload_start', { bytes: file.size, subject });
+      const presign = await presignMut.mutateAsync({ mime: file.type, size: file.size });
       setUploadPct(15);
-      await filesClient.directUpload(presign.upload_url, file);
+
+      await directUploadMut.mutateAsync({ uploadUrl: presign.upload_url, file });
+      setUploadPct(60);
+
+      await completeMut.mutateAsync(presign.file_key);
       setUploadPct(80);
-      await filesClient.complete(presign.file_key);
+
+      const created = await createPendingMut.mutateAsync({
+        req: {
+          studentId: resolveStudentId(),
+          subject,
+          image_key: presign.file_key,
+          mime: file.type,
+          source_type: 1,
+        },
+        idempotencyKey: idemKey,
+      });
       setUploadPct(100);
       setState('UPLOADED');
-      // Navigate to P03 analyzing with taskId placeholder
-      // In real flow: POST /api/ai/analyze returns taskId
-      const taskId = presign.file_key; // temp: use fileKey as taskId until backend returns real taskId
-      setTimeout(() => nav(`/analyzing/${taskId}?qid=${presign.file_key}`), 300);
+      clearIdempotencyKey();
+      track('wb_capture_upload_success', { ms: 0, bytes: file.size, subject, qid: created.qid });
+
+      // E02c will replace `taskId=qid` with the real /api/ai/analyze taskId.
+      setTimeout(() => nav(`/analyzing/${created.qid}?qid=${created.qid}`), 300);
     } catch {
       setState('ERROR');
       setErrorMsg('上传失败，请重试');
     }
-  }, [nav]);
+  }, [nav, subject, presignMut, directUploadMut, completeMut, createPendingMut]);
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
