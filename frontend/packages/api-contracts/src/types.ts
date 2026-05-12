@@ -110,6 +110,88 @@ export interface CreateQuestionResp {
   qid: string;
 }
 
+// ==================== SC-01-E04a · P04 Result · GET /api/wb/questions/{qid} ====================
+// 1:1 aligned with backend QuestionDetailDto + PlannedNodeDto (C01). Backend uses Jackson
+// snake_case for nested keys; the questionsClient camelizes once before reaching FE.
+export interface QuestionDetailSolutionStep {
+  idx: number;
+  title: string;
+  detail?: string;
+  formula?: string;
+}
+export interface QuestionDetailKnowledgePoint {
+  id: string;
+  name: string;
+  weight: number;
+}
+export interface QuestionDetailModelInfo {
+  name: string;
+  version: string;
+}
+export interface QuestionDetail {
+  id: string;
+  subject: 'math' | 'physics' | 'chemistry' | 'english';
+  stem: string;
+  formula?: string;
+  thumbnailUrl?: string;
+  myAnswer: string;
+  correctAnswer: string;
+  reasonMarkdown: string;
+  steps: QuestionDetailSolutionStep[];
+  knowledgePoints: QuestionDetailKnowledgePoint[];
+  difficulty: 1 | 2 | 3 | 4 | 5;
+  confidence: number;
+  modelInfo: QuestionDetailModelInfo;
+}
+export interface QuestionPlannedNode {
+  tLevel: 'T1' | 'T2' | 'T3' | 'T4' | 'T5' | 'T6';
+  dueAt: string;
+  status: 'preview' | 'future' | 'done';
+}
+export interface QuestionDetailResp {
+  question: QuestionDetail;
+  plannedNodes: QuestionPlannedNode[];
+}
+
+// ==================== P04 Save · POST /api/wb/questions/{qid}/save ====================
+// SC-01-E04c · 保存确认 → 触发后端 review-plan 生成 1 plan + 7 nodes（T0..T6）
+// 后端 SaveQuestionResp 形如 { qid, planId, nodes:[{nid,tLevel,dueAt}×7] }（spec §4）
+export interface SaveQuestionReq {
+  qid: string;
+  edits?: Partial<QuestionDetail>;
+}
+
+export interface SavedReviewNode {
+  nid: string;
+  tLevel: string;
+  dueAt: string;
+}
+
+export interface SaveQuestionResp {
+  qid: string;
+  planId: string;
+  nodes: SavedReviewNode[];
+}
+
+// ==================== S4 ai-analysis · P02 analyze-by-url (POST /api/ai/analyze) ====================
+// SC-01-E02c · 拍完照、跳 P03 前触发 · 立即返 taskId + status=ANALYZING（HTTP 202）
+// 对齐 backend AnalyzeController.AnalyzeByUrlRequest (snake_case task_id/image_url)
+// 端点路径：网关 rewrite 前为 /api/ai/analyze-by-url，前端在 P02 spec §5 用 "POST /api/ai/analyze"
+// 别名指向此异步形态（同步 multipart /analyze 形态仅 IT/debug 私有路径）。
+export interface AnalyzeByUrlReq {
+  /** Snowflake String · 由前端 P02 启动时生成（推荐复用 qid，保证 qid===taskId 简化日志关联） */
+  task_id: string;
+  /** 学科枚举 · MATH | PHYSICS | CHEMISTRY | ENGLISH | CHINESE（大写） */
+  subject: string;
+  /** OSS / MinIO presigned URL 或可访问的图片 URL（由 file_key 解析得到） */
+  image_url: string;
+}
+
+export interface AnalyzeByUrlResp {
+  task_id: string;
+  status: 'ANALYZING';
+}
+
 // ==================== S5 review-plan（readonly）====================
 export interface ReviewPlanVO {
   id: string;
@@ -120,4 +202,47 @@ export interface ReviewPlanVO {
   mastery: number;
   ease_factor: number;
   interval: number;
+}
+
+// ==================== SC-01-D01 · home-aggregator · GET /api/home/today ====================
+// 对齐 backend/review-plan-service HomeAggregatorController + HomeTodayResp
+// spec: design/system/pages/P-HOME.spec.md §5 (主聚合接口 · MVP 子集 today.{total,done,circleProgress})
+export interface HomeTodayCard {
+  total: number;
+  done: number;
+  /** 0..1，前端渲染圆环时乘 100 取整 */
+  circleProgress: number;
+}
+
+export interface HomeTodayResume {
+  sid?: string | null;
+  nextNid?: string | null;
+}
+
+export interface HomeTodayResp {
+  tz: string;
+  today: HomeTodayCard;
+  /** B02 决策：当前阶段恒 null（前端隐藏 Resume Banner） */
+  resume?: HomeTodayResume | null;
+}
+
+// ==================== SC-01-C05 · review-plan-service · POST /api/review/sessions ====================
+// 对齐 backend dto: CreateSessionReq / CreateSessionResp（snake_case node_ids；前端 camelCase）
+// spec: design/system/pages/P-HOME.spec.md §5 + P07-review-today.spec.md §5
+export interface CreateReviewSessionReq {
+  /** YYYY-MM-DD · 缺省后端取今日（按 tz 解释） */
+  date?: string;
+  /** 指定节点 nid 列表（Snowflake String）；缺省后端按 today due 全量构造 */
+  nodeIds?: string[];
+  /** IANA tz，可选，缺省 Asia/Shanghai */
+  tz?: string;
+}
+
+export interface CreateReviewSessionResp {
+  /** 会话 ID (Snowflake String) */
+  sid: string;
+  /** 节点 nid 列表（按 next_due_at asc） */
+  nodeIds: string[];
+  /** 节点总数 */
+  total: number;
 }

@@ -79,6 +79,14 @@ export const TEST_IDS = {
     saveCta: 'p04-save-cta',
     lowConfBanner: 'p04-low-conf-banner',
     skeleton: 'p04-skeleton',
+    // SC-01-E04b · 低置信度（conf<0.6）顶部黄条 + 保存前强制确认
+    resultLowConfBanner: 'result-lowconf-banner',
+    resultConfirmModal: 'result-confirm-modal',
+    resultConfirmYesBtn: 'result-confirm-yes-btn',
+    resultConfirmNoBtn: 'result-confirm-no-btn',
+    // SC-01-E04c · P04 保存到错题本（蓝色 CTA + loading 状态）
+    resultSaveBtn: 'result-save-btn',
+    resultSaveLoading: 'result-save-loading',
   },
 
   // P03 Capture (legacy key kept for backward compat) · SC-01 + SC-07

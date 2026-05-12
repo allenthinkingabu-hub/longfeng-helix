@@ -1,0 +1,668 @@
+/**
+ * P04 Result · Mood B pure-warm
+ * STYLE-TRUTH §3 Mood B: 米白底 #F2F2F7 + 白卡 + iOS 标准 nav
+ *
+ * Archive 1:1 参考: design/mockups/wrongbook/_archive/04_result.html
+ * 颜色:
+ *   --bg    : #F2F2F7 (iOS Light bg)
+ *   --card  : #FFFFFF
+ *   --text  : #1C1C1E
+ *   --text2 : #3C3C43
+ *   --text3 : #8E8E93
+ *   --sep   : rgba(60,60,67,.14)
+ *   --blue  : #007AFF
+ *   --red   : #FF3B30
+ *   --green : #34C759
+ *   --orange: #FF9500
+ *   --indigo: #5856D6
+ */
+
+/* ─── Root ──────────────────────────────────────────────────────── */
+.root {
+  --bg:     #F2F2F7;
+  --card:   #FFFFFF;
+  --text:   #1C1C1E;
+  --text2:  #3C3C43;
+  --text3:  #8E8E93;
+  --sep:    rgba(60, 60, 67, 0.14);
+  --blue:   #007AFF;
+  --red:    #FF3B30;
+  --green:  #34C759;
+  --orange: #FF9500;
+  --indigo: #5856D6;
+
+  position: relative;
+  width: 100%;
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Status bar (dark text) ─────────────────────────────────── */
+.statusbar {
+  height: 54px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 28px 8px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #111;
+  position: relative;
+  z-index: 30;
+}
+.statusIcons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ─── Nav bar (glass warm) ───────────────────────────────────── */
+.nav {
+  position: sticky;
+  top: 0;
+  padding: 6px 20px 8px;
+  background: rgba(242, 242, 247, 0.78);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border-bottom: 0.5px solid var(--sep);
+  z-index: 20;
+}
+.navRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+}
+.navBack {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--blue);
+  font-size: 17px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.navBack svg {
+  width: 12px;
+  height: 20px;
+}
+.navActions {
+  color: var(--blue);
+  font-size: 17px;
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+.navActions button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--blue);
+  padding: 4px;
+  -webkit-tap-highlight-color: transparent;
+}
+.navH1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.36px;
+  margin-top: 2px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.navTag {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--green);
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.4px;
+}
+
+/* ─── Scrollable content area ────────────────────────────────── */
+.content {
+  /* CTA 现位于 tabbar (84px) 之上 → 内容底部需让出 CTA(110px) + tabbar(84px) */
+  padding: 12px 16px calc(200px + env(safe-area-inset-bottom, 0px));
+}
+
+/* ─── B2 · Question hero card ────────────────────────────────── */
+.questionHero {
+  background: var(--card);
+  border-radius: 18px;
+  padding: 14px;
+  display: flex;
+  gap: 12px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03), 0 8px 22px rgba(40, 50, 90, 0.06);
+  margin-bottom: 12px;
+}
+.thumb {
+  width: 80px;
+  height: 96px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #fbf8f0, #f1ece0);
+  position: relative;
+  overflow: hidden;
+  flex: 0 0 80px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+.thumbLbl {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  font-size: 6px;
+  color: #a78a3c;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+}
+.thumbQno {
+  position: absolute;
+  top: 14px;
+  left: 6px;
+  font-size: 7px;
+  font-weight: 700;
+  color: #7a3b3b;
+  background: #fde9e9;
+  border-radius: 2px;
+  padding: 1px 3px;
+}
+.thumbH3 {
+  position: absolute;
+  top: 24px;
+  left: 6px;
+  right: 6px;
+  font-family: Georgia, serif;
+  font-size: 7px;
+  line-height: 1.4;
+  color: #222;
+  font-weight: 600;
+}
+.thumbStrike {
+  position: absolute;
+  top: 58px;
+  left: 8px;
+  width: 56px;
+  height: 6px;
+  background: rgba(255, 80, 80, 0.55);
+  transform: rotate(-2deg);
+  border-radius: 1px;
+}
+.thumbPen {
+  position: absolute;
+  top: 66px;
+  left: 16px;
+  font-family: cursive;
+  font-size: 10px;
+  color: #c9302c;
+}
+.heroMeta {
+  flex: 1;
+  min-width: 0;
+}
+.heroKicker {
+  font-size: 11px;
+  color: var(--blue);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.heroStem {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-top: 4px;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+}
+.heroFormula {
+  margin-top: 6px;
+  font-family: 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--text2);
+}
+.heroFormula em {
+  font-style: italic;
+  color: var(--blue);
+  font-weight: 700;
+}
+
+/* ─── B3 · Answer duo cards ──────────────────────────────────── */
+.answers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.ans {
+  border-radius: 14px;
+  padding: 12px 12px 14px;
+  position: relative;
+  overflow: hidden;
+}
+.ansT {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.ansV {
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 6px;
+  letter-spacing: 0.2px;
+}
+.ansN {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+.ansWrong {
+  background: linear-gradient(160deg, #FFE8E6 0%, #FFF 70%);
+  border: 0.5px solid rgba(255, 59, 48, 0.25);
+  box-shadow: inset 0 0 0 1px rgba(255, 59, 48, 0.12);
+}
+.ansWrong .ansT { color: var(--red); }
+.ansRight {
+  background: linear-gradient(160deg, #E4F7EA 0%, #FFF 70%);
+  border: 0.5px solid rgba(52, 199, 89, 0.25);
+  box-shadow: inset 0 0 0 1px rgba(52, 199, 89, 0.12);
+}
+.ansRight .ansT { color: var(--green); }
+.ansDeco {
+  position: absolute;
+  right: -14px;
+  bottom: -14px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  opacity: 0.15;
+}
+.ansWrong .ansDeco { background: var(--red); }
+.ansRight .ansDeco { background: var(--green); }
+
+/* ─── Section header ─────────────────────────────────────────── */
+.secHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 18px 4px 8px;
+}
+.secTitle {
+  font-size: 13px;
+  color: var(--text3);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.secLine {
+  flex: 1;
+  height: 1px;
+  background: var(--sep);
+}
+.secTag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+/* ─── B4 · Error reason card ─────────────────────────────────── */
+.reasonCard {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  border-left: 4px solid var(--red); /* iron-rule: 4px left bar only */
+  margin-bottom: 12px;
+}
+.reasonIx {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #FF7A73, var(--red));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 30px;
+}
+.reasonIx svg { width: 16px; height: 16px; }
+.reasonTxt {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text);
+}
+.reasonKw {
+  color: var(--red);
+  font-weight: 700;
+  background: rgba(255, 59, 48, 0.10);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* ─── B5 · Steps ─────────────────────────────────────────────── */
+.steps {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 6px 4px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+  margin-bottom: 12px;
+}
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 14px;
+}
+.step + .step {
+  border-top: 0.5px solid var(--sep);
+}
+.stepNum {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #5FA8FF, var(--blue));
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 24px;
+  box-shadow: 0 4px 10px rgba(0, 122, 255, 0.3);
+}
+.stepBody { flex: 1; min-width: 0; }
+.stepExp {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text);
+}
+.stepFm {
+  margin-top: 5px;
+  font-family: 'Times New Roman', serif;
+  font-style: italic;
+  color: var(--indigo);
+  font-size: 14px;
+  background: rgba(88, 86, 214, 0.08);
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+}
+.stepFm em { color: var(--blue); font-weight: 700; }
+
+/* ─── B6 · KP + difficulty row ──────────────────────────────── */
+.kpRow {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.kpCard {
+  flex: 2;
+  background: var(--card);
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+}
+.kpHdr {
+  font-size: 11px;
+  color: var(--text3);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.kpChips {
+  margin-top: 8px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(88, 86, 214, 0.10);
+  color: var(--indigo);
+  font-size: 12px;
+  font-weight: 600;
+  border: 0.5px solid rgba(88, 86, 214, 0.2);
+  max-width: 80px; /* iron-rule 5: chip width ≤ 80px */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chipOutline {
+  background: #F2F2F7;
+  color: var(--text2);
+  border-color: var(--sep);
+  max-width: 80px;
+}
+.diffCard {
+  flex: 1;
+  background: var(--card);
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.diffHdr {
+  font-size: 11px;
+  color: var(--text3);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.stars {
+  margin-top: 7px;
+  display: flex;
+  gap: 3px;
+  color: var(--orange);
+  font-size: 18px;
+}
+.starDim { color: #E5E5EA; }
+.diffLevel {
+  font-size: 12px;
+  color: var(--text2);
+  margin-top: 3px;
+}
+
+/* ─── B7 · Ebbinghaus preview card ──────────────────────────── */
+.ebbing {
+  background: linear-gradient(160deg, #EEF4FF 0%, #F7ECFF 100%);
+  border: 0.5px solid rgba(88, 86, 214, 0.18);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.ebbingT {
+  font-size: 12px;
+  color: var(--indigo);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ebbingT svg { width: 14px; height: 14px; }
+.ebbingH4 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-top: 4px;
+  letter-spacing: 0.1px;
+  color: var(--text);
+}
+.ebbingNodes {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.node {
+  flex: 1;
+  text-align: center;
+}
+.nodePill {
+  height: 8px;
+  border-radius: 4px;
+  background: #E5E5EA;
+}
+.nodeFirst .nodePill {
+  background: linear-gradient(90deg, #5FA8FF, var(--blue));
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.18);
+}
+.nodeLv {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 4px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.nodeDt {
+  font-size: 9px;
+  color: var(--text3);
+  margin-top: 1px;
+}
+.nodeFirst .nodeLv { color: var(--blue); }
+
+/* ─── B8 · CTA dock ──────────────────────────────────────────── */
+.cta {
+  position: fixed;
+  left: 0;
+  right: 0;
+  /* 抬到 TabShell tabbar (84px + safe-area) 之上，防止 pointer 被拦截 */
+  bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  padding: 14px 16px 18px;
+  background: linear-gradient(180deg, rgba(242, 242, 247, 0), rgba(242, 242, 247, 0.92) 30%, #F2F2F7 100%);
+  /* 必须高于 TabShell.tabbar 的 z-index: 40 */
+  z-index: 50;
+}
+.ctaRow {
+  display: flex;
+  gap: 8px;
+}
+.btn {
+  flex: 1;
+  height: 46px;
+  border-radius: 14px;
+  border: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.btnGhost {
+  background: rgba(118, 118, 128, 0.12);
+  color: var(--text);
+}
+.btnPrimary {
+  background: linear-gradient(180deg, #5FA8FF, var(--blue));
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(0, 122, 255, 0.28);
+}
+.btnPrimary svg { width: 18px; height: 18px; }
+.ctaNote {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.2px;
+  margin-top: 6px;
+}
+
+/* ─── Low-conf banner ────────────────────────────────────────── */
+.lowConfBanner {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  background: rgba(255, 204, 0, 0.15);
+  border: 0.5px solid rgba(255, 204, 0, 0.4);
+  color: #856404;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ─── Skeleton ───────────────────────────────────────────────── */
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 16px;
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+}
+.skeletonBar {
+  height: 16px;
+  border-radius: 8px;
+  background: rgba(60, 60, 67, 0.1);
+}
+.skeletonCard {
+  height: 96px;
+  border-radius: 14px;
+  background: rgba(60, 60, 67, 0.08);
+}
+
+/* ─── SC-01-E04c · save loading spinner ─────────────────────── */
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-right: 8px;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; }
+}
+
+/* ─── Desktop clamp ──────────────────────────────────────────── */
+@media (min-width: 768px) {
+  .root {
+    max-width: 414px;
+    margin: 0 auto;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.15);
+    min-height: 100vh;
+  }
+  .cta {
+    max-width: 414px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
