@@ -1,0 +1,468 @@
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.longfeng:common:jar:1.0.0-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-surefire-plugin is missing. @ line 173, column 15
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.longfeng:gateway:jar:1.0.0-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.springframework.boot:spring-boot-maven-plugin is missing. @ line 113, column 15
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.longfeng:wrongbook-service:jar:1.0.0-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.springframework.boot:spring-boot-maven-plugin is missing. @ line 159, column 15
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.longfeng:ai-analysis-service:jar:1.0.0-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.springframework.boot:spring-boot-maven-plugin is missing. @ line 137, column 15
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.longfeng:review-plan-service:jar:1.0.0-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-surefire-plugin is missing. @ line 164, column 15
+[WARNING] 'build.plugins.plugin.version' for org.springframework.boot:spring-boot-maven-plugin is missing. @ line 160, column 15
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.longfeng:file-service:jar:1.0.0-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-surefire-plugin is missing. @ line 149, column 15
+[WARNING] 'build.plugins.plugin.version' for org.springframework.boot:spring-boot-maven-plugin is missing. @ line 145, column 15
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.longfeng:anonymous-service:jar:1.0.0-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-surefire-plugin is missing. @ line 121, column 15
+[WARNING] 'build.plugins.plugin.version' for org.springframework.boot:spring-boot-maven-plugin is missing. @ line 117, column 15
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.longfeng:auth-service:jar:1.0.0-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-surefire-plugin is missing. @ line 78, column 15
+[WARNING] 'build.plugins.plugin.version' for org.springframework.boot:spring-boot-maven-plugin is missing. @ line 74, column 15
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] 
+[INFO] ---------------------< com.longfeng:file-service >----------------------
+[INFO] Building file-service 1.0.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ file-service ---
+[INFO] Copying 3 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ file-service ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ file-service ---
+[INFO] skip non existing resourceDirectory /Users/allenwang/build/longfeng/backend/file-service/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ file-service ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.5.4:test (default-test) @ file-service ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.longfeng.fileservice.provider.MinioAttachmentStorageTest
+11:10:43.041 [main] INFO com.longfeng.fileservice.provider.MinioAttachmentStorage -- MinioAttachmentStorage.promote (no-op in dev) bucket=wrongbook-dev key=wrongbook/0/202601/100/999_photo.jpg class=IA
+11:10:43.042 [main] INFO com.longfeng.fileservice.provider.MinioAttachmentStorage -- MinioAttachmentStorage.promote (no-op in dev) bucket=wrongbook-dev key=wrongbook/0/202601/100/999_photo.jpg class=ARCHIVE
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.212 s -- in com.longfeng.fileservice.provider.MinioAttachmentStorageTest
+[INFO] Running com.longfeng.fileservice.controller.PresignControllerTest
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/Users/allenwang/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.13/byte-buddy-agent-1.14.13.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+11:10:43.548 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=test-idem-key-96383f4e-478d-485c-8966-9d46ea4a79cb bucket=wrongbook-dev key=wrongbook/0/202605/7/329908196904820736_a.jpg provider=minio ttlMin=15 sha256=bbbbbbbb
+11:10:43.560 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=test-idem-key-1587a236-2825-4ee1-b1ef-d77ca75a66fa bucket=wrongbook-dev key=wrongbook/1/202605/42/329908196988706816_note.png provider=minio ttlMin=15 sha256=-
+11:10:43.564 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=test-idem-key-a76b5be1-2e18-4d60-82dd-e04ad8b9d02e bucket=wrongbook-dev key=wrongbook/0/202605/7/329908197005484032_a.jpg provider=minio ttlMin=15 sha256=-
+11:10:43.569 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=test-idem-key-99df7986-e61a-415b-bfda-4b0d6707cea1 bucket=wrongbook-dev key=wrongbook/0/202605/0/329908197026455552_photo.png provider=minio ttlMin=15 sha256=-
+11:10:43.665 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=test-key-miss bucket=wrongbook-dev key=wrongbook/0/202605/7/329908197429108736_q.jpg provider=minio ttlMin=15 sha256=-
+11:10:43.667 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=test-idem-key-b982b108-ffa5-46cf-a7b0-53daf597d982 bucket=wrongbook-dev key=wrongbook/0/202605/0/329908197437497344_math.jpg provider=minio ttlMin=15 sha256=-
+11:10:43.669 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=test-idem-key-6b0c717c-c45a-43d3-badc-c47bcbe6ec55 bucket=wrongbook-dev key=wrongbook/0/202605/99/329908197445885952_a.jpg provider=minio ttlMin=15 sha256=-
+11:10:43.673 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign idempotent HIT · key=test-key-hit bucket=wrongbook-dev objectKey=wrongbook/0/202601/7/100_q.jpg
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.619 s -- in com.longfeng.fileservice.controller.PresignControllerTest
+[INFO] Running com.longfeng.fileservice.controller.CallbackControllerTest
+11:10:45.090 [main] ERROR com.longfeng.fileservice.controller.CallbackController -- OSS callback signature verification error
+java.lang.IllegalArgumentException: Illegal base64 character 3c
+	at java.base/java.util.Base64$Decoder.decode0(Base64.java:852)
+	at java.base/java.util.Base64$Decoder.decode(Base64.java:570)
+	at java.base/java.util.Base64$Decoder.decode(Base64.java:593)
+	at com.longfeng.fileservice.controller.CallbackController.parsePemPublicKey(CallbackController.java:198)
+	at com.longfeng.fileservice.controller.CallbackController.verifyOssSignature(CallbackController.java:163)
+	at com.longfeng.fileservice.controller.CallbackController.callback(CallbackController.java:101)
+	at com.longfeng.fileservice.controller.CallbackControllerTest.lambda$2(CallbackControllerTest.java:149)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:53)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:35)
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3115)
+	at com.longfeng.fileservice.controller.CallbackControllerTest.callback_malformedBase64Auth_throwsSignFailed(CallbackControllerTest.java:147)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:728)
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:218)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:214)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:139)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:69)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:151)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.apache.maven.surefire.junitplatform.LauncherAdapter.executeWithoutCancellationToken(LauncherAdapter.java:60)
+	at org.apache.maven.surefire.junitplatform.LauncherAdapter.execute(LauncherAdapter.java:52)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:203)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:168)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:136)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162)
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
+11:10:45.093 [main] WARN com.longfeng.fileservice.controller.CallbackController -- OSS callback signature verification FAILED objectKey=wrongbook/0/202601/0/photo.jpg
+11:10:45.103 [main] INFO com.longfeng.fileservice.controller.CallbackController -- OSS callback: file marked UPLOADED objectKey=wrongbook/0/202601/100/999_photo.jpg size=4500000
+11:10:45.108 [main] WARN com.longfeng.fileservice.controller.CallbackController -- OSS callback: pub-key-url host rejected: evil.example.com
+11:10:45.108 [main] WARN com.longfeng.fileservice.controller.CallbackController -- OSS callback signature verification FAILED objectKey=wrongbook/0/202601/0/photo.jpg
+11:10:45.109 [main] WARN com.longfeng.fileservice.controller.CallbackController -- OSS callback: no wb_file found for objectKey=wrongbook/0/202601/0/notfound.jpg
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.435 s -- in com.longfeng.fileservice.controller.CallbackControllerTest
+[INFO] Running com.longfeng.fileservice.controller.PresignControllerWebMvcTest
+11:10:45.193 [main] INFO org.hibernate.validator.internal.util.Version -- HV000001: Hibernate Validator 8.0.1.Final
+11:10:45.419 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+11:10:45.419 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+11:10:45.420 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+11:10:45.513 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+11:10:45.513 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+11:10:45.513 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+11:10:45.524 [main] WARN org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver -- Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.longfeng.common.dto.ApiResult<com.longfeng.fileservice.controller.PresignController$PresignRespBody>> com.longfeng.fileservice.controller.PresignController.presign(com.longfeng.fileservice.controller.PresignController$PresignReqBody,java.lang.String,long,long): [Field error in object 'presignReqBody' on field 'sha256': rejected value [not-hex]; codes [Pattern.presignReqBody.sha256,Pattern.sha256,Pattern.java.lang.String,Pattern]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [presignReqBody.sha256,sha256]; arguments []; default message [sha256],[Ljakarta.validation.constraints.Pattern$Flag;@2b4829aa,^[a-fA-F0-9]{64}$]; default message [msgkey:file.error.sha256_hex_required]] ]
+11:10:45.528 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+11:10:45.528 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+11:10:45.528 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+11:10:45.534 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=4eb20a96-8de1-40f6-abbe-0395900d5386 bucket=wrongbook-dev key=wrongbook/0/202605/0/329908205268271104_note.png provider=minio ttlMin=15 sha256=-
+11:10:45.559 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+11:10:45.559 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+11:10:45.559 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+11:10:45.564 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=5f329bc2-71a9-41e5-9682-f8974769a50d bucket=wrongbook-dev key=wrongbook/0/202605/0/329908205389905920_math.jpg provider=minio ttlMin=15 sha256=-
+11:10:45.571 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+11:10:45.571 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+11:10:45.571 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+11:10:45.572 [main] WARN org.springframework.web.servlet.PageNotFound -- No mapping for POST /api/files/presign
+11:10:45.572 [main] WARN org.springframework.web.servlet.PageNotFound -- No endpoint POST /api/files/presign.
+11:10:45.575 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+11:10:45.575 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+11:10:45.576 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 1 ms
+11:10:45.584 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+11:10:45.584 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+11:10:45.584 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+11:10:45.589 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=5c13adef-dae0-416a-994a-400ead646383 bucket=wrongbook-dev key=wrongbook/0/202605/0/329908205498957824_math.jpg provider=minio ttlMin=15 sha256=aaaaaaaa
+11:10:45.594 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+11:10:45.594 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+11:10:45.594 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.486 s -- in com.longfeng.fileservice.controller.PresignControllerWebMvcTest
+[INFO] Running com.longfeng.fileservice.support.ObjectKeyBuilderTest
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in com.longfeng.fileservice.support.ObjectKeyBuilderTest
+[INFO] Running com.longfeng.fileservice.job.FileTtlSweepJobTest
+11:10:45.613 [main] INFO com.longfeng.fileservice.job.FileTtlSweepJob -- FileTtlSweepJob.sweepArchive: archived 1 files
+11:10:45.617 [main] WARN com.longfeng.fileservice.job.FileTtlSweepJob -- FileTtlSweepJob.sweepDelete: OSS delete failed for key=wrongbook/0/202601/100/4_photo.jpg — marking deleted anyway
+com.longfeng.common.exception.BusinessException: msgkey:file.error.delete_failed
+	at com.longfeng.fileservice.job.FileTtlSweepJob.sweepDelete(FileTtlSweepJob.java:159)
+	at com.longfeng.fileservice.job.FileTtlSweepJobTest.sweepDelete_ossFailure_stillMarksDeletedInDb(FileTtlSweepJobTest.java:180)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:728)
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:218)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:214)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:139)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:69)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:151)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.apache.maven.surefire.junitplatform.LauncherAdapter.executeWithoutCancellationToken(LauncherAdapter.java:60)
+	at org.apache.maven.surefire.junitplatform.LauncherAdapter.execute(LauncherAdapter.java:52)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:203)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:168)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:136)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162)
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
+11:10:45.618 [main] INFO com.longfeng.fileservice.job.FileTtlSweepJob -- FileTtlSweepJob.sweepDelete: deleted 1 files
+11:10:45.619 [main] INFO com.longfeng.fileservice.job.FileTtlSweepJob -- FileTtlSweepJob.sweepDelete: deleted 1 files
+11:10:45.620 [main] INFO com.longfeng.fileservice.job.FileTtlSweepJob -- FileTtlSweepJob.sweepIaPromotion: promoted 0 files
+11:10:45.621 [main] INFO com.longfeng.fileservice.job.FileTtlSweepJob -- FileTtlSweepJob.sweepIaPromotion: promoted 1 files
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.011 s -- in com.longfeng.fileservice.job.FileTtlSweepJobTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 53, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.5.0:jar (default-jar) @ file-service ---
+[INFO] 
+[INFO] --- failsafe:3.5.4:integration-test (default) @ file-service ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.longfeng.fileservice.FileUploadIT
+11:10:46.117 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.longfeng.fileservice.FileUploadIT]: FileUploadIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+11:10:46.168 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.longfeng.fileservice.Application for test class com.longfeng.fileservice.FileUploadIT
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-05-13T11:10:46.328+04:00  INFO 24695 --- [file-service] [           main] com.longfeng.fileservice.FileUploadIT    : Starting FileUploadIT using Java 25.0.2 with PID 24695 (started by allenwang in /Users/allenwang/build/longfeng/backend/file-service)
+2026-05-13T11:10:46.329+04:00  INFO 24695 --- [file-service] [           main] com.longfeng.fileservice.FileUploadIT    : No active profile set, falling back to 1 default profile: "default"
+2026-05-13T11:10:46.612+04:00  INFO 24695 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-05-13T11:10:46.613+04:00  INFO 24695 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-13T11:10:46.660+04:00  INFO 24695 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 44 ms. Found 3 JPA repository interfaces.
+2026-05-13T11:10:46.831+04:00  INFO 24695 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-05-13T11:10:46.832+04:00  INFO 24695 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-05-13T11:10:46.842+04:00  INFO 24695 --- [file-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.fileservice.repo.FileAssetRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-13T11:10:46.843+04:00  INFO 24695 --- [file-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.fileservice.repo.WbFileLifecycleRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-13T11:10:46.843+04:00  INFO 24695 --- [file-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.fileservice.repo.WbFileRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-13T11:10:46.843+04:00  INFO 24695 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 7 ms. Found 0 Redis repository interfaces.
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by org.apache.tomcat.jni.Library in an unnamed module (file:/Users/allenwang/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/10.1.20/tomcat-embed-core-10.1.20.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+2026-05-13T11:10:47.183+04:00  INFO 24695 --- [file-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+2026-05-13T11:10:47.189+04:00  INFO 24695 --- [file-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-13T11:10:47.189+04:00  INFO 24695 --- [file-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-05-13T11:10:47.213+04:00  INFO 24695 --- [file-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-13T11:10:47.214+04:00  INFO 24695 --- [file-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 877 ms
+2026-05-13T11:10:47.351+04:00  INFO 24695 --- [file-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-13T11:10:47.376+04:00  INFO 24695 --- [file-service] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-05-13T11:10:47.388+04:00  INFO 24695 --- [file-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-13T11:10:47.465+04:00  INFO 24695 --- [file-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-13T11:10:47.476+04:00  INFO 24695 --- [file-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-13T11:10:47.556+04:00  INFO 24695 --- [file-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@41b2123e
+2026-05-13T11:10:47.556+04:00  INFO 24695 --- [file-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-13T11:10:47.952+04:00  INFO 24695 --- [file-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-13T11:10:47.954+04:00  INFO 24695 --- [file-service] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-13T11:10:48.074+04:00  WARN 24695 --- [file-service] [           main] c.l.f.provider.MinioAttachmentStorage    : MinioAttachmentStorage: ensureBucket failed bucket=wrongbook-dev — presign will fail at call time
+
+java.net.ConnectException: Failed to connect to localhost/[0:0:0:0:0:0:0:1]:9000
+	at okhttp3.internal.connection.RealConnection.connectSocket(RealConnection.kt:297) ~[okhttp-4.12.0.jar:na]
+	at okhttp3.internal.connection.RealConnection.connect(RealConnection.kt:207) ~[okhttp-4.12.0.jar:na]
+	at okhttp3.internal.connection.ExchangeFinder.findConnection(ExchangeFinder.kt:226) ~[okhttp-4.12.0.jar:na]
+	at okhttp3.internal.connection.ExchangeFinder.findHealthyConnection(ExchangeFinder.kt:106) ~[okhttp-4.12.0.jar:na]
+	at okhttp3.internal.connection.ExchangeFinder.find(ExchangeFinder.kt:74) ~[okhttp-4.12.0.jar:na]
+	at okhttp3.internal.connection.RealCall.initExchange$okhttp(RealCall.kt:255) ~[okhttp-4.12.0.jar:na]
+	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:32) ~[okhttp-4.12.0.jar:na]
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109) ~[okhttp-4.12.0.jar:na]
+	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95) ~[okhttp-4.12.0.jar:na]
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109) ~[okhttp-4.12.0.jar:na]
+	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83) ~[okhttp-4.12.0.jar:na]
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109) ~[okhttp-4.12.0.jar:na]
+	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76) ~[okhttp-4.12.0.jar:na]
+	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109) ~[okhttp-4.12.0.jar:na]
+	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201) ~[okhttp-4.12.0.jar:na]
+	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:517) ~[okhttp-4.12.0.jar:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1474) ~[na:na]
+	Suppressed: java.net.ConnectException: Failed to connect to localhost/127.0.0.1:9000
+		... 19 common frames omitted
+	Caused by: java.net.ConnectException: Connection refused
+		at java.base/sun.nio.ch.Net.pollConnect(Native Method)
+		at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:639)
+		at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:550)
+		at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:594)
+		at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:284)
+		at java.base/java.net.Socket.connect(Socket.java:659)
+		at okhttp3.internal.platform.Platform.connectSocket(Platform.kt:128)
+		at okhttp3.internal.connection.RealConnection.connectSocket(RealConnection.kt:295)
+		... 18 common frames omitted
+Caused by: java.net.ConnectException: Connection refused
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method) ~[na:na]
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:639) ~[na:na]
+	at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:550) ~[na:na]
+	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:594) ~[na:na]
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:284) ~[na:na]
+	at java.base/java.net.Socket.connect(Socket.java:659) ~[na:na]
+	at okhttp3.internal.platform.Platform.connectSocket(Platform.kt:128) ~[okhttp-4.12.0.jar:na]
+	at okhttp3.internal.connection.RealConnection.connectSocket(RealConnection.kt:295) ~[okhttp-4.12.0.jar:na]
+	... 18 common frames omitted
+
+2026-05-13T11:10:48.312+04:00  INFO 24695 --- [file-service] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by io.netty.util.internal.PlatformDependent0$4 (file:/Users/allenwang/.m2/repository/io/netty/netty-common/4.1.109.Final/netty-common-4.1.109.Final.jar)
+WARNING: Please consider reporting this to the maintainers of class io.netty.util.internal.PlatformDependent0$4
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+2026-05-13T11:10:49.036+04:00  INFO 24695 --- [file-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring TestDispatcherServlet ''
+2026-05-13T11:10:49.036+04:00  INFO 24695 --- [file-service] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-05-13T11:10:49.041+04:00  INFO 24695 --- [file-service] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoint(s) beneath base path '/actuator'
+2026-05-13T11:10:49.048+04:00  INFO 24695 --- [file-service] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 12 ms
+2026-05-13T11:10:49.086+04:00  INFO 24695 --- [file-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 53409 (http) with context path ''
+2026-05-13T11:10:49.101+04:00  INFO 24695 --- [file-service] [           main] com.longfeng.fileservice.FileUploadIT    : Started FileUploadIT in 2.888 seconds (process running for 3.27)
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/Users/allenwang/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.13/byte-buddy-agent-1.14.13.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+2026-05-13T11:10:50.264+04:00  INFO 24695 --- [file-service] [           main] c.l.fileservice.service.UploadService    : complete · fileKey=3e061d10-de7e-4fac-b8ec-6f09df666e99.jpg status=READY thumbSize=504 mediumSize=698
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.322 s -- in com.longfeng.fileservice.FileUploadIT
+[INFO] Running com.longfeng.fileservice.controller.PresignRealPgIT
+2026-05-13T11:10:50.387+04:00  INFO 24695 --- [file-service] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.longfeng.fileservice.controller.PresignRealPgIT]: PresignRealPgIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-05-13T11:10:50.392+04:00  INFO 24695 --- [file-service] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.longfeng.fileservice.Application for test class com.longfeng.fileservice.controller.PresignRealPgIT
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-05-13T11:10:50.404+04:00  INFO 24695 --- [file-service] [           main] c.l.f.controller.PresignRealPgIT         : Starting PresignRealPgIT using Java 25.0.2 with PID 24695 (started by allenwang in /Users/allenwang/build/longfeng/backend/file-service)
+2026-05-13T11:10:50.404+04:00  INFO 24695 --- [file-service] [           main] c.l.f.controller.PresignRealPgIT         : No active profile set, falling back to 1 default profile: "default"
+2026-05-13T11:10:50.469+04:00  INFO 24695 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-05-13T11:10:50.469+04:00  INFO 24695 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-13T11:10:50.471+04:00  INFO 24695 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 1 ms. Found 3 JPA repository interfaces.
+2026-05-13T11:10:50.498+04:00  INFO 24695 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-05-13T11:10:50.498+04:00  INFO 24695 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-05-13T11:10:50.500+04:00  INFO 24695 --- [file-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.fileservice.repo.FileAssetRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-13T11:10:50.500+04:00  INFO 24695 --- [file-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.fileservice.repo.WbFileLifecycleRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-13T11:10:50.500+04:00  INFO 24695 --- [file-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.fileservice.repo.WbFileRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-13T11:10:50.500+04:00  INFO 24695 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 2 ms. Found 0 Redis repository interfaces.
+2026-05-13T11:10:50.541+04:00  INFO 24695 --- [file-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+2026-05-13T11:10:50.542+04:00  INFO 24695 --- [file-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-13T11:10:50.542+04:00  INFO 24695 --- [file-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-05-13T11:10:50.551+04:00  INFO 24695 --- [file-service] [           main] o.a.c.c.C.[Tomcat-1].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2026-05-13T11:10:50.551+04:00  INFO 24695 --- [file-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 147 ms
+2026-05-13T11:10:50.587+04:00  INFO 24695 --- [file-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-13T11:10:50.587+04:00  INFO 24695 --- [file-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-13T11:10:50.589+04:00  INFO 24695 --- [file-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-13T11:10:50.589+04:00  INFO 24695 --- [file-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-05-13T11:10:50.598+04:00  INFO 24695 --- [file-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection org.postgresql.jdbc.PgConnection@76d74efe
+2026-05-13T11:10:50.598+04:00  INFO 24695 --- [file-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-05-13T11:10:50.634+04:00  INFO 24695 --- [file-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-13T11:10:50.634+04:00  INFO 24695 --- [file-service] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-13T11:10:50.841+04:00  INFO 24695 --- [file-service] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoint(s) beneath base path '/actuator'
+2026-05-13T11:10:50.852+04:00  INFO 24695 --- [file-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 53431 (http) with context path ''
+2026-05-13T11:10:50.855+04:00  INFO 24695 --- [file-service] [           main] c.l.f.controller.PresignRealPgIT         : Started PresignRealPgIT in 0.461 seconds (process running for 5.024)
+2026-05-13T11:10:50.897+04:00  INFO 24695 --- [file-service] [o-auto-2-exec-1] o.a.c.c.C.[Tomcat-1].[localhost].[/]     : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-13T11:10:50.898+04:00  INFO 24695 --- [file-service] [o-auto-2-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-05-13T11:10:50.898+04:00  INFO 24695 --- [file-service] [o-auto-2-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2026-05-13T11:10:51.054+04:00  INFO 24695 --- [file-service] [o-auto-2-exec-1] c.l.f.controller.PresignController       : presign MISS · idemKey=0bbb6302-7cfe-4e6f-aa0b-1da18bc51b78 bucket=wrongbook-dev key=wrongbook/0/202605/0/329908228374728704_wt7-real-pg.jpg provider=minio ttlMin=15 sha256=-
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.701 s -- in com.longfeng.fileservice.controller.PresignRealPgIT
+[INFO] Running com.longfeng.fileservice.MockMvcSmokeIT
+2026-05-13T11:10:51.089+04:00  INFO 24695 --- [file-service] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.longfeng.fileservice.MockMvcSmokeIT]: MockMvcSmokeIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-05-13T11:10:51.091+04:00  INFO 24695 --- [file-service] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.longfeng.fileservice.Application for test class com.longfeng.fileservice.MockMvcSmokeIT
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.064 s -- in com.longfeng.fileservice.MockMvcSmokeIT
+[INFO] Running com.longfeng.fileservice.BackendChainIT
+2026-05-13T11:10:51.155+04:00  INFO 24695 --- [file-service] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.longfeng.fileservice.BackendChainIT]: BackendChainIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-05-13T11:10:51.156+04:00  INFO 24695 --- [file-service] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.longfeng.fileservice.Application for test class com.longfeng.fileservice.BackendChainIT
+2026-05-13T11:10:51.655+04:00  INFO 24695 --- [file-service] [           main] c.l.fileservice.service.UploadService    : complete · fileKey=496bb506-21c3-4661-85b7-5ebcbc294cd2.jpg status=READY thumbSize=334 mediumSize=792
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.510 s -- in com.longfeng.fileservice.BackendChainIT
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- failsafe:3.5.4:verify (default) @ file-service ---
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  10.685 s
+[INFO] Finished at: 2026-05-13T11:10:52+04:00
+[INFO] ------------------------------------------------------------------------

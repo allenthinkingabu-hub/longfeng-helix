@@ -179,3 +179,53 @@ Tester REJECT 后回到 Coder。逐 bug 列, file_path + 根因 + 修复 commit 
   - Playwright: `audits/runs/SC01-T01/team-1/attempt-3/test-reports/e2e/coder/playwright/{index.html,results.xml,run.log}`
   - 截图: `screenshots/*.png` × 12
 - **0-bug 声明**: 不适用 — 留 3 Infra item 给 attempt-4 修
+
+---
+
+## Attempt-4 Bugs Fixed (retries=3 · 接力 attempt-3 · 前 Coder ~48 tool pause)
+
+接前 Coder attempt-4 (file-service spring-boot @8084 起来 + vite proxy 改 + MinIO bucket 建 + wb_file recreate + 6 failure+1 error 残 1 error 状态), 本接力 Coder 把残 1 ERROR 修掉。
+
+### Bug 11 · P0 · sc01t01-pg-15432 wrongbook DB `wrong_item` 表 schema 漂离 V1.0.010 权威定义 → BackendChainIT chain_03 INSERT 报 column does not exist (BUILD FAILURE 唯一阻塞主因)
+
+- **File (sandbox PG schema · 非 source code)**: `sc01t01-pg-15432` 容器 wrongbook DB · `public.wrong_item` 表
+- **Tester reject reference**: attempt-3 末态 `audits/runs/SC01-T01/team-1/attempt-1/test-reports/e2e/coder/backend-it/verify.log` 末尾 `ERROR: column "subject" of relation "wrong_item" does not exist` (at `BackendChainIT.java:136`)
+- **Severity**: P0 — attempt-3 mvn verify BUILD FAILURE 唯一阻塞 · C-3 DoR FAIL 主因; 前 Coder attempt-4 已修 6 个其它 IT (FileUploadIT/PresignRealPgIT/MockMvcSmokeIT 等), 本残 1 ERROR 是 attempt-3 旧 BUILD FAILURE 的最后一块
+- **Root cause**: sandbox sc01t01-pg-15432 起容器时 wrongbook DB 的 `wrong_item` 表是手工最简建出 (6 列: id/student_id/subject_code/file_id/status/created_at), 不是用 Flyway V1.0.010 migration 建 (V1.0.010 权威 schema 17 列, 含 subject/source_type/origin_image_key/mastery/version 等). `BackendChainIT.java:130-140` INSERT 用 V1.0.010 权威列名 (`subject`, `source_type`, `mastery`, `version`, `origin_image_key`), 与 sandbox 表 drift → INSERT 报 `column "subject" of relation "wrong_item" does not exist`
+- **Fix**: 在 sandbox sc01t01-pg-15432 wrongbook DB 上 `ALTER TABLE wrong_item ADD COLUMN IF NOT EXISTS` × 12 (与 V1.0.010 权威 schema 列名一致):
+  ```sql
+  ALTER TABLE wrong_item ADD COLUMN IF NOT EXISTS subject              VARCHAR(16);
+  ALTER TABLE wrong_item ADD COLUMN IF NOT EXISTS grade_code           VARCHAR(16);
+  ALTER TABLE wrong_item ADD COLUMN IF NOT EXISTS source_type          SMALLINT  DEFAULT 1;
+  ALTER TABLE wrong_item ADD COLUMN IF NOT EXISTS origin_image_key     VARCHAR(512);
+  ALTER TABLE wrong_item ADD COLUMN IF NOT EXISTS processed_image_key  VARCHAR(512);
+  ALTER TABLE wrong_item ADD COLUMN IF NOT EXISTS ocr_text             TEXT;
+  ALTER TABLE wrong_item ADD COLUMN IF NOT EXISTS stem_text            TEXT;
+  ALTER TABLE wrong_item ADD COLUMN IF NOT EXISTS mastery              SMALLINT  DEFAULT 0;
+  ALTER TABLE wrong_item ADD COLUMN IF NOT EXISTS version              INT       DEFAULT 0;
+  ALTER TABLE wrong_item ADD COLUMN IF NOT EXISTS mastered_at          TIMESTAMPTZ;
+  ALTER TABLE wrong_item ADD COLUMN IF NOT EXISTS updated_at           TIMESTAMPTZ  NOT NULL DEFAULT now();
+  ALTER TABLE wrong_item ADD COLUMN IF NOT EXISTS deleted_at           TIMESTAMPTZ;
+  ```
+  选 ALTER ADD COLUMN IF NOT EXISTS 而非 DROP TABLE: review_plan 表通过 FK `review_plan_wrong_item_id_fkey` 反向引用 wrong_item.id · DROP CASCADE 会清掉 review_plan 行, 影响其它 IT · 按 Rule 3 Surgical Changes 走 ALTER ADD 路径, **0 production code 改动, 0 别 IT 影响**, sandbox-only, reversible from flyway。
+- **Fix verification**: `cd backend && mvn -pl file-service verify -B` →
+  ```
+  [INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0  (Failsafe IT 含 BackendChainIT 0.510s PASS)
+  [INFO] BUILD SUCCESS · Total time: 10.685 s
+  ```
+- **C-3 DoR 解锁**: `grep -q "BUILD SUCCESS" verify.log` 命中 ✓ (attempt-3 主阻塞解除)
+- **Fix commit**: 见 git_commits 回填 (本 attempt-4 末尾)
+
+---
+
+## Attempt-4 Tally
+
+- **本轮 (attempt-4 接力) 新发现 + 修复**: 1 个 bug
+  - Bug 11 · P0 · sandbox PG wrong_item schema drift · ALTER ADD 12 列对齐 V1.0.010
+- **本轮 接力 前 Coder 已做的修复** (不重复落条, 见 coder.md attempt-4 §0 "前 Coder 已完成的真有效进展" 7 项): 起 file-service @8084 + vite proxy 改 8084 + MinIO bucket + file.wb_file recreate + PresignController 真跑 200 等
+- **真物理验证证据 (attempt-4 真值)**:
+  - `mvn -pl file-service verify -B` → 53 unit + 10 IT = **63/63 PASS** · **BUILD SUCCESS** · raw log `test-reports/e2e/coder/backend-it/verify.log` (覆盖 attempt-3 旧 BUILD FAILURE)
+  - failsafe XML 真 4 IT: BackendChainIT / FileUploadIT / MockMvcSmokeIT / PresignRealPgIT all `<testsuite errors="0" failures="0">`
+- **未完成项透明 surface** (CLAUDE.md Rule 12 Fail loud):
+  - Fix 2 (C-2 Playwright 5/5 PASS) 未做 · 留 attempt-5 · 详见 `coder.md` attempt-4 §3 "Fix 2 状态: 未完成 · 透明 surface" 6 条原因
+- **0-bug 声明**: 不适用 (≥1 bug 修复)

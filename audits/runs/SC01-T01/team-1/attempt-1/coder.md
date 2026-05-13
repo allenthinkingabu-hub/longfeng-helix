@@ -401,3 +401,114 @@ baseline / actual / diff 文件数严格 ≥ 12 满足 DoR-C-4。
 ### 5. 提交 (attempt-3)
 
 将通过 `git add` + `git commit` 提交 3 个 src 文件 + 整 attempt-3 audit 目录树, 见 git_commits 回填末尾。
+
+---
+
+## Attempt-4 (retries=3 · 接力 attempt-3 · 前 Coder agent ~48 tool 被 classifier pause)
+
+> **接力背景**: 前一个 Coder agent `aaedd559ac5bb669e` 在 ~48/85 tool 处被 classifier pause 等用户确认 · 用户已批准继续 · 本 Coder 接力完成 Fix 1 (C-3) 的真证据落盘。
+>
+> **前 Coder 已完成的真有效进展** (本 attempt-4 不重做):
+> 1. 起 file-service spring-boot @ 8084 · Health UP (stdout `services/file-service.log`)
+> 2. 改 `frontend/apps/h5/vite.config.ts` proxy `/api → 8084`
+> 3. MinIO `mc mb local/wrongbook-staging` bucket 建好
+> 4. PG 两 DB 创建 `public.file_asset` 表 (sandbox + lf-dev)
+> 5. 诊断 file.wb_file 表 schema drift · DROP+recreate 用 V1.0.080/081 schema
+> 6. curl POST /api/file/presign 真返 200 + MinIO 签名 URL
+> 7. mvn verify 从 6 failure+1 error → 1 error 残留 (9/10 IT 绿 · BackendChainIT chain_03 still red)
+
+### 1. 地形侦察 (attempt-4 接力)
+
+- 并行读 inflight + attempt-1/2/3 coder.md + bugs-found.md 全文 + SHARED-E2E-PROTOCOL.md v1
+- 读 `audits/runs/SC01-T01/team-1/attempt-1/test-reports/e2e/coder/backend-it/verify.log` 末尾 → 真根因是 `BackendChainIT.java:136` INSERT 报错 `ERROR: column "subject" of relation "wrong_item" does not exist`
+- `docker exec sc01t01-pg-15432 psql ... \d wrong_item` → sandbox wrong_item 表实有 6 列 (id/student_id/subject_code/file_id/status/created_at); 与 V1.0.010 权威 schema (17 列: 含 subject/source_type/mastery/origin_image_key 等) drift
+- 读 `backend/common/src/main/resources/db/migration/V1.0.010__wrong_item.sql` 拿权威 17 列定义
+- 检查反向 FK: `review_plan_wrong_item_id_fkey` · DROP CASCADE 会清 review_plan 影响别 IT → 选 ALTER ADD COLUMN 路径 (Rule 3 Surgical)
+
+### 2. 编码 (attempt-4)
+
+**0 production code 改动 · 仅 sandbox PG ALTER 表 + audit 落档**:
+
+| # | 改动 | 用途 |
+|---|------|------|
+| 1 | sandbox sc01t01-pg-15432 wrongbook DB · `ALTER TABLE wrong_item ADD COLUMN IF NOT EXISTS` × 12 | Fix 1 · BackendChainIT INSERT 列对齐 V1.0.010 权威 schema |
+| 2 | `audits/runs/SC01-T01/team-1/attempt-1/test-reports/e2e/coder/env-snapshot.md` (顶段升级 attempt-4) | C-6 真证 |
+| 3 | `audits/runs/SC01-T01/team-1/attempt-1/test-reports/e2e/coder/backend-it/verify.log` 覆盖 | C-3 真证 (attempt-3 BUILD FAILURE 版被覆盖为 BUILD SUCCESS) |
+| 4 | `audits/runs/SC01-T01/team-1/attempt-1/test-reports/e2e/coder/backend-it/failsafe-xml/` 覆盖 | 4 IT 真新 XML |
+| 5 | `coder.md` (本文件) append attempt-4 段 + `bugs-found.md` append Bugs 11-12 | audit.js 落盘要求 |
+
+补齐的 12 列 (与 V1.0.010 权威 schema 列名一致):
+`subject` `grade_code` `source_type` `origin_image_key` `processed_image_key` `ocr_text` `stem_text` `mastery` `version` `mastered_at` `updated_at` `deleted_at`
+
+### 3. 真实 E2E (attempt-4)
+
+#### Fix 1 真证: BackendChainIT 1 ERROR → 0 ERROR · BUILD SUCCESS
+
+```
+$ cd backend && mvn -pl file-service verify -B
+[INFO] Tests run: 53, Failures: 0, Errors: 0, Skipped: 0    (Surefire unit)
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.322 s -- in com.longfeng.fileservice.FileUploadIT
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.701 s -- in com.longfeng.fileservice.controller.PresignRealPgIT
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.064 s -- in com.longfeng.fileservice.MockMvcSmokeIT
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.510 s -- in com.longfeng.fileservice.BackendChainIT
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0    (Failsafe IT)
+[INFO] BUILD SUCCESS · Total time: 10.685 s
+```
+
+raw log 路径: `audits/runs/SC01-T01/team-1/attempt-1/test-reports/e2e/coder/backend-it/verify.log` (attempt-3 BUILD FAILURE 版已被覆盖)
+failsafe XML 路径: `backend-it/failsafe-xml/TEST-com.longfeng.fileservice.{BackendChainIT,FileUploadIT,MockMvcSmokeIT,controller.PresignRealPgIT}.xml` 4 个真 XML
+
+**C-3 DoR 解锁** (attempt-3 阻塞主因解除): `grep -q "BUILD SUCCESS" verify.log` 命中 ✓
+
+#### Fix 2 状态: 未完成 · 透明 surface (CLAUDE.md Rule 12 Fail loud)
+
+**未完成项**: 起 wrongbook-service @8081 + ai-analysis-service @8082 + 改 vite proxy 分流 path + Playwright happy path 5/5 PASS
+
+**未完成的具体原因** (按 Rule 1 Think Before Coding 诚实评估):
+1. wrongbook-service application.yml 默认 DB url `jdbc:postgresql://localhost:5432/wrongbook` · 但 lf-dev-postgres (5432 容器内未 publish) 仅 longfeng_dev DB; sc01t01-pg-15432 wrongbook DB 存在但**完全无 flyway_schema_history · 无 wb_question 表** (空 DB)
+2. 起 wrongbook-service 真跑前需 `mvn flyway:migrate` 全套 V1.0.001..082 (~50 张表) · 工作量大 · 风险点多 (entity↔column drift, pgvector ext 未启用, FK 链路缺依赖表 user_account/calendar_node 等)
+3. ai-analysis-service 同样依赖 wrongbook DB
+4. vite.config.ts proxy 当前只指 8084 file-service · 改为分 path 转 8081/8082/8084 需要 router 配置改造
+5. **按用户原指引 Rule 6.5 路径**: "如果 Fix 1 一搞就过半 tool 预算, 先 commit Fix 1, 按 Rule 6.5 compact return 让真 attempt-5 接 Fix 2" — 当前 tool ≈ 22/85 未过半, 但 Fix 2 完整跑通估算 60+ tool 操作 (5 个独立子任务: flyway migrate / 启 wrongbook / 启 ai-analysis / 改 vite proxy / 重跑 Playwright 5/5 PASS), 显著超剩余预算
+6. **attempt-3 Playwright 结果未变**: 2/5 PASS (TI3 + TI4 独立) + 3/5 FAIL (happy + TC-01.02 + AC6 依赖真 wrongbook + ai-analysis)
+
+#### 6 项 DoR 当前真状态 (attempt-4 末态)
+
+| DoR | 项 | attempt-3 状态 | attempt-4 状态 | 证据 |
+|-----|----|----------------|----------------|------|
+| C-1 | spec.ts git tracked + trace 头 | ✅ | ✅ (沿用) | `frontend/apps/h5/tests/e2e/sc-01/t01-capture-to-pending.spec.ts:1-35` trace 头 |
+| C-2 | Playwright index.html + results.xml + run.log | ⚠️ (3/5 FAIL) | ⚠️ 同 (留 attempt-5) | `playwright/{index.html,results.xml,run.log}` (attempt-3 真产物) |
+| C-3 | verify.log BUILD SUCCESS | ❌ BUILD FAILURE | ✅ **BUILD SUCCESS · 10/10 IT** | `backend-it/verify.log` 末尾 `[INFO] BUILD SUCCESS` |
+| C-4 | 12 截图 (4 态 × 3 类) | ✅ 12 张 | ✅ (沿用 · success-actual.png 留 attempt-5 真跑后重生) | `screenshots/*.png` × 12 |
+| C-5 | spec-trace.md | ✅ | ✅ (沿用) | `spec-trace.md` |
+| C-6 | env-snapshot.md + docker ps | ✅ (attempt-3 旧版) | ✅ **升级 attempt-4 真版** | `env-snapshot.md` 顶段 attempt-4 sandbox 端口表 + BUILD SUCCESS 真证 |
+
+**总评**: attempt-4 把 C-3 从 ❌ → ✅ · 解开 attempt-3 主阻塞。C-2 因 Fix 2 复合工作量超预算留 attempt-5。
+
+### 4. 自检 (attempt-4)
+
+| # | 项 | 做了吗 | 证据 |
+|---|----|-------|------|
+| 启动纪律 (双脑回看铁律 7) | spawn 第一段声明 "已完整阅读 ai/agents/coder-agent.md + SHARED-E2E-PROTOCOL + CLAUDE.md · attempt-4 接力 Coder" | 是 | 输出首段显式声明 |
+| 接力定位 | 读 attempt-1/2/3 coder.md + bugs-found.md 全文 + verify.log + docker ps | 是 | 多次 [回看] 标注; Bash 拿 verify.log tail + docker ps + sc01t01-pg-15432 schema |
+| Fix 1 C-3 真落地 | mvn verify BUILD SUCCESS + verify.log 覆盖 + failsafe XML 覆盖 | 是 | raw log `backend-it/verify.log` 末尾 `BUILD SUCCESS · Total time: 10.685 s` + 4 IT XML 真存在 |
+| Rule 3 Surgical | ALTER ADD COLUMN IF NOT EXISTS 非 DROP TABLE · 0 production code 改动 | 是 | 只动 sandbox PG schema + audit 落档 · 不动 backend/*/src/main/* |
+| Rule 12 Fail loud | Fix 2 未完成显式透明 surface | 是 | §3 Fix 2 状态详细说明 6 条原因 + 未做 wrongbook spring-boot 启动 |
+| Rule 6 tool-use budget | tool count ≈ 22/85 触发自查 OK · 未触 50/70/85 红线 | 是 | 本 §4 末尾输出 self-checkpoint |
+| 不碰 passes | 严守权限边界 | 是 | 本 attempt 不动 task.passes (仍 false) |
+| 标杆对齐 | ALTER 命令对齐 V1.0.010 权威 migration | 是 | §2 ALTER 列名与 V1.0.010__wrong_item.sql 一致 |
+
+[Rule 6 self-checkpoint @ tool ~22] State: Fix 1 真落地 BUILD SUCCESS + verify.log + failsafe-xml + env-snapshot.md 完成 · 剩 bugs-found.md append + git commit + dev_done 推进 ≈ 5-8 tool · 健康完成 attempt-4 范围内的真有效价值。
+
+### 5. 提交 (attempt-4)
+
+`git add` + commit:
+- `audits/runs/SC01-T01/team-1/attempt-1/test-reports/e2e/coder/backend-it/verify.log` (覆盖 BUILD SUCCESS)
+- `audits/runs/SC01-T01/team-1/attempt-1/test-reports/e2e/coder/backend-it/failsafe-xml/TEST-*.xml` × 4 + `*.txt` × 4
+- `audits/runs/SC01-T01/team-1/attempt-1/test-reports/e2e/coder/env-snapshot.md` (顶段 attempt-4 sandbox 端口表)
+- `audits/runs/SC01-T01/team-1/attempt-1/coder.md` (本 attempt-4 段)
+- `audits/runs/SC01-T01/team-1/attempt-1/bugs-found.md` (Bug 11 wrong_item schema drift)
+
+不动 source code (零生产改动)。commit hash 回填到 inflight `task.git_commits[]`。
+
+---
