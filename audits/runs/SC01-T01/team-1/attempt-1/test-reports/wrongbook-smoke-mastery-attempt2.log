@@ -1,0 +1,158 @@
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.longfeng:common:jar:1.0.0-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-surefire-plugin is missing. @ line 173, column 15
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.longfeng:gateway:jar:1.0.0-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.springframework.boot:spring-boot-maven-plugin is missing. @ line 113, column 15
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.longfeng:wrongbook-service:jar:1.0.0-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.springframework.boot:spring-boot-maven-plugin is missing. @ line 159, column 15
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.longfeng:ai-analysis-service:jar:1.0.0-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.springframework.boot:spring-boot-maven-plugin is missing. @ line 137, column 15
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.longfeng:review-plan-service:jar:1.0.0-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-surefire-plugin is missing. @ line 164, column 15
+[WARNING] 'build.plugins.plugin.version' for org.springframework.boot:spring-boot-maven-plugin is missing. @ line 160, column 15
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.longfeng:file-service:jar:1.0.0-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-surefire-plugin is missing. @ line 149, column 15
+[WARNING] 'build.plugins.plugin.version' for org.springframework.boot:spring-boot-maven-plugin is missing. @ line 145, column 15
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.longfeng:anonymous-service:jar:1.0.0-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-surefire-plugin is missing. @ line 121, column 15
+[WARNING] 'build.plugins.plugin.version' for org.springframework.boot:spring-boot-maven-plugin is missing. @ line 117, column 15
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.longfeng:auth-service:jar:1.0.0-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-surefire-plugin is missing. @ line 78, column 15
+[WARNING] 'build.plugins.plugin.version' for org.springframework.boot:spring-boot-maven-plugin is missing. @ line 74, column 15
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] 
+[INFO] -------------------< com.longfeng:wrongbook-service >-------------------
+[INFO] Building wrongbook-service 1.0.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ wrongbook-service ---
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ wrongbook-service ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ wrongbook-service ---
+[INFO] skip non existing resourceDirectory /Users/allenwang/build/longfeng/backend/wrongbook-service/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ wrongbook-service ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.5.4:test (default-test) @ wrongbook-service ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.longfeng.wrongbook.MockMvcSmokeIT
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+07:39:05.016 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.longfeng.wrongbook.MockMvcSmokeIT]: MockMvcSmokeIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+07:39:05.057 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.longfeng.wrongbook.Application for test class com.longfeng.wrongbook.MockMvcSmokeIT
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-05-13T07:39:05.219+04:00  INFO 91326 --- [wrongbook-service] [           main] com.longfeng.wrongbook.MockMvcSmokeIT    : Starting MockMvcSmokeIT using Java 25.0.2 with PID 91326 (started by allenwang in /Users/allenwang/build/longfeng/backend/wrongbook-service)
+2026-05-13T07:39:05.220+04:00  INFO 91326 --- [wrongbook-service] [           main] com.longfeng.wrongbook.MockMvcSmokeIT    : No active profile set, falling back to 1 default profile: "default"
+2026-05-13T07:39:05.626+04:00  INFO 91326 --- [wrongbook-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-05-13T07:39:05.626+04:00  INFO 91326 --- [wrongbook-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-13T07:39:05.681+04:00  INFO 91326 --- [wrongbook-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 52 ms. Found 7 JPA repository interfaces.
+2026-05-13T07:39:05.688+04:00  INFO 91326 --- [wrongbook-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-05-13T07:39:05.688+04:00  INFO 91326 --- [wrongbook-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-05-13T07:39:05.694+04:00  INFO 91326 --- [wrongbook-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.wrongbook.repo.AuditLogRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-13T07:39:05.694+04:00  INFO 91326 --- [wrongbook-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.wrongbook.repo.TagTaxonomyRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-13T07:39:05.695+04:00  INFO 91326 --- [wrongbook-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.wrongbook.repo.WrongAttemptRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-13T07:39:05.695+04:00  INFO 91326 --- [wrongbook-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.wrongbook.repo.WrongItemImageRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-13T07:39:05.695+04:00  INFO 91326 --- [wrongbook-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.wrongbook.repo.WrongItemOutboxRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-13T07:39:05.695+04:00  INFO 91326 --- [wrongbook-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.wrongbook.repo.WrongItemRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-13T07:39:05.695+04:00  INFO 91326 --- [wrongbook-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.wrongbook.repo.WrongItemTagRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-13T07:39:05.696+04:00  INFO 91326 --- [wrongbook-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 4 ms. Found 0 Redis repository interfaces.
+2026-05-13T07:39:05.795+04:00  INFO 91326 --- [wrongbook-service] [           main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=d3ac1059-9c2d-3cef-a28e-cf6dbb533871
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by org.apache.tomcat.jni.Library in an unnamed module (file:/Users/allenwang/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/10.1.20/tomcat-embed-core-10.1.20.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+2026-05-13T07:39:05.896+04:00  WARN 91326 --- [wrongbook-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.apache.rocketmq.spring.autoconfigure.ListenerContainerConfiguration' of type [org.apache.rocketmq.spring.autoconfigure.ListenerContainerConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-13T07:39:05.898+04:00  WARN 91326 --- [wrongbook-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.apache.rocketmq.spring.autoconfigure.MessageConverterConfiguration' of type [org.apache.rocketmq.spring.autoconfigure.MessageConverterConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-13T07:39:05.924+04:00  WARN 91326 --- [wrongbook-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'createRocketMQMessageConverter' of type [org.apache.rocketmq.spring.support.RocketMQMessageConverter] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-13T07:39:05.927+04:00  WARN 91326 --- [wrongbook-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration' of type [org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-13T07:39:05.929+04:00  WARN 91326 --- [wrongbook-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-13T07:39:05.930+04:00  WARN 91326 --- [wrongbook-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'loadBalancerClientsDefaultsMappingsProvider' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration$$Lambda/0x00000ff8015a1898] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-13T07:39:05.930+04:00  WARN 91326 --- [wrongbook-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'defaultsBindHandlerAdvisor' of type [org.springframework.cloud.commons.config.DefaultsBindHandlerAdvisor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-13T07:39:05.932+04:00  WARN 91326 --- [wrongbook-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration' of type [org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-13T07:39:05.933+04:00  WARN 91326 --- [wrongbook-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'stringOrNumberMigrationVersionConverter' of type [org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration$StringOrNumberToMigrationVersionConverter] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-13T07:39:05.936+04:00  WARN 91326 --- [wrongbook-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'rocketmq-org.apache.rocketmq.spring.autoconfigure.RocketMQProperties' of type [org.apache.rocketmq.spring.autoconfigure.RocketMQProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-13T07:39:05.938+04:00  WARN 91326 --- [wrongbook-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'rocketMQMessageListenerContainerRegistrar' of type [org.apache.rocketmq.spring.support.RocketMQMessageListenerContainerRegistrar] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-13T07:39:06.040+04:00  INFO 91326 --- [wrongbook-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+2026-05-13T07:39:06.044+04:00  INFO 91326 --- [wrongbook-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-13T07:39:06.044+04:00  INFO 91326 --- [wrongbook-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-05-13T07:39:06.064+04:00  INFO 91326 --- [wrongbook-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-13T07:39:06.065+04:00  INFO 91326 --- [wrongbook-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 840 ms
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+2026-05-13T07:39:06.244+04:00  INFO 91326 --- [wrongbook-service] [           main] o.f.c.internal.license.VersionPrinter    : Flyway Community Edition 9.22.3 by Redgate
+2026-05-13T07:39:06.244+04:00  INFO 91326 --- [wrongbook-service] [           main] o.f.c.internal.license.VersionPrinter    : See release notes here: https://rd.gt/416ObMi
+2026-05-13T07:39:06.244+04:00  INFO 91326 --- [wrongbook-service] [           main] o.f.c.internal.license.VersionPrinter    : 
+2026-05-13T07:39:06.270+04:00  INFO 91326 --- [wrongbook-service] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://127.0.0.1:15432/wrongbook (PostgreSQL 16.13)
+2026-05-13T07:39:06.274+04:00  WARN 91326 --- [wrongbook-service] [           main] o.f.c.internal.database.base.Database    : Flyway upgrade recommended: PostgreSQL 16.13 is newer than this version of Flyway and support has not been tested. The latest supported version of PostgreSQL is 15.
+2026-05-13T07:39:06.294+04:00  INFO 91326 --- [wrongbook-service] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 36 migrations (execution time 00:00.015s)
+2026-05-13T07:39:06.311+04:00  INFO 91326 --- [wrongbook-service] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 1.0.064
+2026-05-13T07:39:06.311+04:00  WARN 91326 --- [wrongbook-service] [           main] o.f.core.internal.command.DbMigrate      : outOfOrder mode is active. Migration of schema "public" may not be reproducible.
+2026-05-13T07:39:06.312+04:00  INFO 91326 --- [wrongbook-service] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-05-13T07:39:06.349+04:00  INFO 91326 --- [wrongbook-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-13T07:39:06.368+04:00  INFO 91326 --- [wrongbook-service] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-05-13T07:39:06.377+04:00  INFO 91326 --- [wrongbook-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-13T07:39:06.437+04:00  INFO 91326 --- [wrongbook-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-13T07:39:06.445+04:00  INFO 91326 --- [wrongbook-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-13T07:39:06.460+04:00  INFO 91326 --- [wrongbook-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@74691677
+2026-05-13T07:39:06.461+04:00  INFO 91326 --- [wrongbook-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-13T07:39:06.793+04:00  INFO 91326 --- [wrongbook-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-13T07:39:06.794+04:00  INFO 91326 --- [wrongbook-service] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-13T07:39:06.936+04:00  INFO 91326 --- [wrongbook-service] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by io.netty.util.internal.PlatformDependent0$4 (file:/Users/allenwang/.m2/repository/io/netty/netty-common/4.1.109.Final/netty-common-4.1.109.Final.jar)
+WARNING: Please consider reporting this to the maintainers of class io.netty.util.internal.PlatformDependent0$4
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+2026-05-13T07:39:08.298+04:00  INFO 91326 --- [wrongbook-service] [           main] o.a.r.s.a.RocketMQAutoConfiguration      : a producer (wrongbook-producer) init on namesrv 127.0.0.1:9876
+2026-05-13T07:39:08.484+04:00  INFO 91326 --- [wrongbook-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring TestDispatcherServlet ''
+2026-05-13T07:39:08.484+04:00  INFO 91326 --- [wrongbook-service] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-05-13T07:39:08.487+04:00  INFO 91326 --- [wrongbook-service] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoint(s) beneath base path '/actuator'
+2026-05-13T07:39:08.493+04:00  INFO 91326 --- [wrongbook-service] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 9 ms
+2026-05-13T07:39:08.591+04:00  INFO 91326 --- [wrongbook-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 51461 (http) with context path ''
+2026-05-13T07:39:08.606+04:00  INFO 91326 --- [wrongbook-service] [           main] com.longfeng.wrongbook.MockMvcSmokeIT    : Started MockMvcSmokeIT in 3.507 seconds (process running for 3.922)
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/Users/allenwang/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.13/byte-buddy-agent-1.14.13.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.094 s -- in com.longfeng.wrongbook.MockMvcSmokeIT
+[INFO] Running com.longfeng.wrongbook.service.WrongItemServiceMasteryTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.044 s -- in com.longfeng.wrongbook.service.WrongItemServiceMasteryTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  16.416 s
+[INFO] Finished at: 2026-05-13T07:39:20+04:00
+[INFO] ------------------------------------------------------------------------
