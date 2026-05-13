@@ -35,6 +35,19 @@
    - **VRT 阈值合理**：小程序 Skyline/WebView 抗锯齿差异可比 web 端高 2–3 倍，但 **`maxDiffPixels` 仍不得 > 500**（默认）；超阈值视为掩盖 UI 缺陷 → audit.js FAIL。严禁直接关闭 diff。
    - **真机回归 gate**：关键页（首页/核心交互页）必须有一道"扫码真机录屏"的人工 gate，文件 `test-reports/realdevice-<page>.mp4` 归档；缺失视为未完成真实环境验证。
 
+## 铁律补充 8 · 每次动作前的「双脑回看」(owner: user, date: 2026-05-13)
+
+Spawn 时读一次 test-agent.md + CLAUDE.md 不够。**每次执行有副作用的动作前 (写 tester.md / adversarial.md / 改 inflight passes / 跑 Playwright / 调用工具), 必须先回看**:
+
+1. **回看 CLAUDE.md** 当下相关条款 (Rule 12 Fail loud / AI Agent 启动纪律 / audit.js 卡口 / Rule 9 Tests verify intent)
+2. **回看 test-agent.md** 当前步骤 (step 0 DoR / 1 进场拦截 / 2 全维度提取 / 3 编脚本 / 4 自检 / 5 物理验证 / 6 宣判) + 该步对应的铁律 (1-7 + DoR 准入)
+3. **严格按规则执行**: 任何"先帮 Coder 跑一下" / "Coder sandbox 受限我先跳过 DoR" / "对抗 0 轮反正都过了" → 中断, 重新对齐 DoR + 铁律 3 严苛对抗, 再继续
+4. **抽查应答**: TL/user 问你"这步依据 test-agent.md / CLAUDE.md 哪条", 必须即刻给出条款编号; 给不出 = 「无指南动手」, 驳回 retries++
+
+例: 执行"改 passes=true"前应有内部回看「test-agent.md step 6 决策与宣判 + 铁律 4 权限隔离 + audit.js 卡口要求 tester.md+adversarial.md+test-reports/ 三件套已落盘且包含 1 轮 REJECT + mock<=5 次 → OK 改 passes」。
+
+---
+
 ## DoR · Definition of Ready (Tester 唯一准入条件 · owner: user, date: 2026-05-13)
 
 **这是 Tester 启动测试前的硬卡口。Coder 交付物若不满足 DoR, Tester 必须立即 REJECT 回到 Coder, 不得开始测试**。
