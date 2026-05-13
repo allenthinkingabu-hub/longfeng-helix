@@ -51,11 +51,11 @@ import org.springframework.test.context.TestPropertySource;
         // distinct snowflake worker so this IT cannot collide with the running file-service
         // process (which is on worker-id 6 — the application.yml default).
         "snowflake.worker-id=17",
-        "file-service.storage.endpoint=http://localhost:9000",
+        "file-service.storage.endpoint=http://localhost:19000",
         "file-service.storage.bucket=wrongbook-dev",
         "file-service.storage.access-key=minio",
         "file-service.storage.secret-key=minio12345",
-        "app.storage.minio.endpoint=http://localhost:9000",
+        "app.storage.minio.endpoint=http://localhost:19000",
         "app.storage.minio.bucket=wrongbook-dev",
         "app.storage.minio.access-key=minio",
         "app.storage.minio.secret-key=minio12345"

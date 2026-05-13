@@ -1,0 +1,16 @@
+-------------------------------------------------------------------------------
+Test set: com.longfeng.fileservice.controller.PresignRealPgIT
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.703 s <<< FAILURE! -- in com.longfeng.fileservice.controller.PresignRealPgIT
+com.longfeng.fileservice.controller.PresignRealPgIT.presign_realPg_writesBothRows -- Time elapsed: 0.209 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+
+expected: 200 OK
+ but was: 500 INTERNAL_SERVER_ERROR
+	at java.base/jdk.internal.reflect.DirectConstructorHandleAccessor.newInstance(DirectConstructorHandleAccessor.java:62)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at com.longfeng.fileservice.controller.PresignRealPgIT.presign_realPg_writesBothRows(PresignRealPgIT.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+

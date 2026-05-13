@@ -124,3 +124,58 @@ Tester REJECT 后回到 Coder。逐 bug 列, file_path + 根因 + 修复 commit 
   - `mvn -pl file-service verify -B` → 53 unit + 10 IT = **63/63 PASS** · BUILD SUCCESS · raw log `test-reports/file-service-verify-attempt2.log`
   - `mvn -pl wrongbook-service smoke+mastery` → 6/6 PASS · raw log `test-reports/wrongbook-smoke-mastery-attempt2.log`
 - **0-bug 声明**: 不适用 (≥1 bug 修复)。
+
+---
+
+## Attempt-3 Infrastructure (retries=2 · SHARED-E2E-PROTOCOL v1 DoR C-1..C-6)
+
+本 attempt-3 主体工作是搭 Playwright E2E + 起 sandbox + 落 6 项 DoR 三件套。**搭基础设施不是 bug fix**, 按 CLAUDE.md Rule 1 + Rule 12 Fail loud, 仍要落档 attempt-3 实跑发现的 sandbox drift 与未修复项。
+
+### Infra 1 · sandbox drift · attempt-2 假设的常驻容器已下线
+
+- **Files**: 无源码改动 — 仅环境层
+- **Severity**: P0 — 直接导致 attempt-3 mvn verify BUILD FAILURE (attempt-2 时是 63/63 PASS BUILD SUCCESS)
+- **Root cause**: attempt-2 跑通 mvn verify 时基于常驻容器:
+  - `s3-it-pg` (pgvector @ host 15432 · DB=wrongbook + longfeng_file)
+  - `s3-it-redis` (redis @ host 16379)
+  - `s6-it-minio` (minio @ host 9000/9001)
+  这些容器**在 attempt-3 起跑时已全部 stop**。当前在线的是 lf-dev-* 容器组 (lf-dev-postgres 5432/tcp 未 publish + lf-dev-minio 19000 publish + lf-dev-redis 6379/tcp 未 publish)。
+- **Workaround applied (attempt-3)**:
+  - `docker run -d --name sc01t01-pg-15432 -p 15432:5432 -e POSTGRES_DB=longfeng_file pgvector/pgvector:pg16` — 替代 s3-it-pg + 建 longfeng_file + wrongbook DB + schema (file.wb_file, file.wb_file_lifecycle, public.wrong_item, public.review_plan)
+  - `docker run -d --name sc01t01-redis-16379 -p 16379:6379 redis:7-alpine` — 替代 s3-it-redis
+  - `docker exec lf-dev-minio mc mb local/wrongbook-dev` + `local/s6-it-bucket` — 替代 s6-it-minio 的 bucket
+  - 改 IntegrationTestBase.java + PresignRealPgIT.java MinIO 端口 9000 → 19000
+- **Status**: 部分恢复 — mvn verify 从 10 ERRORS 降到 6 FAILURE + 1 ERROR (主要剩 PresignRealPgIT 500 + FileUploadIT 4 failures + BackendChainIT seed 错), 但**未恢复 BUILD SUCCESS**
+
+### Infra 2 · PresignRealPgIT 500 INTERNAL_SERVER_ERROR (attempt-3 实跑暴露)
+
+- **File**: `backend/file-service/src/test/java/com/longfeng/fileservice/controller/PresignRealPgIT.java:104` (failsafe txt 已留 backend-it/failsafe-xml/)
+- **Severity**: P0 — happy path 黄金路径起点 500，attempt-2 时 PASS 但 attempt-3 时 FAIL
+- **Root cause**: 未深入排查 · 可能原因:
+  - Snowflake worker-id 17 与 lf-dev-postgres 既存数据 ID 区间冲突
+  - MinIO bucket 创建后 PresignController 仍调失败 (signature / region / endpoint 内部 client 持有的旧 endpoint)
+  - 新建 sc01t01-pg-15432 容器内 file.wb_file 表与 entity hibernate 列 type drift (本 attempt-3 临时建表 status SMALLINT 实体声明 int — 与 attempt-2 同样问题再现)
+- **Fix**: **未修** · 留 attempt-4
+- **影响**: BackendChainIT (file_asset 表不存在 · seed:88 FAIL) + FileUploadIT 4 scenarios (presign 200 expectation FAIL → 500) + PresignRealPgIT 1 (本身)
+
+### Infra 3 · Playwright E2E 3 FAIL · 后端 spring-boot 服务未启 (attempt-3 实跑暴露)
+
+- **File**: 无源码 — 环境层
+- **Severity**: P0 — happy path / TC-01.02 / AC6 三个 e2e test 500 失败
+- **Root cause**: vite dev server 起在 5174 (proxy /api → http://localhost:8081)，但**没起 file-service / wrongbook-service / ai-analysis-service** 三个 spring-boot 进程。Playwright 真发请求到 vite → vite proxy 到 8081 → connection refused → 500 透传
+- **Fix**: **未修** · 留 attempt-4
+- **影响**: e2e 5/5 中 3 FAIL · 2 PASS (TI3 + TI4 不依赖真后端)
+- **Workaround 可选 (attempt-4)**: `cd backend && mvn -pl file-service spring-boot:run` + 类似启 wrongbook-service / ai-analysis-service 后台
+
+### Tally (attempt-3)
+
+- **本轮 (attempt-3) 工作**:
+  - 搭 Playwright sandbox (vite dev + chromium install + 12 截图齐) — infra, 不计 bug
+  - 跑 mvn verify (10 ERROR 降 6 FAILURE+1 ERROR) — 真 raw 已留
+  - 跑 Playwright E2E (5 test 2 PASS / 3 FAIL) — 真 raw + 截图 + video 已留
+  - 落齐 SHARED-E2E-PROTOCOL.md v1 DoR C-1..C-6 三件套 (env-snapshot + spec-trace + playwright + backend-it + screenshots + spec.ts trace 头)
+- **真验证证据** (与 attempt-2 区分):
+  - mvn verify: `audits/runs/SC01-T01/team-1/attempt-3/test-reports/e2e/coder/backend-it/verify.log`
+  - Playwright: `audits/runs/SC01-T01/team-1/attempt-3/test-reports/e2e/coder/playwright/{index.html,results.xml,run.log}`
+  - 截图: `screenshots/*.png` × 12
+- **0-bug 声明**: 不适用 — 留 3 Infra item 给 attempt-4 修

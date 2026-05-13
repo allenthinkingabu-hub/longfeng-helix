@@ -1,0 +1,28 @@
+Re-optimizing dependencies because lockfile has changed
+
+  VITE v5.4.21  ready in 201 ms
+
+  ➜  Local:   http://localhost:5174/
+  ➜  Network: http://172.16.8.41:5174/
+  ➜  Network: http://192.168.78.216:5174/
+10:34:57 AM [vite] http proxy error: /api/ai/analyze-by-url
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+10:34:57 AM [vite] http proxy error: /api/v1/files/presign
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+10:34:58 AM [vite] http proxy error: /api/v1/files/presign
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+10:34:59 AM [vite] http proxy error: /api/ai/analyze-by-url
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+10:35:01 AM [vite] http proxy error: /api/ai/analyze-by-url
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7)
+10:35:01 AM [vite] page reload playwright-report/index.html

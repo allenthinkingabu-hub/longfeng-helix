@@ -1,0 +1,98 @@
+
+Running 5 tests using 1 worker
+
+  ✘  1 [chromium] › tests/e2e/sc-01/t01-capture-to-pending.spec.ts:101:3 › SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › happy path · presign 200 + PUT MinIO + wb/questions PENDING + analyze 202 + 跳 /analyzing/ (1.0s)
+  ✘  2 [chromium] › tests/e2e/sc-01/t01-capture-to-pending.spec.ts:188:3 › SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › TC-01.02 · same X-Idempotency-Key 24h reuses file_key (no double wb_file row) (344ms)
+  ✘  3 [chromium] › tests/e2e/sc-01/t01-capture-to-pending.spec.ts:233:3 › SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › AC6 · missing X-Idempotency-Key Header returns 400 (not 500) (339ms)
+  ✓  4 [chromium] › tests/e2e/sc-01/t01-capture-to-pending.spec.ts:259:3 › SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › TI4 · shutter 10 rapid clicks during UPLOADING fire only 1 presign request (1.7s)
+  ✓  5 [chromium] › tests/e2e/sc-01/t01-capture-to-pending.spec.ts:295:3 › SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › TI3 · presign 5xx failure shows ERROR banner + does NOT navigate to /analyzing/ (826ms)
+
+
+  1) [chromium] › tests/e2e/sc-01/t01-capture-to-pending.spec.ts:101:3 › SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › happy path · presign 200 + PUT MinIO + wb/questions PENDING + analyze 202 + 跳 /analyzing/ 
+
+    Error: AC6: presign req carries X-Idempotency-Key Header
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBeTruthy[2m()[22m
+
+    Received: [31mundefined[39m
+
+      154 |       presignReqHeaders['x-idempotency-key'],
+      155 |       'AC6: presign req carries X-Idempotency-Key Header',
+    > 156 |     ).toBeTruthy();
+          |       ^
+      157 |
+      158 |     // STEP 7 · 断言 POST /api/wb/questions 200 + status:PENDING (AC3)
+      159 |     const wbResp = await wbQuestionsPromise;
+        at /Users/allenwang/build/longfeng/frontend/apps/h5/tests/e2e/sc-01/t01-capture-to-pending.spec.ts:156:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/sc-01-t01-capture-to-pendi-968fd-NG-analyze-202-跳-analyzing--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/sc-01-t01-capture-to-pendi-968fd-NG-analyze-202-跳-analyzing--chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/sc-01-t01-capture-to-pendi-968fd-NG-analyze-202-跳-analyzing--chromium/error-context.md
+
+  2) [chromium] › tests/e2e/sc-01/t01-capture-to-pending.spec.ts:188:3 › SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › TC-01.02 · same X-Idempotency-Key 24h reuses file_key (no double wb_file row) 
+
+    Error: AC1 first presign 200
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m500[39m
+
+      207 |       data: body,
+      208 |     });
+    > 209 |     expect(first.status(), 'AC1 first presign 200').toBe(200);
+          |                                                     ^
+      210 |     const firstJson = await first.json();
+      211 |     const firstKey = (firstJson?.data ?? firstJson).file_key;
+      212 |     expect(firstKey, 'first call returns file_key').toBeTruthy();
+        at /Users/allenwang/build/longfeng/frontend/apps/h5/tests/e2e/sc-01/t01-capture-to-pending.spec.ts:209:53
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/sc-01-t01-capture-to-pendi-70228--key-no-double-wb-file-row--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/sc-01-t01-capture-to-pendi-70228--key-no-double-wb-file-row--chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/sc-01-t01-capture-to-pendi-70228--key-no-double-wb-file-row--chromium/error-context.md
+
+  3) [chromium] › tests/e2e/sc-01/t01-capture-to-pending.spec.ts:233:3 › SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › AC6 · missing X-Idempotency-Key Header returns 400 (not 500) 
+
+    Error: TI2: missing header → 400 (not 500)
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m400[39m
+    Received: [31m500[39m
+
+      246 |       },
+      247 |     });
+    > 248 |     expect(resp.status(), 'TI2: missing header → 400 (not 500)').toBe(400);
+          |                                                                  ^
+      249 |     const body = await resp.json().catch(() => ({}));
+      250 |     // ErrCode.VALIDATION_FAILED 映射到 code=40001 + httpStatus=400
+      251 |     // 接受任何 < 500 的状态码 (核心是没 NPE 500)
+        at /Users/allenwang/build/longfeng/frontend/apps/h5/tests/e2e/sc-01/t01-capture-to-pending.spec.ts:248:66
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/sc-01-t01-capture-to-pendi-17789-Header-returns-400-not-500--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/sc-01-t01-capture-to-pendi-17789-Header-returns-400-not-500--chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/sc-01-t01-capture-to-pendi-17789-Header-returns-400-not-500--chromium/error-context.md
+
+  3 failed
+    [chromium] › tests/e2e/sc-01/t01-capture-to-pending.spec.ts:101:3 › SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › happy path · presign 200 + PUT MinIO + wb/questions PENDING + analyze 202 + 跳 /analyzing/ 
+    [chromium] › tests/e2e/sc-01/t01-capture-to-pending.spec.ts:188:3 › SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › TC-01.02 · same X-Idempotency-Key 24h reuses file_key (no double wb_file row) 
+    [chromium] › tests/e2e/sc-01/t01-capture-to-pending.spec.ts:233:3 › SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › AC6 · missing X-Idempotency-Key Header returns 400 (not 500) 
+  2 passed (7.9s)

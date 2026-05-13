@@ -26,7 +26,10 @@ public abstract class IntegrationTestBase {
   protected static final String DB_URL = "jdbc:postgresql://127.0.0.1:15432/wrongbook";
   protected static final String DB_USER = "postgres";
   protected static final String DB_PASSWORD = "wb";
-  protected static final String MINIO_ENDPOINT = "http://127.0.0.1:9000";
+  // SC-01-T01 attempt-3 (retries=2) · MinIO 端口从 9000 改 19000:
+  // 当前 lf-dev-minio 容器 publish 19000:9000 (旧 s6-it-minio @ 9000 已下线 ·
+  // 见 env-snapshot.md docker ps 真证 + attempt-3 IT base 端口对齐)。
+  protected static final String MINIO_ENDPOINT = "http://127.0.0.1:19000";
   protected static final String MINIO_USER = "minio";
   protected static final String MINIO_PASSWORD = "minio12345";
 
