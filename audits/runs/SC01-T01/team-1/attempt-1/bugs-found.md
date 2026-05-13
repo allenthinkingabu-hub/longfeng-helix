@@ -10,7 +10,7 @@
 - **Severity**: P0 — 阻断 SC-01 步骤 4 黄金路径，FE 端 5MB 抓拍场景任何重传都会 INSERT 第二条 wb_file 行 + 重新挤一个 OSS 对象。
 - **Root cause**: `presign(...)` 方法签名只接受 `(@RequestBody PresignReqBody req, @RequestHeader X-Tenant-Id, @RequestHeader X-User-Id)`，**完全无视 `X-Idempotency-Key`**。下游 wrongbook-service 已经做了三级幂等，但 file-service 自己没做，导致重试时 (presigned URL + objectKey + wb_file row) 都会重新生成一份。
 - **Fix**: 加 `@RequestHeader(value = "X-Idempotency-Key", required = false) String idempotencyKey`，方法首行：缺/blank 即抛 `BusinessException(ErrCode.VALIDATION_FAILED, "msgkey:file.error.idempotency_key_required")`，让 GlobalExceptionHandler 映射 HTTP 400 (AC6)。然后在 MIME / size 校验后用 Redis `peekIdempotencyCache(tenantId, studentId, key)` 短路：命中 → 复用旧 `objectKey` 重新签发上传 URL + image_url，**不**插 wb_file 第二行（AC2）。
-- **Fix commit**: `<pending>` (将在 `git commit` 后回填到本文件)。
+- **Fix commit**: `de7c220` (`feat(SC01-T01): file-service presign 接 X-Idempotency-Key + sha256_hash + Redis 24h cache`).
 
 ## Bug 2 · file-service Redis 依赖缺失 → idempotency cache 无法编译
 
@@ -18,7 +18,7 @@
 - **Severity**: P0（前置依赖）— Bug 1 的修复需要 `StringRedisTemplate`，但 file-service 此前从未用 Redis（pom 未声明 `spring-boot-starter-data-redis`）。
 - **Root cause**: 6 个其它后端模块（wrongbook-service / review-plan-service / auth-service 等）都已声明该依赖，唯独 file-service 没有 —— 因为 callback 流没用 Redis，A03 audit 也只指出 idempotency 缺失，没指出依赖差距。
 - **Fix**: 在 `<dependencies>` 区段（`spring-boot-starter-validation` 之后、`org.postgresql` 之前）加 `spring-boot-starter-data-redis`，并写明 SC-01-T01 AC2 + field-injected `required=false` 让单测 + dev 无 Redis 时仍能启动。
-- **Fix commit**: `<pending>` (合并在同一 commit)。
+- **Fix commit**: `de7c220` (合并在同一 commit `feat(SC01-T01): ...`).
 
 ## Bug 3 · file-service `wb_file.sha256_hash` 列存在但永远写 null → SC-01-A03 audit §2 P0-2
 
@@ -26,7 +26,7 @@
 - **Severity**: P0 — V1.0.080 schema 早已开 `sha256_hash CHAR(64)`，`WbFile.sha256Hash` setter 也早就在，但 `PresignReqBody` 不接受 `sha256_hash` / `sha256` 字段，controller 也从不调 setter，列永远 null → content-addressable dedup 完全失效。
 - **Root cause**: 历史代码 + A03 audit 列出但未修。
 - **Fix**: 1) `PresignReqBody` record 加 `@JsonProperty("sha256_hash") @JsonAlias({"sha256"}) @Pattern(regexp = "^[a-fA-F0-9]{64}$") String sha256`（optional · @Pattern 校验失败 → 400）；2) `presign(...)` 主路径在写 `WbFile` 前 `if (req.sha256() != null && !req.sha256().isBlank()) file.setSha256Hash(req.sha256())`（**仅 supplied 时写**，FE 未必每次算 hash · 兼容老 GuestCapture 链路不破）；3) 同时给 `content_type` 加 `@JsonAlias({"mime"})`、给 `bytes` 加 `@JsonAlias({"size"})` 对齐 spec wire（Capture FE 新链路用 `size`/`mime` · 老 GuestCapture 用 `bytes`/`content_type` · 两个都接）。
-- **Fix commit**: `<pending>` (合并在同一 commit)。
+- **Fix commit**: `de7c220` (合并在同一 commit `feat(SC01-T01): ...`).
 
 ---
 
