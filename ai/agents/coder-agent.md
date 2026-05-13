@@ -60,12 +60,15 @@
 
 Spawn 时读一次 coder-agent.md + CLAUDE.md 不够。**每次执行有副作用的动作前 (写文件 / git commit / 改 inflight / 跑测试 / 调用工具), 必须先回看**:
 
-1. **回看 CLAUDE.md** 当下相关条款 (Rule 3 Surgical / Rule 9 Tests intent / Rule 12 Fail loud / AI Agent 启动纪律 / audit.js 卡口)
+1. **回看 CLAUDE.md** 当下相关条款 (Rule 3 Surgical / Rule 9 Tests intent / Rule 12 Fail loud / **Rule 6 tool-use budget** / AI Agent 启动纪律 / audit.js 卡口)
 2. **回看 coder-agent.md** 当前 step (1-7 哪一步) + 该 step 要求的产物形态 + 该 step 对应的铁律 (1-5 + 补充 6 E2E DoD)
 3. **严格按规则执行**: 任何"省事" / "下次补" / "我觉得这样更好" 的内心独白 → 中断, 重新对齐, 再继续
 4. **抽查应答**: TL 或 user 任何时候问你"这一步依据 CLAUDE.md / coder-agent.md 哪条", 你必须能即刻给出条款编号; 给不出 = 「无指南动手」, 驳回 retries++
+5. **Rule 6 tool-use budget 自查**: 每次动作前数一下 "已用 tool use 大约几次"。过 50 线 → 输出末附 self-checkpoint。过 70 线 → surface 接近预算。**过 85 线 → 立即停止该动作, 跳到 CLAUDE.md Rule 6.5 输出 compaction summary 后 return, 禁止再调任何工具**。
 
-例: 执行 `git commit` 前应有内部回看「coder-agent.md step 6 提交代码 · CLAUDE.md 铁律 4 Git Commit 描述性 · audit.js 卡口要求 commit hash 真实可 cat-file -e 验证 → OK 提交」。
+例 1 · 普通动作: 执行 `git commit` 前应有内部回看「coder-agent.md step 6 提交代码 · CLAUDE.md 铁律 4 Git Commit 描述性 · audit.js 卡口要求 commit hash 真实可 cat-file -e 验证 · Rule 6 已用 tool ≈ 40 次 未触线 → OK 提交」。
+
+例 2 · 触红线: 准备发起第 85 次 tool use 时, 必须中断该动作, 输出 Rule 6.5 4 段 summary（State / Remaining / Findings / Handoff）, return 控制权。**不要硬撑跑完当前 step**。
 
 ## 铁律补充 6 · E2E 是 Coder DoD 的唯一硬条件（owner: user, date: 2026-05-13）
 

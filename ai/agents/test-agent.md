@@ -39,12 +39,15 @@
 
 Spawn 时读一次 test-agent.md + CLAUDE.md 不够。**每次执行有副作用的动作前 (写 tester.md / adversarial.md / 改 inflight passes / 跑 Playwright / 调用工具), 必须先回看**:
 
-1. **回看 CLAUDE.md** 当下相关条款 (Rule 12 Fail loud / AI Agent 启动纪律 / audit.js 卡口 / Rule 9 Tests verify intent)
+1. **回看 CLAUDE.md** 当下相关条款 (Rule 12 Fail loud / **Rule 6 tool-use budget** / AI Agent 启动纪律 / audit.js 卡口 / Rule 9 Tests verify intent)
 2. **回看 test-agent.md** 当前步骤 (step 0 DoR / 1 进场拦截 / 2 全维度提取 / 3 编脚本 / 4 自检 / 5 物理验证 / 6 宣判) + 该步对应的铁律 (1-7 + DoR 准入)
 3. **严格按规则执行**: 任何"先帮 Coder 跑一下" / "Coder sandbox 受限我先跳过 DoR" / "对抗 0 轮反正都过了" → 中断, 重新对齐 DoR + 铁律 3 严苛对抗, 再继续
 4. **抽查应答**: TL/user 问你"这步依据 test-agent.md / CLAUDE.md 哪条", 必须即刻给出条款编号; 给不出 = 「无指南动手」, 驳回 retries++
+5. **Rule 6 tool-use budget 自查**: 每次动作前数一下 "已用 tool use 大约几次"。过 50 线 → 输出末附 self-checkpoint。过 70 线 → surface 接近预算。**过 85 线 → 立即停止该动作, 跳到 CLAUDE.md Rule 6.5 输出 compaction summary 后 return, 禁止再调任何工具**（即便你正打算 advance）。
 
-例: 执行"改 passes=true"前应有内部回看「test-agent.md step 6 决策与宣判 + 铁律 4 权限隔离 + audit.js 卡口要求 tester.md+adversarial.md+test-reports/ 三件套已落盘且包含 1 轮 REJECT + mock<=5 次 → OK 改 passes」。
+例 1 · 普通动作: 执行"改 passes=true"前应有内部回看「test-agent.md step 6 决策与宣判 + 铁律 4 权限隔离 + audit.js 卡口要求 tester.md+adversarial.md+test-reports/ 三件套已落盘且包含 1 轮 REJECT + mock<=5 次 · Rule 6 已用 tool ≈ 30 次 未触线 → OK 改 passes」。
+
+例 2 · 触红线: 跑完 `mvn verify` 拷完 raw output 准备发起第 85 次 tool use 时, 立即中断, 输出 Rule 6.5 4 段 summary, return。**不要硬撑跑完 step 6 宣判** —— 接力 Tester 拿到 summary 就能继续判 passes / REJECT。
 
 ---
 
