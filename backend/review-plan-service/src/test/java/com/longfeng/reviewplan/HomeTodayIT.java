@@ -32,7 +32,7 @@ import org.springframework.test.web.servlet.MvcResult;
  *   <li>② 有 review_plan 数据：3 条 due today，1 条 completed_at=today → total=3 / done=1
  * </ol>
  *
- * <p>测试基础设施沿用 {@link IntegrationTestBase}（共享 pgvector @ 15432 · Flyway off · MQ off）。
+ * <p>测试基础设施沿用 {@link IntegrationTestBase}（sandbox PG @ 15436 · Flyway on · MQ off）。
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
