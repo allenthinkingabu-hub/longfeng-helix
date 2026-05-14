@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>P02 拍题页 (rehearsal mock)</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; margin: 0; padding: 24px; background: #f5f5f5; }
+    .root { max-width: 480px; margin: 0 auto; }
+    h1 { font-size: 18px; margin: 0 0 16px; }
+    .chips { display: flex; gap: 8px; margin-bottom: 24px; }
+    .chip { padding: 8px 16px; border: 1px solid #ccc; border-radius: 20px; background: #fff; cursor: pointer; }
+    .chip[aria-pressed="true"] { background: #007aff; color: white; border-color: #007aff; }
+    .shutter { width: 80px; height: 80px; border-radius: 50%; background: white; border: 4px solid #333; margin: 24px auto; display: block; cursor: pointer; }
+    .shutter:active { transform: scale(0.95); }
+    .status { text-align: center; padding: 12px; border-radius: 8px; font-weight: bold; margin-top: 16px; }
+    .status.idle      { background: #e8e8e8; color: #555; }
+    .status.uploading { background: #fff3cd; color: #856404; }
+    .status.success   { background: #d4edda; color: #155724; }
+    .status.error     { background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+  <div class="root" data-testid="p02-root">
+    <h1>P02 · 拍题录入</h1>
+    <div class="chips">
+      <button class="chip" data-testid="subject-chip-math" aria-pressed="false">数学</button>
+      <button class="chip" data-testid="subject-chip-eng" aria-pressed="false">英语</button>
+    </div>
+    <button class="shutter" data-testid="capture-shutter" aria-label="capture"></button>
+    <div class="status idle" data-testid="capture-status">IDLE · 选学科 + 按快门</div>
+  </div>
+
+  <script>
+    const chips = document.querySelectorAll('.chip');
+    const shutter = document.querySelector('[data-testid="capture-shutter"]');
+    const status = document.querySelector('[data-testid="capture-status"]');
+
+    chips.forEach(c => c.addEventListener('click', () => {
+      chips.forEach(x => x.setAttribute('aria-pressed', 'false'));
+      c.setAttribute('aria-pressed', 'true');
+    }));
+
+    const setState = (s, text) => {
+      status.className = 'status ' + s;
+      status.textContent = text;
+      status.setAttribute('data-state', s);
+    };
+
+    shutter.addEventListener('click', () => {
+      if (status.getAttribute('data-state') === 'uploading') return;  // debounce
+      const forceError = new URLSearchParams(location.search).get('forceError') === '1';
+      const subject = document.querySelector('.chip[aria-pressed="true"]');
+      if (!subject) { setState('error', 'ERROR · 先选学科'); return; }
+      setState('uploading', 'UPLOADING · 上传中…');
+      setTimeout(() => {
+        if (forceError) setState('error', 'ERROR · 上传失败');
+        else setState('success', 'SUCCESS · 已生成题目 #q-001');
+      }, 300);
+    });
+  </script>
+</body>
+</html>
