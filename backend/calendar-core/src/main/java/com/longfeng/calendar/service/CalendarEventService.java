@@ -86,8 +86,7 @@ public class CalendarEventService {
         ZonedDateTime startOfDay = date.atStartOfDay(tz);
         Instant from = startOfDay.toInstant();
         Instant to = startOfDay.plusDays(1).toInstant();
-        List<CalendarEvent> events = repo.findByOwnerIdAndStartAtBetweenOrderByStartAtAsc(
-                ownerId, from, to);
+        List<CalendarEvent> events = repo.findByOwnerAndDateRange(ownerId, from, to);
         return events.stream().map(this::toResp).toList();
     }
 

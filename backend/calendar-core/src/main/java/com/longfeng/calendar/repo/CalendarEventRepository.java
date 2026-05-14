@@ -18,8 +18,14 @@ public interface CalendarEventRepository extends JpaRepository<CalendarEvent, Lo
 
     boolean existsByIdempotencyKey(String idempotencyKey);
 
-    List<CalendarEvent> findByOwnerIdAndStartAtBetweenOrderByStartAtAsc(
-            Long ownerId, Instant from, Instant to);
+    @Query("SELECT e FROM CalendarEvent e "
+            + "WHERE e.ownerId = :ownerId "
+            + "AND e.startAt >= :from AND e.startAt < :to "
+            + "ORDER BY e.startAt ASC")
+    List<CalendarEvent> findByOwnerAndDateRange(
+            @Param("ownerId") Long ownerId,
+            @Param("from") Instant from,
+            @Param("to") Instant to);
 
     List<CalendarEvent> findByRelationTypeAndRelationIdStartingWith(
             String relationType, String relationIdPrefix);
