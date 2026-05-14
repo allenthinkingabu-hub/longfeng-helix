@@ -1,0 +1,38 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: review-plan-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/wrongbook
+    username: postgres
+    password: wb
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  cache:
+    type: caffeine
+
+review:
+  feign:
+    enabled: true
+  mq:
+    enabled: true
+  job:
+    enabled: false
+  algorithm:
+    ease-init: 2.500
+    ease-min: 1.300
+
+app:
+  snowflake:
+    worker-id: 5
+
+calendar:
+  core-service:
+    url: http://localhost:18080

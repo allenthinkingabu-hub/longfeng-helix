@@ -9,6 +9,7 @@
     <groupId>com.longfeng</groupId>
     <artifactId>wrongbook-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../wrongbook-parent/pom.xml</relativePath>
   </parent>
 
   <artifactId>review-plan-service</artifactId>
