@@ -5,7 +5,7 @@
     "team_id": "team-4",
     "title": "PHASE-A · calendar-core 业务实施 (Coder 自反推 entity/repo/service/controller + Flyway + IT)",
     "attempt": 3,
-    "phase": "tester",
+    "phase": "done",
     "dev_done": true,
     "passes": true,
     "retries": 0,
@@ -14,7 +14,9 @@
       "cdf3335",
       "758d495",
       "a1e3f8c",
-      "33c4b4b"
+      "33c4b4b",
+      "b94e6d3",
+      "cc42427"
     ]
   },
   "work_log_dir": "audits/runs/PHASE-A-CALENDAR/team-4/attempt-3",
@@ -159,7 +161,7 @@
       "task.passes"
     ]
   },
-  "written_at": "2026-05-14T19:42:11.616Z",
+  "written_at": "2026-05-14T19:42:48.738Z",
   "written_by": "TL agent (PHASE-A spawn prep)",
   "deliverables_definition_of_done": [
     "1. 完整实现 src/main/java 业务层 (entity/repo/service/controller/config)",
