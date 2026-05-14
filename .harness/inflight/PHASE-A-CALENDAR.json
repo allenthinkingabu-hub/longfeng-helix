@@ -4,12 +4,12 @@
     "id": "PHASE-A-CALENDAR",
     "team_id": "team-4",
     "title": "PHASE-A · calendar-core 业务实施 (Coder 自反推 entity/repo/service/controller + Flyway + IT)",
-    "attempt": 2,
-    "phase": "tester",
+    "attempt": 3,
+    "phase": "coder",
     "dev_done": true,
-    "passes": true,
+    "passes": false,
     "retries": 0,
-    "audit_retries": 1,
+    "audit_retries": 2,
     "git_commits": [
       "cdf3335",
       "758d495",
@@ -17,82 +17,51 @@
       "33c4b4b"
     ]
   },
-  "work_log_dir": "audits/runs/PHASE-A-CALENDAR/team-4/attempt-2",
+  "work_log_dir": "audits/runs/PHASE-A-CALENDAR/team-4/attempt-3",
   "log_requirements": {
     "must_write": [
-      "tester.md",
-      "adversarial.md",
-      "test-reports/"
+      "coder.md",
+      "bugs-found.md"
     ]
   },
   "audit_gate": "audit.js v1 五维度严卡 (用户红线: 真实测试不可妥协) || dim 1 coder_compliance: coder.md 4 关键词 (地形侦察/编码/自检/提交) + bugs-found.md 真 bug list || dim 2 tester_compliance: tester.md + adversarial.md ≥1 REJECT + ≥1 fix · test-reports/ 含真 surefire+failsafe XML · mock 总闭集 ≤ 5 || dim 3 bug_reality: git_commits[] 全部 git cat-file -e 验真 || dim 4 test_validity: tester.md 声称 testcase 数 == surefire/failsafe XML <testcase> 实际数 (差 1 即 FAIL) || dim 5 spec_alignment: dor_c1_to_c6_required=false → skip · 但 IT 必须用 Testcontainers 接 sandbox 容器 (PG:15435, Redis:16382, MinIO:9006) · 禁止 H2/embedded/Mock 后端 || mvn verify BUILD SUCCESS 是 dev_done=true 唯一硬条件 · failsafe 必须真跑 IT (非 mvn test)",
   "previous_audit_verdict": {
     "task_id": "PHASE-A-CALENDAR",
-    "attempt": 1,
+    "attempt": 2,
     "team_id": "team-4",
-    "audited_at": "2026-05-14T19:40:03.818Z",
+    "audited_at": "2026-05-14T19:41:33.673Z",
     "audited_by": "audit.js v1 (deterministic · 5 dims)",
     "pass": false,
     "checks": [
       {
         "dimension": "coder_compliance",
         "name": "coder_md_exists",
-        "pass": true,
-        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/team-4-calendar/audits/runs/PHASE-A-CALENDAR/team-4/attempt-1/coder.md"
-      },
-      {
-        "dimension": "coder_compliance",
-        "name": "coder_md_keyword_地形侦察",
-        "pass": true,
-        "evidence": "1×"
-      },
-      {
-        "dimension": "coder_compliance",
-        "name": "coder_md_keyword_编码",
-        "pass": true,
-        "evidence": "1×"
-      },
-      {
-        "dimension": "coder_compliance",
-        "name": "coder_md_keyword_自检",
-        "pass": true,
-        "evidence": "1×"
-      },
-      {
-        "dimension": "coder_compliance",
-        "name": "coder_md_keyword_提交",
-        "pass": true,
-        "evidence": "1×"
+        "pass": false,
+        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/team-4-calendar/audits/runs/PHASE-A-CALENDAR/team-4/attempt-2/coder.md"
       },
       {
         "dimension": "coder_compliance",
         "name": "bugs_found_md_exists",
-        "pass": true,
-        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/team-4-calendar/audits/runs/PHASE-A-CALENDAR/team-4/attempt-1/bugs-found.md"
-      },
-      {
-        "dimension": "coder_compliance",
-        "name": "bugs_found_md_has_declaration",
-        "pass": true,
-        "evidence": "bug list found"
+        "pass": false,
+        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/team-4-calendar/audits/runs/PHASE-A-CALENDAR/team-4/attempt-2/bugs-found.md"
       },
       {
         "dimension": "tester_compliance",
         "name": "tester_md_exists",
         "pass": true,
-        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/team-4-calendar/audits/runs/PHASE-A-CALENDAR/team-4/attempt-1/tester.md"
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/team-4-calendar/audits/runs/PHASE-A-CALENDAR/team-4/attempt-2/tester.md"
       },
       {
         "dimension": "tester_compliance",
         "name": "adversarial_md_exists",
         "pass": true,
-        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/team-4-calendar/audits/runs/PHASE-A-CALENDAR/team-4/attempt-1/adversarial.md"
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/team-4-calendar/audits/runs/PHASE-A-CALENDAR/team-4/attempt-2/adversarial.md"
       },
       {
         "dimension": "tester_compliance",
         "name": "test_reports_nonempty",
         "pass": true,
-        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/team-4-calendar/audits/runs/PHASE-A-CALENDAR/team-4/attempt-1/test-reports"
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/team-4-calendar/audits/runs/PHASE-A-CALENDAR/team-4/attempt-2/test-reports"
       },
       {
         "dimension": "tester_compliance",
@@ -110,7 +79,7 @@
         "dimension": "tester_compliance",
         "name": "mock_total_le_5",
         "pass": true,
-        "evidence": "mock=2/5 (MockMvc)"
+        "evidence": "mock=1/5 (MockMvc)"
       },
       {
         "dimension": "tester_compliance",
@@ -127,8 +96,8 @@
       {
         "dimension": "test_validity",
         "name": "tester_md_testcase_count_matches_xml",
-        "pass": false,
-        "evidence": "claimed=6 ≠ xml<testcase>=12"
+        "pass": true,
+        "evidence": "claimed=6 == xml<testcase>=6"
       },
       {
         "dimension": "test_validity",
@@ -143,8 +112,8 @@
         "evidence": "inflight.physical_verification.dor_c1_to_c6_required=false — DoR skipped (P0 audit task)"
       }
     ],
-    "redo_target": "tester",
-    "redo_reason": "[test_validity.tester_md_testcase_count_matches_xml] claimed=6 ≠ xml<testcase>=12"
+    "redo_target": "coder",
+    "redo_reason": "[coder_compliance.coder_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/team-4-calendar/audits/runs/PHASE-A-CALENDAR/team-4/attempt-2/coder.md · [coder_compliance.bugs_found_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/team-4-calendar/audits/runs/PHASE-A-CALENDAR/team-4/attempt-2/bugs-found.md"
   },
   "context": {
     "scenario": "PHASE-A 5-team 并行 · calendar-core 业务实施",
@@ -182,14 +151,15 @@
     "branch_name": "claude/phase-a-calendar"
   },
   "physical_verification": {
-    "dor_c1_to_c6_required": false
+    "dor_c1_to_c6_required": true
   },
   "permissions": {
     "writable_fields": [
-      "task.passes"
+      "task.dev_done",
+      "task.git_commits"
     ]
   },
-  "written_at": "2026-05-14T19:40:03.822Z",
+  "written_at": "2026-05-14T19:41:33.678Z",
   "written_by": "TL agent (PHASE-A spawn prep)",
   "deliverables_definition_of_done": [
     "1. 完整实现 src/main/java 业务层 (entity/repo/service/controller/config)",
