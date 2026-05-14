@@ -68,37 +68,45 @@ public class FileUploadService {
         return new PresignResp(pr.uploadUrl(), fileKey, props.getPresignTtlSeconds(), props.getBucket());
     }
 
+    private static final Set<String> IMAGE_MIME =
+            Set.of("image/jpeg", "image/png", "image/heic", "image/webp");
+
     public CompleteResp complete(String fileKey) {
         FileAsset asset = repo.findByObjectKey(fileKey)
                 .orElseThrow(() -> new BusinessException(ErrCode.RESOURCE_NOT_FOUND, "FILE_NOT_FOUND"));
 
-        byte[] original;
-        try (InputStream is = storage.readObject(props.getBucket(), fileKey)) {
-            original = is.readAllBytes();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to read object from storage", e);
+        boolean isImage = IMAGE_MIME.contains(asset.getMimeType());
+
+        if (isImage) {
+            byte[] original;
+            try (InputStream is = storage.readObject(props.getBucket(), fileKey)) {
+                original = is.readAllBytes();
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to read object from storage", e);
+            }
+
+            try {
+                byte[] thumbBytes = toWebp(original, 150, 150);
+                String thumbKey = "variants/thumb/" + fileKey;
+                storage.putObject(props.getBucket(), thumbKey,
+                        new ByteArrayInputStream(thumbBytes), thumbBytes.length, "image/webp");
+
+                byte[] mediumBytes = toWebp(original, 800, 600);
+                String mediumKey = "variants/medium/" + fileKey;
+                storage.putObject(props.getBucket(), mediumKey,
+                        new ByteArrayInputStream(mediumBytes), mediumBytes.length, "image/webp");
+
+                asset.setVariantThumbKey(thumbKey);
+                asset.setVariantMediumKey(mediumKey);
+            } catch (Exception e) {
+                throw new RuntimeException("Image processing failed", e);
+            }
         }
 
-        try {
-            byte[] thumbBytes = toWebp(original, 150, 150);
-            String thumbKey = "variants/thumb/" + fileKey;
-            storage.putObject(props.getBucket(), thumbKey,
-                    new ByteArrayInputStream(thumbBytes), thumbBytes.length, "image/webp");
+        asset.setStatus(FileAsset.STATUS_READY);
+        repo.save(asset);
 
-            byte[] mediumBytes = toWebp(original, 800, 600);
-            String mediumKey = "variants/medium/" + fileKey;
-            storage.putObject(props.getBucket(), mediumKey,
-                    new ByteArrayInputStream(mediumBytes), mediumBytes.length, "image/webp");
-
-            asset.setStatus(FileAsset.STATUS_READY);
-            asset.setVariantThumbKey(thumbKey);
-            asset.setVariantMediumKey(mediumKey);
-            repo.save(asset);
-
-            return new CompleteResp(asset.getStatus(), thumbKey, mediumKey);
-        } catch (Exception e) {
-            throw new RuntimeException("Image processing failed", e);
-        }
+        return new CompleteResp(asset.getStatus(), asset.getVariantThumbKey(), asset.getVariantMediumKey());
     }
 
     public DownloadResp download(String fileKey) {
