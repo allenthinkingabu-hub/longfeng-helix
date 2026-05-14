@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI 错题本 · 效果图作品集</title>
+<style>
+  :root{
+    --bg:#0B0D12; --panel:#12151C; --card:#171B24; --border:rgba(255,255,255,.08);
+    --text:#F2F4F8; --sec:#9CA3AF; --ter:#6B7280;
+    --blue:#4C9BFF; --red:#FF5A4F; --orange:#FFB454; --green:#3CD47B;
+    --indigo:#8B87F6; --yellow:#F6D84C; --purple:#C581F7; --teal:#4FD1D9; --pink:#FF5E94;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+  html,body{background:radial-gradient(1200px 700px at 20% -10%,#1a2238 0,#0B0D12 60%) #0B0D12;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","PingFang SC",sans-serif;min-height:100vh;}
+  .wrap{max-width:1280px;margin:0 auto;padding:56px 28px 96px;}
+
+  /* Header */
+  .hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:40px;}
+  .brand{display:flex;align-items:center;gap:14px;}
+  .logo{width:52px;height:52px;border-radius:14px;background:conic-gradient(from 210deg,#FF5A4F,#FFB454,#F6D84C,#3CD47B,#4C9BFF,#8B87F6,#C581F7,#FF5A4F);box-shadow:inset 0 0 0 2px rgba(255,255,255,.14),0 8px 24px rgba(0,0,0,.4);position:relative;display:flex;align-items:center;justify-content:center;}
+  .logo::after{content:"AI";font-family:-apple-system,sans-serif;font-weight:800;font-size:18px;color:#fff;letter-spacing:1px;text-shadow:0 1px 2px rgba(0,0,0,.5);}
+  .brand .ttl{font-size:22px;font-weight:800;letter-spacing:.2px;}
+  .brand .sub{font-size:12px;color:var(--sec);margin-top:2px;letter-spacing:.3px;font-weight:500;}
+  .meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .pill{padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--border);font-size:11px;font-weight:600;color:var(--sec);letter-spacing:.3px;display:flex;align-items:center;gap:6px;}
+  .pill .dot{width:6px;height:6px;border-radius:50%;}
+  .pill.blue .dot{background:var(--blue);}
+  .pill.red .dot{background:var(--red);}
+  .pill.green .dot{background:var(--green);}
+  .pill.orange .dot{background:var(--orange);}
+  .pill.indigo .dot{background:var(--indigo);}
+
+  /* Hero */
+  .hero{background:linear-gradient(135deg,rgba(76,155,255,.10),rgba(139,135,246,.06));border:1px solid var(--border);border-radius:22px;padding:24px 28px;display:grid;grid-template-columns:1.35fr 1fr;gap:28px;align-items:center;margin-bottom:40px;position:relative;overflow:hidden;}
+  .hero::before{content:"";position:absolute;right:-60px;top:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(76,155,255,.22),transparent 70%);}
+  .hero h1{font-size:34px;font-weight:800;letter-spacing:-.4px;line-height:1.15;margin-bottom:10px;}
+  .hero p{font-size:14px;color:var(--sec);line-height:1.65;letter-spacing:.1px;max-width:560px;}
+  .flow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px;}
+  .step{padding:7px 11px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);font-size:12px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;position:relative;z-index:1;}
+  .step .sn{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#4C9BFF,#8B87F6);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+  .arr{color:var(--ter);font-size:13px;}
+
+  .kpi{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px;}
+  .kpi .lbl{font-size:10px;font-weight:700;color:var(--ter);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px;}
+  .kpi .val{font-size:26px;font-weight:800;letter-spacing:-.3px;}
+  .kpi .sub{font-size:11px;color:var(--sec);font-weight:500;margin-top:2px;}
+  .kpi.blue .val{background:linear-gradient(90deg,#4C9BFF,#8B87F6);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .kpi.red .val{background:linear-gradient(90deg,#FF5A4F,#FFB454);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .kpi.green .val{background:linear-gradient(90deg,#3CD47B,#4FD1D9);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .kpi.purple .val{background:linear-gradient(90deg,#C581F7,#8B87F6);-webkit-background-clip:text;background-clip:text;color:transparent;}
+
+  /* IA bar */
+  .ia{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:44px;padding:14px 18px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:14px;}
+  .ia .lb{font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--ter);padding:6px 10px;border-radius:8px;}
+  .ia .tab{font-size:12px;font-weight:700;padding:6px 12px;border-radius:8px;background:rgba(76,155,255,.1);color:var(--blue);display:flex;align-items:center;gap:6px;}
+  .ia .tab.cta{background:linear-gradient(135deg,#4C9BFF,#8B87F6);color:#fff;}
+  .ia .tab .k{font-size:9px;font-weight:800;opacity:.7}
+  .ia .arrow{color:var(--ter);align-self:center;font-size:14px;}
+  .ia .note{font-size:11px;color:var(--sec);margin-left:auto;align-self:center;}
+
+  /* Section title */
+  .sec-title{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;margin-top:6px;}
+  .sec-title h2{font-size:18px;font-weight:800;letter-spacing:.2px;}
+  .sec-title .cnt{font-size:11px;color:var(--ter);font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+  .sec-title .bar{flex:1;height:1px;background:var(--border);}
+
+  /* Gallery grid */
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:44px;}
+  @media (max-width:1100px){.grid{grid-template-columns:repeat(3,1fr);} .hero{grid-template-columns:1fr;}}
+  @media (max-width:720px){.grid{grid-template-columns:repeat(2,1fr);}}
+
+  .tile{position:relative;background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;display:flex;flex-direction:column;text-decoration:none;color:inherit;}
+  .tile:hover{transform:translateY(-4px);box-shadow:0 18px 44px rgba(0,0,0,.55);border-color:rgba(255,255,255,.16);}
+  .tile .preview{position:relative;aspect-ratio:393/852;background:#000;overflow:hidden;border-bottom:1px solid var(--border);}
+  .tile .preview iframe{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.36);transform-origin:center center;width:393px;height:852px;border:0;pointer-events:none;background:#000;}
+  .tile .num{position:absolute;top:12px;left:12px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.2);z-index:2;}
+  .tile .badge{position:absolute;top:12px;right:12px;padding:4px 10px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.4px;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.22);color:#fff;z-index:2;}
+  .tile .badge.red{background:rgba(255,59,48,.72);}
+  .tile .badge.blue{background:rgba(0,122,255,.72);}
+  .tile .badge.indigo{background:rgba(88,86,214,.72);}
+  .tile .badge.green{background:rgba(52,199,89,.78);}
+  .tile .badge.orange{background:rgba(255,149,0,.78);}
+  .tile .badge.yellow{background:rgba(255,204,0,.82);color:#1C1C1E;}
+  .tile .badge.pink{background:rgba(255,45,85,.78);}
+  .tile .badge.teal{background:rgba(48,176,199,.82);}
+  .tile .badge.gray{background:rgba(142,142,147,.78);}
+
+  .tile .meta{padding:16px 18px 18px;}
+  .tile .tg{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+  .tile .tg .sqr{width:8px;height:8px;border-radius:3px;}
+  .tile .tg .step{font-size:10px;font-weight:700;color:var(--ter);letter-spacing:.6px;text-transform:uppercase;}
+  .tile h3{font-size:15px;font-weight:800;letter-spacing:.1px;margin-bottom:4px;}
+  .tile p{font-size:12px;color:var(--sec);line-height:1.5;}
+  .tile .rel{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+  .tile .rel .r{font-size:10px;font-weight:600;color:var(--sec);padding:3px 7px;border-radius:6px;background:rgba(255,255,255,.05);border:1px solid var(--border);letter-spacing:.1px;}
+
+  /* footnote */
+  .foot{margin-top:60px;padding-top:28px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px;}
+  .foot .r{font-size:11px;color:var(--ter);letter-spacing:.4px;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;}
+  .lg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--sec);font-weight:600;letter-spacing:.2px;}
+  .lg .sq{width:10px;height:10px;border-radius:3px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- Header -->
+  <div class="hdr">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <div class="ttl">AI 错题本 · 效果图作品集</div>
+        <div class="sub">Apple HIG · iOS 17 · iPhone 15 Pro 393×852 · 方案 β · 今日聚合派 · 匿名 Shell v1.2</div>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="pill blue"><span class="dot"></span>19 个页面</div>
+      <div class="pill green"><span class="dot"></span>Spring AI 多模态</div>
+      <div class="pill red"><span class="dot"></span>艾宾浩斯 T0–T6</div>
+      <div class="pill indigo"><span class="dot"></span>日历×复习 视图融合</div>
+      <div class="pill orange"><span class="dot"></span>匿名态 5 场景 · 增长漏斗</div>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div>
+      <h1>拍一张错题，<br/>AI 给你一条可执行的记忆曲线。</h1>
+      <p>学生拍照上传错题 → Spring AI 多模态模型提取题干、错因与知识点 → 系统按艾宾浩斯 6 节点生成复习排期 → 所有节点写入通用日历系统，并以"今日聚合首页"为核心心智入口统一派发。14 张效果图还原了从登录到复习再到长期追踪的完整闭环。</p>
+      <div class="flow">
+        <div class="step"><span class="sn">1</span>拍题</div><span class="arr">→</span>
+        <div class="step"><span class="sn">2</span>AI 流式分析</div><span class="arr">→</span>
+        <div class="step"><span class="sn">3</span>结构化结果</div><span class="arr">→</span>
+        <div class="step"><span class="sn">4</span>错题本归档</div><span class="arr">→</span>
+        <div class="step"><span class="sn">5</span>记忆曲线排期</div><span class="arr">→</span>
+        <div class="step"><span class="sn">6</span>首页 · 日历 · 通知多通道派发</div>
+      </div>
+    </div>
+    <div style="position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="kpi blue"><div class="lbl">T0 — T6</div><div class="val">7 节点</div><div class="sub">初记 + 6 次复习 · 1h/1d/3d/7d/15d/30d</div></div>
+      <div class="kpi green"><div class="lbl">Pre-notice</div><div class="val">30 min</div><div class="sub">节点到期前提前提醒 · 24h 滑动窗口</div></div>
+      <div class="kpi red"><div class="lbl">AI 分析</div><div class="val">~4.2s</div><div class="sub">qwen-vl-max / gpt-4o-mini 双模热备</div></div>
+      <div class="kpi purple"><div class="lbl">日历复用</div><div class="val">100%</div><div class="sub">relation_type = STUDY · 零侵入</div></div>
+    </div>
+  </div>
+
+  <!-- IA bar -->
+  <div class="ia">
+    <span class="lb">Tab Bar</span>
+    <span class="tab"><span class="k">01</span>首页</span>
+    <span class="arrow">/</span>
+    <span class="tab"><span class="k">05</span>错题本</span>
+    <span class="arrow">/</span>
+    <span class="tab cta"><span class="k">02</span>拍题 +</span>
+    <span class="arrow">/</span>
+    <span class="tab"><span class="k">07</span>复习</span>
+    <span class="arrow">/</span>
+    <span class="tab"><span class="k">13</span>我的</span>
+    <span class="note">日历 → 首页"本周"条带 / "完整日历"二级入口（10_calendar_month）</span>
+  </div>
+
+  <!-- Anonymous Shell bar -->
+  <div class="ia" style="background:linear-gradient(135deg,rgba(255,180,84,.08),rgba(197,129,247,.06));border-color:rgba(255,180,84,.2);">
+    <span class="lb" style="color:#FFB454;">匿名 Shell</span>
+    <span class="tab" style="background:rgba(255,180,84,.14);color:#FFB454;"><span class="k">14</span>P-LANDING</span>
+    <span class="arrow">/</span>
+    <span class="tab" style="background:rgba(255,180,84,.14);color:#FFB454;"><span class="k">15</span>P-GUEST-CAPTURE</span>
+    <span class="arrow">/</span>
+    <span class="tab" style="background:rgba(79,209,217,.14);color:#4FD1D9;"><span class="k">16</span>P-SHARED</span>
+    <span class="arrow">/</span>
+    <span class="tab" style="background:rgba(197,129,247,.14);color:#C581F7;"><span class="k">17</span>P-WELCOMEBACK</span>
+    <span class="arrow">/</span>
+    <span class="tab" style="background:rgba(88,86,214,.14);color:#8B87F6;"><span class="k">18</span>P-OBSERVER</span>
+    <span class="note">无 Tab Bar · 登录态决策树 bootstrap/resolve-entry.ts 分流</span>
+  </div>
+
+  <!-- Section: entry & aggregate -->
+  <div class="sec-title">
+    <h2>一 · 引导 &amp; 聚合首页</h2>
+    <span class="cnt">Onboarding → Today Hub</span>
+    <span class="bar"></span>
+  </div>
+
+  <div class="grid">
+    <a class="tile" href="00_login.html" target="_blank">
+      <div class="preview">
+        <span class="num">00</span>
+        <span class="badge gray">引导</span>
+        <iframe src="00_login.html" loading="lazy"></iframe>
+      </div>
+      <div class="meta">
+        <div class="tg"><span class="sqr" style="background:var(--ter);"></span><span class="step">入口 · 登录</span></div>
+        <h3>欢迎 · 一键微信登录</h3>
+        <p>品牌引导 + 年级学科初始化 · 首次进入前完成账户与学习档案搭建。</p>
+        <div class="rel"><span class="r">OAuth 2.0</span><span class="r">学生画像</span></div>
+      </div>
+    </a>
+
+    <a class="tile" href="01_home.html" target="_blank" style="grid-column:span 3;">
+      <div class="preview" style="aspect-ratio:auto;height:520px;">
+        <iframe src="01_home.html" loading="lazy" style="transform:translate(-50%,-50%) scale(.58);"></iframe>
+        <span class="num">01</span>
+        <span class="badge blue">方案 β · 核心</span>
+      </div>
+      <div class="meta">
+        <div class="tg"><span class="sqr" style="background:var(--blue);"></span><span class="step">Today Hub · 首页</span></div>
+        <h3>今日聚合派首页 · 一屏俯瞰学习生活</h3>
+        <p>极光 hero 问候 + 连续打卡带 → 今日复习大卡（8 题 · 进度 38% · 学科分布）→ 一周走势 sparkline → 七日排期条带（T 级色点 / 红字考试 / 蓝字家庭）→ 消息聚合 3 条 → 薄弱知识点提醒 → 快捷入口 2×2。日历"月视图"作为二级深链（右下 Quick Entry）。</p>
+        <div class="rel"><span class="r">替代原 日历 Tab</span><span class="r">周条带 · T 级融合</span><span class="r">消息·弱项·快捷 三栏</span><span class="r">Deep link 默认落位</span></div>
+      </div>
+    </a>
+  </div>
+
+  <!-- Section: wrongbook loop -->
+  <div class="sec-title">
+    <h2>二 · 错题闭环</h2>
+    <span class="cnt">Capture → Analyze → Result → Book → Detail</span>
+    <span class="bar"></span>
+  </div>
+
+  <div class="grid">
+    <a class="tile" href="02_capture.html" target="_blank">
+      <div class="preview">
+        <span class="num">02</span>
+        <span class="badge yellow">拍题</span>
+        <iframe src="02_capture.html" loading="lazy"></iframe>
+      </div>
+      <div class="meta">
+        <div class="tg"><span class="sqr" style="background:var(--yellow);"></span><span class="step">Step 1 · 采集</span></div>
+        <h3>拍题相机 · 边缘自动识别</h3>
+        <p>学科快速切换 · 边缘检测 · 多输入源（相机 / 相册 / 文档）。</p>
+        <div class="rel"><span class="r">Vision · 边缘修正</span><span class="r">断点续传</span></div>
+      </div>
+    </a>
+
+    <a class="tile" href="03_analyzing.html" target="_blank">
+      <div class="preview">
+        <span class="num">03</span>
+        <span class="badge indigo">流式</span>
+        <iframe src="03_analyzing.html" loading="lazy"></iframe>
+      </div>
+      <div class="meta">
+        <div class="tg"><span class="sqr" style="background:var(--indigo);"></span><span class="step">Step 2 · AI 分析</span></div>
+        <h3>实时分析 · 多模态 SSE</h3>
+        <p>4 步流水线可视化、结构化 JSON 边打边出、模型 / 耗时透明。</p>
+        <div class="rel"><span class="r">Spring AI · SSE</span><span class="r">qwen-vl-max</span></div>
+      </div>
+    </a>
+
+    <a class="tile" href="04_result.html" target="_blank">
+      <div class="preview">
+        <span class="num">04</span>
+        <span class="badge green">结构化</span>
+        <iframe src="04_result.html" loading="lazy"></iframe>
+      </div>
+      <div class="meta">
+        <div class="tg"><span class="sqr" style="background:var(--green);"></span><span class="step">Step 3 · 结果</span></div>
+        <h3>AI 分析报告 · 对比讲解</h3>
+        <p>错解 vs 正解对照、错因高亮、分步解题、知识点 + 难度 + 首次排期。</p>
+        <div class="rel"><span class="r">T0 立即落位</span><span class="r">KP 自动挂载</span></div>
+      </div>
+    </a>
+
+    <a class="tile" href="05_wrongbook_list.html" target="_blank">
+      <div class="preview">
+        <span class="num">05</span>
+        <span class="badge red">错题本</span>
+        <iframe src="05_wrongbook_list.html" loading="lazy"></iframe>
+      </div>
+      <div class="meta">
+        <div class="tg"><span class="sqr" style="background:var(--red);"></span><span class="step">Step 4 · 归档</span></div>
+        <h3>错题列表 · 语义搜索</h3>
+        <p>学科分组 · 掌握度筛选 · 缩略图 + 6 段阶段进度条 + 到期提醒。</p>
+        <div class="rel"><span class="r">pgvector</span><span class="r">多维筛选</span></div>
+      </div>
+    </a>
+  </div>
+
+  <div class="grid" style="grid-template-columns:repeat(4,1fr);">
+    <a class="tile" href="06_wrongbook_detail.html" target="_blank" style="grid-column:span 2;">
+      <div class="preview" style="aspect-ratio:auto;height:520px;">
+        <iframe src="06_wrongbook_detail.html" loading="lazy" style="transform:translate(-50%,-50%) scale(.58);"></iframe>
+        <span class="num">06</span>
+        <span class="badge indigo">深度</span>
+      </div>
+      <div class="meta">
+        <div class="tg"><span class="sqr" style="background:var(--indigo);"></span><span class="step">Step 5 · 错题详情</span></div>
+        <h3>单题档案 · 记忆曲线 + 能力雷达</h3>
+        <p>原图 / AI 分析 / 复习历史 / 变式题四分区 · 6 节点时间线 · 知识点能力雷达图。</p>
+        <div class="rel"><span class="r">Timeline T0→T6</span><span class="r">KP 雷达</span><span class="r">变式题推荐</span></div>
+      </div>
+    </a>
+
+    <a class="tile" href="07_review_today.html" target="_blank">
+      <div class="preview">
+        <span class="num">07</span>
+        <span class="badge blue">今日</span>
+        <iframe src="07_review_today.html" loading="lazy"></iframe>
+      </div>
+      <div class="meta">
+        <div class="tg"><span class="sqr" style="background:var(--blue);"></span><span class="step">Step 6 · 今日队列</span></div>
+        <h3>今日待复习 · 分时段智能排序</h3>
+        <p>倒计时分级 · 上午 / 下午分组 · 批量开始。返回键回到首页。</p>
+        <div class="rel"><span class="r">Tab · 复习</span><span class="r">队列语义</span></div>
+      </div>
+    </a>
+
+    <a class="tile" href="08_review_exec.html" target="_blank">
+      <div class="preview">
+        <span class="num">08</span>
+        <span class="badge orange">执行</span>
+        <iframe src="08_review_exec.html" loading="lazy"></iframe>
+      </div>
+      <div class="meta">
+        <div class="tg"><span class="sqr" style="background:var(--orange);"></span><span class="step">Step 7 · 复习执行</span></div>
+        <h3>题干 · 作答 · 自评三按钮</h3>
+        <p>手写作答区 · 揭示标准解答 · 未掌握 / 部分 / 已掌握 驱动节点推进。</p>
+        <div class="rel"><span class="r">状态机</span><span class="r">T 级推进</span></div>
+      </div>
+    </a>
+  </div>
+
+  <!-- Section: review finish + calendar + events + system -->
+  <div class="sec-title">
+    <h2>三 · 复习反馈 · 日历 · 事件 · 系统</h2>
+    <span class="cnt">Finish → Calendar → Event → Notifications → Settings</span>
+    <span class="bar"></span>
+  </div>
+
+  <div class="grid">
+    <a class="tile" href="09_review_done.html" target="_blank">
+      <div class="preview">
+        <span class="num">09</span>
+        <span class="badge green">完成</span>
+        <iframe src="09_review_done.html" loading="lazy"></iframe>
+      </div>
+      <div class="meta">
+        <div class="tg"><span class="sqr" style="background:var(--green);"></span><span class="step">Step 8 · 反馈</span></div>
+        <h3>掌握度推进 · 下次排期</h3>
+        <p>庆祝 hero · T2 → T3 曲线跃迁 · 知识点掌握变化 · 继续 / 结束双按钮。</p>
+        <div class="rel"><span class="r">成就心智</span><span class="r">下一节点落位</span></div>
+      </div>
+    </a>
+
+    <a class="tile" href="10_calendar_month.html" target="_blank">
+      <div class="preview">
+        <span class="num">10</span>
+        <span class="badge teal">日历</span>
+        <iframe src="10_calendar_month.html" loading="lazy"></iframe>
+      </div>
+      <div class="meta">
+        <div class="tg"><span class="sqr" style="background:var(--teal);"></span><span class="step">二级 · 完整日历</span></div>
+        <h3>月视图 · 视图融合</h3>
+        <p>方案 β 下降级为二级页。月格含复习数量徽章 + T 级色点；当日事件列表融合"复习节点 · 考试 · 家庭"；所有行跳向事件详情。</p>
+        <div class="rel"><span class="r">T 级色点</span><span class="r">复习×通用 融合</span><span class="r">显示复习可切</span></div>
+      </div>
+    </a>
+
+    <a class="tile" href="11_event_detail.html" target="_blank">
+      <div class="preview">
+        <span class="num">11</span>
+        <span class="badge indigo">锚点</span>
+        <iframe src="11_event_detail.html" loading="lazy"></iframe>
+      </div>
+      <div class="meta">
+        <div class="tg"><span class="sqr" style="background:var(--indigo);"></span><span class="step">融合 · 事件详情</span></div>
+        <h3>事件详情 · 双形态同壳</h3>
+        <p>复习节点形态：T 级胶囊 · 题目缩略 · 6 节点曲线 · 下次排期 · "立即复习"。通用事件形态折叠记忆区，保留"时间&amp;提醒""关联"共享壳。</p>
+        <div class="rel"><span class="r">视图融合锚点</span><span class="r">Deep link → 08</span></div>
+      </div>
+    </a>
+
+    <a class="tile" href="12_notifications.html" target="_blank">
+      <div class="preview">
+        <span class="num">12</span>
+        <span class="badge pink">通知</span>
+        <iframe src="12_notifications.html" loading="lazy"></iframe>
+      </div>
+      <div class="meta">
+        <div class="tg"><span class="sqr" style="background:var(--pink);"></span><span class="step">系统 · 通知中心</span></div>
+        <h3>多通道消息聚合</h3>
+        <p>T 级到期提醒 / 家长分享 / 系统更新分组展示 · 已读状态 · 跳回事件详情。</p>
+        <div class="rel"><span class="r">APNs / 微信 / 站内</span><span class="r">免打扰策略</span></div>
+      </div>
+    </a>
+  </div>
+
+  <div class="grid" style="grid-template-columns:repeat(4,1fr);">
+    <a class="tile" href="13_settings.html" target="_blank">
+      <div class="preview">
+        <span class="num">13</span>
+        <span class="badge gray">我的</span>
+        <iframe src="13_settings.html" loading="lazy"></iframe>
+      </div>
+      <div class="meta">
+        <div class="tg"><span class="sqr" style="background:var(--ter);"></span><span class="step">Tab · 我的</span></div>
+        <h3>个人设置 · 偏好 · 家长同步</h3>
+        <p>通知偏好 · 学科年级 · 家长绑定 · 隐私与数据 · 我的完整日历二级入口。</p>
+        <div class="rel"><span class="r">家长视图</span><span class="r">隐私</span></div>
+      </div>
+    </a>
+
+    <!-- decorative placeholder: relationship legend -->
+    <div class="tile" style="grid-column:span 3;background:linear-gradient(135deg,rgba(76,155,255,.08),rgba(139,135,246,.06));">
+      <div class="meta" style="padding:22px 24px;">
+        <div class="tg"><span class="sqr" style="background:var(--indigo);"></span><span class="step">关系图 · Calendar ↔ Review</span></div>
+        <h3 style="font-size:16px;margin-bottom:8px;">复习 → 日历 单向依赖 · 事件详情为视图融合锚点</h3>
+        <p style="line-height:1.6;">
+          <b style="color:#fff;">复习域</b>（07·08·09）通过 Feign 调用日历域，写入 <code style="background:rgba(255,255,255,.05);padding:1px 6px;border-radius:4px;color:var(--blue);">relation_type=STUDY · relation_id=question:{qid}:node:{nid}</code>；
+          <b style="color:#fff;">日历域</b>（10）对复习事件着色 T 级 + 书本图标、允许筛选开关；
+          <b style="color:#fff;">事件详情</b>（11）根据 relation_type 双分支渲染，同一壳体。
+          首页（01）周条带亦订阅同一事件池，保证三处心智口径一致。
+        </p>
+        <div class="rel" style="margin-top:14px;">
+          <span class="r">状态映射：MASTERED/PARTIAL/FORGOT → COMPLETED + 色</span>
+          <span class="r">跨域事件：ReviewNodeScheduled / Completed</span>
+          <span class="r">日历无业务词汇，永远通用</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section: Anonymous Shell — 5 growth-funnel scenarios -->
+  <div class="sec-title">
+    <h2>四 · 匿名态 · 增长漏斗 5 场景</h2>
+    <span class="cnt">Anonymous Shell · SC-11…SC-15 · 打破登录墙</span>
+    <span class="bar"></span>
+  </div>
+
+  <!-- KPI strip for anonymous conversion funnel -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">
+    <div class="kpi" style="background:linear-gradient(135deg,rgba(255,180,84,.08),rgba(255,90,79,.04));border:1px solid rgba(255,180,84,.18);">
+      <div class="lbl" style="color:#FFB454;">访客 → 游客试用</div>
+      <div class="val" style="background:linear-gradient(90deg,#FFB454,#FF5A4F);-webkit-background-clip:text;background-clip:text;color:transparent;">≥ 35%</div>
+      <div class="sub">P-LANDING 进入 ÷ 点「试试看」抵达 P-GUEST-CAPTURE</div>
+    </div>
+    <div class="kpi" style="background:linear-gradient(135deg,rgba(60,212,123,.08),rgba(79,209,217,.04));border:1px solid rgba(60,212,123,.18);">
+      <div class="lbl" style="color:#3CD47B;">游客 → 注册 Claim</div>
+      <div class="val" style="background:linear-gradient(90deg,#3CD47B,#4FD1D9);-webkit-background-clip:text;background-clip:text;color:transparent;">≥ 25%</div>
+      <div class="sub">游客完成 AI 分析 ÷ 成功注册并 claim 历史</div>
+    </div>
+    <div class="kpi" style="background:linear-gradient(135deg,rgba(76,155,255,.08),rgba(139,135,246,.04));border:1px solid rgba(76,155,255,.18);">
+      <div class="lbl" style="color:#4C9BFF;">分享链 → 注册</div>
+      <div class="val" style="background:linear-gradient(90deg,#4C9BFF,#8B87F6);-webkit-background-clip:text;background-clip:text;color:transparent;">≥ 15%</div>
+      <div class="sub">P-SHARED 打开 ÷ 完成注册并加入错题本</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <a class="tile" href="14_landing.html" target="_blank">
+      <div class="preview">
+        <span class="num">14</span>
+        <span class="badge orange">SC-11 · 落地</span>
+        <iframe src="14_landing.html" loading="lazy"></iframe>
+      </div>
+      <div class="meta">
+        <div class="tg"><span class="sqr" style="background:var(--orange);"></span><span class="step">匿名 · 访客落地</span></div>
+        <h3>P-LANDING · 价值橱窗 + 样例预览</h3>
+        <p>Aurora hero 价值主张 + 3 张脱敏真实样例 + 3 段功能 + 社会证明 + 三步转化说明。双 CTA：「试一次·免费」和「已有账号·登录」。无 Tab Bar · 顶栏仅 Logo + 登录。</p>
+        <div class="rel"><span class="r">0 注册成本</span><span class="r">登录墙破局</span><span class="r">未成年人条款</span></div>
+      </div>
+    </a>
+
+    <a class="tile" href="15_guest_capture.html" target="_blank">
+      <div class="preview">
+        <span class="num">15</span>
+        <span class="badge yellow">SC-12 · 试用</span>
+        <iframe src="15_guest_capture.html" loading="lazy"></iframe>
+      </div>
+      <div class="meta">
+        <div class="tg"><span class="sqr" style="background:var(--yellow);"></span><span class="step">匿名 · 游客拍题</span></div>
+        <h3>P-GUEST-CAPTURE · 1 次免费试用</h3>
+        <p>暗色拍题视口 · 边缘黄框检测 · 额度横幅「剩 1 次 · 24h 保留」· 合规 consent gate + 设备指纹 + IP 限流徽章。登录按钮蓝紫渐变升级 CTA。</p>
+        <div class="rel"><span class="r">device_fp 限 1/日</span><span class="r">guest_session 24h</span><span class="r">Claim 机制</span></div>
+      </div>
+    </a>
+
+    <a class="tile" href="16_shared.html" target="_blank">
+      <div class="preview">
+        <span class="num">16</span>
+        <span class="badge teal">SC-13 · 分享</span>
+        <iframe src="16_shared.html" loading="lazy"></iframe>
+      </div>
+      <div class="meta">
+        <div class="tg"><span class="sqr" style="background:var(--teal);"></span><span class="step">匿名 · 分享预览</span></div>
+        <h3>P-SHARED · 脱敏预览 + 升级 CTA</h3>
+        <p>分享者匿名化 Z*** 头像 · 题图局部高斯模糊 · 文本关键词遮罩 · AI 分析教案渐隐 lock layer · 底部审计条（令牌 / TTL / IP 记录）。升级 CTA「一键加入我的错题本」自动 claim。</p>
+        <div class="rel"><span class="r">HS256 JWT ≤7d</span><span class="r">Bloom Filter 撤销</span><span class="r">脱敏规则</span></div>
+      </div>
+    </a>
+
+    <a class="tile" href="17_welcomeback.html" target="_blank">
+      <div class="preview">
+        <span class="num">17</span>
+        <span class="badge pink">SC-14 · 回流</span>
+        <iframe src="17_welcomeback.html" loading="lazy"></iframe>
+      </div>
+      <div class="meta">
+        <div class="tg"><span class="sqr" style="background:var(--purple);"></span><span class="step">匿名 · 回流唤起（P1）</span></div>
+        <h3>P-WELCOMEBACK · 设备指纹柔性唤醒</h3>
+        <p>黄昏暖色 hero + 指纹徽章 · 待复习 12 节点大卡（遗忘风险环） · 学科分布 3 格 · 14 天缺席热力带 · Top 3 待复习题。一键回登 + 继续匿名浏览选项。</p>
+        <div class="rel"><span class="r">account_device 软绑</span><span class="r">不自动登录</span><span class="r">P1 延后</span></div>
+      </div>
+    </a>
+  </div>
+
+  <div class="grid" style="grid-template-columns:repeat(4,1fr);">
+    <a class="tile" href="18_observer.html" target="_blank" style="grid-column:span 2;">
+      <div class="preview" style="aspect-ratio:auto;height:520px;">
+        <iframe src="18_observer.html" loading="lazy" style="transform:translate(-50%,-50%) scale(.58);"></iframe>
+        <span class="num">18</span>
+        <span class="badge indigo">SC-15 · 观察</span>
+      </div>
+      <div class="meta">
+        <div class="tg"><span class="sqr" style="background:var(--indigo);"></span><span class="step">匿名 · 只读观察者（P1）</span></div>
+        <h3>P-OBSERVER · 家长/班主任只读会话</h3>
+        <p>深蓝 hero + 45° "scope = READ · observer only" 水印 · 身份卡（角色 / Scope / 剩余时长 / 邀请码 / 学生可撤销）· 3 条只读错题记录（锁图标）· 4 个斜纹禁用按钮 · Ghost Tab Bar（仅首页 tab 激活）。</p>
+        <div class="rel"><span class="r">OBSERVER JWT</span><span class="r">网关 ObserverFilter</span><span class="r">scope=READ 全链路强制</span><span class="r">一次性邀请码</span></div>
+      </div>
+    </a>
+
+    <!-- Anonymous shell relationship legend -->
+    <div class="tile" style="grid-column:span 2;background:linear-gradient(135deg,rgba(255,180,84,.08),rgba(197,129,247,.06));">
+      <div class="meta" style="padding:22px 24px;">
+        <div class="tg"><span class="sqr" style="background:var(--orange);"></span><span class="step">关系图 · Anonymous Shell ↔ Tab Shell</span></div>
+        <h3 style="font-size:16px;margin-bottom:8px;">登录态决策树统一前置 · 5 条冷启动路径汇入一个分流器</h3>
+        <p style="line-height:1.6;">
+          <b style="color:#fff;">bootstrap/resolve-entry.ts</b> 三节点判定 → JWT 有效 <code style="background:rgba(255,255,255,.05);padding:1px 6px;border-radius:4px;color:#3CD47B;">则入 Tab Shell</code>；shareToken / observerCode 命中 <code style="background:rgba(255,255,255,.05);padding:1px 6px;border-radius:4px;color:#4FD1D9;">则入 P-SHARED / P-OBSERVER</code>；设备指纹命中 <code style="background:rgba(255,255,255,.05);padding:1px 6px;border-radius:4px;color:#C581F7;">则入 P-WELCOMEBACK</code>；其余冷启动 <code style="background:rgba(255,255,255,.05);padding:1px 6px;border-radius:4px;color:#FFB454;">则入 P-LANDING</code>。
+          后端 <code style="background:rgba(255,255,255,.05);padding:1px 6px;border-radius:4px;color:#4C9BFF;">GET /api/session/resolve</code> + 网关 <code style="background:rgba(255,255,255,.05);padding:1px 6px;border-radius:4px;color:#4C9BFF;">AnonFilter / ObserverFilter</code> 共同保障。
+        </p>
+        <div class="rel" style="margin-top:14px;">
+          <span class="r">anonymous-service 新微服务</span>
+          <span class="r">Flyway V20260421_02 · 7 张匿名表</span>
+          <span class="r">Redis Bloom Filter 令牌撤销</span>
+          <span class="r">Bucket4j 限流 1/日 · 10/IP·日</span>
+          <span class="r">FingerprintJS 指纹</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="foot">
+    <div class="l">
+      <div class="legend">
+        <div class="lg"><span class="sq" style="background:var(--ter);"></span>引导 / 系统</div>
+        <div class="lg"><span class="sq" style="background:var(--blue);"></span>首页 / 复习</div>
+        <div class="lg"><span class="sq" style="background:var(--yellow);"></span>拍题 / 游客</div>
+        <div class="lg"><span class="sq" style="background:var(--indigo);"></span>AI / 深度 / 观察者</div>
+        <div class="lg"><span class="sq" style="background:var(--green);"></span>结果 / 完成</div>
+        <div class="lg"><span class="sq" style="background:var(--red);"></span>错题</div>
+        <div class="lg"><span class="sq" style="background:var(--orange);"></span>执行 / 匿名落地</div>
+        <div class="lg"><span class="sq" style="background:var(--teal);"></span>日历 / 分享</div>
+        <div class="lg"><span class="sq" style="background:var(--pink);"></span>通知 / 回流</div>
+      </div>
+    </div>
+    <div class="r">© 2026 Longfeng · 通用日历 × AI 错题本 · 方案 β + 匿名 Shell v1.2 · 效果预览（非生产代码）</div>
+  </div>
+</div>
+</body>
+</html>

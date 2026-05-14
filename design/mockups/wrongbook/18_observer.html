@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>P-OBSERVER · 只读观察者 · AI 错题本</title>
+<style>
+  :root{
+    --bg:#F2F2F7; --card:#FFFFFF; --sep:rgba(60,60,67,.14);
+    --text:#1C1C1E; --sec:#636366; --ter:#8E8E93;
+    --blue:#007AFF; --red:#FF3B30; --orange:#FF9500; --green:#34C759;
+    --indigo:#5856D6; --yellow:#FFCC00; --purple:#AF52DE; --teal:#30B0C7;
+    --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","PingFang SC",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+  html,body{background:#E5E5EA;font-family:var(--font);color:var(--text);}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px 0;}
+  .phone{position:relative;width:393px;height:852px;background:var(--bg);border-radius:54px;box-shadow:inset 0 0 0 6px #111,0 24px 64px rgba(0,0,0,.22);overflow:hidden;}
+  .phone::before{content:"";position:absolute;left:50%;top:11px;transform:translateX(-50%);width:126px;height:37px;background:#000;border-radius:20px;z-index:50;}
+  .statusbar{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;font-size:17px;font-weight:600;z-index:40;color:#fff;}
+  .statusbar .time{margin-top:12px;}
+  .statusbar .icons{margin-top:12px;display:flex;gap:6px;align-items:center;color:#fff;}
+
+  /* Observer header — restrained teal/navy */
+  .header{position:absolute;top:0;left:0;right:0;height:260px;background:linear-gradient(160deg,#0F1A3D 0%,#1F3C8C 55%,#30B0C7 100%);overflow:hidden;z-index:5;}
+  .header::before{content:"";position:absolute;width:300px;height:300px;border-radius:50%;top:-120px;right:-100px;background:radial-gradient(circle,rgba(79,209,217,.45),transparent 70%);filter:blur(26px);}
+
+  /* Scope=READ watermark — corner badge */
+  .watermark{position:absolute;top:108px;right:-28px;transform:rotate(38deg);font-size:14px;font-weight:900;letter-spacing:3px;color:rgba(255,255,255,.14);text-transform:uppercase;user-select:none;pointer-events:none;padding:6px 42px;border-top:1px dashed rgba(255,255,255,.15);border-bottom:1px dashed rgba(255,255,255,.15);z-index:8;}
+
+  /* Anonymous nav */
+  .anon-nav{position:absolute;top:62px;left:18px;right:18px;z-index:30;display:flex;align-items:center;justify-content:space-between;}
+  .back{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.14);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;color:#fff;}
+  .brand{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.14);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.22);}
+  .brand .dot{width:6px;height:6px;border-radius:50%;background:#4FD1D9;box-shadow:0 0 6px #4FD1D9;}
+  .brand .nm{font-size:11px;font-weight:800;color:#fff;letter-spacing:.5px;text-transform:uppercase;}
+  .exit{padding:7px 12px;border-radius:999px;background:rgba(255,59,48,.22);backdrop-filter:blur(12px);border:1px solid rgba(255,59,48,.4);color:#fff;font-size:11px;font-weight:700;letter-spacing:.2px;display:flex;align-items:center;gap:5px;}
+
+  /* Observer identity card */
+  .identity{position:absolute;top:110px;left:18px;right:18px;z-index:20;padding:14px 16px;background:rgba(0,0,0,.28);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.14);border-radius:18px;color:#fff;}
+  .id-row{display:flex;justify-content:space-between;align-items:center;}
+  .id-role{display:flex;align-items:center;gap:10px;}
+  .id-role .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4FD1D9,#5856D6);border:1.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;}
+  .id-role .av::after{content:"P";}
+  .id-role .tx .k{font-size:9.5px;font-weight:700;color:rgba(255,255,255,.65);letter-spacing:.5px;text-transform:uppercase;}
+  .id-role .tx .v{font-size:13px;font-weight:800;margin-top:1px;}
+  .id-role .tx .v em{font-style:normal;color:#FFD166;font-size:10.5px;font-weight:700;margin-left:4px;}
+  .id-scope{padding:5px 10px;border-radius:8px;background:rgba(79,209,217,.2);border:1px solid rgba(79,209,217,.4);color:#4FD1D9;font-size:10px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;}
+  .id-meta{margin-top:12px;padding-top:10px;border-top:.5px solid rgba(255,255,255,.14);display:flex;justify-content:space-between;gap:12px;}
+  .id-meta .m .k{font-size:9px;font-weight:700;color:rgba(255,255,255,.55);letter-spacing:.5px;text-transform:uppercase;}
+  .id-meta .m .v{font-size:11px;font-weight:700;margin-top:2px;color:#fff;}
+  .id-meta .m .v em{font-style:normal;color:#4FD1D9;}
+
+  /* Student summary card */
+  .student-summary{position:absolute;top:240px;left:18px;right:18px;z-index:20;padding:14px 16px;background:rgba(0,0,0,.22);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.12);border-radius:16px;color:#fff;display:flex;align-items:center;gap:12px;}
+  .student-summary .av{width:42px;height:42px;border-radius:50%;background:conic-gradient(from 210deg,#FFD166,#FF6B6B,#C581F7,#4C9BFF);border:2px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;}
+  .student-summary .av::after{content:"A";}
+  .student-summary .nm{font-size:14px;font-weight:800;letter-spacing:.1px;}
+  .student-summary .sub{font-size:10.5px;color:rgba(255,255,255,.7);font-weight:500;margin-top:2px;letter-spacing:.2px;}
+
+  /* Scroll body */
+  .scroll{position:absolute;top:300px;left:0;right:0;bottom:84px;overflow:auto;padding:20px 14px 30px;z-index:20;background:var(--bg);border-top-left-radius:26px;border-top-right-radius:26px;}
+  .scroll::before{content:"";position:absolute;top:-20px;left:0;right:0;height:44px;background:linear-gradient(180deg,transparent,var(--bg));pointer-events:none;}
+
+  /* Stats strip */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+  .stat{background:var(--card);border-radius:12px;padding:12px 10px;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+  .stat .n{font-size:20px;font-weight:800;letter-spacing:-.3px;line-height:1;}
+  .stat .n.blue{color:var(--blue);}
+  .stat .n.green{color:var(--green);}
+  .stat .n.orange{color:var(--orange);}
+  .stat .l{font-size:10px;font-weight:600;color:var(--sec);margin-top:4px;letter-spacing:.2px;}
+
+  /* Section title */
+  .sec-t{margin:4px 4px 10px;display:flex;align-items:baseline;justify-content:space-between;}
+  .sec-t .t{font-size:13px;font-weight:800;letter-spacing:.1px;}
+  .sec-t .m{font-size:11px;color:var(--ter);font-weight:600;}
+
+  /* Read-only item list */
+  .qitem{background:var(--card);border-radius:14px;padding:12px;display:flex;gap:10px;margin-bottom:8px;box-shadow:0 1px 2px rgba(0,0,0,.04);position:relative;}
+  .qitem::after{content:"";position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;background:rgba(60,60,67,.08);display:flex;align-items:center;justify-content:center;}
+  .qitem .locked-icon{position:absolute;top:12px;right:12px;color:var(--ter);z-index:2;}
+  .qitem .th{width:46px;height:46px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px;letter-spacing:.3px;}
+  .qitem .th.math{background:linear-gradient(135deg,#4C9BFF,#5856D6);}
+  .qitem .th.phys{background:linear-gradient(135deg,#FF9500,#FF3B30);}
+  .qitem .th.chem{background:linear-gradient(135deg,#AF52DE,#5856D6);}
+  .qitem .body{flex:1;min-width:0;padding-right:22px;}
+  .qitem .body .tp{display:flex;gap:6px;align-items:center;margin-bottom:4px;}
+  .qitem .body .tp .tlab{padding:2px 6px;border-radius:4px;font-size:9px;font-weight:800;letter-spacing:.4px;}
+  .qitem .body .tp .tlab.done{background:rgba(52,199,89,.12);color:var(--green);}
+  .qitem .body .tp .tlab.pending{background:rgba(255,149,0,.12);color:var(--orange);}
+  .qitem .body .tp .dt{font-size:9.5px;color:var(--ter);font-weight:600;}
+  .qitem .body h4{font-size:13px;font-weight:700;margin-bottom:4px;letter-spacing:.1px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .qitem .body .progress-bar{display:flex;gap:3px;margin-top:4px;}
+  .qitem .body .seg{height:5px;flex:1;border-radius:2px;background:#E5E5EA;}
+  .qitem .body .seg.done{background:var(--green);}
+  .qitem .body .seg.cur{background:var(--orange);}
+
+  /* Disabled action bar */
+  .disabled-actions{margin-top:14px;padding:12px 14px;background:rgba(60,60,67,.04);border:1px dashed rgba(60,60,67,.2);border-radius:12px;}
+  .disabled-actions .t{font-size:10px;font-weight:800;letter-spacing:.5px;color:var(--ter);text-transform:uppercase;margin-bottom:8px;}
+  .disabled-actions .btns{display:flex;gap:8px;}
+  .disabled-actions .btn{flex:1;height:36px;border-radius:10px;background:#fff;border:.5px solid var(--sep);display:flex;align-items:center;justify-content:center;gap:6px;color:var(--ter);font-size:11px;font-weight:700;opacity:.55;position:relative;}
+  .disabled-actions .btn::before{content:"";position:absolute;inset:0;border-radius:10px;background:repeating-linear-gradient(45deg,transparent 0 6px,rgba(60,60,67,.04) 6px 7px);pointer-events:none;}
+  .disabled-actions .lock-note{margin-top:10px;font-size:10px;color:var(--ter);font-weight:500;letter-spacing:.1px;line-height:1.4;}
+
+  /* Readonly Tab dock (ghost) */
+  .tabghost{position:absolute;bottom:0;left:0;right:0;height:84px;padding:10px 16px 26px;background:rgba(242,242,247,.92);backdrop-filter:blur(20px);border-top:.5px solid var(--sep);display:flex;justify-content:space-around;align-items:center;z-index:45;}
+  .tab{display:flex;flex-direction:column;align-items:center;gap:3px;opacity:.45;}
+  .tab .ic{width:22px;height:22px;color:var(--sec);}
+  .tab .l{font-size:9.5px;font-weight:600;color:var(--sec);}
+  .tab.active{opacity:1;}
+  .tab.active .ic{color:var(--blue);}
+  .tab.active .l{color:var(--blue);}
+  .tab.locked .ic{color:var(--ter);}
+
+  .homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#000;opacity:.8;z-index:60;}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar">
+    <span class="time">9:41</span>
+    <div class="icons">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="1" width="3" height="11" rx="1"/><rect x="15" y="-2" width="3" height="14" rx="1" opacity=".45"/></svg>
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><path d="M8.5 2c3.5 0 6.6 1.4 8.5 3.5l-1.5 1.3C13.9 5 11.3 3.8 8.5 3.8S3.1 5 1.5 6.8L0 5.5C1.9 3.4 5 2 8.5 2zm0 3c2.4 0 4.5 1 6 2.5L13 8.8c-1.2-1.1-2.8-1.8-4.5-1.8S5.2 7.7 4 8.8L2.5 7.5C4 6 6.1 5 8.5 5zm0 3c1.3 0 2.5.5 3.4 1.3L8.5 13 5.1 9.3C6 8.5 7.2 8 8.5 8z"/></svg>
+      <svg width="28" height="12" viewBox="0 0 28 12" fill="none"><rect x=".5" y=".5" width="24" height="11" rx="3" stroke="currentColor" opacity=".55"/><rect x="26" y="4" width="1.5" height="4" rx=".75" fill="currentColor" opacity=".5"/><rect x="2.5" y="2.5" width="20" height="7" rx="1.5" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <div class="header"></div>
+  <div class="watermark">scope = READ · observer only · scope = READ · observer only</div>
+
+  <div class="anon-nav">
+    <div class="back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </div>
+    <div class="brand">
+      <span class="dot"></span>
+      <span class="nm">观察者 · Observer</span>
+    </div>
+    <div class="exit">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      退出
+    </div>
+  </div>
+
+  <div class="identity">
+    <div class="id-row">
+      <div class="id-role">
+        <div class="av"></div>
+        <div class="tx">
+          <div class="k">Parent · 观察者</div>
+          <div class="v">您是 Allen 的 <em>家长</em></div>
+        </div>
+      </div>
+      <span class="id-scope">● READ</span>
+    </div>
+    <div class="id-meta">
+      <div class="m">
+        <div class="k">会话有效</div>
+        <div class="v">剩余 <em>2h 34m</em></div>
+      </div>
+      <div class="m">
+        <div class="k">邀请码</div>
+        <div class="v" style="font-family:'SF Mono',monospace;">O-A9T4-XZ7</div>
+      </div>
+      <div class="m">
+        <div class="k">学生可撤销</div>
+        <div class="v">● 秒级生效</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="student-summary">
+    <div class="av"></div>
+    <div>
+      <div class="nm">Allen 同学</div>
+      <div class="sub">高二 · 12 班 · 连续打卡 5 天 · 本周 23 题</div>
+    </div>
+  </div>
+
+  <div class="scroll">
+    <div class="stats">
+      <div class="stat"><div class="n blue">86</div><div class="l">错题总数</div></div>
+      <div class="stat"><div class="n green">73<span style="font-size:13px;">%</span></div><div class="l">掌握率</div></div>
+      <div class="stat"><div class="n orange">12</div><div class="l">待复习</div></div>
+    </div>
+
+    <div class="sec-t">
+      <div class="t">近 7 天复习记录</div>
+      <div class="m">只读 · 不可操作</div>
+    </div>
+
+    <div class="qitem">
+      <svg class="locked-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <div class="th math">数</div>
+      <div class="body">
+        <div class="tp">
+          <span class="tlab done">T5 · 已完成</span>
+          <span class="dt">4 月 19 日 · 耗时 3'24"</span>
+        </div>
+        <h4>二次函数最值 · 闭区间三情形</h4>
+        <div class="progress-bar">
+          <span class="seg done"></span><span class="seg done"></span><span class="seg done"></span>
+          <span class="seg done"></span><span class="seg done"></span><span class="seg"></span>
+        </div>
+      </div>
+    </div>
+    <div class="qitem">
+      <svg class="locked-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <div class="th phys">物</div>
+      <div class="body">
+        <div class="tp">
+          <span class="tlab pending">T3 · 今日到期</span>
+          <span class="dt">预计今晚 20:00</span>
+        </div>
+        <h4>斜面受力分解 · 共点力平衡</h4>
+        <div class="progress-bar">
+          <span class="seg done"></span><span class="seg done"></span><span class="seg cur"></span>
+          <span class="seg"></span><span class="seg"></span><span class="seg"></span>
+        </div>
+      </div>
+    </div>
+    <div class="qitem">
+      <svg class="locked-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <div class="th chem">化</div>
+      <div class="body">
+        <div class="tp">
+          <span class="tlab done">T4 · 已完成</span>
+          <span class="dt">4 月 18 日 · 耗时 2'50"</span>
+        </div>
+        <h4>氧化还原反应 · 电子转移平衡</h4>
+        <div class="progress-bar">
+          <span class="seg done"></span><span class="seg done"></span><span class="seg done"></span>
+          <span class="seg done"></span><span class="seg"></span><span class="seg"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="disabled-actions">
+      <div class="t">▸ 操作按钮 · 观察者不可用</div>
+      <div class="btns">
+        <div class="btn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          编辑
+        </div>
+        <div class="btn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          重做
+        </div>
+        <div class="btn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          归档
+        </div>
+        <div class="btn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          分享
+        </div>
+      </div>
+      <div class="lock-note">您的 JWT 具有 <b style="color:var(--text);font-weight:800;">scope = READ</b>，所有写接口已在网关层拒绝（HTTP 403）· 学生可随时通过"我的 → 观察者 → 撤销"立刻结束本会话。</div>
+    </div>
+  </div>
+
+  <!-- Ghost Tab bar — visually present to mimic student's UI but all locked except the current read view -->
+  <div class="tabghost">
+    <div class="tab active">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-4v-7h-6v7H5a2 2 0 0 1-2-2z"/></svg>
+      <div class="l">首页</div>
+    </div>
+    <div class="tab locked">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6l2 3h10a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/></svg>
+      <div class="l">错题本</div>
+    </div>
+    <div class="tab locked">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <div class="l">拍题</div>
+    </div>
+    <div class="tab locked">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <div class="l">复习</div>
+    </div>
+    <div class="tab locked">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 22a8 8 0 0 1 16 0"/></svg>
+      <div class="l">我的</div>
+    </div>
+  </div>
+
+  <div class="homebar"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{
+  "$metadata": {
+    "source": "getdesign.md/apple/design-md",
+    "saved_local": "design/system/inspiration/apple.design.md",
+    "generated_by": "ui-ux-pro-max-skill v2.5.0"
+  },
+  "tkn": {
+    "radius": {
+      "xs": {
+        "value": "5px",
+        "type": "dimension",
+        "comment": "Small containers, link tags, small badges"
+      },
+      "sm": {
+        "value": "8px",
+        "type": "dimension",
+        "comment": "Buttons, product cards, image containers — the standard Apple button radius"
+      },
+      "md": {
+        "value": "11px",
+        "type": "dimension",
+        "comment": "Search inputs, filter buttons"
+      },
+      "lg": {
+        "value": "12px",
+        "type": "dimension",
+        "comment": "Feature panels, lifestyle image containers. Maximum for rectangular elements."
+      },
+      "pill": {
+        "value": "980px",
+        "type": "dimension",
+        "comment": "Full pill CTAs — 'Learn more', 'Shop' links. The signature Apple CTA link shape. 980px mirrors Apple's max-content-width."
+      },
+      "circle": {
+        "value": "50%",
+        "type": "dimension",
+        "comment": "Media controls (play/pause arrows), avatar images, circular icon buttons"
+      }
+    }
+  }
+}

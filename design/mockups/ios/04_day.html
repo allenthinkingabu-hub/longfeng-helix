@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>日视图 · 通用日历</title>
+<style>
+:root{
+  --blue:#007AFF; --red:#FF3B30; --orange:#FF9500; --green:#34C759; --indigo:#5856D6; --yellow:#FFCC00;
+  --gray1:#8E8E93; --gray5:#E5E5EA; --gray6:#F2F2F7;
+  --label:#000; --label2:#3C3C4399; --label3:#3C3C434D;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--font);-webkit-font-smoothing:antialiased}
+body{background:linear-gradient(180deg,#EAF1FB 0%,#F7F6FA 55%,#FDF1F4 100%);display:grid;place-items:center;padding:40px;color:var(--label)}
+.phone{position:relative;width:393px;height:852px;background:#F5F7FA;border-radius:55px;
+  box-shadow:0 40px 100px -20px rgba(30,40,80,.35),0 8px 24px rgba(20,30,60,.12),inset 0 0 0 6px #111;overflow:hidden;}
+.phone::before{content:"";position:absolute;top:11px;left:50%;transform:translateX(-50%);width:125px;height:37px;background:#000;border-radius:20px;z-index:30;}
+.status{position:absolute;inset:0 0 auto 0;height:54px;padding:18px 34px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:17px;font-weight:600;z-index:25;color:#000;}
+.status .right{display:flex;gap:6px;align-items:center}
+
+.navbar{
+  position:absolute;top:54px;left:0;right:0;padding:6px 20px 12px;z-index:22;
+  background:rgba(245,247,250,.85);backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%);
+  border-bottom:.5px solid rgba(60,60,67,.1);
+}
+.nav-top{display:flex;justify-content:space-between;align-items:center;height:44px;color:var(--blue);font-size:17px;font-weight:500}
+.nav-top .ttl{color:#000;font-weight:600}
+.heading{display:flex;align-items:flex-end;gap:12px;margin-top:4px}
+.heading .day{font-size:52px;font-weight:700;letter-spacing:-1.5px;line-height:1;color:#000;font-variant-numeric:tabular-nums}
+.heading .info{padding-bottom:6px}
+.heading .info .wd{font-size:17px;font-weight:600;letter-spacing:-.2px}
+.heading .info .sub{color:var(--label2);font-size:13px;font-weight:500;margin-top:2px}
+.heading .info .sub b{color:#000;font-weight:600}
+.seg-wrap{display:flex;gap:8px;margin-top:14px;align-items:center}
+.seg{background:rgba(120,120,128,.12);border-radius:9px;padding:2px;display:flex;font-size:13px;font-weight:600;flex:0 0 auto}
+.seg span{padding:6px 12px;border-radius:7px;color:var(--label2)}
+.seg span.on{background:#fff;color:#000;box-shadow:0 1px 2px rgba(0,0,0,.06),0 3px 8px rgba(0,0,0,.04)}
+.summary{flex:1;display:flex;gap:6px;color:var(--label2);font-size:12px;font-weight:500;align-items:center;justify-content:flex-end}
+.summary .n{color:#000;font-weight:700;font-size:13px;margin:0 2px;font-variant-numeric:tabular-nums}
+.summary .chip{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;background:#fff;border-radius:20px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.summary .chip .d{width:6px;height:6px;border-radius:50%}
+
+.body{position:absolute;top:228px;left:0;right:0;bottom:83px;padding:14px 16px 14px;overflow-y:auto}
+.now-pill{
+  display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(255,59,48,.1);color:var(--red);border-radius:20px;
+  font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:10px;
+}
+.now-pill .p{width:6px;height:6px;border-radius:50%;background:var(--red);animation:none}
+
+.card{
+  background:#fff;border-radius:18px;padding:14px 14px;margin-bottom:10px;display:flex;gap:12px;align-items:stretch;
+  box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 16px rgba(0,0,0,.06);
+  position:relative;
+}
+.card::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3.5px;border-radius:2px;background:var(--blue)}
+.card.done::before{background:var(--gray1)}
+.card.orange::before{background:var(--orange)}
+.card.green::before{background:var(--green)}
+.card.indigo::before{background:var(--indigo)}
+.card.yellow::before{background:var(--yellow)}
+.card .time{width:62px;flex:0 0 62px;padding-left:12px}
+.card .time .h{font-size:17px;font-weight:700;color:#000;letter-spacing:-.2px;font-variant-numeric:tabular-nums}
+.card .time .d{font-size:11px;color:var(--label2);font-weight:500;margin-top:1px;letter-spacing:.3px}
+.card .main{flex:1;min-width:0}
+.card .ti{font-size:16px;font-weight:600;letter-spacing:-.2px;color:#000;display:flex;align-items:center;gap:6px}
+.card .ti .tag{font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;letter-spacing:.3px}
+.card.done .ti{color:var(--label3);text-decoration:line-through}
+.card .meta{color:var(--label2);font-size:12px;font-weight:500;margin-top:4px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.card .meta svg{flex:0 0 auto}
+.card .actions{display:flex;gap:8px;margin-top:10px}
+.pill{font-size:11px;font-weight:600;padding:4px 10px;border-radius:14px;color:var(--blue);background:rgba(10,132,255,.08);display:inline-flex;align-items:center;gap:4px}
+.pill.ghost{color:var(--label);background:rgba(120,120,128,.12)}
+.check{
+  width:24px;height:24px;border-radius:12px;border:1.5px solid var(--gray5);flex:0 0 24px;align-self:center;display:grid;place-items:center;margin-right:4px;
+}
+.card.done .check{background:var(--green);border-color:var(--green)}
+.card.done .check svg{color:#fff}
+.card .check svg{color:transparent}
+
+.divider{display:flex;align-items:center;gap:10px;color:var(--label2);font-size:11px;font-weight:600;letter-spacing:1px;padding:10px 4px 6px}
+.divider::before,.divider::after{content:"";flex:1;height:.5px;background:rgba(60,60,67,.12)}
+
+.fab{
+  position:absolute;right:20px;bottom:110px;width:56px;height:56px;border-radius:28px;
+  background:linear-gradient(180deg,#1E94FF,#0A84FF);display:grid;place-items:center;color:#fff;
+  box-shadow:0 14px 30px -6px rgba(10,132,255,.55),0 6px 14px rgba(10,132,255,.3),inset 0 1px 0 rgba(255,255,255,.2);z-index:30;
+}
+.tabbar{
+  position:absolute;bottom:0;left:0;right:0;height:83px;padding:8px 0 20px;
+  background:rgba(255,255,255,.85);backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%);
+  border-top:.5px solid rgba(60,60,67,.12);display:flex;z-index:20;
+}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--gray1);font-size:10px;font-weight:500}
+.tab.on{color:var(--blue)}
+.homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#000;opacity:.85;z-index:50}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="status">
+    <span>9:41</span>
+    <div class="right">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="1" width="3" height="11" rx="1"/><rect x="15" y="-2" width="3" height="14" rx="1" opacity=".35"/></svg>
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><path d="M8.5 2c3.5 0 6.6 1.4 8.5 3.5l-1.5 1.3C13.9 5 11.3 3.8 8.5 3.8S3.1 5 1.5 6.8L0 5.5C1.9 3.4 5 2 8.5 2zm0 3c2.4 0 4.5 1 6 2.5L13 8.8c-1.2-1.1-2.8-1.8-4.5-1.8S5.2 7.7 4 8.8L2.5 7.5C4 6 6.1 5 8.5 5zm0 3c1.3 0 2.5.5 3.4 1.3L8.5 13 5.1 9.3C6 8.5 7.2 8 8.5 8z"/></svg>
+      <svg width="28" height="12" viewBox="0 0 28 12" fill="none"><rect x=".5" y=".5" width="24" height="11" rx="3" stroke="currentColor" opacity=".5"/><rect x="26" y="4" width="1.5" height="4" rx=".75" fill="currentColor" opacity=".5"/><rect x="2.5" y="2.5" width="20" height="7" rx="1.5" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <div class="navbar">
+    <div class="nav-top">
+      <span>‹ 日历</span>
+      <span class="ttl">日视图</span>
+      <span style="font-weight:500">今天</span>
+    </div>
+    <div class="heading">
+      <div class="day">21</div>
+      <div class="info">
+        <div class="wd">4 月 · 星期二</div>
+        <div class="sub"><b>2026</b> · Asia/Shanghai · GMT+8</div>
+      </div>
+    </div>
+    <div class="seg-wrap">
+      <div class="seg"><span class="on">日</span><span>周</span><span>月</span></div>
+      <div class="summary">
+        <span class="chip"><span class="d" style="background:var(--blue)"></span>学习 <b class="n">2</b></span>
+        <span class="chip"><span class="d" style="background:var(--orange)"></span>任务 <b class="n">3</b></span>
+        <span class="chip"><span class="d" style="background:var(--green)"></span>提醒 <b class="n">1</b></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="now-pill"><span class="p"></span> NOW · 09:41</div>
+
+    <div class="card done">
+      <div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="time"><div class="h">08:00</div><div class="d">30 min</div></div>
+      <div class="main">
+        <div class="ti">晨间冥想 <span class="tag" style="background:rgba(120,120,128,.12);color:var(--label2)">提醒</span></div>
+        <div class="meta"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>已完成 · 08:32</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="time"><div class="h">09:30</div><div class="d">30 min</div></div>
+      <div class="main">
+        <div class="ti">晨站会 <span class="tag" style="background:rgba(10,132,255,.12);color:var(--blue)">任务</span></div>
+        <div class="meta">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          09:30-10:00
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          工程团队 4 人
+        </div>
+      </div>
+    </div>
+
+    <div class="divider">上午</div>
+
+    <div class="card orange">
+      <div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="time"><div class="h">11:00</div><div class="d">80 min</div></div>
+      <div class="main">
+        <div class="ti">PostgreSQL 分库方案评审 <span class="tag" style="background:rgba(255,149,0,.14);color:#B36B00">任务</span></div>
+        <div class="meta">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 2 22 22 22"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="17" r="1"/></svg>
+          P0 · 截止 18:00
+        </div>
+        <div class="actions">
+          <span class="pill">查看文档</span>
+          <span class="pill ghost">顺延</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider">下午</div>
+
+    <div class="card">
+      <div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="time"><div class="h">14:30</div><div class="d">70 min</div></div>
+      <div class="main">
+        <div class="ti">Hibernate 二级缓存 <span class="tag" style="background:rgba(10,132,255,.12);color:var(--blue)">学习</span></div>
+        <div class="meta">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          阶段 <b style="color:#000">3 / 5</b> · 下次 5 月 2 日
+        </div>
+      </div>
+    </div>
+
+    <div class="card green">
+      <div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="time"><div class="h">17:40</div><div class="d">—</div></div>
+      <div class="main">
+        <div class="ti">接女儿放学 <span class="tag" style="background:rgba(52,199,89,.14);color:#1E7E34">提醒</span></div>
+        <div class="meta">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          每工作日重复 · 提前 10 分钟提醒
+        </div>
+      </div>
+    </div>
+
+    <div class="card indigo">
+      <div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="time"><div class="h">21:30</div><div class="d">全天</div></div>
+      <div class="main">
+        <div class="ti">读《人类简史》第 12 章笔记 <span class="tag" style="background:rgba(88,86,214,.14);color:#4240AD">备忘</span></div>
+        <div class="meta">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Markdown · 3 段落
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fab">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </div>
+
+  <div class="tabbar">
+    <div class="tab on">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      日历
+    </div>
+    <div class="tab">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      事项
+    </div>
+    <div class="tab">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      通知
+    </div>
+    <div class="tab">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      我
+    </div>
+  </div>
+
+  <div class="homebar"></div>
+</div>
+</body>
+</html>

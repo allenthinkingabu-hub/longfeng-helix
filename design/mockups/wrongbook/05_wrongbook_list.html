@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>04 / 错题本列表</title>
+<style>
+  :root{
+    --blue:#007AFF; --red:#FF3B30; --orange:#FF9500; --green:#34C759; --indigo:#5856D6; --yellow:#FFCC00;
+    --bg:#F2F2F7; --card:#FFFFFF; --text:#1C1C1E; --text2:#3C3C43; --text3:#8E8E93; --sep:rgba(60,60,67,.14);
+    --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+  html,body{height:100%;}
+  body{font-family:var(--font);color:var(--text);background:
+    radial-gradient(1200px 800px at 10% -10%, #E8EEFB 0%, transparent 60%),
+    radial-gradient(1000px 700px at 110% 10%, #F5E8FB 0%, transparent 55%),
+    linear-gradient(180deg,#EEF2F8 0%,#E6ECF5 100%);
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 0;}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px;}
+  .caption{font-size:13px;color:#5E6B82;letter-spacing:.08em;text-transform:uppercase;}
+  .phone{position:relative;width:393px;height:852px;border-radius:55px;overflow:hidden;
+    box-shadow:0 40px 100px -20px rgba(30,40,80,.35),0 8px 24px rgba(20,30,60,.12),inset 0 0 0 6px #111;}
+  .phone::before{content:"";position:absolute;top:11px;left:50%;transform:translateX(-50%);width:125px;height:37px;background:#000;border-radius:20px;z-index:40;}
+  .screen{position:absolute;inset:0;background:var(--bg);}
+  .status{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 8px;font-weight:600;font-size:15px;color:#111;z-index:30;}
+  .status .r{display:flex;align-items:center;gap:6px;}
+  .homebar{position:absolute;left:50%;transform:translateX(-50%);bottom:8px;width:134px;height:5px;border-radius:3px;background:#000;opacity:.85;z-index:30;}
+
+  .nav{position:absolute;top:54px;left:0;right:0;padding:6px 18px 10px;background:rgba(242,242,247,.78);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border-bottom:.5px solid var(--sep);z-index:20;}
+  .nav .row{display:flex;align-items:center;justify-content:space-between;height:36px;}
+  .nav h1{font-size:34px;font-weight:700;letter-spacing:.36px;}
+  .nav .r{display:flex;gap:14px;color:var(--blue);font-size:17px;align-items:center;}
+  /* search */
+  .search{margin-top:8px;background:rgba(118,118,128,.12);border-radius:10px;padding:8px 10px;display:flex;align-items:center;gap:8px;color:var(--text3);font-size:14px;}
+  .search svg{width:14px;height:14px;}
+  .search .ai{margin-left:auto;font-size:11px;color:var(--blue);font-weight:600;background:rgba(0,122,255,.10);padding:3px 7px;border-radius:6px;}
+  /* subject chips */
+  .chips-row{margin-top:10px;display:flex;gap:8px;overflow-x:auto;}
+  .sc{flex-shrink:0;padding:6px 11px;border-radius:999px;background:var(--card);border:.5px solid var(--sep);font-size:13px;font-weight:600;color:var(--text2);display:inline-flex;align-items:center;gap:6px;}
+  .sc.on{background:var(--blue);color:#fff;border-color:transparent;box-shadow:0 6px 14px rgba(0,122,255,.25);}
+  .sc .ct{font-size:11px;opacity:.75;}
+  .sc.on .ct{opacity:.85;}
+
+  .content{position:absolute;top:222px;left:0;right:0;bottom:84px;overflow:hidden;padding:10px 16px 16px;}
+
+  /* mastery filter row */
+  .mr{display:flex;gap:8px;align-items:center;padding:2px 2px 10px;}
+  .mf{flex:1;background:var(--card);border-radius:12px;padding:9px 10px;display:flex;flex-direction:column;align-items:center;gap:1px;box-shadow:0 1px 0 rgba(0,0,0,.03);position:relative;}
+  .mf .v{font-size:18px;font-weight:700;letter-spacing:.2px;}
+  .mf .t{font-size:11px;color:var(--text3);letter-spacing:.2px;}
+  .mf.red .v{color:var(--red);} .mf.orange .v{color:var(--orange);} .mf.green .v{color:var(--green);}
+  .mf.on{background:linear-gradient(180deg,#fff,#F5FAFF);border:.5px solid rgba(0,122,255,.25);box-shadow:0 8px 18px rgba(0,122,255,.10);}
+  .mf .bar{position:absolute;top:0;left:14px;right:14px;height:3px;border-radius:0 0 4px 4px;background:transparent;}
+  .mf.on .bar{background:linear-gradient(90deg,#5FA8FF,var(--blue));}
+
+  /* sort hint */
+  .sort{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text3);padding:0 4px 8px;}
+  .sort .l{display:flex;align-items:center;gap:5px;}
+  .sort strong{color:var(--text2);font-weight:600;}
+
+  /* card list */
+  .card{background:var(--card);border-radius:16px;padding:12px;display:flex;gap:12px;box-shadow:0 1px 0 rgba(0,0,0,.03),0 8px 22px rgba(40,50,90,.05);margin-bottom:10px;position:relative;overflow:hidden;}
+  .card .thumb{width:60px;height:74px;border-radius:8px;background:linear-gradient(180deg,#fbf8f0,#f1ece0);position:relative;overflow:hidden;flex:0 0 60px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.05);}
+  .thumb .qno{position:absolute;top:6px;left:6px;font-size:7px;font-weight:700;color:#7a3b3b;background:#fde9e9;border-radius:2px;padding:1px 3px;}
+  .thumb h3{position:absolute;top:18px;left:6px;right:6px;font-family:Georgia,serif;font-size:6px;line-height:1.4;color:#222;font-weight:600;}
+  .thumb .strk{position:absolute;top:48px;left:8px;width:38px;height:5px;background:rgba(255,80,80,.55);transform:rotate(-2deg);border-radius:1px;}
+  .card .body{flex:1;min-width:0;}
+  .card .h{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;}
+  .card .h .sub{color:var(--blue);}
+  .card .h .dot{width:3px;height:3px;border-radius:50%;background:var(--text3);}
+  .card .h .time{color:var(--text3);font-weight:500;}
+  .card .stem{font-size:14px;line-height:1.45;margin-top:4px;letter-spacing:.05px;font-weight:500;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .card .tags{margin-top:7px;display:flex;gap:6px;flex-wrap:wrap;}
+  .tg{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:999px;font-size:11px;font-weight:600;border:.5px solid var(--sep);}
+  .tg.kp{background:rgba(88,86,214,.08);color:var(--indigo);border-color:rgba(88,86,214,.18);}
+  .tg.err{background:rgba(255,59,48,.08);color:var(--red);border-color:rgba(255,59,48,.18);}
+  .tg.diff{background:#FFFAF0;color:var(--orange);border-color:rgba(255,149,0,.2);}
+  .card .right{display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;flex:0 0 64px;}
+  .stage-bar{display:flex;gap:2px;}
+  .sb{width:8px;height:5px;border-radius:1.5px;background:#E5E5EA;}
+  .sb.done{background:var(--green);}
+  .sb.now{background:linear-gradient(90deg,#5FA8FF,var(--blue));}
+  .pillbg{font-size:10px;font-weight:700;padding:3px 7px;border-radius:999px;letter-spacing:.3px;}
+  .pillbg.red{background:rgba(255,59,48,.12);color:var(--red);}
+  .pillbg.orange{background:rgba(255,149,0,.14);color:var(--orange);}
+  .pillbg.green{background:rgba(52,199,89,.14);color:var(--green);}
+  .due{font-size:10px;color:var(--text3);font-weight:600;letter-spacing:.2px;}
+  .left-bar{position:absolute;left:0;top:0;bottom:0;width:3px;}
+  .left-bar.red{background:var(--red);} .left-bar.orange{background:var(--orange);} .left-bar.green{background:var(--green);} .left-bar.blue{background:var(--blue);}
+
+  /* FAB */
+  .fab{position:absolute;right:18px;bottom:104px;width:60px;height:60px;border-radius:50%;background:linear-gradient(180deg,#5FA8FF,var(--blue));color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 16px 30px rgba(0,122,255,.35),0 4px 10px rgba(0,122,255,.2);z-index:25;}
+  .fab svg{width:26px;height:26px;}
+
+  /* tab bar */
+  .tabbar{position:absolute;bottom:0;left:0;right:0;height:84px;padding:8px 0 24px;background:rgba(255,255,255,.78);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border-top:.5px solid var(--sep);display:flex;z-index:15;}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--text3);font-size:10px;}
+  .tab.active{color:var(--blue);}
+  .tab svg{width:24px;height:24px;}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="caption">4 / 8 · Wrong-question book · subject + mastery filters</div>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="status">
+          <span>9:41</span>
+          <div class="r">
+            <svg width="17" height="11" viewBox="0 0 17 11"><g fill="#111"><rect x="0" y="7" width="3" height="4" rx=".5"/><rect x="4.5" y="5" width="3" height="6" rx=".5"/><rect x="9" y="3" width="3" height="8" rx=".5"/><rect x="13.5" y="1" width="3" height="10" rx=".5"/></g></svg>
+            <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M8 3c2 0 3.8.7 5.2 1.9l1.4-1.4C12.8 1.9 10.5 1 8 1S3.2 1.9 1.4 3.5l1.4 1.4C4.2 3.7 6 3 8 3Z" fill="#111"/><path d="M8 6c1.2 0 2.3.4 3.2 1.1l1.4-1.4C11.3 4.6 9.7 4 8 4s-3.3.6-4.6 1.7l1.4 1.4C5.7 6.4 6.8 6 8 6Z" fill="#111"/><circle cx="8" cy="9" r="1.4" fill="#111"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="#111" opacity=".45"/><rect x="2" y="2" width="17" height="8" rx="1.6" fill="#111"/><rect x="23" y="4" width="2" height="4" rx="1" fill="#111" opacity=".45"/></svg>
+          </div>
+        </div>
+
+        <div class="nav">
+          <div class="row">
+            <h1>错题本</h1>
+            <div class="r">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M6 12h12M9 17h6" stroke="#007AFF" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <span style="color:var(--text2);">二次函数 顶点</span>
+            <span class="ai">AI 语义</span>
+          </div>
+          <div class="chips-row">
+            <span class="sc on">全部 <span class="ct">128</span></span>
+            <span class="sc">数学 <span class="ct">52</span></span>
+            <span class="sc">物理 <span class="ct">31</span></span>
+            <span class="sc">化学 <span class="ct">18</span></span>
+            <span class="sc">英语 <span class="ct">19</span></span>
+            <span class="sc">语文 <span class="ct">8</span></span>
+          </div>
+        </div>
+
+        <div class="content">
+          <!-- mastery -->
+          <div class="mr">
+            <div class="mf red on"><div class="bar"></div><div class="v">42</div><div class="t">未掌握</div></div>
+            <div class="mf orange"><div class="bar"></div><div class="v">35</div><div class="t">部分掌握</div></div>
+            <div class="mf green"><div class="bar"></div><div class="v">51</div><div class="t">已掌握</div></div>
+          </div>
+
+          <div class="sort">
+            <div class="l">按 <strong>下次复习时间</strong> · 升序</div>
+            <div>共 <strong>42</strong> 条</div>
+          </div>
+
+          <!-- cards -->
+          <div class="card">
+            <div class="left-bar red"></div>
+            <div class="thumb"><span class="qno">17</span><h3>已知 f(x)=x²−4x+3</h3><div class="strk"></div></div>
+            <div class="body">
+              <div class="h"><span class="sub">数学</span><span class="dot"></span><span>顶点式</span><span class="dot"></span><span class="time">今日 14:28 入库</span></div>
+              <div class="stem">已知函数 f(x)=x²−4x+3，求其顶点坐标与对称轴方程。学生选 B (2,−1)，顶点 h k 混淆。</div>
+              <div class="tags">
+                <span class="tg kp">二次函数</span>
+                <span class="tg kp">配方法</span>
+                <span class="tg err">概念</span>
+                <span class="tg diff">★★★</span>
+              </div>
+            </div>
+            <div class="right">
+              <span class="pillbg red">未掌握</span>
+              <div class="stage-bar"><span class="sb now"></span><span class="sb"></span><span class="sb"></span><span class="sb"></span><span class="sb"></span><span class="sb"></span></div>
+              <span class="due">T1 · 1 小时后</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="left-bar orange"></div>
+            <div class="thumb"><span class="qno">23</span><h3>电路并联欧姆定律</h3><div class="strk"></div></div>
+            <div class="body">
+              <div class="h"><span class="sub" style="color:var(--orange);">物理</span><span class="dot"></span><span>欧姆定律</span><span class="dot"></span><span class="time">昨天</span></div>
+              <div class="stem">两个电阻 R₁=4Ω, R₂=6Ω 并联接 12V，求总电流。学生忽略并联公式 1/R = 1/R₁ + 1/R₂。</div>
+              <div class="tags">
+                <span class="tg kp">并联电路</span>
+                <span class="tg kp">欧姆定律</span>
+                <span class="tg err">公式</span>
+                <span class="tg diff">★★</span>
+              </div>
+            </div>
+            <div class="right">
+              <span class="pillbg orange">部分</span>
+              <div class="stage-bar"><span class="sb done"></span><span class="sb now"></span><span class="sb"></span><span class="sb"></span><span class="sb"></span><span class="sb"></span></div>
+              <span class="due">T2 · 明日 09:00</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="left-bar green"></div>
+            <div class="thumb"><span class="qno">08</span><h3>tense agreement</h3><div class="strk" style="background:rgba(255,80,80,.4);"></div></div>
+            <div class="body">
+              <div class="h"><span class="sub" style="color:var(--green);">英语</span><span class="dot"></span><span>时态一致性</span><span class="dot"></span><span class="time">3 天前</span></div>
+              <div class="stem">"By the time he arrived, the meeting ___ already started." 学生填 has，正确为 had。</div>
+              <div class="tags">
+                <span class="tg kp">past perfect</span>
+                <span class="tg kp">when/by the time</span>
+                <span class="tg diff">★★</span>
+              </div>
+            </div>
+            <div class="right">
+              <span class="pillbg green">已掌握</span>
+              <div class="stage-bar"><span class="sb done"></span><span class="sb done"></span><span class="sb done"></span><span class="sb now"></span><span class="sb"></span><span class="sb"></span></div>
+              <span class="due">T4 · 4 天后</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="left-bar red"></div>
+            <div class="thumb"><span class="qno">11</span><h3>化学方程配平</h3><div class="strk"></div></div>
+            <div class="body">
+              <div class="h"><span class="sub" style="color:var(--indigo);">化学</span><span class="dot"></span><span>配平</span><span class="dot"></span><span class="time">2 天前</span></div>
+              <div class="stem">配平：Al + HCl → AlCl₃ + H₂。学生写错系数 1:3:1:1，正确 2:6:2:3。</div>
+              <div class="tags">
+                <span class="tg kp">化学方程式</span>
+                <span class="tg err">计算</span>
+                <span class="tg diff">★★★</span>
+              </div>
+            </div>
+            <div class="right">
+              <span class="pillbg red">未掌握</span>
+              <div class="stage-bar"><span class="sb done"></span><span class="sb"></span><span class="sb"></span><span class="sb"></span><span class="sb"></span><span class="sb"></span></div>
+              <span class="due">T1 · 已逾期</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAB -->
+        <div class="fab"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="4.5" stroke="#fff" stroke-width="1.8"/><path d="M5 8h3l1.5-2h5L16 8h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+
+        <!-- tab bar -->
+        <div class="tabbar">
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11 L12 3 L21 11 V20 a1 1 0 0 1 -1 1 H14 V14 H10 V21 H4 a1 1 0 0 1 -1 -1 Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg><span>首页</span></div>
+          <div class="tab active"><svg viewBox="0 0 24 24" fill="none"><path d="M5 4h11l3 3v13H5V4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 11h8M8 14h6M8 17h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>错题本</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="4.5" stroke="currentColor" stroke-width="1.8"/><path d="M5 8h3l1.5-2h5L16 8h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>拍题</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.5c-3.6 0-6.2 2.6-6.2 6.2v3.4L4 15.5v1.3h16v-1.3l-1.8-2.4V9.7c0-3.6-2.6-6.2-6.2-6.2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 19.5a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>复习</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.5" r="3.8" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 20c1.2-3.8 4.2-5.6 7.5-5.6s6.3 1.8 7.5 5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>我的</span></div>
+        </div>
+
+        <div class="homebar"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

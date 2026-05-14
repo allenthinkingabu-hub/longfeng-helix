@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>05 / 错题详情</title>
+<style>
+  :root{
+    --blue:#007AFF; --red:#FF3B30; --orange:#FF9500; --green:#34C759; --indigo:#5856D6; --yellow:#FFCC00; --pink:#FF2D55;
+    --bg:#F2F2F7; --card:#FFFFFF; --text:#1C1C1E; --text2:#3C3C43; --text3:#8E8E93; --sep:rgba(60,60,67,.14);
+    --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+  html,body{height:100%;}
+  body{font-family:var(--font);color:var(--text);background:
+    radial-gradient(1200px 800px at 10% -10%, #E8EEFB 0%, transparent 60%),
+    radial-gradient(1000px 700px at 110% 10%, #F5E8FB 0%, transparent 55%),
+    linear-gradient(180deg,#EEF2F8 0%,#E6ECF5 100%);
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 0;}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px;}
+  .caption{font-size:13px;color:#5E6B82;letter-spacing:.08em;text-transform:uppercase;}
+  .phone{position:relative;width:393px;height:852px;border-radius:55px;overflow:hidden;
+    box-shadow:0 40px 100px -20px rgba(30,40,80,.35),0 8px 24px rgba(20,30,60,.12),inset 0 0 0 6px #111;}
+  .phone::before{content:"";position:absolute;top:11px;left:50%;transform:translateX(-50%);width:125px;height:37px;background:#000;border-radius:20px;z-index:40;}
+  .screen{position:absolute;inset:0;background:var(--bg);}
+  .status{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 8px;font-weight:600;font-size:15px;color:#111;z-index:30;}
+  .status .r{display:flex;align-items:center;gap:6px;}
+  .homebar{position:absolute;left:50%;transform:translateX(-50%);bottom:8px;width:134px;height:5px;border-radius:3px;background:#000;opacity:.85;z-index:30;}
+
+  .nav{position:absolute;top:54px;left:0;right:0;padding:6px 18px 8px;background:rgba(242,242,247,.78);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border-bottom:.5px solid var(--sep);z-index:20;}
+  .nav .row{display:flex;align-items:center;justify-content:space-between;height:36px;}
+  .nav .back{display:flex;align-items:center;gap:4px;color:var(--blue);font-size:17px;}
+  .nav .back svg{width:12px;height:20px;}
+  .nav .r{display:flex;gap:14px;color:var(--blue);font-size:17px;align-items:center;}
+  .nav h1{font-size:22px;font-weight:700;letter-spacing:.36px;margin-top:2px;display:flex;align-items:center;gap:10px;}
+  .nav h1 .pill{font-size:11px;font-weight:600;color:#fff;background:var(--red);padding:3px 8px;border-radius:6px;letter-spacing:.4px;}
+
+  .content{position:absolute;top:152px;left:0;right:0;bottom:104px;overflow:hidden;padding:12px 16px 16px;}
+
+  /* image card with gradient overlay */
+  .img{position:relative;height:170px;border-radius:18px;overflow:hidden;background:linear-gradient(180deg,#fbf8f0,#ece5d3);box-shadow:0 1px 0 rgba(0,0,0,.04),0 12px 24px rgba(40,50,90,.1);}
+  .img .paper{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-2deg);width:62%;height:78%;background:linear-gradient(180deg,#fff,#f8f4e8);border-radius:4px;padding:14px;box-shadow:0 6px 18px rgba(0,0,0,.18);font-family:Georgia,serif;color:#222;font-size:9px;line-height:1.5;}
+  .img .paper .lbl{font-family:var(--font);font-size:7px;font-weight:700;letter-spacing:.2em;color:#a78a3c;text-transform:uppercase;}
+  .img .paper .qno{display:inline-block;margin-top:5px;font-family:var(--font);font-size:8px;font-weight:700;color:#7a3b3b;background:#fde9e9;border-radius:2px;padding:1px 4px;}
+  .img .paper h3{font-size:9px;line-height:1.5;margin-top:5px;font-weight:600;}
+  .img .paper .fm{margin-top:5px;text-align:center;font-style:italic;font-size:11px;color:#222;}
+  .img .paper .fm em{color:#a02828;font-weight:700;font-style:italic;}
+  .img .paper .strk{position:absolute;left:18px;top:78px;width:120px;height:9px;background:rgba(255,80,80,.55);transform:rotate(-2deg);border-radius:1px;}
+  .img .paper .pen{position:absolute;left:34px;top:90px;font-family:cursive;font-size:13px;color:#c9302c;}
+  .img .badge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;padding:5px 9px;border-radius:6px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-weight:600;letter-spacing:.2px;}
+  .img .magn{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.55);color:#fff;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);}
+  .img .magn svg{width:16px;height:16px;}
+
+  /* tabs */
+  .stab{margin-top:14px;display:flex;background:rgba(118,118,128,.12);border-radius:10px;padding:2px;font-size:13px;font-weight:600;}
+  .stab span{flex:1;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:var(--text2);}
+  .stab .on{background:#fff;color:var(--text);box-shadow:0 3px 8px rgba(0,0,0,.06);}
+
+  /* analysis brief */
+  .brief{margin-top:12px;background:var(--card);border-radius:14px;padding:12px;box-shadow:0 1px 0 rgba(0,0,0,.03);}
+  .brief .row{display:flex;align-items:center;gap:8px;}
+  .brief .kicker{font-size:11px;color:var(--blue);font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+  .brief .stem{font-size:13.5px;line-height:1.55;margin-top:6px;font-weight:500;}
+  .brief .grid{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .ans{border-radius:10px;padding:9px 10px;}
+  .ans .l{font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;}
+  .ans .v{font-size:14px;font-weight:700;margin-top:2px;}
+  .ans.w{background:rgba(255,59,48,.08);border:.5px solid rgba(255,59,48,.2);}
+  .ans.w .l{color:var(--red);}
+  .ans.r{background:rgba(52,199,89,.08);border:.5px solid rgba(52,199,89,.2);}
+  .ans.r .l{color:var(--green);}
+  .err{margin-top:9px;background:rgba(255,59,48,.06);border-left:3px solid var(--red);border-radius:0 8px 8px 0;padding:8px 10px;font-size:12.5px;line-height:1.5;color:var(--text2);}
+  .err b{color:var(--red);background:rgba(255,59,48,.10);padding:1px 4px;border-radius:3px;}
+
+  /* timeline */
+  .sec{display:flex;align-items:center;gap:8px;margin:16px 4px 8px;}
+  .sec h3{font-size:13px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;font-weight:700;}
+  .sec .line{flex:1;height:1px;background:var(--sep);}
+  .sec .r{font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.3px;}
+
+  .tl{background:var(--card);border-radius:14px;padding:14px 14px 10px;box-shadow:0 1px 0 rgba(0,0,0,.03);position:relative;}
+  .axis{position:relative;height:60px;margin-top:4px;}
+  /* curve */
+  .axis svg{position:absolute;inset:0;width:100%;height:100%;}
+  .nodes{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;padding:0 4px;}
+  .nd{display:flex;flex-direction:column;align-items:center;gap:3px;}
+  .nd .dot{width:14px;height:14px;border-radius:50%;background:#E5E5EA;border:2.5px solid #fff;box-shadow:0 0 0 1px var(--sep);}
+  .nd.done .dot{background:var(--green);}
+  .nd.now  .dot{background:linear-gradient(180deg,#5FA8FF,var(--blue));box-shadow:0 0 0 4px rgba(0,122,255,.2);}
+  .nd .lv{font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.3px;}
+  .nd.done .lv{color:var(--green);}
+  .nd.now  .lv{color:var(--blue);}
+  .nd .dt{font-size:9px;color:var(--text3);}
+  .stats{margin-top:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;border-top:.5px solid var(--sep);padding-top:10px;}
+  .st{text-align:center;}
+  .st .v{font-size:18px;font-weight:700;letter-spacing:.2px;}
+  .st .v.b{color:var(--blue);} .st .v.g{color:var(--green);} .st .v.o{color:var(--orange);}
+  .st .t{font-size:11px;color:var(--text3);margin-top:2px;letter-spacing:.2px;}
+
+  /* radar */
+  .radar-row{display:flex;gap:10px;margin-top:12px;}
+  .radar{flex:1;background:var(--card);border-radius:14px;padding:12px;box-shadow:0 1px 0 rgba(0,0,0,.03);display:flex;flex-direction:column;align-items:center;}
+  .radar .hd{font-size:11px;color:var(--text3);font-weight:700;letter-spacing:.5px;text-transform:uppercase;align-self:flex-start;}
+  .radar svg{margin-top:4px;}
+  .legend{flex:1;background:var(--card);border-radius:14px;padding:12px;box-shadow:0 1px 0 rgba(0,0,0,.03);}
+  .legend .hd{font-size:11px;color:var(--text3);font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+  .legend .it{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;}
+  .legend .it .d{width:8px;height:8px;border-radius:50%;}
+  .legend .it .nm{flex:1;color:var(--text2);}
+  .legend .it .v{font-size:11px;font-weight:700;}
+
+  /* CTA bar */
+  .cta{position:absolute;left:0;right:0;bottom:84px;height:78px;padding:14px 16px 18px;background:linear-gradient(180deg,rgba(242,242,247,0),rgba(242,242,247,.95) 30%,#F2F2F7 100%);display:flex;gap:8px;}
+  .btn{flex:1;height:46px;border-radius:14px;border:0;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .btn.ghost{background:rgba(118,118,128,.12);color:var(--text);}
+  .btn.primary{flex:2;background:linear-gradient(180deg,#5FA8FF,var(--blue));color:#fff;box-shadow:0 10px 24px rgba(0,122,255,.28);}
+  .btn.primary svg{width:18px;height:18px;}
+
+  /* tab bar */
+  .tabbar{position:absolute;bottom:0;left:0;right:0;height:84px;padding:8px 0 24px;background:rgba(255,255,255,.78);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border-top:.5px solid var(--sep);display:flex;z-index:15;}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--text3);font-size:10px;}
+  .tab.active{color:var(--blue);}
+  .tab svg{width:24px;height:24px;}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="caption">5 / 8 · Detail · Ebbinghaus timeline · KP radar</div>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="status">
+          <span>9:41</span>
+          <div class="r">
+            <svg width="17" height="11" viewBox="0 0 17 11"><g fill="#111"><rect x="0" y="7" width="3" height="4" rx=".5"/><rect x="4.5" y="5" width="3" height="6" rx=".5"/><rect x="9" y="3" width="3" height="8" rx=".5"/><rect x="13.5" y="1" width="3" height="10" rx=".5"/></g></svg>
+            <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M8 3c2 0 3.8.7 5.2 1.9l1.4-1.4C12.8 1.9 10.5 1 8 1S3.2 1.9 1.4 3.5l1.4 1.4C4.2 3.7 6 3 8 3Z" fill="#111"/><path d="M8 6c1.2 0 2.3.4 3.2 1.1l1.4-1.4C11.3 4.6 9.7 4 8 4s-3.3.6-4.6 1.7l1.4 1.4C5.7 6.4 6.8 6 8 6Z" fill="#111"/><circle cx="8" cy="9" r="1.4" fill="#111"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="#111" opacity=".45"/><rect x="2" y="2" width="17" height="8" rx="1.6" fill="#111"/><rect x="23" y="4" width="2" height="4" rx="1" fill="#111" opacity=".45"/></svg>
+          </div>
+        </div>
+
+        <div class="nav">
+          <div class="row">
+            <a class="back"><svg viewBox="0 0 12 20" fill="none"><path d="M10 2 2 10l8 8" stroke="#007AFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>错题本</a>
+            <div class="r">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M16 5l3 3-10 10H6v-3L16 5Z" stroke="#007AFF" stroke-width="1.8" stroke-linejoin="round"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="6" r="1.6" fill="#007AFF"/><circle cx="12" cy="12" r="1.6" fill="#007AFF"/><circle cx="12" cy="18" r="1.6" fill="#007AFF"/></svg>
+            </div>
+          </div>
+          <h1>错题 #17 <span class="pill">未掌握</span></h1>
+        </div>
+
+        <div class="content">
+          <!-- image -->
+          <div class="img">
+            <div class="paper">
+              <div class="lbl">数学 · 第 12 章 复习题</div>
+              <div class="qno">17</div>
+              <h3>已知函数 f(x) = x² − 4x + 3，求其顶点坐标与对称轴方程。</h3>
+              <div class="fm">f(x) = (x − <em>1</em>)² − <em>2</em></div>
+              <div class="strk"></div>
+              <div class="pen">B ✗</div>
+            </div>
+            <div class="badge">原图 · 1.2 MB</div>
+            <div class="magn"><svg viewBox="0 0 24 24" fill="none"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+
+          <!-- segment tabs -->
+          <div class="stab"><span class="on">分析</span><span>复习记录</span><span>变式题</span></div>
+
+          <!-- analysis brief -->
+          <div class="brief">
+            <div class="row"><span class="kicker">数学 · 二次函数 · 顶点式</span></div>
+            <div class="stem">已知函数 f(x) = x² − 4x + 3，求其顶点坐标与对称轴方程。</div>
+            <div class="grid">
+              <div class="ans w"><div class="l">✗ 你的答</div><div class="v">B. (2, −1)</div></div>
+              <div class="ans r"><div class="l">✓ 正解</div><div class="v">A. (2, −1)</div></div>
+            </div>
+            <div class="err">错因：把顶点式 (x − h)² + k 中 <b>h, k 含义混淆</b>，顶点应为 (h, k) 而非 (−h, k)。</div>
+          </div>
+
+          <!-- timeline -->
+          <div class="sec"><h3>艾宾浩斯 复习时间线</h3><div class="line"></div><span class="r">3/6 已完成</span></div>
+          <div class="tl">
+            <div class="axis">
+              <svg viewBox="0 0 320 60" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="lg" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#34C759"/><stop offset=".5" stop-color="#5FA8FF"/><stop offset="1" stop-color="#C7C7CC"/></linearGradient>
+                </defs>
+                <path d="M10 50 C40 38, 60 30, 80 36 S130 50, 156 28 S210 6, 250 22 S300 48, 310 50" stroke="url(#lg)" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+                <path d="M10 50 C40 38, 60 30, 80 36 S130 50, 156 28 L156 60 L10 60 Z" fill="url(#lg)" opacity=".10"/>
+              </svg>
+            </div>
+            <div class="nodes">
+              <div class="nd done"><div class="dot"></div><div class="lv">T1</div><div class="dt">4/19 14:30</div></div>
+              <div class="nd done"><div class="dot"></div><div class="lv">T2</div><div class="dt">4/20</div></div>
+              <div class="nd done"><div class="dot"></div><div class="lv">T3</div><div class="dt">4/22</div></div>
+              <div class="nd now"><div class="dot"></div><div class="lv">T4</div><div class="dt">今日</div></div>
+              <div class="nd"><div class="dot"></div><div class="lv">T5</div><div class="dt">5/6</div></div>
+              <div class="nd"><div class="dot"></div><div class="lv">T6</div><div class="dt">5/21</div></div>
+            </div>
+            <div class="stats">
+              <div class="st"><div class="v b">5 次</div><div class="t">累计复习</div></div>
+              <div class="st"><div class="v g">68 %</div><div class="t">掌握度</div></div>
+              <div class="st"><div class="v o">1 次</div><div class="t">遗忘</div></div>
+            </div>
+          </div>
+
+          <!-- radar + KP legend -->
+          <div class="radar-row">
+            <div class="radar">
+              <div class="hd">知识点能力</div>
+              <svg width="130" height="130" viewBox="0 0 130 130">
+                <g transform="translate(65 65)" fill="none">
+                  <!-- rings -->
+                  <polygon points="0,-50 47.5,-15.5 29.4,40.5 -29.4,40.5 -47.5,-15.5" stroke="#E5E5EA" stroke-width="1"/>
+                  <polygon points="0,-37 35.2,-11.4 21.8,30 -21.8,30 -35.2,-11.4" stroke="#E5E5EA" stroke-width="1"/>
+                  <polygon points="0,-25 23.8,-7.7 14.7,20.2 -14.7,20.2 -23.8,-7.7" stroke="#E5E5EA" stroke-width="1"/>
+                  <polygon points="0,-12 11.4,-3.7 7.1,9.7 -7.1,9.7 -11.4,-3.7" stroke="#E5E5EA" stroke-width="1"/>
+                  <!-- axes -->
+                  <line x1="0" y1="0" x2="0" y2="-50" stroke="#E5E5EA"/>
+                  <line x1="0" y1="0" x2="47.5" y2="-15.5" stroke="#E5E5EA"/>
+                  <line x1="0" y1="0" x2="29.4" y2="40.5" stroke="#E5E5EA"/>
+                  <line x1="0" y1="0" x2="-29.4" y2="40.5" stroke="#E5E5EA"/>
+                  <line x1="0" y1="0" x2="-47.5" y2="-15.5" stroke="#E5E5EA"/>
+                  <!-- data -->
+                  <polygon points="0,-30 38,-12.4 22,30.2 -25,34 -38,-12.4" fill="rgba(0,122,255,.18)" stroke="#007AFF" stroke-width="1.6"/>
+                  <!-- labels -->
+                  <text x="0" y="-56" text-anchor="middle" font-size="9" fill="#3C3C43" font-weight="600">顶点式</text>
+                  <text x="54" y="-12" font-size="9" fill="#3C3C43" font-weight="600">配方</text>
+                  <text x="34" y="49" font-size="9" fill="#3C3C43" font-weight="600">对称轴</text>
+                  <text x="-34" y="49" text-anchor="end" font-size="9" fill="#3C3C43" font-weight="600">判别式</text>
+                  <text x="-54" y="-12" text-anchor="end" font-size="9" fill="#3C3C43" font-weight="600">韦达</text>
+                </g>
+              </svg>
+            </div>
+            <div class="legend">
+              <div class="hd">本题知识点</div>
+              <div class="it"><span class="d" style="background:var(--blue)"></span><span class="nm">顶点式</span><span class="v" style="color:var(--orange)">60%</span></div>
+              <div class="it"><span class="d" style="background:var(--indigo)"></span><span class="nm">配方法</span><span class="v" style="color:var(--green)">76%</span></div>
+              <div class="it"><span class="d" style="background:var(--green)"></span><span class="nm">对称轴</span><span class="v" style="color:var(--green)">82%</span></div>
+              <div class="it"><span class="d" style="background:var(--text3)"></span><span class="nm">Bloom</span><span class="v">APPLY</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta">
+          <button class="btn ghost">归档</button>
+          <button class="btn primary"><svg viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7L8 5Z" fill="#fff"/></svg>立即复习</button>
+        </div>
+
+        <!-- tab bar -->
+        <div class="tabbar">
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11 L12 3 L21 11 V20 a1 1 0 0 1 -1 1 H14 V14 H10 V21 H4 a1 1 0 0 1 -1 -1 Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg><span>首页</span></div>
+          <div class="tab active"><svg viewBox="0 0 24 24" fill="none"><path d="M5 4h11l3 3v13H5V4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 11h8M8 14h6M8 17h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>错题本</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="4.5" stroke="currentColor" stroke-width="1.8"/><path d="M5 8h3l1.5-2h5L16 8h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>拍题</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.5c-3.6 0-6.2 2.6-6.2 6.2v3.4L4 15.5v1.3h16v-1.3l-1.8-2.4V9.7c0-3.6-2.6-6.2-6.2-6.2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 19.5a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>复习</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.5" r="3.8" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 20c1.2-3.8 4.2-5.6 7.5-5.6s6.3 1.8 7.5 5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>我的</span></div>
+        </div>
+
+        <div class="homebar"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

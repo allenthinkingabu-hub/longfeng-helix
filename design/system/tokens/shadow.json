@@ -1,0 +1,32 @@
+{
+  "$metadata": {
+    "source": "getdesign.md/apple/design-md",
+    "saved_local": "design/system/inspiration/apple.design.md",
+    "generated_by": "ui-ux-pro-max-skill v2.5.0"
+  },
+  "tkn": {
+    "shadow": {
+      "card": {
+        "value": "rgba(0,0,0,0.22) 3px 5px 30px 0px",
+        "type": "shadow",
+        "comment": "Soft, diffused elevation for product cards. Mimics studio light on a physical object. Applied sparingly — most elements have NO shadow.",
+        "wechat_override": "rgba(0,0,0,0.26) 3px 5px 30px 0px"
+      },
+      "nav-glass": {
+        "value": "backdrop-filter: saturate(180%) blur(20px)",
+        "type": "shadow",
+        "comment": "Not a box-shadow — this is the CSS backdrop-filter applied to rgba(0,0,0,0.80) nav background. Creates the Apple translucent glass navbar. Falls back to solid #1c1c1e in WeChat miniprogram (no backdrop-filter support)."
+      },
+      "focus": {
+        "value": "0 0 0 2px #0071e3",
+        "type": "shadow",
+        "comment": "Focus ring for keyboard navigation. Applied to ALL interactive elements without exception."
+      },
+      "none": {
+        "value": "none",
+        "type": "shadow",
+        "comment": "Explicit no-shadow. Apple's default — most elements have no shadow at all."
+      }
+    }
+  }
+}

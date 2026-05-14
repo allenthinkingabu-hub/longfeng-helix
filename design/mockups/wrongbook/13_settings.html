@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>06 / 设置 · 通用日历</title>
+<style>
+  :root{
+    --blue:#007AFF; --red:#FF3B30; --orange:#FF9500; --green:#34C759; --indigo:#5856D6; --yellow:#FFCC00; --pink:#FF2D55;
+    --bg:#F2F2F7; --card:#FFFFFF; --text:#1C1C1E; --text2:#3C3C43; --text3:#8E8E93; --sep:rgba(60,60,67,.14);
+    --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+  html,body{height:100%;}
+  body{font-family:var(--font);color:var(--text);background:
+    radial-gradient(1200px 800px at 10% -10%, #E8EEFB 0%, transparent 60%),
+    radial-gradient(1000px 700px at 110% 10%, #F5E8FB 0%, transparent 55%),
+    linear-gradient(180deg,#EEF2F8 0%,#E6ECF5 100%);
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 0;}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px;}
+  .caption{font-size:13px;color:#5E6B82;letter-spacing:.08em;text-transform:uppercase;}
+  .phone{position:relative;width:393px;height:852px;border-radius:55px;overflow:hidden;
+    box-shadow:0 40px 100px -20px rgba(30,40,80,.35),0 8px 24px rgba(20,30,60,.12),inset 0 0 0 6px #111;}
+  .phone::before{content:"";position:absolute;top:11px;left:50%;transform:translateX(-50%);width:125px;height:37px;background:#000;border-radius:20px;z-index:40;}
+  .screen{position:absolute;inset:0;background:var(--bg);}
+  .status{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 8px;font-weight:600;font-size:15px;color:#111;z-index:30;}
+  .status .r{display:flex;align-items:center;gap:6px;}
+  .homebar{position:absolute;left:50%;transform:translateX(-50%);bottom:8px;width:134px;height:5px;border-radius:3px;background:#000;opacity:.85;z-index:30;}
+
+  /* Large title nav */
+  .nav{position:absolute;top:54px;left:0;right:0;padding:6px 20px 8px;background:rgba(242,242,247,.78);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border-bottom:.5px solid var(--sep);z-index:20;}
+  .nav .row{display:flex;align-items:center;justify-content:space-between;height:36px;}
+  .nav .back{display:flex;align-items:center;gap:4px;color:var(--blue);font-size:17px;}
+  .nav .back svg{width:12px;height:20px;}
+  .nav .edit{color:var(--blue);font-size:17px;}
+  .nav h1{font-size:34px;font-weight:700;letter-spacing:.36px;margin-top:2px;}
+
+  .content{position:absolute;top:155px;left:0;right:0;bottom:84px;overflow:hidden;padding:6px 16px 20px;}
+
+  /* Profile card */
+  .profile{background:var(--card);border-radius:14px;padding:14px;display:flex;align-items:center;gap:14px;box-shadow:0 1px 0 rgba(0,0,0,.03);}
+  .avatar{width:58px;height:58px;border-radius:50%;background:
+    conic-gradient(from 210deg,#7AA8FF,#B993FF,#FF9FB5,#FFC96B,#7AA8FF);
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;font-weight:600;letter-spacing:.5px;
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,.6),0 6px 18px rgba(90,90,140,.25);}
+  .profile .meta{flex:1;min-width:0;}
+  .profile .name{font-size:20px;font-weight:600;}
+  .profile .sub{font-size:13px;color:var(--text3);margin-top:2px;letter-spacing:.1px;}
+  .profile .chevron{color:var(--text3);}
+
+  /* Group list */
+  .group{margin-top:22px;}
+  .group .label{font-size:12px;letter-spacing:.3px;color:var(--text3);padding:0 16px 6px;text-transform:uppercase;}
+  .list{background:var(--card);border-radius:14px;overflow:hidden;}
+  .item{display:flex;align-items:center;gap:12px;padding:11px 14px;min-height:44px;border-top:.5px solid var(--sep);}
+  .item:first-child{border-top:none;}
+  .ico{width:29px;height:29px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;flex:0 0 29px;}
+  .ico svg{width:17px;height:17px;}
+  .ico.blue{background:var(--blue);} .ico.red{background:var(--red);} .ico.orange{background:var(--orange);}
+  .ico.green{background:var(--green);} .ico.indigo{background:var(--indigo);} .ico.yellow{background:var(--yellow);}
+  .ico.pink{background:var(--pink);} .ico.gray{background:#8E8E93;}
+  .item .title{flex:1;font-size:16px;color:var(--text);}
+  .item .value{font-size:15px;color:var(--text3);}
+  .item .chev{color:#C7C7CC;}
+  .item .chev svg{width:8px;height:13px;}
+
+  /* Toggle */
+  .switch{width:51px;height:31px;background:#E9E9EB;border-radius:31px;position:relative;flex:0 0 51px;}
+  .switch .dot{position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.15),0 1px 2px rgba(0,0,0,.1);transition:.2s;}
+  .switch.on{background:var(--green);}
+  .switch.on .dot{left:22px;}
+
+  .note{font-size:12px;color:var(--text3);padding:6px 16px 0;line-height:1.45;}
+
+  /* Tab bar (ghost — not current) */
+  .tabbar{position:absolute;bottom:0;left:0;right:0;height:84px;padding:8px 0 24px;background:rgba(255,255,255,.78);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border-top:.5px solid var(--sep);display:flex;z-index:15;}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--text3);font-size:10px;}
+  .tab.active{color:var(--blue);}
+  .tab svg{width:24px;height:24px;}
+
+  .meta-grid{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .chip-tone{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;background:#F2F2F7;color:var(--text2);font-size:12px;border:.5px solid var(--sep);}
+  .dot-tone{width:10px;height:10px;border-radius:50%;}
+
+  .version{text-align:center;font-size:12px;color:var(--text3);padding:14px 0 0;letter-spacing:.2px;}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="caption">6 / 7 · Settings · Apple HIG grouped list</div>
+    <div class="phone">
+      <div class="screen">
+
+        <!-- status bar -->
+        <div class="status">
+          <span>9:41</span>
+          <div class="r">
+            <svg width="17" height="11" viewBox="0 0 17 11"><g fill="#111"><rect x="0" y="7" width="3" height="4" rx=".5"/><rect x="4.5" y="5" width="3" height="6" rx=".5"/><rect x="9" y="3" width="3" height="8" rx=".5"/><rect x="13.5" y="1" width="3" height="10" rx=".5"/></g></svg>
+            <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M8 3c2 0 3.8.7 5.2 1.9l1.4-1.4C12.8 1.9 10.5 1 8 1S3.2 1.9 1.4 3.5l1.4 1.4C4.2 3.7 6 3 8 3Z" fill="#111"/><path d="M8 6c1.2 0 2.3.4 3.2 1.1l1.4-1.4C11.3 4.6 9.7 4 8 4s-3.3.6-4.6 1.7l1.4 1.4C5.7 6.4 6.8 6 8 6Z" fill="#111"/><circle cx="8" cy="9" r="1.4" fill="#111"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="#111" opacity=".45"/><rect x="2" y="2" width="17" height="8" rx="1.6" fill="#111"/><rect x="23" y="4" width="2" height="4" rx="1" fill="#111" opacity=".45"/></svg>
+          </div>
+        </div>
+
+        <!-- nav -->
+        <div class="nav">
+          <div class="row">
+            <a class="back"><svg viewBox="0 0 12 20" fill="none"><path d="M10 2 2 10l8 8" stroke="#007AFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>日历</a>
+            <a class="edit">完成</a>
+          </div>
+          <h1>设置</h1>
+        </div>
+
+        <!-- content -->
+        <div class="content">
+          <!-- profile -->
+          <div class="profile">
+            <div class="avatar">AW</div>
+            <div class="meta">
+              <div class="name">Allen Wang</div>
+              <div class="sub">allenthinking.abu@gmail.com · Pro 版</div>
+              <div class="meta-grid" style="margin-top:8px;">
+                <span class="chip-tone"><span class="dot-tone" style="background:var(--green)"></span>已同步 · 刚刚</span>
+                <span class="chip-tone"><span class="dot-tone" style="background:var(--blue)"></span>3 端在线</span>
+              </div>
+            </div>
+            <div class="chevron"><svg width="8" height="13" viewBox="0 0 8 13" fill="none"><path d="M1 1l6 5.5L1 12" stroke="#C7C7CC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+
+          <!-- 偏好 -->
+          <div class="group">
+            <div class="label">偏好设置</div>
+            <div class="list">
+              <div class="item">
+                <div class="ico blue"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="#fff" stroke-width="1.8"/><path d="M3.5 12h17M12 3.5c2.5 2.3 3.8 5.2 3.8 8.5s-1.3 6.2-3.8 8.5M12 3.5c-2.5 2.3-3.8 5.2-3.8 8.5s1.3 6.2 3.8 8.5" stroke="#fff" stroke-width="1.5"/></svg></div>
+                <div class="title">时区</div>
+                <div class="value">Asia/Shanghai (GMT+8)</div>
+                <div class="chev"><svg viewBox="0 0 8 13" fill="none"><path d="M1 1l6 5.5L1 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="item">
+                <div class="ico indigo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h10M4 18h16" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                <div class="title">语言</div>
+                <div class="value">简体中文</div>
+                <div class="chev"><svg viewBox="0 0 8 13" fill="none"><path d="M1 1l6 5.5L1 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="item">
+                <div class="ico orange"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.2" fill="#fff"/><g stroke="#fff" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M5.6 18.4l1.6-1.6M16.8 7.2l1.6-1.6"/></g></svg></div>
+                <div class="title">外观</div>
+                <div class="value">自动</div>
+                <div class="chev"><svg viewBox="0 0 8 13" fill="none"><path d="M1 1l6 5.5L1 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="item">
+                <div class="ico green"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15" rx="2.5" stroke="#fff" stroke-width="1.8"/><path d="M3.5 9.5h17M8 3.5v3M16 3.5v3" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                <div class="title">一周起始日</div>
+                <div class="value">周一</div>
+                <div class="chev"><svg viewBox="0 0 8 13" fill="none"><path d="M1 1l6 5.5L1 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+            </div>
+            <div class="note">所有时间以 UTC 存储，按此时区在前端渲染。跨时区旅行时自动切换显示。</div>
+          </div>
+
+          <!-- 通知 -->
+          <div class="group">
+            <div class="label">通知与提醒</div>
+            <div class="list">
+              <div class="item">
+                <div class="ico red"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.5c-3.6 0-6.2 2.6-6.2 6.2v3.4L4 15.5v1.3h16v-1.3l-1.8-2.4V9.7c0-3.6-2.6-6.2-6.2-6.2Z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 19.5a2 2 0 0 0 4 0" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                <div class="title">推送通知</div>
+                <div class="switch on"><div class="dot"></div></div>
+              </div>
+              <div class="item">
+                <div class="ico blue"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5.5" width="17" height="13" rx="2.2" stroke="#fff" stroke-width="1.8"/><path d="m4 7 8 6 8-6" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+                <div class="title">邮件通知</div>
+                <div class="switch on"><div class="dot"></div></div>
+              </div>
+              <div class="item">
+                <div class="ico green"><svg viewBox="0 0 24 24" fill="none"><path d="M6 4.5h5l2 4.5-2.6 1.3a10.5 10.5 0 0 0 4.8 4.8L16.5 12l4.5 2v5a2 2 0 0 1-2 2C10.8 20.6 4.4 14.2 4 5.5a2 2 0 0 1 2-2Z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+                <div class="title">短信通知</div>
+                <div class="value">未绑定手机</div>
+                <div class="switch"><div class="dot"></div></div>
+              </div>
+              <div class="item">
+                <div class="ico indigo"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="#fff" stroke-width="1.8"/><path d="M12 7v5l3.2 2" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                <div class="title">免打扰时段</div>
+                <div class="value">23:00 — 07:30</div>
+                <div class="chev"><svg viewBox="0 0 8 13" fill="none"><path d="M1 1l6 5.5L1 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="item">
+                <div class="ico orange"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7c3-2 6-2 8 0s5 2 8 0v10c-3 2-6 2-8 0s-5-2-8 0V7Z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+                <div class="title">记忆曲线节奏</div>
+                <div class="value">标准 5 阶段</div>
+                <div class="chev"><svg viewBox="0 0 8 13" fill="none"><path d="M1 1l6 5.5L1 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 隐私与账户 -->
+          <div class="group">
+            <div class="label">隐私与账户</div>
+            <div class="list">
+              <div class="item">
+                <div class="ico gray"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="9.5" rx="2" stroke="#fff" stroke-width="1.8"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10" stroke="#fff" stroke-width="1.8"/></svg></div>
+                <div class="title">Face ID 解锁</div>
+                <div class="switch on"><div class="dot"></div></div>
+              </div>
+              <div class="item">
+                <div class="ico pink"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.5l7.5 3v5.2c0 4.6-3.2 8.5-7.5 9.3-4.3-.8-7.5-4.7-7.5-9.3V6.5L12 3.5Z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="m8.5 12 2.5 2.5L16 10" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="title">端到端加密</div>
+                <div class="value">已启用</div>
+                <div class="chev"><svg viewBox="0 0 8 13" fill="none"><path d="M1 1l6 5.5L1 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="item">
+                <div class="ico blue"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8.5c4-3 12-3 16 0v7c-4 3-12 3-16 0v-7Z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+                <div class="title">数据导出</div>
+                <div class="value">.ics / .json</div>
+                <div class="chev"><svg viewBox="0 0 8 13" fill="none"><path d="M1 1l6 5.5L1 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <div class="item">
+                <div class="ico red"><svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12l-1 12.5A2 2 0 0 1 15 21H9a2 2 0 0 1-2-1.5L6 7Z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" stroke="#fff" stroke-width="1.8"/></svg></div>
+                <div class="title" style="color:var(--red)">注销账户</div>
+                <div class="chev"><svg viewBox="0 0 8 13" fill="none"><path d="M1 1l6 5.5L1 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 关于 -->
+          <div class="group">
+            <div class="label">关于</div>
+            <div class="list">
+              <div class="item">
+                <div class="ico gray"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="#fff" stroke-width="1.8"/><path d="M12 11v5.5M12 8v.1" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                <div class="title">版本</div>
+                <div class="value">1.0.0 · build 240421</div>
+              </div>
+              <div class="item">
+                <div class="ico blue"><svg viewBox="0 0 24 24" fill="none"><path d="M4.5 6.5h15v11h-15z" stroke="#fff" stroke-width="1.8"/><path d="M7 10h10M7 13.5h7" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                <div class="title">服务条款与隐私政策</div>
+                <div class="chev"><svg viewBox="0 0 8 13" fill="none"><path d="M1 1l6 5.5L1 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+            </div>
+            <div class="version">© 2026 Longfeng · 通用日历系统</div>
+          </div>
+        </div>
+
+        <!-- tab bar (我的 active) -->
+        <div class="tabbar">
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5h17M8 3.5v3M16 3.5v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <span>日历</span>
+          </div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h10M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <span>待办</span>
+          </div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3.5 18.5 9 13l3.5 3.5L20.5 8.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>统计</span>
+          </div>
+          <div class="tab active">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.5" r="3.8" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 20c1.2-3.8 4.2-5.6 7.5-5.6s6.3 1.8 7.5 5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <span>我的</span>
+          </div>
+        </div>
+
+        <div class="homebar"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

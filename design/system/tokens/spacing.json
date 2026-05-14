@@ -1,0 +1,131 @@
+{
+  "$metadata": {
+    "source": "getdesign.md/apple/design-md",
+    "saved_local": "design/system/inspiration/apple.design.md",
+    "generated_by": "ui-ux-pro-max-skill v2.5.0"
+  },
+  "tkn": {
+    "spacing": {
+      "1": {
+        "value": "2px",
+        "type": "dimension",
+        "comment": "0.5 unit — icon micro-alignment"
+      },
+      "2": {
+        "value": "4px",
+        "type": "dimension",
+        "comment": "0.5 base — dense internal padding, icon-to-text gap"
+      },
+      "2xs": {
+        "value": "2px",
+        "type": "dimension",
+        "comment": "Alias: icon micro-alignment"
+      },
+      "xs": {
+        "value": "4px",
+        "type": "dimension",
+        "comment": "Alias: dense internal padding"
+      },
+      "3": {
+        "value": "6px",
+        "type": "dimension",
+        "comment": "0.75 unit — compact chip padding"
+      },
+      "4": {
+        "value": "8px",
+        "type": "dimension",
+        "comment": "1 base unit — component internal gap, button vertical padding"
+      },
+      "sm": {
+        "value": "8px",
+        "type": "dimension",
+        "comment": "Alias: 1 base unit"
+      },
+      "5": {
+        "value": "10px",
+        "type": "dimension",
+        "comment": "1.25 unit — fine-grained layout adjustment"
+      },
+      "6": {
+        "value": "12px",
+        "type": "dimension",
+        "comment": "1.5 unit — card internal padding"
+      },
+      "7": {
+        "value": "14px",
+        "type": "dimension",
+        "comment": "1.75 unit — nav link padding"
+      },
+      "8": {
+        "value": "16px",
+        "type": "dimension",
+        "comment": "2 base units — standard card padding, content inset"
+      },
+      "md": {
+        "value": "16px",
+        "type": "dimension",
+        "comment": "Alias: standard card padding"
+      },
+      "9": {
+        "value": "20px",
+        "type": "dimension",
+        "comment": "2.5 units — section sub-gap"
+      },
+      "10": {
+        "value": "24px",
+        "type": "dimension",
+        "comment": "3 base units — component separation"
+      },
+      "lg": {
+        "value": "24px",
+        "type": "dimension",
+        "comment": "Alias: component separation"
+      },
+      "12": {
+        "value": "32px",
+        "type": "dimension",
+        "comment": "4 base units — section padding, major spacing"
+      },
+      "xl": {
+        "value": "32px",
+        "type": "dimension",
+        "comment": "Alias: section padding"
+      },
+      "14": {
+        "value": "48px",
+        "type": "dimension",
+        "comment": "6 units — major section separation"
+      },
+      "2xl": {
+        "value": "48px",
+        "type": "dimension",
+        "comment": "Alias: major section separation"
+      },
+      "16": {
+        "value": "64px",
+        "type": "dimension",
+        "comment": "8 units — hero vertical rhythm"
+      },
+      "3xl": {
+        "value": "64px",
+        "type": "dimension",
+        "comment": "Alias: hero vertical rhythm"
+      },
+      "20": {
+        "value": "80px",
+        "type": "dimension",
+        "comment": "10 units — generous hero padding"
+      },
+      "24": {
+        "value": "96px",
+        "type": "dimension",
+        "comment": "12 units — between major page sections"
+      },
+      "4xl": {
+        "value": "96px",
+        "type": "dimension",
+        "comment": "Alias: between major page sections"
+      }
+    }
+  }
+}

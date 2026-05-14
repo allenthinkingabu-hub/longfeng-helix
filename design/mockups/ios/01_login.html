@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>登录页 · 通用日历</title>
+<style>
+:root{
+  --blue:#007AFF; --blue2:#0A84FF;
+  --gray1:#8E8E93; --gray2:#AEAEB2; --gray3:#C7C7CC; --gray4:#D1D1D6; --gray5:#E5E5EA; --gray6:#F2F2F7;
+  --label:#000000D9; --label2:#3C3C434D; --label3:#3C3C434D;
+  --bg:#FFFFFF; --bg2:#F2F2F7;
+  --radius-card:22px; --radius-btn:14px; --radius-input:12px;
+  --shadow-card:0 1px 3px rgba(0,0,0,.04),0 12px 40px rgba(0,0,0,.08);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--font);-webkit-font-smoothing:antialiased}
+body{background:linear-gradient(180deg,#EAF1FB 0%,#F7F6FA 55%,#FDF1F4 100%);display:grid;place-items:center;padding:40px;color:var(--label)}
+.phone{
+  position:relative;width:393px;height:852px;background:#fff;border-radius:55px;
+  box-shadow:0 40px 100px -20px rgba(30,40,80,.35),0 8px 24px rgba(20,30,60,.12),inset 0 0 0 6px #111;
+  overflow:hidden;
+}
+.phone::before{
+  content:"";position:absolute;top:11px;left:50%;transform:translateX(-50%);
+  width:125px;height:37px;background:#000;border-radius:20px;z-index:20;
+}
+.status{
+  position:absolute;inset:0 0 auto 0;height:54px;padding:18px 34px 0;display:flex;justify-content:space-between;align-items:flex-start;
+  font-size:17px;font-weight:600;letter-spacing:-.2px;z-index:15;color:#000;
+}
+.status .right{display:flex;gap:6px;align-items:center}
+.status .right svg{display:block}
+.screen{position:absolute;inset:0;padding-top:54px;padding-bottom:34px;background:
+  radial-gradient(120% 60% at 50% -10%, #E8F1FF 0%, transparent 60%),
+  linear-gradient(180deg,#FFFFFF 0%,#F7F7FB 100%);
+  display:flex;flex-direction:column;align-items:center;}
+.logo-wrap{margin-top:62px;position:relative}
+.logo{
+  width:92px;height:92px;border-radius:24px;
+  background:linear-gradient(135deg,#3BA6FF 0%,#0A84FF 60%,#0060DF 100%);
+  display:grid;place-items:center;
+  box-shadow:0 20px 40px -10px rgba(10,132,255,.45),0 6px 16px rgba(10,132,255,.25);
+  position:relative;overflow:hidden;
+}
+.logo::after{content:"";position:absolute;top:-30%;left:-10%;width:140%;height:70%;
+  background:linear-gradient(180deg,rgba(255,255,255,.35),transparent);transform:rotate(-8deg);border-radius:50%;}
+.logo svg{position:relative;z-index:1}
+.app-title{margin-top:22px;font-size:28px;font-weight:700;letter-spacing:-.4px}
+.app-sub{margin-top:6px;color:#3C3C4399;font-size:15px;font-weight:400}
+.app-sub b{color:#0A84FF;font-weight:500}
+.card{
+  width:333px;margin-top:30px;padding:14px;
+  background:rgba(255,255,255,.78);backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%);
+  border:.5px solid rgba(60,60,67,.08);border-radius:var(--radius-card);box-shadow:var(--shadow-card);
+}
+.field{
+  display:flex;align-items:center;gap:10px;padding:13px 14px;background:#F2F2F7;border-radius:var(--radius-input);margin-bottom:8px;
+}
+.field svg{color:#8E8E93;flex:0 0 18px}
+.field input{
+  flex:1;border:0;background:transparent;font:500 16px var(--font);color:#000;outline:none;letter-spacing:-.1px;
+}
+.field input::placeholder{color:#8E8E9399;font-weight:400}
+.row-foot{display:flex;justify-content:space-between;align-items:center;padding:8px 4px 4px;font-size:13px;color:#3C3C4399}
+.chk{display:flex;align-items:center;gap:8px}
+.chk .box{width:18px;height:18px;border-radius:6px;background:var(--blue);display:grid;place-items:center}
+.chk .box svg{color:#fff}
+.forget{color:var(--blue);font-weight:500}
+.btn{
+  width:333px;height:50px;margin-top:14px;border-radius:var(--radius-btn);border:0;
+  font:600 16px var(--font);letter-spacing:-.1px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;
+}
+.btn.primary{background:linear-gradient(180deg,#1E94FF 0%,#0A84FF 100%);color:#fff;
+  box-shadow:0 10px 24px -8px rgba(10,132,255,.5),inset 0 1px 0 rgba(255,255,255,.25);}
+.btn.apple{background:#000;color:#fff;margin-top:10px}
+.btn.wechat{background:#fff;color:#1F1F1F;margin-top:10px;border:.5px solid rgba(60,60,67,.12)}
+.btn.wechat svg{color:#07C160}
+.divider{width:333px;display:flex;align-items:center;gap:10px;margin-top:22px;color:#8E8E9399;font-size:12px;letter-spacing:.5px}
+.divider::before,.divider::after{content:"";flex:1;height:.5px;background:rgba(60,60,67,.18)}
+.foot{
+  position:absolute;bottom:44px;left:0;right:0;text-align:center;font-size:12px;color:#8E8E93;letter-spacing:.1px;
+}
+.foot a{color:var(--blue);text-decoration:none}
+.homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#000;opacity:.8}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="status">
+    <span>9:41</span>
+    <div class="right">
+      <!-- signal -->
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="1" width="3" height="11" rx="1"/><rect x="15" y="-2" width="3" height="14" rx="1" opacity=".35"/></svg>
+      <!-- wifi -->
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><path d="M8.5 2c3.5 0 6.6 1.4 8.5 3.5l-1.5 1.3C13.9 5 11.3 3.8 8.5 3.8S3.1 5 1.5 6.8L0 5.5C1.9 3.4 5 2 8.5 2zm0 3c2.4 0 4.5 1 6 2.5L13 8.8c-1.2-1.1-2.8-1.8-4.5-1.8S5.2 7.7 4 8.8L2.5 7.5C4 6 6.1 5 8.5 5zm0 3c1.3 0 2.5.5 3.4 1.3L8.5 13 5.1 9.3C6 8.5 7.2 8 8.5 8z"/></svg>
+      <!-- battery -->
+      <svg width="28" height="12" viewBox="0 0 28 12" fill="none"><rect x=".5" y=".5" width="24" height="11" rx="3" stroke="currentColor" opacity=".5"/><rect x="26" y="4" width="1.5" height="4" rx=".75" fill="currentColor" opacity=".5"/><rect x="2.5" y="2.5" width="20" height="7" rx="1.5" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <div class="screen">
+    <div class="logo-wrap">
+      <div class="logo">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <rect x="7" y="10" width="34" height="31" rx="7" fill="#fff" opacity=".98"/>
+          <rect x="7" y="10" width="34" height="10" rx="4" fill="#FFFFFF"/>
+          <rect x="13" y="6" width="2.6" height="8" rx="1.3" fill="#fff"/>
+          <rect x="32.4" y="6" width="2.6" height="8" rx="1.3" fill="#fff"/>
+          <circle cx="16" cy="27" r="2" fill="#0A84FF"/>
+          <circle cx="24" cy="27" r="2" fill="#FF9500"/>
+          <circle cx="32" cy="27" r="2" fill="#34C759"/>
+          <circle cx="16" cy="34" r="2" fill="#C7C7CC"/>
+          <circle cx="24" cy="34" r="2" fill="#0A84FF"/>
+          <circle cx="32" cy="34" r="2" fill="#C7C7CC"/>
+        </svg>
+      </div>
+    </div>
+    <div class="app-title">日历</div>
+    <div class="app-sub">统一 <b>学习 · 任务 · 提醒 · 备忘</b></div>
+
+    <div class="card">
+      <div class="field">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
+        <input type="email" placeholder="邮箱或手机号" value="allen@longfeng.io"/>
+      </div>
+      <div class="field">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input type="password" placeholder="密码" value="••••••••••"/>
+      </div>
+      <div class="row-foot">
+        <div class="chk">
+          <div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span>记住我</span>
+        </div>
+        <span class="forget">忘记密码？</span>
+      </div>
+    </div>
+
+    <button class="btn primary">登录</button>
+
+    <div class="divider">或使用</div>
+
+    <button class="btn apple">
+      <svg width="16" height="18" viewBox="0 0 16 18" fill="currentColor"><path d="M13.4 13.7c-.5 1.2-.8 1.7-1.5 2.8-1 1.5-2.4 3.4-4.1 3.4-1.5 0-1.9-1-4-1-2 0-2.5 1-4 1-1.7 0-3-1.7-4-3.2C-6.5 13.3-7 7.6-4.1 4.6c1-1 2.4-1.6 3.7-1.6 1.6 0 2.6 1 3.9 1 1.3 0 2-1 3.9-1 1.5 0 3 .8 4 2.2-3.5 1.9-3 6.9.6 8.5zM9.1-1.9C9.8-2.8 10.3-4 10.2-5.2c-1 .1-2.3.7-3 1.5-.7.7-1.4 2-1.2 3.1 1.1.1 2.3-.6 3.1-1.3z" transform="translate(4 3)"/></svg>
+      使用 Apple 账号继续
+    </button>
+    <button class="btn wechat">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9.5 3C5 3 1.5 5.9 1.5 9.5c0 2 1.1 3.8 2.9 5l-.7 2.2 2.6-1.3c.9.2 1.9.4 2.8.3-.2-.6-.3-1.3-.3-2C8.8 10.1 12 7 16 7c.2 0 .5 0 .7.1C16 4.7 13 3 9.5 3zM7 7.2c.6 0 1.1.5 1.1 1.1s-.5 1.1-1.1 1.1S5.9 9 5.9 8.3 6.4 7.2 7 7.2zm5 0c.6 0 1.1.5 1.1 1.1s-.5 1.1-1.1 1.1S11 9 11 8.3s.4-1.1 1-1.1zm4 1.6c-3.9 0-7 2.7-7 5.9 0 3.3 3.1 5.9 7 5.9.8 0 1.6-.1 2.4-.3l2.2 1.1-.6-1.8c1.6-1.1 2.6-2.7 2.6-4.5 0-3.2-3-6.3-6.6-6.3zm-2.3 4.2c.5 0 .9.4.9.9s-.4.9-.9.9-.9-.4-.9-.9.4-.9.9-.9zm4.5 0c.5 0 .9.4.9.9s-.4.9-.9.9-.9-.4-.9-.9.4-.9.9-.9z"/></svg>
+      使用微信登录
+    </button>
+
+    <div class="foot">
+      登录即表示同意 <a>服务条款</a> 与 <a>隐私政策</a>
+    </div>
+  </div>
+
+  <div class="homebar"></div>
+</div>
+</body>
+</html>

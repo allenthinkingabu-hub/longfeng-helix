@@ -1,0 +1,218 @@
+{
+  "$metadata": {
+    "source": "getdesign.md/apple/design-md",
+    "saved_local": "design/system/inspiration/apple.design.md",
+    "generated_by": "ui-ux-pro-max-skill v2.5.0",
+    "human_overrides": ["subject-palette", "miniprogram-saturation"]
+  },
+  "_meta": {
+    "description": "AI错题本 color tokens — Apple aesthetic base with two human overrides",
+    "platform_overrides": {
+      "wechat": {
+        "saturation_delta": 12,
+        "shadow_alpha_delta": 0.04,
+        "note": "WeChat miniprogram renders Apple cold-white as dirty; +12% saturation correction applied via Style Dictionary wxss platform transform"
+      }
+    }
+  },
+  "tkn": {
+    "color": {
+      "black": {
+        "value": "#000000",
+        "type": "color",
+        "comment": "Hero dark backgrounds, immersive product sections"
+      },
+      "white": {
+        "value": "#ffffff",
+        "type": "color",
+        "comment": "Text on dark backgrounds, button text on blue/dark CTAs"
+      },
+      "bg": {
+        "light": {
+          "value": "#f5f5f7",
+          "type": "color",
+          "comment": "Alternate section backgrounds — slight blue-gray tint prevents sterility"
+        },
+        "dark": {
+          "value": "#000000",
+          "type": "color",
+          "comment": "Immersive dark section backgrounds"
+        }
+      },
+      "surface": {
+        "dark-1": {
+          "value": "#272729",
+          "type": "color",
+          "comment": "Card backgrounds in dark sections"
+        },
+        "dark-2": {
+          "value": "#262628",
+          "type": "color",
+          "comment": "Subtle surface variation in dark contexts"
+        },
+        "dark-3": {
+          "value": "#28282a",
+          "type": "color",
+          "comment": "Elevated cards on dark backgrounds"
+        },
+        "dark-4": {
+          "value": "#2a2a2d",
+          "type": "color",
+          "comment": "Highest dark surface elevation"
+        },
+        "dark-5": {
+          "value": "#242426",
+          "type": "color",
+          "comment": "Deepest dark surface tone"
+        }
+      },
+      "text": {
+        "primary": {
+          "value": "#1d1d1f",
+          "type": "color",
+          "comment": "Primary body text on light backgrounds",
+          "contrast_on_light": "16.83:1"
+        },
+        "secondary": {
+          "value": "rgba(0,0,0,0.80)",
+          "type": "color",
+          "comment": "Secondary text, nav items on light. Effective ~#333 on white = 12.6:1"
+        },
+        "tertiary": {
+          "value": "rgba(0,0,0,0.48)",
+          "type": "color",
+          "comment": "Disabled states, carousel controls. For decorative/large use only"
+        },
+        "on-dark": {
+          "value": "#ffffff",
+          "type": "color",
+          "comment": "Text on dark section backgrounds",
+          "contrast_on_dark": "21:1"
+        }
+      },
+      "button": {
+        "active": {
+          "value": "#ededf2",
+          "type": "color",
+          "comment": "Active/pressed state for light buttons"
+        },
+        "default-light": {
+          "value": "#fafafc",
+          "type": "color",
+          "comment": "Search/filter button backgrounds"
+        }
+      },
+      "overlay": {
+        "media": {
+          "value": "rgba(210,210,215,0.64)",
+          "type": "color",
+          "comment": "Media control scrims, overlays"
+        }
+      },
+      "primary": {
+        "DEFAULT": {
+          "value": "#0071e3",
+          "type": "color",
+          "comment": "Apple Blue — ONLY chromatic accent in core palette. Primary CTA backgrounds, focus rings.",
+          "contrast_on_light": "4.70:1",
+          "contrast_on_dark": "4.47:1",
+          "_warning_dark": "below-AA for small text on pure black (#000); use primary-dark for small text on dark backgrounds"
+        },
+        "dark": {
+          "value": "#2997ff",
+          "type": "color",
+          "comment": "Links/interactive on dark section backgrounds. Higher luminance for contrast on black.",
+          "contrast_on_light": "3.02:1",
+          "contrast_on_dark": "6.96:1",
+          "_warning_light": "below-AA for small text on white; use primary-DEFAULT for light backgrounds"
+        },
+        "link": {
+          "value": "#0066cc",
+          "type": "color",
+          "comment": "Inline text links on light backgrounds. Slightly darker than primary for text-level readability.",
+          "contrast_on_light": "5.57:1",
+          "contrast_on_dark": "3.77:1"
+        }
+      },
+      "success": {
+        "DEFAULT": {
+          "value": "#1A7D34",
+          "type": "color",
+          "comment": "Success states, confirmations",
+          "contrast_on_light": "5.21:1",
+          "contrast_on_dark": "4.03:1"
+        }
+      },
+      "warning": {
+        "DEFAULT": {
+          "value": "#B45309",
+          "type": "color",
+          "comment": "Warning states, caution banners",
+          "contrast_on_light": "5.02:1",
+          "contrast_on_dark": "4.18:1"
+        }
+      },
+      "danger": {
+        "DEFAULT": {
+          "value": "#C0392B",
+          "type": "color",
+          "comment": "Error states, destructive actions",
+          "contrast_on_light": "5.44:1",
+          "contrast_on_dark": "3.86:1"
+        }
+      },
+      "info": {
+        "DEFAULT": {
+          "value": "#005C99",
+          "type": "color",
+          "comment": "Info banners, informational states",
+          "contrast_on_light": "7.02:1",
+          "contrast_on_dark": "2.99:1",
+          "_warning_dark": "below-AA on black; info banners should only appear on light backgrounds"
+        }
+      }
+    },
+    "subject": {
+      "math": {
+        "value": "#C41E3A",
+        "type": "color",
+        "css_var": "--tkn-subject-math",
+        "comment": "EXCEPTION 1 — Carmine red. High-energy, distinct from physics/chemistry/english. For math subject chips, tags, left-bars.",
+        "contrast_on_light": "5.84:1",
+        "contrast_on_dark": "3.59:1",
+        "white_text_on_this": "5.84:1",
+        "rationale": "tag_taxonomy requires >=4 visually distinct subject colors; math classically red"
+      },
+      "physics": {
+        "value": "#0057B7",
+        "type": "color",
+        "css_var": "--tkn-subject-physics",
+        "comment": "EXCEPTION 1 — Cobalt blue. Physical world / science association.",
+        "contrast_on_light": "6.89:1",
+        "contrast_on_dark": "3.05:1",
+        "white_text_on_this": "6.89:1",
+        "rationale": "Distinct from primary-DEFAULT (#0071e3) in both hue and luminance"
+      },
+      "chemistry": {
+        "value": "#1A6B3A",
+        "type": "color",
+        "css_var": "--tkn-subject-chemistry",
+        "comment": "EXCEPTION 1 — Forest green. Lab / organic chemistry association.",
+        "contrast_on_light": "6.55:1",
+        "contrast_on_dark": "3.21:1",
+        "white_text_on_this": "6.55:1",
+        "rationale": "Green not used anywhere else in core palette; unambiguous"
+      },
+      "english": {
+        "value": "#9C4F00",
+        "type": "color",
+        "css_var": "--tkn-subject-english",
+        "comment": "EXCEPTION 1 — Amber / copper. Warm language / literary association.",
+        "contrast_on_light": "5.95:1",
+        "contrast_on_dark": "3.53:1",
+        "white_text_on_this": "5.95:1",
+        "rationale": "Warm orange avoids both red (math) and blue (physics) territory; meets 4.5:1 on light"
+      }
+    }
+  }
+}

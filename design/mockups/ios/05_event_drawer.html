@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>新建事项 · 通用日历</title>
+<style>
+:root{
+  --blue:#007AFF; --red:#FF3B30; --orange:#FF9500; --green:#34C759; --indigo:#5856D6;
+  --gray1:#8E8E93; --gray5:#E5E5EA; --gray6:#F2F2F7;
+  --label:#000; --label2:#3C3C4399; --label3:#3C3C434D;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--font);-webkit-font-smoothing:antialiased}
+body{background:linear-gradient(180deg,#EAF1FB 0%,#F7F6FA 55%,#FDF1F4 100%);display:grid;place-items:center;padding:40px;color:var(--label)}
+.phone{position:relative;width:393px;height:852px;background:#000;border-radius:55px;
+  box-shadow:0 40px 100px -20px rgba(30,40,80,.35),0 8px 24px rgba(20,30,60,.12),inset 0 0 0 6px #111;overflow:hidden;}
+.phone::before{content:"";position:absolute;top:11px;left:50%;transform:translateX(-50%);width:125px;height:37px;background:#000;border-radius:20px;z-index:30;}
+.status{position:absolute;inset:0 0 auto 0;height:54px;padding:18px 34px 0;display:flex;justify-content:space-between;align-items:flex-start;font-size:17px;font-weight:600;z-index:25;color:#fff;}
+.status .right{display:flex;gap:6px;align-items:center}
+
+/* Backdrop: dimmed month view underneath */
+.backdrop{
+  position:absolute;inset:0;background:
+    radial-gradient(80% 40% at 20% 15%,rgba(10,132,255,.25),transparent 70%),
+    radial-gradient(60% 40% at 85% 10%,rgba(255,149,0,.18),transparent 70%),
+    linear-gradient(180deg,#1A1A1E 0%,#0A0A0C 100%);
+}
+.backdrop::after{content:"";position:absolute;inset:0;backdrop-filter:blur(6px);background:rgba(0,0,0,.25)}
+
+/* Sheet */
+.sheet{
+  position:absolute;left:0;right:0;bottom:0;height:740px;border-top-left-radius:26px;border-top-right-radius:26px;
+  background:linear-gradient(180deg,rgba(252,252,253,.92),rgba(248,249,252,.98));
+  backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);
+  box-shadow:0 -20px 60px rgba(0,0,0,.35);overflow:hidden;
+}
+.grab{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:44px;height:5px;border-radius:3px;background:rgba(60,60,67,.3)}
+.sheet-nav{
+  display:flex;justify-content:space-between;align-items:center;padding:18px 20px 0;
+}
+.sheet-nav .cancel{color:var(--blue);font-size:17px;font-weight:500}
+.sheet-nav .title{font-size:17px;font-weight:600;color:#000}
+.sheet-nav .save{color:#fff;font-size:15px;font-weight:600;padding:6px 14px;background:var(--blue);border-radius:16px;box-shadow:0 4px 12px rgba(10,132,255,.35)}
+
+.body{padding:18px 16px 0;height:calc(100% - 52px);overflow-y:auto;padding-bottom:140px}
+.input-title{
+  background:transparent;border:0;width:100%;font:700 28px var(--font);color:#000;letter-spacing:-.5px;padding:4px 4px 8px;outline:none;
+}
+.input-title::placeholder{color:var(--label3)}
+
+/* Relation type segmented */
+.relation-seg{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:4px 0 16px;
+}
+.rel-btn{
+  background:#fff;border-radius:14px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;
+  border:1.5px solid transparent;box-shadow:0 1px 2px rgba(0,0,0,.04),0 4px 10px rgba(0,0,0,.04);
+  transition:all .2s;
+}
+.rel-btn .ic{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;color:#fff}
+.rel-btn .lb{font-size:12px;font-weight:600;color:var(--label2);letter-spacing:-.1px}
+.rel-btn.on{border-color:var(--blue);background:#fff;box-shadow:0 4px 14px rgba(10,132,255,.2),0 1px 2px rgba(0,0,0,.04)}
+.rel-btn.on .lb{color:#000}
+.rel-btn .ic.b1{background:linear-gradient(135deg,#2A98FF,#0A84FF)}
+.rel-btn .ic.b2{background:linear-gradient(135deg,#FFB23B,#FF9500)}
+.rel-btn .ic.b3{background:linear-gradient(135deg,#43D467,#2AB84F)}
+.rel-btn .ic.b4{background:linear-gradient(135deg,#7D7BE0,#5856D6)}
+
+.section{
+  background:#fff;border-radius:16px;margin-bottom:14px;overflow:hidden;
+  box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 16px rgba(0,0,0,.05);
+}
+.row{
+  display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:.5px solid rgba(60,60,67,.08);min-height:48px;
+}
+.row:last-child{border-bottom:0}
+.row .ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:#fff;flex:0 0 30px}
+.row .ic.blue{background:var(--blue)}
+.row .ic.orange{background:var(--orange)}
+.row .ic.green{background:var(--green)}
+.row .ic.red{background:var(--red)}
+.row .ic.indigo{background:var(--indigo)}
+.row .ic.gray{background:var(--gray1)}
+.row .lb{flex:1;font-size:15px;font-weight:500;color:#000;letter-spacing:-.1px}
+.row .val{color:var(--label2);font-size:15px;font-weight:500;display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
+.row .val .chev{color:var(--label3)}
+.row .val .pill{padding:3px 10px;background:rgba(10,132,255,.12);color:var(--blue);border-radius:10px;font-size:13px;font-weight:600}
+.row.toggle .sw{width:51px;height:31px;border-radius:16px;background:var(--green);position:relative}
+.row.toggle .sw::after{content:"";position:absolute;top:2px;right:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+
+/* Stage picker (study) */
+.stage-picker{padding:14px}
+.stage-picker .lbl{font-size:13px;font-weight:600;color:var(--label2);letter-spacing:.3px;padding:0 2px 8px;text-transform:uppercase}
+.stages{display:flex;gap:8px}
+.st{flex:1;height:54px;border-radius:12px;background:var(--gray6);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--label2);font-size:11px;font-weight:600;letter-spacing:.3px}
+.st .n{font-size:18px;font-weight:700;color:#000}
+.st.on{background:linear-gradient(180deg,#2A98FF,#0A84FF);color:#fff}
+.st.on .n{color:#fff}
+.st.done{background:rgba(52,199,89,.18);color:#1E7E34}
+.st.done .n{color:#1E7E34}
+
+/* Reminder channels chips */
+.channels{padding:14px}
+.channels .lbl{font-size:13px;font-weight:600;color:var(--label2);letter-spacing:.3px;padding:0 2px 8px;text-transform:uppercase}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:7px 12px;border-radius:20px;background:var(--gray6);font-size:13px;font-weight:500;color:var(--label);display:inline-flex;align-items:center;gap:6px}
+.chip.on{background:rgba(10,132,255,.15);color:var(--blue);font-weight:600}
+.chip.on svg{color:var(--blue)}
+
+.tz-note{
+  padding:10px 14px;background:rgba(10,132,255,.06);border-radius:12px;color:var(--blue);font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px;margin-bottom:14px;
+}
+
+.sheet-foot{
+  position:absolute;bottom:0;left:0;right:0;padding:14px 16px 34px;
+  background:linear-gradient(180deg,rgba(255,255,255,0) 0%, rgba(248,249,252,.95) 40%, rgba(248,249,252,1) 100%);
+  display:flex;gap:10px;
+}
+.btn{
+  flex:1;height:50px;border-radius:14px;border:0;font:600 16px var(--font);letter-spacing:-.1px;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn.ghost{background:rgba(120,120,128,.12);color:#000}
+.btn.primary{
+  background:linear-gradient(180deg,#1E94FF,#0A84FF);color:#fff;
+  box-shadow:0 10px 24px -8px rgba(10,132,255,.5),inset 0 1px 0 rgba(255,255,255,.25);
+  flex:1.4;
+}
+.homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#fff;opacity:.85;z-index:50}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="backdrop"></div>
+  <div class="status">
+    <span>9:41</span>
+    <div class="right">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="1" width="3" height="11" rx="1"/><rect x="15" y="-2" width="3" height="14" rx="1" opacity=".35"/></svg>
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><path d="M8.5 2c3.5 0 6.6 1.4 8.5 3.5l-1.5 1.3C13.9 5 11.3 3.8 8.5 3.8S3.1 5 1.5 6.8L0 5.5C1.9 3.4 5 2 8.5 2zm0 3c2.4 0 4.5 1 6 2.5L13 8.8c-1.2-1.1-2.8-1.8-4.5-1.8S5.2 7.7 4 8.8L2.5 7.5C4 6 6.1 5 8.5 5zm0 3c1.3 0 2.5.5 3.4 1.3L8.5 13 5.1 9.3C6 8.5 7.2 8 8.5 8z"/></svg>
+      <svg width="28" height="12" viewBox="0 0 28 12" fill="none"><rect x=".5" y=".5" width="24" height="11" rx="3" stroke="currentColor" opacity=".5"/><rect x="26" y="4" width="1.5" height="4" rx=".75" fill="currentColor" opacity=".5"/><rect x="2.5" y="2.5" width="20" height="7" rx="1.5" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="sheet-nav">
+      <span class="cancel">取消</span>
+      <span class="title">新建事项</span>
+      <span class="save">完成</span>
+    </div>
+
+    <div class="body">
+      <input class="input-title" placeholder="事项标题…" value="Hibernate 二级缓存复习"/>
+
+      <div class="relation-seg">
+        <div class="rel-btn on">
+          <div class="ic b1">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          </div>
+          <div class="lb">学习</div>
+        </div>
+        <div class="rel-btn">
+          <div class="ic b2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <div class="lb">任务</div>
+        </div>
+        <div class="rel-btn">
+          <div class="ic b3">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          </div>
+          <div class="lb">提醒</div>
+        </div>
+        <div class="rel-btn">
+          <div class="ic b4">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="lb">备忘</div>
+        </div>
+      </div>
+
+      <!-- 日期时间 section -->
+      <div class="section">
+        <div class="row">
+          <div class="ic red"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          <span class="lb">日期</span>
+          <span class="val">2026 年 4 月 21 日 <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 6 15 12 9 18"/></svg></span>
+        </div>
+        <div class="row">
+          <div class="ic blue"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <span class="lb">时间</span>
+          <span class="val">14:30 — 15:40 <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 6 15 12 9 18"/></svg></span>
+        </div>
+        <div class="row toggle">
+          <div class="ic gray"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 12h20"/></svg></div>
+          <span class="lb">全天</span>
+          <div class="sw" style="background:var(--gray5);"><span style="display:none"></span></div>
+        </div>
+      </div>
+
+      <!-- 学习专属：记忆阶段 -->
+      <div class="section">
+        <div class="stage-picker">
+          <div class="lbl">学习 · 记忆曲线阶段</div>
+          <div class="stages">
+            <div class="st done"><div class="n">1</div>1 天</div>
+            <div class="st done"><div class="n">2</div>3 天</div>
+            <div class="st on"><div class="n">3</div>7 天</div>
+            <div class="st"><div class="n">4</div>15 天</div>
+            <div class="st"><div class="n">5</div>30 天</div>
+          </div>
+        </div>
+        <div class="row" style="border-top:.5px solid rgba(60,60,67,.08)">
+          <div class="ic indigo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></div>
+          <span class="lb">下次复习</span>
+          <span class="val"><span class="pill">2026-05-02</span></span>
+        </div>
+      </div>
+
+      <!-- 提醒 / 通知 -->
+      <div class="section">
+        <div class="row">
+          <div class="ic green"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div>
+          <span class="lb">提前提醒</span>
+          <span class="val">15 分钟 <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 6 15 12 9 18"/></svg></span>
+        </div>
+        <div class="channels" style="border-top:.5px solid rgba(60,60,67,.08)">
+          <div class="lbl">推送渠道</div>
+          <div class="chips">
+            <span class="chip on">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="3"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+              APP
+            </span>
+            <span class="chip on">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m2 7 10 6 10-6"/></svg>
+              邮件
+            </span>
+            <span class="chip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              短信
+            </span>
+            <span class="chip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+              站内信
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tz-note">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        UTC 存储 · 当前按 <b style="font-weight:700">Asia/Shanghai</b> 显示，切换时区自动换算
+      </div>
+    </div>
+
+    <div class="sheet-foot">
+      <button class="btn ghost">更多选项</button>
+      <button class="btn primary">保存并创建</button>
+    </div>
+  </div>
+
+  <div class="homebar"></div>
+</div>
+</body>
+</html>

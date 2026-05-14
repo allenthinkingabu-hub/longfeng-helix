@@ -1,0 +1,368 @@
+{
+  "$metadata": {
+    "source": "getdesign.md/apple/design-md",
+    "saved_local": "design/system/inspiration/apple.design.md",
+    "generated_by": "ui-ux-pro-max-skill v2.5.0"
+  },
+  "tkn": {
+    "font": {
+      "display": {
+        "value": "'SF Pro Display', 'SF Pro Icons', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "type": "fontFamily",
+        "comment": "Use at 20px and above. Optical sizing: wider letter spacing, thinner strokes for large sizes."
+      },
+      "text": {
+        "value": "'SF Pro Text', 'SF Pro Icons', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "type": "fontFamily",
+        "comment": "Use at 19px and below. Tighter and sturdier for small sizes."
+      }
+    },
+    "type": {
+      "display-hero": {
+        "fontSize": {
+          "value": "56px",
+          "type": "dimension"
+        },
+        "fontFamily": {
+          "value": "{tkn.font.display}",
+          "type": "fontFamily"
+        },
+        "fontWeight": {
+          "value": 600,
+          "type": "fontWeight"
+        },
+        "lineHeight": {
+          "value": 1.07,
+          "type": "number"
+        },
+        "letterSpacing": {
+          "value": "-0.28px",
+          "type": "dimension"
+        },
+        "comment": "Product launch headlines, maximum impact. Billboard-like compression."
+      },
+      "section-heading": {
+        "fontSize": {
+          "value": "40px",
+          "type": "dimension"
+        },
+        "fontFamily": {
+          "value": "{tkn.font.display}",
+          "type": "fontFamily"
+        },
+        "fontWeight": {
+          "value": 600,
+          "type": "fontWeight"
+        },
+        "lineHeight": {
+          "value": 1.10,
+          "type": "number"
+        },
+        "letterSpacing": {
+          "value": "0px",
+          "type": "dimension"
+        },
+        "comment": "Feature section titles"
+      },
+      "tile-heading": {
+        "fontSize": {
+          "value": "28px",
+          "type": "dimension"
+        },
+        "fontFamily": {
+          "value": "{tkn.font.display}",
+          "type": "fontFamily"
+        },
+        "fontWeight": {
+          "value": 400,
+          "type": "fontWeight"
+        },
+        "lineHeight": {
+          "value": 1.14,
+          "type": "number"
+        },
+        "letterSpacing": {
+          "value": "0.196px",
+          "type": "dimension"
+        },
+        "comment": "Product tile headlines"
+      },
+      "card-title": {
+        "fontSize": {
+          "value": "21px",
+          "type": "dimension"
+        },
+        "fontFamily": {
+          "value": "{tkn.font.display}",
+          "type": "fontFamily"
+        },
+        "fontWeight": {
+          "value": 700,
+          "type": "fontWeight"
+        },
+        "lineHeight": {
+          "value": 1.19,
+          "type": "number"
+        },
+        "letterSpacing": {
+          "value": "0.231px",
+          "type": "dimension"
+        },
+        "comment": "Bold card headings. 700 is rare — only for primary card titles."
+      },
+      "sub-heading": {
+        "fontSize": {
+          "value": "21px",
+          "type": "dimension"
+        },
+        "fontFamily": {
+          "value": "{tkn.font.display}",
+          "type": "fontFamily"
+        },
+        "fontWeight": {
+          "value": 400,
+          "type": "fontWeight"
+        },
+        "lineHeight": {
+          "value": 1.19,
+          "type": "number"
+        },
+        "letterSpacing": {
+          "value": "0.231px",
+          "type": "dimension"
+        },
+        "comment": "Regular card headings, sub-navigation headings"
+      },
+      "nav-heading": {
+        "fontSize": {
+          "value": "34px",
+          "type": "dimension"
+        },
+        "fontFamily": {
+          "value": "{tkn.font.text}",
+          "type": "fontFamily"
+        },
+        "fontWeight": {
+          "value": 600,
+          "type": "fontWeight"
+        },
+        "lineHeight": {
+          "value": 1.47,
+          "type": "number"
+        },
+        "letterSpacing": {
+          "value": "-0.374px",
+          "type": "dimension"
+        },
+        "comment": "Large navigation headings"
+      },
+      "body": {
+        "fontSize": {
+          "value": "17px",
+          "type": "dimension"
+        },
+        "fontFamily": {
+          "value": "{tkn.font.text}",
+          "type": "fontFamily"
+        },
+        "fontWeight": {
+          "value": 400,
+          "type": "fontWeight"
+        },
+        "lineHeight": {
+          "value": 1.47,
+          "type": "number"
+        },
+        "letterSpacing": {
+          "value": "-0.374px",
+          "type": "dimension"
+        },
+        "comment": "Standard reading text. Minimum on mobile — avoids iOS auto-zoom."
+      },
+      "body-emphasis": {
+        "fontSize": {
+          "value": "17px",
+          "type": "dimension"
+        },
+        "fontFamily": {
+          "value": "{tkn.font.text}",
+          "type": "fontFamily"
+        },
+        "fontWeight": {
+          "value": 600,
+          "type": "fontWeight"
+        },
+        "lineHeight": {
+          "value": 1.24,
+          "type": "number"
+        },
+        "letterSpacing": {
+          "value": "-0.374px",
+          "type": "dimension"
+        },
+        "comment": "Emphasized body text, labels"
+      },
+      "button-lg": {
+        "fontSize": {
+          "value": "18px",
+          "type": "dimension"
+        },
+        "fontFamily": {
+          "value": "{tkn.font.text}",
+          "type": "fontFamily"
+        },
+        "fontWeight": {
+          "value": 300,
+          "type": "fontWeight"
+        },
+        "lineHeight": {
+          "value": 1.00,
+          "type": "number"
+        },
+        "letterSpacing": {
+          "value": "0px",
+          "type": "dimension"
+        },
+        "comment": "Large button text, light weight"
+      },
+      "button": {
+        "fontSize": {
+          "value": "17px",
+          "type": "dimension"
+        },
+        "fontFamily": {
+          "value": "{tkn.font.text}",
+          "type": "fontFamily"
+        },
+        "fontWeight": {
+          "value": 400,
+          "type": "fontWeight"
+        },
+        "lineHeight": {
+          "value": 2.41,
+          "type": "number"
+        },
+        "letterSpacing": {
+          "value": "0px",
+          "type": "dimension"
+        },
+        "comment": "Standard button text. Relaxed line-height creates tall click area."
+      },
+      "link": {
+        "fontSize": {
+          "value": "14px",
+          "type": "dimension"
+        },
+        "fontFamily": {
+          "value": "{tkn.font.text}",
+          "type": "fontFamily"
+        },
+        "fontWeight": {
+          "value": 400,
+          "type": "fontWeight"
+        },
+        "lineHeight": {
+          "value": 1.43,
+          "type": "number"
+        },
+        "letterSpacing": {
+          "value": "-0.224px",
+          "type": "dimension"
+        },
+        "comment": "Body links, 'Learn more'"
+      },
+      "caption": {
+        "fontSize": {
+          "value": "14px",
+          "type": "dimension"
+        },
+        "fontFamily": {
+          "value": "{tkn.font.text}",
+          "type": "fontFamily"
+        },
+        "fontWeight": {
+          "value": 400,
+          "type": "fontWeight"
+        },
+        "lineHeight": {
+          "value": 1.29,
+          "type": "number"
+        },
+        "letterSpacing": {
+          "value": "-0.224px",
+          "type": "dimension"
+        },
+        "comment": "Secondary text, descriptions"
+      },
+      "caption-bold": {
+        "fontSize": {
+          "value": "14px",
+          "type": "dimension"
+        },
+        "fontFamily": {
+          "value": "{tkn.font.text}",
+          "type": "fontFamily"
+        },
+        "fontWeight": {
+          "value": 600,
+          "type": "fontWeight"
+        },
+        "lineHeight": {
+          "value": 1.29,
+          "type": "number"
+        },
+        "letterSpacing": {
+          "value": "-0.224px",
+          "type": "dimension"
+        },
+        "comment": "Emphasized captions, chip labels"
+      },
+      "micro": {
+        "fontSize": {
+          "value": "12px",
+          "type": "dimension"
+        },
+        "fontFamily": {
+          "value": "{tkn.font.text}",
+          "type": "fontFamily"
+        },
+        "fontWeight": {
+          "value": 400,
+          "type": "fontWeight"
+        },
+        "lineHeight": {
+          "value": 1.33,
+          "type": "number"
+        },
+        "letterSpacing": {
+          "value": "-0.12px",
+          "type": "dimension"
+        },
+        "comment": "Fine print, footnotes"
+      },
+      "nano": {
+        "fontSize": {
+          "value": "10px",
+          "type": "dimension"
+        },
+        "fontFamily": {
+          "value": "{tkn.font.text}",
+          "type": "fontFamily"
+        },
+        "fontWeight": {
+          "value": 400,
+          "type": "fontWeight"
+        },
+        "lineHeight": {
+          "value": 1.47,
+          "type": "number"
+        },
+        "letterSpacing": {
+          "value": "-0.08px",
+          "type": "dimension"
+        },
+        "comment": "Legal text, smallest permitted size"
+      }
+    }
+  }
+}

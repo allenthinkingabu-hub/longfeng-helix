@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>02 / AI 分析中 · 错题本</title>
+<style>
+  :root{
+    --blue:#007AFF; --red:#FF3B30; --orange:#FF9500; --green:#34C759; --indigo:#5856D6; --yellow:#FFCC00;
+    --bg:#F2F2F7; --card:#FFFFFF; --text:#1C1C1E; --text2:#3C3C43; --text3:#8E8E93; --sep:rgba(60,60,67,.14);
+    --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;
+    --mono:"SF Mono","JetBrains Mono",ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+  html,body{height:100%;}
+  body{font-family:var(--font);color:var(--text);background:
+    radial-gradient(1200px 800px at 10% -10%, #E8EEFB 0%, transparent 60%),
+    radial-gradient(1000px 700px at 110% 10%, #F5E8FB 0%, transparent 55%),
+    linear-gradient(180deg,#EEF2F8 0%,#E6ECF5 100%);
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 0;}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px;}
+  .caption{font-size:13px;color:#5E6B82;letter-spacing:.08em;text-transform:uppercase;}
+  .phone{position:relative;width:393px;height:852px;border-radius:55px;overflow:hidden;
+    box-shadow:0 40px 100px -20px rgba(30,40,80,.35),0 8px 24px rgba(20,30,60,.12),inset 0 0 0 6px #111;}
+  .phone::before{content:"";position:absolute;top:11px;left:50%;transform:translateX(-50%);width:125px;height:37px;background:#000;border-radius:20px;z-index:40;}
+  .screen{position:absolute;inset:0;background:var(--bg);}
+  .status{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 8px;font-weight:600;font-size:15px;color:#111;z-index:30;}
+  .status .r{display:flex;align-items:center;gap:6px;}
+  .homebar{position:absolute;left:50%;transform:translateX(-50%);bottom:8px;width:134px;height:5px;border-radius:3px;background:#000;opacity:.85;z-index:30;}
+
+  .nav{position:absolute;top:54px;left:0;right:0;padding:6px 20px 8px;background:rgba(242,242,247,.78);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border-bottom:.5px solid var(--sep);z-index:20;}
+  .nav .row{display:flex;align-items:center;justify-content:space-between;height:36px;}
+  .nav .back{display:flex;align-items:center;gap:4px;color:var(--blue);font-size:17px;}
+  .nav .back svg{width:12px;height:20px;}
+  .nav .x{color:var(--text3);font-size:15px;}
+  .nav h1{font-size:24px;font-weight:700;letter-spacing:.36px;margin-top:2px;display:flex;align-items:baseline;gap:10px;}
+  .nav .badge{font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#5FA8FF,#5856D6);padding:3px 8px;border-radius:6px;letter-spacing:.4px;}
+
+  .content{position:absolute;top:152px;left:0;right:0;bottom:104px;overflow:hidden;padding:14px 16px 16px;}
+
+  /* image preview thumb */
+  .preview{display:flex;gap:12px;align-items:center;background:var(--card);border-radius:14px;padding:10px;box-shadow:0 1px 0 rgba(0,0,0,.03),0 8px 22px rgba(40,50,90,.05);}
+  .thumb{width:72px;height:88px;border-radius:8px;background:linear-gradient(180deg,#fbf8f0,#f1ece0);position:relative;overflow:hidden;flex:0 0 72px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.05);}
+  .thumb .lbl{position:absolute;top:6px;left:6px;font-size:6px;color:#a78a3c;letter-spacing:.18em;font-weight:700;}
+  .thumb .qno{position:absolute;top:14px;left:6px;font-size:7px;font-weight:700;color:#7a3b3b;background:#fde9e9;border-radius:2px;padding:1px 3px;}
+  .thumb h3{position:absolute;top:24px;left:6px;right:6px;font-family:Georgia,serif;font-size:7px;line-height:1.4;color:#222;font-weight:600;}
+  .thumb .strk{position:absolute;top:54px;left:8px;width:50px;height:6px;background:rgba(255,80,80,.55);transform:rotate(-2deg);border-radius:1px;}
+  .thumb .pen{position:absolute;top:62px;left:14px;font-family:cursive;font-size:9px;color:#c9302c;}
+  .preview .meta{flex:1;min-width:0;}
+  .preview .t1{font-size:14px;font-weight:600;letter-spacing:.1px;}
+  .preview .t2{font-size:12px;color:var(--text3);margin-top:3px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .preview .t2 .chip{display:inline-flex;align-items:center;gap:5px;background:#F2F2F7;padding:3px 7px;border-radius:999px;border:.5px solid var(--sep);}
+
+  /* model badge */
+  .model{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--text3);padding:0 4px;}
+  .model .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px rgba(52,199,89,.18);}
+  .model strong{color:var(--text2);font-weight:600;}
+
+  /* stages list */
+  .stages{margin-top:14px;background:var(--card);border-radius:18px;padding:8px 4px;box-shadow:0 1px 0 rgba(0,0,0,.03),0 8px 22px rgba(40,50,90,.05);}
+  .step{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;position:relative;}
+  .step + .step::before{content:"";position:absolute;left:24.5px;top:-6px;width:1px;height:14px;background:var(--sep);}
+  .step .ico{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:0 0 28px;font-size:12px;font-weight:700;color:#fff;}
+  .step .ico.done{background:var(--green);}
+  .step .ico.now{background:linear-gradient(180deg,#5FA8FF,var(--blue));box-shadow:0 0 0 5px rgba(0,122,255,.18);}
+  .step .ico.wait{background:#E5E5EA;color:var(--text3);}
+  .step .ico svg{width:14px;height:14px;}
+  .step .body{flex:1;min-width:0;}
+  .step .title{font-size:14px;font-weight:600;letter-spacing:.1px;}
+  .step .title .t{color:var(--text3);font-weight:500;font-size:12px;margin-left:6px;}
+  .step .desc{font-size:12px;color:var(--text3);margin-top:2px;line-height:1.45;}
+  .step.now .title{color:var(--blue);}
+  .step.now .desc{color:var(--text2);}
+  .step.wait .title{color:var(--text3);}
+  /* shimmer for now */
+  .shim{position:relative;height:4px;background:rgba(0,122,255,.10);border-radius:2px;margin-top:8px;overflow:hidden;}
+  .shim::after{content:"";position:absolute;inset:0;width:38%;background:linear-gradient(90deg,transparent,rgba(0,122,255,.85),transparent);border-radius:2px;left:24%;}
+
+  /* streaming output card */
+  .stream{margin-top:14px;background:#0F1422;color:#E2E8F0;border-radius:14px;padding:14px;font-family:var(--mono);font-size:11.5px;line-height:1.55;letter-spacing:.2px;box-shadow:0 1px 0 rgba(0,0,0,.04),0 12px 28px rgba(40,50,90,.10);position:relative;}
+  .stream .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:10px;color:#94A3B8;letter-spacing:.6px;text-transform:uppercase;}
+  .stream .hdr .dots{display:flex;gap:5px;}
+  .stream .hdr .dots i{width:8px;height:8px;border-radius:50%;background:#475569;display:block;}
+  .stream .hdr .dots i:nth-child(1){background:#FF5F57;}
+  .stream .hdr .dots i:nth-child(2){background:#FEBC2E;}
+  .stream .hdr .dots i:nth-child(3){background:#28C840;}
+  .stream pre{white-space:pre-wrap;word-break:break-word;}
+  .k{color:#7DD3FC;}     /* key */
+  .v{color:#FDE68A;}     /* string */
+  .n{color:#F0ABFC;}     /* number */
+  .b{color:#86EFAC;}     /* bool/enum */
+  .c{color:#64748B;}     /* comment */
+  .cur{display:inline-block;width:8px;height:13px;background:#7DD3FC;vertical-align:-2px;margin-left:1px;animation:b 1s steps(1) infinite;}
+  @keyframes b{50%{opacity:0;}}
+
+  /* footer cancel */
+  .cancel{position:absolute;left:16px;right:16px;bottom:104px;height:50px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.75);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:14px;color:var(--red);font-weight:600;font-size:15px;border:.5px solid var(--sep);}
+
+  /* tab bar */
+  .tabbar{position:absolute;bottom:0;left:0;right:0;height:84px;padding:8px 0 24px;background:rgba(255,255,255,.78);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border-top:.5px solid var(--sep);display:flex;z-index:15;}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--text3);font-size:10px;}
+  .tab.active{color:var(--blue);}
+  .tab svg{width:24px;height:24px;}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="caption">2 / 8 · Analyzing · Spring AI streaming · 4 stages</div>
+    <div class="phone">
+      <div class="screen">
+
+        <!-- status -->
+        <div class="status">
+          <span>9:41</span>
+          <div class="r">
+            <svg width="17" height="11" viewBox="0 0 17 11"><g fill="#111"><rect x="0" y="7" width="3" height="4" rx=".5"/><rect x="4.5" y="5" width="3" height="6" rx=".5"/><rect x="9" y="3" width="3" height="8" rx=".5"/><rect x="13.5" y="1" width="3" height="10" rx=".5"/></g></svg>
+            <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M8 3c2 0 3.8.7 5.2 1.9l1.4-1.4C12.8 1.9 10.5 1 8 1S3.2 1.9 1.4 3.5l1.4 1.4C4.2 3.7 6 3 8 3Z" fill="#111"/><path d="M8 6c1.2 0 2.3.4 3.2 1.1l1.4-1.4C11.3 4.6 9.7 4 8 4s-3.3.6-4.6 1.7l1.4 1.4C5.7 6.4 6.8 6 8 6Z" fill="#111"/><circle cx="8" cy="9" r="1.4" fill="#111"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="#111" opacity=".45"/><rect x="2" y="2" width="17" height="8" rx="1.6" fill="#111"/><rect x="23" y="4" width="2" height="4" rx="1" fill="#111" opacity=".45"/></svg>
+          </div>
+        </div>
+
+        <!-- nav -->
+        <div class="nav">
+          <div class="row">
+            <a class="back"><svg viewBox="0 0 12 20" fill="none"><path d="M10 2 2 10l8 8" stroke="#007AFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>拍题</a>
+            <a class="x">取消</a>
+          </div>
+          <h1>AI 正在分析… <span class="badge">3 / 4</span></h1>
+        </div>
+
+        <!-- content -->
+        <div class="content">
+          <!-- preview -->
+          <div class="preview">
+            <div class="thumb">
+              <span class="lbl">数学 · 12</span>
+              <span class="qno">17</span>
+              <h3>已知 f(x)=x²−4x+3</h3>
+              <div class="strk"></div>
+              <div class="pen">B</div>
+            </div>
+            <div class="meta">
+              <div class="t1">第 17 题 · 顶点与对称轴</div>
+              <div class="t2">
+                <span class="chip">数学</span>
+                <span class="chip">G9</span>
+                <span class="chip">2026-04-21 14:28</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- model badge -->
+          <div class="model"><span class="dot"></span><span>已选模型 <strong>qwen-vl-max</strong> · 备用 <strong>gpt-4o-mini</strong> · 平均时延 <strong>4.2s</strong></span></div>
+
+          <!-- stages -->
+          <div class="stages">
+            <div class="step">
+              <div class="ico done"><svg viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="body">
+                <div class="title">OCR 识别题干 <span class="t">· 0.8s</span></div>
+                <div class="desc">已提取 132 字符，置信度 99.4%</div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="ico done"><svg viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="body">
+                <div class="title">学科 / 知识点判断 <span class="t">· 0.6s</span></div>
+                <div class="desc">数学 · 二次函数 · 顶点式 · Bloom: APPLY</div>
+              </div>
+            </div>
+            <div class="step now">
+              <div class="ico now">3</div>
+              <div class="body">
+                <div class="title">错因分析中…</div>
+                <div class="desc">正在比对学生作答与正确解法的差异</div>
+                <div class="shim"></div>
+              </div>
+            </div>
+            <div class="step wait">
+              <div class="ico wait">4</div>
+              <div class="body">
+                <div class="title">生成解答步骤</div>
+                <div class="desc">将输出 JSON Schema · 含公式 LaTeX</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- streaming JSON -->
+          <div class="stream">
+            <div class="hdr"><span>SSE · /api/ai/stream/tk_8f72a · qwen-vl-max</span><span class="dots"><i></i><i></i><i></i></span></div>
+<pre>{
+  <span class="k">"stem"</span>: <span class="v">"已知函数 f(x)=x²−4x+3，求其顶点坐标与对称轴方程。"</span>,
+  <span class="k">"studentAnswer"</span>: <span class="v">"B. (2, −1)"</span>,
+  <span class="k">"correctAnswer"</span>: <span class="v">"A. (1, −2)"</span>,
+  <span class="k">"errorType"</span>: <span class="b">"CONCEPT"</span>,
+  <span class="k">"errorReason"</span>: <span class="v">"对顶点式 (x−h)²+k 的 h, k 含义混淆"</span>,
+  <span class="k">"solutionSteps"</span>: [
+    { <span class="k">"step"</span>: <span class="n">1</span>, <span class="k">"explain"</span>: <span class="v">"配方：f(x)=(x−2)²−1"</span> }<span class="cur"></span></pre>
+          </div>
+        </div>
+
+        <!-- cancel sticky -->
+        <div class="cancel">放弃本次分析</div>
+
+        <!-- tab bar -->
+        <div class="tabbar">
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11 L12 3 L21 11 V20 a1 1 0 0 1 -1 1 H14 V14 H10 V21 H4 a1 1 0 0 1 -1 -1 Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg><span>首页</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none"><path d="M5 4h11l3 3v13H5V4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 11h8M8 14h6M8 17h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>错题本</span></div>
+          <div class="tab active"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="4.5" stroke="currentColor" stroke-width="1.8"/><path d="M5 8h3l1.5-2h5L16 8h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>拍题</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.5c-3.6 0-6.2 2.6-6.2 6.2v3.4L4 15.5v1.3h16v-1.3l-1.8-2.4V9.7c0-3.6-2.6-6.2-6.2-6.2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 19.5a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>复习</span></div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.5" r="3.8" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 20c1.2-3.8 4.2-5.6 7.5-5.6s6.3 1.8 7.5 5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>我的</span></div>
+        </div>
+
+        <div class="homebar"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

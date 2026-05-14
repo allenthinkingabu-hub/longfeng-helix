@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>P-WELCOMEBACK · 回流唤起 · AI 错题本</title>
+<style>
+  :root{
+    --bg:#F2F2F7; --card:#FFFFFF; --sep:rgba(60,60,67,.14);
+    --text:#1C1C1E; --sec:#636366; --ter:#8E8E93;
+    --blue:#007AFF; --red:#FF3B30; --orange:#FF9500; --green:#34C759;
+    --indigo:#5856D6; --yellow:#FFCC00; --purple:#AF52DE; --teal:#30B0C7;
+    --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","PingFang SC",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+  html,body{background:#E5E5EA;font-family:var(--font);color:var(--text);}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px 0;}
+  .phone{position:relative;width:393px;height:852px;background:var(--bg);border-radius:54px;box-shadow:inset 0 0 0 6px #111,0 24px 64px rgba(0,0,0,.22);overflow:hidden;}
+  .phone::before{content:"";position:absolute;left:50%;top:11px;transform:translateX(-50%);width:126px;height:37px;background:#000;border-radius:20px;z-index:50;}
+  .statusbar{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;font-size:17px;font-weight:600;z-index:40;color:#fff;}
+  .statusbar .time{margin-top:12px;}
+  .statusbar .icons{margin-top:12px;display:flex;gap:6px;align-items:center;color:#fff;}
+
+  /* Warm dusk hero */
+  .hero{position:absolute;top:0;left:0;right:0;height:360px;background:linear-gradient(170deg,#3C2A55 0%,#8B4A9C 35%,#E8725A 75%,#FFB454 100%);overflow:hidden;z-index:5;}
+  .hero::before{content:"";position:absolute;width:320px;height:320px;border-radius:50%;top:-100px;left:-120px;background:radial-gradient(circle,rgba(255,209,102,.55),transparent 70%);filter:blur(30px);}
+  .hero::after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;bottom:-80px;right:-80px;background:radial-gradient(circle,rgba(197,129,247,.45),transparent 70%);filter:blur(24px);}
+  .hero .horizon{position:absolute;bottom:0;left:0;right:0;height:120px;background:linear-gradient(180deg,transparent,rgba(60,42,85,.55) 60%,rgba(242,242,247,1) 100%);}
+  .hero .blob{position:absolute;width:140px;height:140px;border-radius:50%;top:36%;left:52%;background:radial-gradient(circle,rgba(255,107,107,.4),transparent 70%);filter:blur(18px);}
+
+  /* Anonymous nav */
+  .anon-nav{position:absolute;top:62px;left:18px;right:18px;z-index:30;display:flex;align-items:center;justify-content:space-between;}
+  .back{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.14);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;color:#fff;}
+  .brand{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.14);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.22);}
+  .brand .dot{width:6px;height:6px;border-radius:50%;background:#FFD166;box-shadow:0 0 6px #FFD166;}
+  .brand .nm{font-size:11px;font-weight:800;color:#fff;letter-spacing:.5px;text-transform:uppercase;}
+  .fp{padding:6px 10px;border-radius:999px;background:rgba(0,0,0,.25);backdrop-filter:blur(12px);color:rgba(255,255,255,.75);font-size:10px;font-weight:700;letter-spacing:.4px;font-family:"SF Mono",monospace;}
+
+  /* Welcome text */
+  .welcome{position:absolute;top:118px;left:20px;right:20px;z-index:20;color:#fff;}
+  .eyebrow{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,.9);}
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:#FFD166;box-shadow:0 0 8px #FFD166;}
+  .title{margin-top:14px;font-size:30px;font-weight:800;letter-spacing:-.4px;line-height:1.15;}
+  .title em{font-style:normal;background:linear-gradient(90deg,#FFD166,#FF6B6B);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{margin-top:10px;font-size:13px;line-height:1.55;color:rgba(255,255,255,.85);letter-spacing:.1px;max-width:320px;}
+  .sub b{color:#FFD166;font-weight:700;}
+
+  /* Last-seen chip */
+  .lastseen{margin-top:14px;padding:10px 14px;border-radius:14px;background:rgba(0,0,0,.22);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.14);display:flex;align-items:center;gap:10px;color:rgba(255,255,255,.92);}
+  .lastseen .av{width:30px;height:30px;border-radius:50%;background:conic-gradient(from 210deg,#FFD166,#FF6B6B,#C581F7,#4C9BFF,#FFD166);border:1.5px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3);}
+  .lastseen .av::after{content:"A";}
+  .lastseen .tx .k{font-size:10px;font-weight:700;color:rgba(255,255,255,.65);letter-spacing:.4px;text-transform:uppercase;}
+  .lastseen .tx .v{font-size:12.5px;font-weight:700;margin-top:1px;}
+
+  /* Scroll body */
+  .scroll{position:absolute;top:350px;left:0;right:0;bottom:0;overflow:auto;padding:0 14px 180px;z-index:20;background:var(--bg);border-top-left-radius:26px;border-top-right-radius:26px;}
+
+  /* Pending hero card */
+  .pending{margin-top:14px;background:linear-gradient(135deg,#fff 0%,#FFF5E4 100%);border:1px solid rgba(255,180,84,.25);border-radius:20px;padding:18px;box-shadow:0 2px 6px rgba(0,0,0,.04),0 18px 44px rgba(255,140,0,.08);position:relative;overflow:hidden;}
+  .pending::before{content:"";position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(255,180,84,.25),transparent 70%);}
+  .pending .row{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:2;}
+  .pending .l .k{font-size:10px;font-weight:800;letter-spacing:1.2px;color:var(--orange);text-transform:uppercase;}
+  .pending .l .big{font-size:38px;font-weight:800;letter-spacing:-1px;line-height:1;margin-top:6px;background:linear-gradient(135deg,#FF9500,#FF3B30);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .pending .l .big em{font-style:normal;font-size:14px;font-weight:700;color:var(--sec);margin-left:4px;letter-spacing:-.2px;}
+  .pending .l .sub{font-size:12px;color:var(--sec);font-weight:600;margin-top:4px;}
+  .pending .donut{position:relative;width:84px;height:84px;}
+  .pending .donut svg{position:absolute;inset:0;transform:rotate(-90deg);}
+  .pending .donut .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .pending .donut .center .n{font-size:14px;font-weight:800;letter-spacing:-.2px;color:var(--text);}
+  .pending .donut .center .l{font-size:9px;font-weight:700;color:var(--ter);letter-spacing:.4px;text-transform:uppercase;margin-top:1px;}
+
+  .pending .breakdown{position:relative;z-index:2;margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .pending .sub-chip{padding:10px 10px;border-radius:12px;background:rgba(255,255,255,.85);border:.5px solid var(--sep);display:flex;align-items:center;gap:8px;}
+  .pending .sub-chip .sq{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800;}
+  .pending .sub-chip .tx .n{font-size:13px;font-weight:800;line-height:1;letter-spacing:-.2px;}
+  .pending .sub-chip .tx .l{font-size:9.5px;font-weight:600;color:var(--ter);margin-top:2px;letter-spacing:.2px;}
+
+  /* Progress stripe */
+  .progress{margin-top:14px;background:var(--card);border-radius:16px;padding:14px;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+  .progress .title{font-size:12px;font-weight:800;color:var(--text);letter-spacing:.2px;margin-bottom:10px;}
+  .progress .title em{font-style:normal;color:var(--blue);}
+  .calendar-strip{display:grid;grid-template-columns:repeat(14,1fr);gap:3px;}
+  .cell{aspect-ratio:1;border-radius:3px;background:#F2F2F7;}
+  .cell.low{background:#FFE4CC;}
+  .cell.mid{background:#FFB454;}
+  .cell.high{background:#FF6B6B;}
+  .cell.gap{background:repeating-linear-gradient(45deg,#E5E5EA,#E5E5EA 3px,#F2F2F7 3px,#F2F2F7 6px);}
+
+  .legend{margin-top:10px;display:flex;align-items:center;gap:12px;font-size:10px;color:var(--ter);font-weight:600;}
+  .legend .lg{display:flex;align-items:center;gap:4px;}
+  .legend .sq{width:10px;height:10px;border-radius:3px;}
+
+  /* Top pending questions list */
+  .qlist-title{margin:18px 4px 8px;display:flex;align-items:baseline;justify-content:space-between;}
+  .qlist-title .t{font-size:13px;font-weight:800;letter-spacing:.1px;}
+  .qlist-title .m{font-size:11px;color:var(--ter);font-weight:600;}
+  .qitem{background:var(--card);border-radius:14px;padding:12px;display:flex;gap:10px;margin-bottom:8px;box-shadow:0 1px 2px rgba(0,0,0,.03);}
+  .qitem .th{width:46px;height:46px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px;letter-spacing:.3px;}
+  .qitem .th.math{background:linear-gradient(135deg,#4C9BFF,#5856D6);}
+  .qitem .th.phys{background:linear-gradient(135deg,#FF9500,#FF3B30);}
+  .qitem .th.eng{background:linear-gradient(135deg,#34C759,#30B0C7);}
+  .qitem .body{flex:1;min-width:0;}
+  .qitem .body .tp{display:flex;gap:6px;align-items:center;margin-bottom:2px;}
+  .qitem .body .tp .tlab{padding:2px 6px;border-radius:4px;font-size:9px;font-weight:800;letter-spacing:.4px;}
+  .qitem .body .tp .tlab.t2{background:rgba(88,86,214,.1);color:var(--indigo);}
+  .qitem .body .tp .tlab.t4{background:rgba(255,149,0,.1);color:var(--orange);}
+  .qitem .body .tp .tlab.t6{background:rgba(255,59,48,.1);color:var(--red);}
+  .qitem .body .tp .overdue{font-size:9.5px;color:var(--red);font-weight:800;letter-spacing:.2px;}
+  .qitem .body h4{font-size:13px;font-weight:700;margin:2px 0;letter-spacing:.1px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .qitem .body .dt{font-size:10.5px;color:var(--ter);font-weight:500;}
+  .qitem .arr{align-self:center;color:var(--ter);}
+
+  /* Sticky CTA dock */
+  .cta-dock{position:absolute;bottom:0;left:0;right:0;padding:14px 16px 22px;background:linear-gradient(180deg,rgba(242,242,247,0),rgba(242,242,247,.95) 30%,rgba(242,242,247,1) 100%);z-index:45;display:flex;flex-direction:column;gap:8px;}
+  .cta-back{height:52px;border-radius:16px;background:linear-gradient(135deg,#8B4A9C 0%,#E8725A 55%,#FFB454 100%);color:#fff;font-size:15px;font-weight:800;letter-spacing:.2px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 12px 30px -6px rgba(232,114,90,.45),inset 0 1px 0 rgba(255,255,255,.2);position:relative;overflow:hidden;}
+  .cta-back::after{content:"";position:absolute;top:-40%;left:-20%;width:140%;height:80%;background:linear-gradient(180deg,rgba(255,255,255,.18),transparent);transform:rotate(-4deg);pointer-events:none;}
+  .cta-keep{height:40px;border-radius:12px;background:transparent;border:1px solid rgba(60,60,67,.16);color:var(--sec);font-size:12.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .cta-hint{text-align:center;font-size:10px;font-weight:500;color:var(--ter);margin-top:2px;}
+
+  .homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#000;opacity:.8;z-index:60;}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar">
+    <span class="time">9:41</span>
+    <div class="icons">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="1" width="3" height="11" rx="1"/><rect x="15" y="-2" width="3" height="14" rx="1" opacity=".45"/></svg>
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><path d="M8.5 2c3.5 0 6.6 1.4 8.5 3.5l-1.5 1.3C13.9 5 11.3 3.8 8.5 3.8S3.1 5 1.5 6.8L0 5.5C1.9 3.4 5 2 8.5 2zm0 3c2.4 0 4.5 1 6 2.5L13 8.8c-1.2-1.1-2.8-1.8-4.5-1.8S5.2 7.7 4 8.8L2.5 7.5C4 6 6.1 5 8.5 5zm0 3c1.3 0 2.5.5 3.4 1.3L8.5 13 5.1 9.3C6 8.5 7.2 8 8.5 8z"/></svg>
+      <svg width="28" height="12" viewBox="0 0 28 12" fill="none"><rect x=".5" y=".5" width="24" height="11" rx="3" stroke="currentColor" opacity=".55"/><rect x="26" y="4" width="1.5" height="4" rx=".75" fill="currentColor" opacity=".5"/><rect x="2.5" y="2.5" width="20" height="7" rx="1.5" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <div class="hero">
+    <span class="blob"></span>
+    <div class="horizon"></div>
+  </div>
+
+  <div class="anon-nav">
+    <div class="back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
+    <div class="brand">
+      <span class="dot"></span>
+      <span class="nm">欢迎回来 · Welcome Back</span>
+    </div>
+    <span class="fp">FP · a4c9…7e21</span>
+  </div>
+
+  <div class="welcome">
+    <div class="eyebrow"><span class="dot"></span>识别到你熟悉的设备</div>
+    <h1 class="title">好久不见，<br/>你的复习曲线<em>还在等你</em></h1>
+    <p class="sub">我们通过设备指纹发现你是这个账户的主人。还剩 <b>12 个</b> 节点待复习，最长已延迟 <b>5 天</b>。一键回登可立即接续。</p>
+
+    <div class="lastseen">
+      <div class="av"></div>
+      <div class="tx">
+        <div class="k">上次活跃 · Last Seen</div>
+        <div class="v">Allen · 高二 · 3 月 12 日（40 天前）</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll">
+    <div class="pending">
+      <div class="row">
+        <div class="l">
+          <div class="k">待复习节点</div>
+          <div class="big">12<em>个</em></div>
+          <div class="sub">其中 <span style="color:var(--red);font-weight:800;">3 个已逾期</span> · 最早 3 月 15 日</div>
+        </div>
+        <div class="donut">
+          <svg viewBox="0 0 84 84">
+            <circle cx="42" cy="42" r="34" fill="none" stroke="rgba(60,60,67,.08)" stroke-width="8"/>
+            <circle cx="42" cy="42" r="34" fill="none" stroke="url(#g)" stroke-width="8" stroke-dasharray="128 214" stroke-linecap="round"/>
+            <defs>
+              <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#FF9500"/>
+                <stop offset="100%" stop-color="#FF3B30"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="center">
+            <div class="n">60%</div>
+            <div class="l">遗忘风险</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="breakdown">
+        <div class="sub-chip">
+          <div class="sq" style="background:linear-gradient(135deg,#4C9BFF,#5856D6);">数</div>
+          <div class="tx"><div class="n">7</div><div class="l">数学 · 高二</div></div>
+        </div>
+        <div class="sub-chip">
+          <div class="sq" style="background:linear-gradient(135deg,#FF9500,#FF3B30);">物</div>
+          <div class="tx"><div class="n">3</div><div class="l">物理</div></div>
+        </div>
+        <div class="sub-chip">
+          <div class="sq" style="background:linear-gradient(135deg,#34C759,#30B0C7);">英</div>
+          <div class="tx"><div class="n">2</div><div class="l">英语</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="progress">
+      <div class="title">最近 14 天 · <em>复习缺席记录</em></div>
+      <div class="calendar-strip">
+        <div class="cell low"></div>
+        <div class="cell low"></div>
+        <div class="cell mid"></div>
+        <div class="cell gap"></div>
+        <div class="cell gap"></div>
+        <div class="cell gap"></div>
+        <div class="cell gap"></div>
+        <div class="cell gap"></div>
+        <div class="cell gap"></div>
+        <div class="cell gap"></div>
+        <div class="cell high"></div>
+        <div class="cell high"></div>
+        <div class="cell high"></div>
+        <div class="cell high"></div>
+      </div>
+      <div class="legend">
+        <div class="lg"><span class="sq" style="background:#FFE4CC;"></span>轻量</div>
+        <div class="lg"><span class="sq" style="background:#FFB454;"></span>中等</div>
+        <div class="lg"><span class="sq" style="background:#FF6B6B;"></span>高密度</div>
+        <div class="lg"><span class="sq" style="background:repeating-linear-gradient(45deg,#E5E5EA,#E5E5EA 3px,#F2F2F7 3px,#F2F2F7 6px);"></span>未登录</div>
+      </div>
+    </div>
+
+    <div class="qlist-title">
+      <div class="t">最需要复习的 3 题</div>
+      <div class="m">共 12 题 →</div>
+    </div>
+    <div class="qitem">
+      <div class="th math">数</div>
+      <div class="body">
+        <div class="tp">
+          <span class="tlab t6">T6 · 30d</span>
+          <span class="overdue">· 已逾期 5 天</span>
+        </div>
+        <h4>二次函数最值 · 闭区间三情形</h4>
+        <div class="dt">首次入库 · 2 月 10 日</div>
+      </div>
+      <div class="arr">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+    <div class="qitem">
+      <div class="th phys">物</div>
+      <div class="body">
+        <div class="tp">
+          <span class="tlab t4">T4 · 7d</span>
+          <span class="overdue">· 已逾期 3 天</span>
+        </div>
+        <h4>斜面受力分解 · 共点力平衡</h4>
+        <div class="dt">首次入库 · 3 月 1 日</div>
+      </div>
+      <div class="arr">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+    <div class="qitem">
+      <div class="th eng">英</div>
+      <div class="body">
+        <div class="tp">
+          <span class="tlab t2">T2 · 1d</span>
+          <span style="font-size:9.5px;color:var(--orange);font-weight:700;">· 今日到期</span>
+        </div>
+        <h4>虚拟语气 · 与现在事实相反</h4>
+        <div class="dt">首次入库 · 3 月 10 日</div>
+      </div>
+      <div class="arr">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-dock">
+    <button class="cta-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      一键回登 · 接续复习
+    </button>
+    <button class="cta-keep">
+      继续匿名浏览 · 不回登
+    </button>
+    <div class="cta-hint">回登将使用保存的微信 / Apple ID · 不会泄露隐私</div>
+  </div>
+
+  <div class="homebar"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,79 @@
+{
+  "$metadata": {
+    "source": "getdesign.md/apple/design-md + Apple HIG motion guidelines",
+    "saved_local": "design/system/inspiration/apple.design.md",
+    "generated_by": "ui-ux-pro-max-skill v2.5.0"
+  },
+  "tkn": {
+    "motion": {
+      "ease": {
+        "apple-standard": {
+          "value": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+          "type": "cubicBezier",
+          "comment": "Apple HIG standard — ease-out feel. Natural deceleration into resting state."
+        },
+        "enter": {
+          "value": "cubic-bezier(0.0, 0.0, 0.2, 1.0)",
+          "type": "cubicBezier",
+          "comment": "Elements entering viewport. Fast start, smooth arrival."
+        },
+        "exit": {
+          "value": "cubic-bezier(0.4, 0.0, 1.0, 1.0)",
+          "type": "cubicBezier",
+          "comment": "Elements exiting. Immediate start, clean departure. Always faster than enter."
+        },
+        "linear": {
+          "value": "cubic-bezier(0.0, 0.0, 1.0, 1.0)",
+          "type": "cubicBezier",
+          "comment": "Linear — use only for opacity fades where easing feels unnatural. Not for transforms."
+        }
+      },
+      "duration": {
+        "fast": {
+          "value": "150ms",
+          "type": "duration",
+          "comment": "Micro-interactions: hover state, focus ring appearance, button press feedback. Must be imperceptible."
+        },
+        "base": {
+          "value": "250ms",
+          "type": "duration",
+          "comment": "Standard element transitions: cards expanding, content loading, state changes within view."
+        },
+        "slow": {
+          "value": "400ms",
+          "type": "duration",
+          "comment": "Complex transitions: modal open, bottom sheet slide-up, page-level element reveals."
+        },
+        "exit-fast": {
+          "value": "90ms",
+          "type": "duration",
+          "comment": "Exit paired with fast — 60% of 150ms. Hover-out, focus-blur."
+        },
+        "exit-base": {
+          "value": "150ms",
+          "type": "duration",
+          "comment": "Exit paired with base — 60% of 250ms. Standard exit transition."
+        },
+        "exit-slow": {
+          "value": "240ms",
+          "type": "duration",
+          "comment": "Exit paired with slow — 60% of 400ms. Modal close, sheet dismiss."
+        }
+      },
+      "stagger": {
+        "list-item": {
+          "value": "30ms",
+          "type": "duration",
+          "comment": "Stagger delay between list/grid items entering. 30-50ms range. Avoids 'all at once' or 'too slow' reveal."
+        }
+      },
+      "scale": {
+        "press": {
+          "value": "0.97",
+          "type": "number",
+          "comment": "Scale on card/button tap press. Subtle physical feedback. Restore on release with ease-apple-standard."
+        }
+      }
+    }
+  }
+}
