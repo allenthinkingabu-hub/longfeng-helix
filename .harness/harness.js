@@ -144,6 +144,8 @@ function listInflight() {
 
 // ─── spawn agent (pluggable: claude | stub | manual) ─────────────
 function spawnAgent({ role, taskId }) {
+  const payload     = readInflight(taskId);
+  const workingDir  = (payload.isolation && payload.isolation.working_dir) || REPO_ROOT;
   const agentMd     = path.join('.harness', 'agents', role === 'coder' ? 'coder-agent.md' : 'test-agent.md');
   const inflightRel = path.relative(REPO_ROOT, inflightPath(taskId));
   const prompt = [
@@ -151,11 +153,11 @@ function spawnAgent({ role, taskId }) {
     `第一件事: 完整读 ${agentMd} 全文 + 完整读 ${inflightRel} 全文。`,
     `按 agent.md 内化的铁律和步骤执行 task ${taskId}。`,
     `完成后改对应 inflight 字段 (Coder: dev_done; Tester: passes)，`,
-    `然后调用 node harness/harness.js --advance=${taskId} 通知 harness 推进。`,
+    `然后调用 node .harness/harness.js --advance=${taskId} 通知 harness 推进。`,
   ].join(' ');
 
   if (SPAWN_MODE === 'stub') {
-    log(`${YELLOW}[stub spawn] would spawn ${role} for ${taskId}${RESET}`);
+    log(`${YELLOW}[stub spawn] would spawn ${role} for ${taskId} cwd=${path.relative(REPO_ROOT, workingDir) || '.'}${RESET}`);
     log(`${DIM}  prompt: ${prompt}${RESET}`);
     return { mode: 'stub', pid: null };
   }
@@ -163,13 +165,13 @@ function spawnAgent({ role, taskId }) {
   if (SPAWN_MODE === 'manual') {
     ensureDir(EVENT_DIR);
     const reqPath = path.join(EVENT_DIR, `spawn-${taskId}-${role}-${Date.now()}.json`);
-    writeJson(reqPath, { role, taskId, prompt, agentMd, inflightRel });
+    writeJson(reqPath, { role, taskId, prompt, agentMd, inflightRel, workingDir });
     log(`${YELLOW}[manual spawn] wrote ${path.relative(REPO_ROOT, reqPath)} — TL agent must spawn via Task tool.${RESET}`);
     return { mode: 'manual', pid: null, reqPath };
   }
 
   try {
-    const child = cp.spawn('claude', ['-p', prompt], { cwd: REPO_ROOT, stdio: ['ignore', 'inherit', 'inherit'], detached: true });
+    const child = cp.spawn('claude', ['-p', prompt], { cwd: workingDir, stdio: ['ignore', 'inherit', 'inherit'], detached: true });
     child.unref();
     log(`${GREEN}[claude spawn] ${role} ${taskId} pid=${child.pid}${RESET}`);
     return { mode: 'claude', pid: child.pid };
@@ -353,13 +355,13 @@ function cmdHelp() {
 ${BOLD}harness.js — engine for AI agent team (Coder + Tester) adversarial loop${RESET}
 
 ${BOLD}USAGE${RESET}
-  node harness/harness.js --init=<task_id> [--team=<team>] [--title="..."] [--context=path/to/ctx.json]
-  node harness/harness.js --advance=<task_id>
-  node harness/harness.js --status[=<task_id>]
-  node harness/harness.js --list
-  node harness/harness.js --reset=<task_id>
-  node harness/harness.js --start [--task=<id>] [--team=<team>] [--feature-list=path]
-  node harness/harness.js --help
+  node .harness/harness.js --init=<task_id> [--team=<team>] [--title="..."] [--context=path/to/ctx.json]
+  node .harness/harness.js --advance=<task_id>
+  node .harness/harness.js --status[=<task_id>]
+  node .harness/harness.js --list
+  node .harness/harness.js --reset=<task_id>
+  node .harness/harness.js --start [--task=<id>] [--team=<team>] [--feature-list=path]
+  node .harness/harness.js --help
 
 ${BOLD}ENV${RESET}
   HARNESS_SPAWN_MODE   claude | stub | manual    (default: claude)
