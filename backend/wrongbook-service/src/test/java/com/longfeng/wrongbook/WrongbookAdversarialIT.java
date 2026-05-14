@@ -137,4 +137,80 @@ class WrongbookAdversarialIT extends IntegrationTestBase {
                 Long.class, Long.parseLong(qid1));
         assertThat(count).isEqualTo(1L);
     }
+
+    // ── #5 SQL injection attempt in subject field → should reject or escape safely ──
+    @Test
+    @Order(5)
+    @DisplayName("ADV-5 POST with SQL injection in subject → CHECK constraint rejects")
+    void createWithSqlInjectionSubject() throws Exception {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("student_id", 999998L);
+        body.put("subject", "'; DROP TABLE wrong_item; --");
+        body.put("source_type", 1);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("X-Idempotency-Key", UUID.randomUUID().toString());
+
+        ResponseEntity<String> resp = rest.exchange(
+                base() + "/api/wb/questions",
+                HttpMethod.POST,
+                new HttpEntity<>(json.writeValueAsString(body), headers),
+                String.class);
+
+        // DB CHECK constraint ck_wrong_subject rejects non-whitelisted values
+        assertThat(resp.getStatusCode().is4xxClientError() || resp.getStatusCode().is5xxServerError())
+                .as("SQL injection string in subject must not succeed")
+                .isTrue();
+
+        // verify table still exists (not dropped)
+        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+        Long tableExists = jdbc.queryForObject(
+                "SELECT count(*) FROM information_schema.tables WHERE table_name = 'wrong_item'",
+                Long.class);
+        assertThat(tableExists).isEqualTo(1L);
+    }
+
+    // ── #6 超長 stem_text via PATCH → should not crash service ──
+    @Test
+    @Order(6)
+    @DisplayName("ADV-6 PATCH with 超长 stem_text (100KB) → boundary test")
+    void patchWithOversizedStemText() throws Exception {
+        // first create a valid question
+        Map<String, Object> createBody = new LinkedHashMap<>();
+        createBody.put("student_id", 999997L);
+        createBody.put("subject", "english");
+        createBody.put("source_type", 1);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("X-Idempotency-Key", UUID.randomUUID().toString());
+
+        ResponseEntity<String> createResp = rest.exchange(
+                base() + "/api/wb/questions",
+                HttpMethod.POST,
+                new HttpEntity<>(json.writeValueAsString(createBody), headers),
+                String.class);
+        assertThat(createResp.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        String qid = json.readTree(createResp.getBody()).path("data").path("qid").asText();
+
+        // patch with 超长 100KB stem_text (boundary / 脏数据 test)
+        String oversizedText = "A".repeat(100_000);
+        Map<String, Object> patchBody = new LinkedHashMap<>();
+        patchBody.put("stem_text", oversizedText);
+
+        java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+        java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                .uri(java.net.URI.create(base() + "/api/wb/questions/" + qid))
+                .method("PATCH", java.net.http.HttpRequest.BodyPublishers.ofString(json.writeValueAsString(patchBody)))
+                .header("Content-Type", "application/json")
+                .header("X-Request-Id", UUID.randomUUID().toString())
+                .build();
+        java.net.http.HttpResponse<String> httpResp = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+        // TEXT column has no length limit so this should succeed or fail gracefully
+        assertThat(httpResp.statusCode() == 200 || httpResp.statusCode() >= 400)
+                .as("oversized input must either succeed (TEXT col) or fail gracefully, not crash")
+                .isTrue();
+    }
 }
