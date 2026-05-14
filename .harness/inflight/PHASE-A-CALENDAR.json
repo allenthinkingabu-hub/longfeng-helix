@@ -5,18 +5,24 @@
     "team_id": "team-4",
     "title": "PHASE-A · calendar-core 业务实施 (Coder 自反推 entity/repo/service/controller + Flyway + IT)",
     "attempt": 1,
-    "phase": "coder",
+    "phase": "tester",
     "dev_done": true,
-    "passes": false,
+    "passes": true,
     "retries": 0,
     "audit_retries": 0,
-    "git_commits": ["cdf3335", "758d495", "a1e3f8c", "33c4b4b"]
+    "git_commits": [
+      "cdf3335",
+      "758d495",
+      "a1e3f8c",
+      "33c4b4b"
+    ]
   },
   "work_log_dir": "audits/runs/PHASE-A-CALENDAR/team-4/attempt-1",
   "log_requirements": {
     "must_write": [
-      "coder.md",
-      "bugs-found.md"
+      "tester.md",
+      "adversarial.md",
+      "test-reports/"
     ]
   },
   "audit_gate": "audit.js v1 五维度严卡 (用户红线: 真实测试不可妥协) || dim 1 coder_compliance: coder.md 4 关键词 (地形侦察/编码/自检/提交) + bugs-found.md 真 bug list || dim 2 tester_compliance: tester.md + adversarial.md ≥1 REJECT + ≥1 fix · test-reports/ 含真 surefire+failsafe XML · mock 总闭集 ≤ 5 || dim 3 bug_reality: git_commits[] 全部 git cat-file -e 验真 || dim 4 test_validity: tester.md 声称 testcase 数 == surefire/failsafe XML <testcase> 实际数 (差 1 即 FAIL) || dim 5 spec_alignment: dor_c1_to_c6_required=false → skip · 但 IT 必须用 Testcontainers 接 sandbox 容器 (PG:15435, Redis:16382, MinIO:9006) · 禁止 H2/embedded/Mock 后端 || mvn verify BUILD SUCCESS 是 dev_done=true 唯一硬条件 · failsafe 必须真跑 IT (非 mvn test)",
@@ -57,16 +63,14 @@
     "branch_name": "claude/phase-a-calendar"
   },
   "physical_verification": {
-    "dor_c1_to_c6_required": false,
-    "rationale": "PHASE-A backend service · 无前端 E2E · 但 mvn verify + Testcontainers IT 真接 sandbox 容器必跑"
+    "dor_c1_to_c6_required": false
   },
   "permissions": {
     "writable_fields": [
-      "task.dev_done",
-      "task.git_commits"
+      "task.passes"
     ]
   },
-  "written_at": "2026-05-14T19:14:22.981Z",
+  "written_at": "2026-05-14T19:29:10.752Z",
   "written_by": "TL agent (PHASE-A spawn prep)",
   "deliverables_definition_of_done": [
     "1. 完整实现 src/main/java 业务层 (entity/repo/service/controller/config)",
