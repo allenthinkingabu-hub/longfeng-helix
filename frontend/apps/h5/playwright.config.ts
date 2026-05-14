@@ -1,6 +1,6 @@
 // S7 · SC-01-T01 · Playwright E2E config
 // owner: SC01-T01 Coder attempt-3 (retries=2)
-// 依据: ai/agents/coder-agent.md §4 真实 E2E + 铁律补充 6 E2E DoD 唯一硬条件
+// 依据: .harness/agents/coder-agent.md §4 真实 E2E + 铁律补充 6 E2E DoD 唯一硬条件
 //
 // 目标 baseURL: vite dev server (port 5174, configured in vite.config.ts) →
 // 反向代理 /api → 真后端 file-service / wrongbook-service / ai-analysis-service。

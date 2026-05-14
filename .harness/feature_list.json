@@ -1,0 +1,688 @@
+{
+  "schema_version": "3.1",
+  "scenario_id": "SC-01",
+  "scenario_title": "首次拍题 → 今日首次复习完成",
+  "scenario_goal": "学生第一次走完「拍题 → AI 分析 → 保存入库 → 复习计划落地 → 日历同步 → 首次复习完成」的端到端黄金路径，验证核心转化漏斗。",
+
+  "generated_from": "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 (20 user-action steps)",
+  "generated_at": "2026-05-14",
+  "owner": "user",
+  "recovery_note": "本文件由 2026-05-14 协作回忆生成 · 原 v3.1 因事故丢失 · 14 task 边界依据 biz §2B.2 20 步压缩为 14 垂直切片 · T01 状态由 git log + audits/runs/SC01-T01 实证 · T02..T14 dev_done/passes 初始化为 false (从未开发)",
+
+  "scenario_biz_ref": "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2",
+  "scenario_spec_refs": [
+    "design/system/pages/P02-capture.spec.md",
+    "design/system/pages/P03-analyzing.spec.md",
+    "design/system/pages/P04-result.spec.md",
+    "design/system/pages/P05-wrongbook-list.spec.md",
+    "design/system/pages/P-HOME.spec.md",
+    "design/system/pages/P07-review-today.spec.md",
+    "design/system/pages/P08-review-exec.spec.md",
+    "design/system/pages/P09-review-done.spec.md"
+  ],
+  "scenario_tc_ids": ["TC-01.01", "TC-01.02", "TC-01.03", "TC-01.04", "TC-01.05", "TC-01.06"],
+
+  "system_invariants": [
+    "DB: wb_question 1 条 (status=ACTIVE) · wb_review_plan 1 条 · wb_review_node 7 条 (T0=GRADED·MASTERED, T1..T6=SCHEDULED) · calendar_event 7 条 (relation_type=STUDY · 第 1 条 state=COMPLETED 绿色)",
+    "MQ: question.created.topic · review.node.opened · review.node.graded 各 ≥ 1 条",
+    "Outbox: 无未投递消息滞留",
+    "幂等: 重放步骤 9 的 confirm 不产生重复计划 (按 qid 唯一)"
+  ],
+
+  "work_log_dir_pattern": "audits/runs/<task_id_short>/<team>/attempt-<N>/",
+  "log_requirements_template": {
+    "coder":  ["coder.md", "bugs-found.md"],
+    "tester": ["tester.md", "adversarial.md", "test-reports/"]
+  },
+  "audit_gate": "harness/audit.js 5 维度全过才真 PASS · 任一不过 REDO · audit_retries ≥ 3 触发熔断",
+
+  "id_convention": {
+    "long_form":  "SC-01-T<NN> (含连字符 · 用于 spec / git branch / commit message)",
+    "short_form": "SC01-T<NN> (无连字符 · 用于 .harness/inflight/<id>.json 文件名 · audits/runs/<id>/ 目录名)",
+    "pascal":     "T<NN><PurposeShort> (用于 *E2EIT.java / *AdversarialIT.java 类名)"
+  },
+
+  "total_tasks": 14,
+
+  "tasks": [
+    {
+      "task_id": "SC-01-T01",
+      "task_id_short": "SC01-T01",
+      "task_id_pascal": "T01CaptureToPending",
+      "task_title": "学生 P02 拍题 → presign + OSS PUT + wrongbook PENDING question + 跳 P03",
+      "scenario": "TC-01.01 黄金路径起点 · 内嵌 TC-01.02 断点续传 + idempotency",
+      "biz_step_range": "biz §2B.2 步 1-4",
+      "page": "P02-capture",
+      "page_state_machine": "IDLE → FOCUSING → CAPTURED → UPLOADING → UPLOADED (→nav P03)",
+      "branch": "feature/SC-01-T01-capture-to-pending",
+      "owner_team": "team-1",
+      "biz_refs": ["biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 1-4", "TC-01.02"],
+      "spec_refs": ["design/system/pages/P02-capture.spec.md §5 API 触点", "design/system/pages/P02-capture.spec.md §6 状态机"],
+      "phase_0_audit_refs": ["audits/SC-01-PHASE-0/A03-file-presign.md"],
+      "primary_services": ["frontend/apps/h5", "backend/file-service", "backend/wrongbook-service"],
+      "primary_apis": [
+        "POST /api/file/presign",
+        "PUT {presignedUrl} (OSS direct)",
+        "POST /api/wb/questions"
+      ],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "POST /api/file/presign · Header X-Idempotency-Key + body {sha256_hash, size, mime} → 200 {url, key, expiresIn}" },
+        { "id": "AC2", "text": "同 X-Idempotency-Key 在 24h 内复用首次 file_key (TC-01.02 内嵌幂等)" },
+        { "id": "AC3", "text": "POST /api/wb/questions · Header X-Idempotency-Key → 200 PENDING + qid · 三级幂等优先 (header > requestId > body)" },
+        { "id": "AC4", "text": "POST /api/ai/analyze-by-url → 202 + taskId · FE 自动 router.push('/analyzing/{taskId}')" },
+        { "id": "AC5", "text": "shutter UPLOADING 状态 aria-disabled='true' · 10 次连点只触发 1 次 presign" },
+        { "id": "AC6", "text": "缺 X-Idempotency-Key 必返 400 ERR_IDEMPOTENCY_KEY_REQUIRED (不是 500)" }
+      ],
+      "test_invariants": [
+        "TI1: 同 idemKey 24h 内 wb_file 仅 1 行",
+        "TI2: 缺 header 返 400 非 500",
+        "TI3: presign / PUT / wb-questions 任一 5xx 不得跳 P03",
+        "TI4: shutter UPLOADING 状态 10 连点 → presignCount === 1",
+        "TI5: 4 态 (idle/uploading/success/error) VRT screenshot × 3 (baseline/actual/diff)"
+      ],
+      "key_invariants": ["步骤 4 上传按 idempotency_key 不重复创建 question"],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-01/t01-capture-to-pending.spec.ts",
+        "backend_e2e_it": "backend/file-service/src/test/java/.../T01CaptureToPendingE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 4,
+      "audit_retries": 0,
+      "git_commits": ["eb5a764", "78b80e7", "cb357b8"],
+      "current_status": "BLOCKED_AT_ATTEMPT_5",
+      "blocker": "Bug 13 (sandbox sc01t01-pg-15432 wrongbook DB 5 张手工表 V1.0.002/003/005/010/016/056 与 wrongbook-service Flyway 期望从 V1.0.001 跑全 39 migrations 冲突 · 等 TL 决策路径 A/B/C)",
+      "work_log_dir": "audits/runs/SC01-T01/team-1/attempt-5/"
+    },
+
+    {
+      "task_id": "SC-01-T02",
+      "task_id_short": "SC01-T02",
+      "task_id_pascal": "T02PendingToAnalyzing",
+      "task_title": "上传完成自动跳 P03 · 创建 PENDING question · 启 analyze 任务 · SSE 订阅",
+      "scenario": "TC-01.01 步 5 · upload-success → P02 淡出 → P03 骨架屏",
+      "biz_step_range": "biz §2B.2 步 5",
+      "page": "P02→P03",
+      "page_state_machine": "capture.UPLOADED → analyzing.QUEUED → STEP_1",
+      "branch": "feature/SC-01-T02-pending-to-analyzing",
+      "owner_team": "team-1",
+      "biz_refs": ["biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 5", "biz §2A.4 P03 规格卡"],
+      "spec_refs": ["design/system/pages/P02-capture.spec.md §6 状态机 (UPLOADED → nav P03)", "design/system/pages/P03-analyzing.spec.md §5 API 触点"],
+      "phase_0_audit_refs": ["audits/SC-01-PHASE-0/A02-wrongbook-api.md", "audits/SC-01-PHASE-0/A04-ai-analysis.md"],
+      "primary_services": ["frontend/apps/h5", "backend/wrongbook-service", "backend/ai-analysis-service"],
+      "primary_apis": [
+        "POST /api/wb/questions",
+        "POST /api/ai/analyze-by-url",
+        "GET /api/ai/stream/{taskId} (SSE · H5)",
+        "WebSocket /ws/analyze/{taskId} (miniapp)"
+      ],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "P02→P03 自动跳转必须发生在 createPending 200 + analyze 202 之后 · 跳转 ≤ 500ms" },
+        { "id": "AC2", "text": "P03 首屏骨架屏 (4 步流水线占位 wait 态) 必须在跳转后 ≤ 100ms 渲染" },
+        { "id": "AC3", "text": "SSE EventSource onopen 触发 · taskId 与 analyze-by-url 返回值一致" },
+        { "id": "AC4", "text": "createPending 失败 (5xx) → 留 P02 + ERROR banner + 不跳 P03 (路由门禁)" },
+        { "id": "AC5", "text": "analyze-by-url 5xx → 留 P02 + retry button + 不跳 P03" },
+        { "id": "AC6", "text": "SSE 连接失败 → 顶部 toast「等待 AI 服务」+ 不阻塞 (允许 P03 已进)" }
+      ],
+      "test_invariants": [
+        "TI1: 同 X-Idempotency-Key 重放 createPending → qid 复用 (与 T01 idem 链路一致)",
+        "TI2: createPending 在 analyze-by-url 之前发起 (顺序断言)",
+        "TI3: SSE 连接 24h 不丢消息 (基础设施保证)",
+        "TI4: 4 态 (queued/connecting/streaming/disconnected) VRT screenshot"
+      ],
+      "key_invariants": ["P03 进场必须满足 PENDING question 已创建 + analyze taskId 已分配 · 否则视为路由非法"],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-01/t02-pending-to-analyzing.spec.ts",
+        "backend_e2e_it": "backend/wrongbook-service/src/test/java/.../T02PendingToAnalyzingE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC01-T02/team-1/attempt-1/"
+    },
+
+    {
+      "task_id": "SC-01-T03",
+      "task_id_short": "SC01-T03",
+      "task_id_pascal": "T03AiStreamPipeline",
+      "task_title": "AI 4 步流水线 SSE 推送 · 模型 fallback · 取消按钮",
+      "scenario": "TC-01.01 步 6 + TC-01.03 (qwen 超时切 gpt)",
+      "biz_step_range": "biz §2B.2 步 6",
+      "page": "P03-analyzing",
+      "page_state_machine": "QUEUED → STEP_1 (OCR) → STEP_2 (ANALYSIS) → STEP_3 (STEPS) → STEP_4 (DONE)",
+      "branch": "feature/SC-01-T03-ai-stream-pipeline",
+      "owner_team": "team-1",
+      "biz_refs": ["biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 6", "biz §2A.4 P03 规格卡 (4 步流水线)", "TC-01.03"],
+      "spec_refs": ["design/system/pages/P03-analyzing.spec.md §4 type union", "design/system/pages/P03-analyzing.spec.md §6 状态机 SLOW"],
+      "phase_0_audit_refs": ["audits/SC-01-PHASE-0/A04-ai-analysis.md §2.3 4 步事件名 vs P03 type union"],
+      "primary_services": ["frontend/apps/h5", "backend/ai-analysis-service"],
+      "primary_apis": [
+        "GET /api/ai/stream/{taskId} (SSE)",
+        "POST /api/ai/cancel/{taskId}"
+      ],
+      "sse_event_types": ["STEP_START", "STEP_DONE", "PARTIAL_JSON", "DONE", "FAIL", "CANCELLED", "FALLBACK_MODEL"],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "SSE 收到 STEP_START → 对应流水线节点翻 'now' (pulse 动画)" },
+        { "id": "AC2", "text": "SSE 收到 STEP_DONE → 节点翻 'done' (绿 checkmark)" },
+        { "id": "AC3", "text": "SSE 收到 PARTIAL_JSON → 右侧 JSON 流式打字机 append (chunk 字段 · 非 partialJson)" },
+        { "id": "AC4", "text": "4 步全部走完 (OCR→ANALYSIS→STEPS→DONE) · 总耗时 4-8s 内 · 节点状态严格 wait→now→done" },
+        { "id": "AC5", "text": "TC-01.03 · qwen-vl-max 超时 > 10s → FALLBACK_MODEL event (chunk='qwen-vl-max→gpt-4o-mini') · 顶部黄条「切换备用模型中」· 自动切 gpt-4o-mini · 埋点 wb_ai_stream_fail{code=TIMEOUT} 1 + _start{model=gpt-4o-mini} 1" },
+        { "id": "AC6", "text": "取消按钮始终可点 · Tap → POST /api/ai/cancel/{taskId} → BE 先发 CANCELLED 帧再 complete sink · FE 据 type=CANCELLED 触发 onCancelled · 返 P02" }
+      ],
+      "test_invariants": [
+        "TI1: PARTIAL_JSON payload 在 chunk 字段 (A04 spec drift fix)",
+        "TI2: FALLBACK_MODEL 只在非主 provider 命中时 emit · 主 provider 成功静默",
+        "TI3: 4 步 SSE 完成顺序严格 (STEP_DONE 必须先于下一步 STEP_START)",
+        "TI4: 中途断网 SSE 自动重连 (≤ 3 次 · indicator 显式提示)",
+        "TI5: 取消后服务端 CANCELLED 帧到达 FE · sink complete · 资源回收"
+      ],
+      "key_invariants": ["SSE 4 步全程不阻塞 UI 主线程", "禁止返回键 / 左滑返回 / 系统 Home 静默丢任务 (必调 cancel API)"],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-01/t03-ai-stream-pipeline.spec.ts",
+        "backend_e2e_it": "backend/ai-analysis-service/src/test/java/.../T03AiStreamPipelineE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC01-T03/team-1/attempt-1/"
+    },
+
+    {
+      "task_id": "SC-01-T04",
+      "task_id_short": "SC01-T04",
+      "task_id_pascal": "T04AnalyzeDoneToResult",
+      "task_title": "SSE DONE 后 P03→P04 跳转 · 渲染 Hero + 错因 + 3 步解法 + 6 节点预告",
+      "scenario": "TC-01.01 步 7-8 + TC-01.04 (低置信黄条)",
+      "biz_step_range": "biz §2B.2 步 7-8",
+      "page": "P03→P04",
+      "page_state_machine": "analyzing.SUCCEEDED → result.DRAFT",
+      "branch": "feature/SC-01-T04-analyze-done-to-result",
+      "owner_team": "team-1",
+      "biz_refs": ["biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 7-8", "biz §2A.4 P04 规格卡", "TC-01.04"],
+      "spec_refs": ["design/system/pages/P04-result.spec.md §5 API 触点 (GET /api/wb/questions/{qid})"],
+      "phase_0_audit_refs": ["audits/SC-01-PHASE-0/A02-wrongbook-api.md QuestionDetailController.get() L84"],
+      "primary_services": ["frontend/apps/h5", "backend/wrongbook-service", "backend/ai-analysis-service"],
+      "primary_apis": [
+        "GET /api/wb/questions/{qid}",
+        "GET /analysis/{itemId}/latest"
+      ],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "SSE DONE event 到达 → analysis_result 已落库 (wrong_item_analysis 行存在)" },
+        { "id": "AC2", "text": "P03 淡出 + P04 淡入 ≤ 300ms · 滚动条置顶" },
+        { "id": "AC3", "text": "GET /api/wb/questions/{qid} 返聚合 {question, plannedNodes} · plain JSON 不裹 ApiResult · FE 直接 destructure" },
+        { "id": "AC4", "text": "P04 完整渲染: Hero (题干+公式) + 错解红条 + 正解绿卡 + 3 步解法 + KP chips + 难度 ★ + 6 节点预告 T0=now/T1-T6=future" },
+        { "id": "AC5", "text": "TC-01.04 · confidence < 0.6 → 顶部黄条「AI 不太确定，请复核」+ 保存按钮可用但触发前端强制确认弹窗 · 埋点 wb_result_low_conf" }
+      ],
+      "test_invariants": [
+        "TI1: 6 节点时间线初始 T0=now · T1-T6=future (非 SCHEDULED 因尚未 save)",
+        "TI2: confidence 字段 ∈ [0,1] (DB constraint · ai-analysis-service 写入时校验)",
+        "TI3: 滚动到底部触发 wb_result_scroll{depth%} 埋点",
+        "TI4: P04 4 态 (draft/editing/saving/saved) 中 draft 态 VRT screenshot"
+      ],
+      "key_invariants": ["P04 进场必须满足 analysis_result 已落库 (SSE DONE 后 GET 应返回完整 analysis)"],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-01/t04-analyze-done-to-result.spec.ts",
+        "backend_e2e_it": "backend/wrongbook-service/src/test/java/.../T04AnalyzeDoneToResultE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC01-T04/team-1/attempt-1/"
+    },
+
+    {
+      "task_id": "SC-01-T05",
+      "task_id_short": "SC01-T05",
+      "task_id_pascal": "T05ResultSaveToWrongbook",
+      "task_title": "Tap「保存到错题本」· POST /save · 触发 plan + 7 nodes 生成",
+      "scenario": "TC-01.01 步 9",
+      "biz_step_range": "biz §2B.2 步 9",
+      "page": "P04-result",
+      "page_state_machine": "result.DRAFT → SAVING → SAVED",
+      "branch": "feature/SC-01-T05-result-save-to-wrongbook",
+      "owner_team": "team-1",
+      "biz_refs": ["biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 9", "biz §2A.4 P04 规格卡 后端副作用"],
+      "spec_refs": ["design/system/pages/P04-result.spec.md §5 API 触点 (POST /save)"],
+      "phase_0_audit_refs": ["audits/SC-01-PHASE-0/A02-wrongbook-api.md QuestionDetailController.save() L134"],
+      "primary_services": ["frontend/apps/h5", "backend/wrongbook-service"],
+      "primary_apis": ["POST /api/wb/questions/{qid}/save"],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "Tap 蓝色「保存到错题本」按钮 · loading spinner + 触觉 success" },
+        { "id": "AC2", "text": "POST /api/wb/questions/{qid}/save body{strategyCode=EBBINGHAUS_STD} Header X-Request-Id → 200 SaveQuestionResp" },
+        { "id": "AC3", "text": "DB: wb_question.status DRAFT → ACTIVE · 同步发 question.created.topic outbox event" },
+        { "id": "AC4", "text": "重放 save (同 qid) 不产生重复计划 · 第 2 次返回当前快照 (幂等)" },
+        { "id": "AC5", "text": "save 失败 (5xx) → 留 P04 + ERROR banner + 不写 plan + outbox 不发" }
+      ],
+      "test_invariants": [
+        "TI1: question.created.topic outbox 1 条 (payload {itemId, userId, subject, occurredAt})",
+        "TI2: save 幂等基于 qid 唯一索引 (重放 INSERT 撞 unique → 走 catch 返当前快照)",
+        "TI3: 埋点 wb_result_save{subject,kpCount} 1 条",
+        "TI4: save 全链耗时 ≤ 800ms (P95)"
+      ],
+      "key_invariants": ["save 200 + question.created.topic outbox 必须事务一致 (同一 DB tx 内)"],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-01/t05-result-save-to-wrongbook.spec.ts",
+        "backend_e2e_it": "backend/wrongbook-service/src/test/java/.../T05ResultSaveToWrongbookE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC01-T05/team-1/attempt-1/"
+    },
+
+    {
+      "task_id": "SC-01-T06",
+      "task_id_short": "SC01-T06",
+      "task_id_pascal": "T06ChainPlanNodesCalendar",
+      "task_title": "question.created MQ → review-plan 生成 plan+7 nodes → calendar-core 落 7 events",
+      "scenario": "TC-01.01 步 10 (后端透明) + TC-01.05 (calendar 503 outbox 兜底)",
+      "biz_step_range": "biz §2B.2 步 10",
+      "page": "(后端透明 · 用户无感知)",
+      "page_state_machine": "review.plan.created · 7 nodes ACTIVE · 7 calendar_events SCHEDULED",
+      "branch": "feature/SC-01-T06-chain-plan-nodes-calendar",
+      "owner_team": "team-2",
+      "biz_refs": ["biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 10", "biz §SC-01.10", "TC-01.05"],
+      "spec_refs": ["design/arch/s5-review-plan.md §A1 NODE_OFFSETS"],
+      "phase_0_audit_refs": ["audits/SC-01-PHASE-0/A05-review-plan.md §2.3 7 节点生成", "audits/SC-01-PHASE-0/A05-review-plan.md §2.2 question.created 订阅"],
+      "primary_services": ["backend/wrongbook-service (publisher)", "backend/review-plan-service (consumer)", "backend/calendar-core (Feign target)"],
+      "primary_apis": [
+        "MQ Topic: question.created.topic",
+        "review-plan internal: createSevenNodes(itemId, userId, occurredAt)",
+        "Feign POST → calendar-core: batchCreate 7 events"
+      ],
+      "node_offsets": ["2h", "1d", "2d", "4d", "7d", "14d", "30d"],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "question.created.topic 投递 1 条 · payload {itemId, userId, subject, topic, action, occurredAt} (snake_case JsonAlias 容错)" },
+        { "id": "AC2", "text": "review-plan-service QuestionCreatedConsumer 消费 → service.createSevenNodes → wb_review_plan 1 条 + wb_review_node 7 条 (node_index 0..6 · strategyCode=EBBINGHAUS_SM2 · ease_factor=2.5 · status=ACTIVE)" },
+        { "id": "AC3", "text": "NODE_OFFSETS [2h, 1d, 2d, 4d, 7d, 14d, 30d] 写入 next_due_at = baseInstant + offset · 与 spec §SC-01.10 字符级一致" },
+        { "id": "AC4", "text": "createSevenNodes 后 calendarBatchCreate.dispatch(persisted) → 7 条 calendar_event (relation_type=STUDY · 独立事务)" },
+        { "id": "AC5", "text": "TC-01.05 · calendar-core 503 → outbox EVENT_CALENDAR_BATCH_CREATE 滞留 · 3 次重试 (1s/3s/9s 退避) → 最终 7 条 event 全部落地 · UI 顶部 toast「排期同步中，稍后自动重试」" },
+        { "id": "AC6", "text": "幂等: 同 wrong_item_id 重放 createSevenNodes → existsByWrongItemId 闸门拦截 · success counter 不增 / duplicate counter 增 · 不重复落 7 行" }
+      ],
+      "test_invariants": [
+        "TI1: 7 节点 node_index 严格 0..6 · 无重复无缺失 (unique index uk_review_plan_item_node)",
+        "TI2: NODE_OFFSETS 与 spec §SC-01.10 + design/arch/s5-review-plan.md §A1 100% 对齐 (任何 offset 改动需 ADR)",
+        "TI3: 重放 question.created (同 msgId) → success=0 / duplicate=1 (micrometer counter)",
+        "TI4: calendar 失败不回滚 plan (eventual consistency · SC-01-C07)",
+        "TI5: outbox 重试到上限 (3 次) 仍失败 → 告警 + 落 dead-letter (不静默丢消息)"
+      ],
+      "key_invariants": ["7 nodes + 7 calendar events 最终一致 (不允许 'plan 已建但 events 0 条' 持续 > 5 min)", "重放不产生重复 plan/nodes/events"],
+      "physical_verification": {
+        "frontend_e2e": "(N/A · 后端透明 · 由 T05/T07 间接验证)",
+        "backend_e2e_it": "backend/review-plan-service/src/test/java/.../T06ChainPlanNodesCalendarE2EIT.java (含 EbbinghausEndToEndIT + CalendarBatchCreateIT 联调)"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "note": "A05 audit 显示 C05/C06/C07/C08 + D01 已合入主干 → T06 本质是 E2E 验证而非新写代码 · Coder 重点是 IT 联调 + outbox 兜底实证",
+      "work_log_dir": "audits/runs/SC01-T06/team-2/attempt-1/"
+    },
+
+    {
+      "task_id": "SC-01-T07",
+      "task_id_short": "SC01-T07",
+      "task_id_pascal": "T07ListHighlightNewest",
+      "task_title": "P04→P05 自动跳转 · 第 1 卡 (qid) 绿色高亮 3s",
+      "scenario": "TC-01.01 步 11",
+      "biz_step_range": "biz §2B.2 步 11",
+      "page": "P04→P05",
+      "page_state_machine": "result.SAVED → list.HIGHLIGHTED → list.LIST",
+      "branch": "feature/SC-01-T07-list-highlight-newest",
+      "owner_team": "team-1",
+      "biz_refs": ["biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 11", "biz §2A.4 P05 规格卡"],
+      "spec_refs": ["design/system/pages/P05-wrongbook-list.spec.md §5 GET /api/wb/questions"],
+      "phase_0_audit_refs": ["audits/SC-01-PHASE-0/A02-wrongbook-api.md QuestionDetailController.list() L154"],
+      "primary_services": ["frontend/apps/h5", "backend/wrongbook-service"],
+      "primary_apis": ["GET /api/wb/questions?sort=created_desc&highlight={qid}&page=1&size=20"],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "save 200 后 P04 淡出 + P05 淡入 ≤ 500ms · 列表滚动已置顶 (scrollY=0)" },
+        { "id": "AC2", "text": "GET /api/wb/questions?sort=created_desc&highlight={qid} → 200 QuestionListResp · 第 1 项 qid 与传入 highlight 匹配" },
+        { "id": "AC3", "text": "第 1 卡绿色高亮 (border 2px solid green-500) 持续 3s 后 fade-out 至正常态" },
+        { "id": "AC4", "text": "高亮卡左色条 + 学科 chip + KP chips + 难度 ★ + 6 段阶段进度 (T0 done · T1-T6 future) + 下次到期 全部渲染" }
+      ],
+      "test_invariants": [
+        "TI1: highlight={qid} 不在 list 中 → fallback 不高亮 (不抛错 · 列表正常渲染)",
+        "TI2: 高亮 fade-out 后卡片回归正常颜色 (不残留 border)",
+        "TI3: 埋点 wb_list_view{highlightedQid} 1 条",
+        "TI4: 4 态 (loading/empty/list/error) 中 list 态 + highlighted 态 VRT screenshot"
+      ],
+      "key_invariants": ["高亮是 UI 反馈不是业务状态 · BE 不需要存 highlight 字段"],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-01/t07-list-highlight-newest.spec.ts",
+        "backend_e2e_it": "backend/wrongbook-service/src/test/java/.../T07ListHighlightNewestE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC01-T07/team-1/attempt-1/"
+    },
+
+    {
+      "task_id": "SC-01-T08",
+      "task_id_short": "SC01-T08",
+      "task_id_pascal": "T08HomeTodayCounterTick",
+      "task_title": "P05→P-HOME 返回 · 今日复习大卡数字 +1 · 圆环进度动画",
+      "scenario": "TC-01.01 步 12-13",
+      "biz_step_range": "biz §2B.2 步 12-13",
+      "page": "P05→P-HOME",
+      "page_state_machine": "list.LIST → home.LOADING → home.READY",
+      "branch": "feature/SC-01-T08-home-today-counter-tick",
+      "owner_team": "team-1",
+      "biz_refs": ["biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 12-13", "biz §2A.3.3 P-HOME 今日聚合首页"],
+      "spec_refs": ["design/system/pages/P-HOME.spec.md §5 GET /api/home/today"],
+      "phase_0_audit_refs": ["audits/SC-01-PHASE-0/A05-review-plan.md §2.4 HomeAggregatorController.homeToday"],
+      "primary_services": ["frontend/apps/h5", "backend/review-plan-service (HomeAggregator)"],
+      "primary_apis": ["GET /api/home/today?tz=Asia/Shanghai"],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "Tap Tab 1「首页」→ P-HOME 顶部大卡重新渲染 (loading skeleton 100ms 后真数据)" },
+        { "id": "AC2", "text": "GET /api/home/today?tz=Asia/Shanghai → 200 {today:{total, done, circleProgress}, resume:null}" },
+        { "id": "AC3", "text": "大卡数字从 N → N+1 (compare before/after · 必须经过 +1 动画 · 不可静默替换)" },
+        { "id": "AC4", "text": "圆环进度从 done/total 旧值动画到新值 · 300ms easeInOut" }
+      ],
+      "test_invariants": [
+        "TI1: tz 参数必须传 (跨时区学生 · 影响今日窗口 UTC 计算)",
+        "TI2: total=0 → 显示「今天已完成，拍一道新题试试？」hero 空态 (不显示数字 0)",
+        "TI3: 数字 +1 动画 ≥ 300ms 可见 (不允许静默 update)",
+        "TI4: home.READY 态 VRT screenshot"
+      ],
+      "key_invariants": ["P-HOME 数据为 MVP 子集 (today.total/done/circleProgress + resume) · Phase 1 再剥独立 home-aggregator"],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-01/t08-home-today-counter-tick.spec.ts",
+        "backend_e2e_it": "backend/review-plan-service/src/test/java/.../T08HomeTodayCounterTickE2EIT.java (含 HomeTodayIT)"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC01-T08/team-1/attempt-1/"
+    },
+
+    {
+      "task_id": "SC-01-T09",
+      "task_id_short": "SC01-T09",
+      "task_id_pascal": "T09SessionStartAll",
+      "task_title": "Tap 大卡「全部开始」→ POST /sessions → P-HOME→P07",
+      "scenario": "TC-01.01 步 14",
+      "biz_step_range": "biz §2B.2 步 14",
+      "page": "P-HOME→P07",
+      "page_state_machine": "home.READY → today.LIST → session.OPEN",
+      "branch": "feature/SC-01-T09-session-start-all",
+      "owner_team": "team-1",
+      "biz_refs": ["biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 14", "biz §2A.4 P07 规格卡"],
+      "spec_refs": ["design/system/pages/P-HOME.spec.md §5 POST /api/review/sessions", "design/system/pages/P07-review-today.spec.md §5"],
+      "phase_0_audit_refs": ["audits/SC-01-PHASE-0/A05-review-plan.md §2.1 #1 createSession"],
+      "primary_services": ["frontend/apps/h5", "backend/review-plan-service"],
+      "primary_apis": [
+        "GET /api/review/today?tz=Asia/Shanghai",
+        "POST /api/review/sessions body {date?, node_ids?, tz?}"
+      ],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "Tap 大卡「全部开始」CTA · 按钮 loading + 触觉 medium" },
+        { "id": "AC2", "text": "POST /api/review/sessions body {date, node_ids:[...]} → 200 {sid, nids[], total}" },
+        { "id": "AC3", "text": "P-HOME → P07 跳转 ≤ 500ms · P07 滚动自动定位到最新一条 (highlight={firstNid})" },
+        { "id": "AC4", "text": "P07 完整渲染: Hero 渐变卡 + 3 统计卡 (完成/进行/未开始) + 进度条 + 时段分组 (现在/上午/下午/晚上) + 底部「全部开始」CTA" },
+        { "id": "AC5", "text": "node_ids 数量 = today.total · 全部为 ACTIVE 态" }
+      ],
+      "test_invariants": [
+        "TI1: session 在 in-memory store 创建成功 (B02 决策 A · reboot 后会话丢失可接受)",
+        "TI2: 重放 POST /sessions 不返回相同 sid (允许多 session 并行 · 但同 sid 重 POST 返当前快照)",
+        "TI3: 埋点 home_today_start_all{count} 1 条",
+        "TI4: P07 list 态 VRT screenshot"
+      ],
+      "key_invariants": ["session 是会话级临时态 · 不持久化到 DB (B02 决策 A) · reboot 后可由 FE 重建"],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-01/t09-session-start-all.spec.ts",
+        "backend_e2e_it": "backend/review-plan-service/src/test/java/.../T09SessionStartAllE2EIT.java (含 SessionFlowIT)"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC01-T09/team-1/attempt-1/"
+    },
+
+    {
+      "task_id": "SC-01-T10",
+      "task_id_short": "SC01-T10",
+      "task_id_pascal": "T10OpenFirstNode",
+      "task_title": "P07 Tap 第 1 题「开始」→ POST /nodes/{nid}/open → P08 + 写 EVENT_OPENED",
+      "scenario": "TC-01.01 步 15-16",
+      "biz_step_range": "biz §2B.2 步 15-16",
+      "page": "P07→P08",
+      "page_state_machine": "today.LIST → exec.READING → exec.ANSWERING",
+      "branch": "feature/SC-01-T10-open-first-node",
+      "owner_team": "team-1",
+      "biz_refs": ["biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 15-16", "biz §2A.4 P08 规格卡"],
+      "spec_refs": ["design/system/pages/P07-review-today.spec.md §5", "design/system/pages/P08-review-exec.spec.md §5"],
+      "phase_0_audit_refs": ["audits/SC-01-PHASE-0/A05-review-plan.md §2.1 #4 openNode"],
+      "primary_services": ["frontend/apps/h5", "backend/review-plan-service"],
+      "primary_apis": ["POST /api/review/nodes/{nid}/open"],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "Tap 列表第一题「开始」按钮 · 按钮 loading + 触觉 medium" },
+        { "id": "AC2", "text": "POST /api/review/nodes/{nid}/open → 200 + 写 EVENT_OPENED outbox + NodeLifecycleTracker.markOpened(nid)" },
+        { "id": "AC3", "text": "P07 → P08 跳转 ≤ 400ms · 顶部进度条 1/N + 题元 Chips (T 级 / 学科 / 难度) + 题干卡 (Hero 风) 渲染" },
+        { "id": "AC4", "text": "状态 LIST → READING (题干可见) → 学生开始手写作答触发 ANSWERING · canvas 笔迹实时渲染" },
+        { "id": "AC5", "text": "P08 强制关闭 (×) → 弹二次确认 Sheet「本次复习尚未自评，退出将保留在原计划」[取消/退出]" }
+      ],
+      "test_invariants": [
+        "TI1: open 幂等 (同 nid 重放 → 200 + 不重复写 EVENT_OPENED · NodeLifecycleTracker 不刷 opened_at)",
+        "TI2: 揭示前不能看答案 (UI 锁 · 答案卡 display:none + aria-hidden)",
+        "TI3: 埋点 wb_exec_open{nid,T} 1 条 + sessionId 字段",
+        "TI4: P08 4 态 (reading/answering/revealed/graded) 中 reading 态 VRT screenshot"
+      ],
+      "key_invariants": ["EVENT_OPENED outbox 必须 ≥ 1 条 (key_invariants 'review.node.opened ≥ 1 条')"],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-01/t10-open-first-node.spec.ts",
+        "backend_e2e_it": "backend/review-plan-service/src/test/java/.../T10OpenFirstNodeE2EIT.java (含 NodeLifecycleIT)"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC01-T10/team-1/attempt-1/"
+    },
+
+    {
+      "task_id": "SC-01-T11",
+      "task_id_short": "SC01-T11",
+      "task_id_pascal": "T11RevealAnswer",
+      "task_title": "P08 Tap「揭示答案」· POST /nodes/{nid}/reveal · 绿色答案卡展开",
+      "scenario": "TC-01.01 步 17",
+      "biz_step_range": "biz §2B.2 步 17",
+      "page": "P08-review-exec",
+      "page_state_machine": "exec.ANSWERING → exec.REVEALED",
+      "branch": "feature/SC-01-T11-reveal-answer",
+      "owner_team": "team-1",
+      "biz_refs": ["biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 17", "biz §2A.4 P08 规格卡"],
+      "spec_refs": ["design/system/pages/P08-review-exec.spec.md §5 POST /reveal"],
+      "phase_0_audit_refs": ["audits/SC-01-PHASE-0/A05-review-plan.md §2.1 #5 revealNode"],
+      "primary_services": ["frontend/apps/h5", "backend/review-plan-service"],
+      "primary_apis": ["POST /api/review/nodes/{nid}/reveal"],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "Tap「揭示答案」按钮 · 按钮 loading + 触觉 light" },
+        { "id": "AC2", "text": "POST /api/review/nodes/{nid}/reveal → 200 · NodeLifecycleTracker.markRevealed(nid) (仅记 revealed_at)" },
+        { "id": "AC3", "text": "答案卡绿色展开 (height 0 → auto · 300ms easeOut) + 3 步解法渲染 + 6 节点时间线高亮当前 T (pulse)" },
+        { "id": "AC4", "text": "状态 ANSWERING → REVEALED · 揭示后底部 3 按钮 (未掌握/部分/已掌握) 全部可点" }
+      ],
+      "test_invariants": [
+        "TI1: reveal 不改 plan (不更新 ease_factor / next_due_at)",
+        "TI2: reveal 不发 MQ (不写 outbox)",
+        "TI3: 揭示后 不允许再 tap「✓ 已掌握」 (UI 禁用 · 只能 tap PARTIAL/FORGOT)",
+        "TI4: 埋点 wb_exec_reveal{nid,waitMs} 1 条 · waitMs = revealed_at - opened_at"
+      ],
+      "key_invariants": ["reveal 是只读操作 (lifecycle 时戳) · 不触发任何业务状态变更"],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-01/t11-reveal-answer.spec.ts",
+        "backend_e2e_it": "backend/review-plan-service/src/test/java/.../T11RevealAnswerE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC01-T11/team-1/attempt-1/"
+    },
+
+    {
+      "task_id": "SC-01-T12",
+      "task_id_short": "SC01-T12",
+      "task_id_pascal": "T12GradeMastered",
+      "task_title": "P08 Tap「✓ 已掌握」· POST /nodes/{nid}/grade {grade:MASTERED} · SM-2 重算 · 推进 T+1",
+      "scenario": "TC-01.01 步 18 + TC-01.06 FORGOT 变体 (SC-04 入口)",
+      "biz_step_range": "biz §2B.2 步 18",
+      "page": "P08→P09",
+      "page_state_machine": "exec.REVEALED → exec.GRADED → done.RESULT",
+      "branch": "feature/SC-01-T12-grade-mastered",
+      "owner_team": "team-1",
+      "biz_refs": ["biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 18", "biz §2A.4 P08 规格卡 自评语义", "TC-01.06"],
+      "spec_refs": ["design/system/pages/P08-review-exec.spec.md §5 POST /grade", "design/arch/s5-review-plan.md SM-2 算法"],
+      "phase_0_audit_refs": ["audits/SC-01-PHASE-0/A05-review-plan.md §2.1 #6 gradeNode", "audits/SC-01-PHASE-0/A05-review-plan.md §1.2 SM-2 算法"],
+      "primary_services": ["frontend/apps/h5", "backend/review-plan-service", "backend/calendar-core (FORGOT 级联)"],
+      "primary_apis": ["POST /api/review/nodes/{nid}/grade body {grade, timeSpentMs, answerText?}"],
+      "grade_mapping": { "MASTERED": 5, "PARTIAL": 3, "FORGOT": 0 },
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "Tap 绿色「✓ 已掌握」按钮 · loading + 触觉 success" },
+        { "id": "AC2", "text": "POST /api/review/nodes/{nid}/grade body {grade:MASTERED, timeSpentMs} → 200 + 写 EVENT_GRADED outbox + 推进 T+1 (next_due_at = NODE_OFFSETS[currentIndex+1])" },
+        { "id": "AC3", "text": "SM-2 重算: quality=5, ease_factor → min(easeMax=3.0, prev + 0.1) · 写入 wb_review_node 行" },
+        { "id": "AC4", "text": "P08 → P09 跳转 ≤ 500ms · 同时刷 today 大卡 -1" },
+        { "id": "AC5", "text": "TC-01.06 · Tap 红色「✗ 未掌握」grade=FORGOT → SC-04 入口: 当前 + 后续 6 nodes 全部 CANCELLED + forceCreateSevenNodes(跳幂等闸门) 重建 7 nodes + calendar 批删 6 + 批建 7 · 最终一致" }
+      ],
+      "test_invariants": [
+        "TI1: MASTERED 连续 3 次且 ease ≥ 2.8 → markAllMasteredByWrongItemId 软删全 7 行 (Q-G 聚合根原子性)",
+        "TI2: PARTIAL → quality=3 · plan 维持不变 (next_due_at 不改)",
+        "TI3: FORGOT → 走 forceCreateSevenNodes 跳 existsByWrongItemId 闸门 · 调用方先 soft-delete 旧 7 行",
+        "TI4: EVENT_GRADED outbox payload 含 plan/wrongItem/quality/grade 字段",
+        "TI5: P08 graded 态 + P09 result 态 VRT screenshot × 2"
+      ],
+      "key_invariants": ["EVENT_GRADED outbox 必须 ≥ 1 条 (key_invariants 'review.node.graded ≥ 1 条')", "FORGOT 重排原子性: 旧 6 events 删除 + 新 7 events 创建必须同时完成或都不完成 (不允许中间态持续 > 5 min)"],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-01/t12-grade-mastered.spec.ts",
+        "backend_e2e_it": "backend/review-plan-service/src/test/java/.../T12GradeMasteredE2EIT.java (含 GradeForgotIT + ForgotResetIT)"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC01-T12/team-1/attempt-1/"
+    },
+
+    {
+      "task_id": "SC-01-T13",
+      "task_id_short": "SC01-T13",
+      "task_id_pascal": "T13DoneResultHero",
+      "task_title": "P09 庆祝 Hero + GET /nodes/{nid}/result + 记忆曲线 + 加日历",
+      "scenario": "TC-01.01 步 19",
+      "biz_step_range": "biz §2B.2 步 19",
+      "page": "P09-review-done",
+      "page_state_machine": "done.RESULT (或 done.ALL_DONE 庆祝升级态)",
+      "branch": "feature/SC-01-T13-done-result-hero",
+      "owner_team": "team-1",
+      "biz_refs": ["biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 19", "biz §2A.4 P09 规格卡"],
+      "spec_refs": ["design/system/pages/P09-review-done.spec.md §5 GET /result + POST /subscribe"],
+      "phase_0_audit_refs": ["audits/SC-01-PHASE-0/A05-review-plan.md §2.1 #8 nodeResult", "audits/SC-01-PHASE-0/A05-review-plan.md §2.4 CalendarSubscribeController"],
+      "primary_services": ["frontend/apps/h5", "backend/review-plan-service", "backend/calendar-core"],
+      "primary_apis": [
+        "GET /api/review/nodes/{nid}/result",
+        "POST /api/calendar/events/{eid}/subscribe"
+      ],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "P09 渲染绿色庆祝 Hero (绿渐变 + confetti 1s 动画 + 大对勾)" },
+        { "id": "AC2", "text": "GET /api/review/nodes/{nid}/result → 200 NodeResultResp {planId, wrongItemId, nodeIndex, nodeState, quality, easeBefore/After, intervalBefore/After, nextDueAt, durationMs, mastered}" },
+        { "id": "AC3", "text": "记忆曲线 SVG · 6 节点状态: T1/T2=done · T3=now 脉冲 · T4-T6=gray (基于 nodeIndex)" },
+        { "id": "AC4", "text": "「+加入日历」按钮 → POST /api/calendar/events/{eid}/subscribe → 200 · Toast「已同步到日历」" },
+        { "id": "AC5", "text": "3 统计卡 (已掌握/部分/遗忘) + KP 掌握度条形 (oldPct→newPct 动画) 渲染" }
+      ],
+      "test_invariants": [
+        "TI1: confetti 动画 ≤ 1s 且不阻塞滚动",
+        "TI2: ALL_DONE 升级态 (session 完成) 不显示「继续」按钮 · 仅「结束本次」",
+        "TI3: subscribe 幂等 (同 eid 重放返当前快照)",
+        "TI4: 埋点 wb_done_view{nid,nextT} + wb_done_add_calendar{nid} 各 1 条",
+        "TI5: P09 result 态 + ALL_DONE 态 VRT screenshot × 2"
+      ],
+      "key_invariants": ["nodeResult 聚合 plan + ReviewOutcome + lifecycle 时戳 (满足 P09 hero/曲线渲染需求)"],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-01/t13-done-result-hero.spec.ts",
+        "backend_e2e_it": "backend/review-plan-service/src/test/java/.../T13DoneResultHeroE2EIT.java (含 NodeResultIT + CalendarSubscribeIT)"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC01-T13/team-1/attempt-1/"
+    },
+
+    {
+      "task_id": "SC-01-T14",
+      "task_id_short": "SC01-T14",
+      "task_id_pascal": "T14ExitToHome",
+      "task_title": "Tap「结束本次」· P09→P-HOME · 大卡数字 N→N-1 · 圆环动画",
+      "scenario": "TC-01.01 步 20 (SC-01 黄金路径终点)",
+      "biz_step_range": "biz §2B.2 步 20",
+      "page": "P09→P-HOME",
+      "page_state_machine": "done.RESULT → home.READY",
+      "branch": "feature/SC-01-T14-exit-to-home",
+      "owner_team": "team-1",
+      "biz_refs": ["biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 20", "biz §2A.3.3 P-HOME 今日聚合首页"],
+      "spec_refs": ["design/system/pages/P09-review-done.spec.md §5", "design/system/pages/P-HOME.spec.md §5"],
+      "phase_0_audit_refs": ["audits/SC-01-PHASE-0/A05-review-plan.md §2.4 HomeAggregatorController"],
+      "primary_services": ["frontend/apps/h5", "backend/review-plan-service (HomeAggregator)"],
+      "primary_apis": ["GET /api/home/today?tz=Asia/Shanghai (刷新)"],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "Tap「结束本次」按钮 · 触觉 light" },
+        { "id": "AC2", "text": "P09 → P-HOME 跳转 ≤ 500ms" },
+        { "id": "AC3", "text": "GET /api/home/today 刷新 · 大卡数字 N → N-1 (相比 T08 +1 后 · 净变化 0 · 但本次有数字 -1 动画)" },
+        { "id": "AC4", "text": "圆环动画 (旧 done/total → 新 done/total · 300ms easeInOut)" },
+        { "id": "AC5", "text": "若 done==total (全部完成) → hero 切换为「今天已完成，拍一道新题试试？」+ Tab 3 拍题入口高亮" }
+      ],
+      "test_invariants": [
+        "TI1: 数字 -1 动画必须可见 (≥ 300ms · 不静默 update)",
+        "TI2: 圆环进度回归 home_view 埋点字段",
+        "TI3: 埋点 wb_done_exit{nid} + home_view 各 1 条",
+        "TI4: ALL_DONE hero 态 VRT screenshot",
+        "TI5: System Invariants 终态全部满足: wb_question 1 (ACTIVE) · wb_review_plan 1 · wb_review_node 7 (T0=GRADED·MASTERED, T1..T6=SCHEDULED) · calendar_event 7 (第 1 条 COMPLETED 绿色) · MQ 3 topic 各 ≥ 1 条 · Outbox 0 滞留"
+      ],
+      "key_invariants": ["SC-01 黄金路径终点 · 终态必须满足 scenario_id=SC-01 的 system_invariants 全部 4 条"],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-01/t14-exit-to-home.spec.ts (含 SC-01 全链路终态断言)",
+        "backend_e2e_it": "backend/review-plan-service/src/test/java/.../T14ExitToHomeE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "note": "T14 是 SC-01 黄金路径终点 · Tester 必须在此 task 额外验证 system_invariants 全部 4 条 (DB / MQ / Outbox / 幂等)",
+      "work_log_dir": "audits/runs/SC01-T14/team-1/attempt-1/"
+    }
+  ]
+}

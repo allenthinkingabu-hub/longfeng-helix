@@ -19,10 +19,10 @@ When the project takes shape, replace the placeholders below with concrete, repo
 
 ### AI Agents & Workflow Assets (AI 代理与工作流资产)
 
-本项目建立了一套 AI 驱动的研发体系。相关的 AI 组件（Agents, Skills, Hooks）位于以下路径。当 AI 协助开发或执行自动化流程时，请参考以下规范：
-- **Agents (智能体定义)**: 存放在 `ai/agents/` 目录（例如：架构审查 Agent、QA Agent 等）。负责做决策和拆解任务。
-- **Skills (核心技能/工具)**: 存放在 `ai/skills/` 目录。负责具体执行的确定性脚本或函数（例如：强制 E2E 测试脚本、PDF 生成工具等）。
-- **Hooks (生命周期钩子)**: 存放在 `ai/hooks/` 目录。负责在 Git 提交流水线或构建生命周期中自动唤醒上述 Agent。
+本项目建立了一套 AI 驱动的研发体系。相关的 AI 组件（Agents, Skills, Hooks）**全部**位于 `.harness/` 根下（与 harness 运行时产物 `feature_list.json` / `inflight/` / `audit-verdict.json` 同根 · 2026-05-14 用户决策 · 统一 harness 资产命名空间）。当 AI 协助开发或执行自动化流程时，请参考以下规范：
+- **Agents (智能体定义)**: 存放在 `.harness/agents/` 目录（例如：Coder / Tester / TL Agent · 架构审查 Agent · QA Agent 等）。负责做决策和拆解任务。
+- **Skills (核心技能/工具)**: 存放在 `.harness/skills/` 目录（例如：`gen-feature-list.md` 把 biz SC 拆成 feature_list.json · 强制 E2E 测试脚本 · PDF 生成工具等）。负责具体执行的确定性脚本或函数。
+- **Hooks (生命周期钩子)**: 存放在 `.harness/hooks/` 目录。负责在 Git 提交流水线或构建生命周期中自动唤醒上述 Agent。
 
 ## 通用工程德行（12 条 · 在项目铁律下生效）
 
@@ -112,10 +112,10 @@ LLM 看不到自己的 token 计数器，所以本项目用 **tool use 次数作
 每次 spawn 一个 sub-agent（无论 Coder / Tester / TL / 其它角色），它**第一件事必须**：
 
 1. **完整读自己的 agent 定义**（不是跳读、不是扫一眼）：
-   - Coder Agent → 强制读 `ai/agents/coder-agent.md` 全文
-   - Tester Agent → 强制读 `ai/agents/test-agent.md` 全文
-   - TL Agent → 强制读 `ai/agents/tl-agent.md` 全文
-   - 在 sub-agent 的第一条输出里**显式声明**："已完整阅读 ai/agents/{role}-agent.md，本文铁律 N 条 + 执行流程 M 步已内化。"
+   - Coder Agent → 强制读 `.harness/agents/coder-agent.md` 全文
+   - Tester Agent → 强制读 `.harness/agents/test-agent.md` 全文
+   - TL Agent → 强制读 `.harness/agents/tl-agent.md` 全文
+   - 在 sub-agent 的第一条输出里**显式声明**："已完整阅读 .harness/agents/{role}-agent.md，本文铁律 N 条 + 执行流程 M 步已内化。"
 2. **内化任务步骤 + 铁律**（不允许跳读、跳步骤、用"我理解"替代真做）
 3. **按步骤逐条执行**：对应 agent.md 每一步都要有具体动作产物
 4. **结束前必做"反省自检"**：对照 agent.md 每一步、每条铁律，逐条回答：

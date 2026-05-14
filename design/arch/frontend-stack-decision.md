@@ -45,7 +45,7 @@
 
 - **API 契约**：升级 `frontend/packages/api-contracts` 为 OpenAPI 3.1 单源 → 自动生成 TS（H5/miniapp） + Dart freezed models + Dio clients（Flutter）。**业务字段命名仅在 OpenAPI 单源定义一次**。
 - **Design tokens**：颜色 / 间距 / 字体 / 圆角 / 投影中心化（JSON 单源），三栈各自消费（CSS variables / WXSS / Dart const）。
-- **测试协议**：`ai/agents/SHARED-E2E-PROTOCOL.md` 加 Flutter 分支（`integration_test` + `golden_test` + spec trace 表）。
+- **测试协议**：`.harness/agents/SHARED-E2E-PROTOCOL.md` 加 Flutter 分支（`integration_test` + `golden_test` + spec trace 表）。
 
 ---
 
@@ -142,5 +142,5 @@
 - `frontend/apps/h5/` 现状脚手架
 - `frontend/apps/miniapp/` 原生小程序
 - `frontend/packages/api-contracts/src/types.ts` —— 未来 OpenAPI 单源起点
-- `ai/agents/SHARED-E2E-PROTOCOL.md` —— Coder/Tester E2E 协议（待加 Flutter 分支）
+- `.harness/agents/SHARED-E2E-PROTOCOL.md` —— Coder/Tester E2E 协议（待加 Flutter 分支）
 - `feature_list.json` v3.1 —— SC-01 14 task 垂直切片清单

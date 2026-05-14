@@ -10,8 +10,8 @@
  *
  * Owner: Coder team-1 attempt-3 (retries=2)
  * 依据:
- *   - ai/agents/coder-agent.md §4 真实 E2E + 铁律补充 6 E2E = DoD 唯一硬条件
- *   - ai/agents/SHARED-E2E-PROTOCOL.md v1 DoR C-1..C-6
+ *   - .harness/agents/coder-agent.md §4 真实 E2E + 铁律补充 6 E2E = DoD 唯一硬条件
+ *   - .harness/agents/SHARED-E2E-PROTOCOL.md v1 DoR C-1..C-6
  *   - .harness/inflight/SC01-T01.json task.e2e_path 11 步骤 1:1 翻译
  *   - design/system/pages/P02-capture.spec.md §5 API 触点 + §6 状态机
  *   - audits/runs/SC01-T01/team-1/attempt-1/adversarial.md "给 Coder attempt-3 的必做清单"

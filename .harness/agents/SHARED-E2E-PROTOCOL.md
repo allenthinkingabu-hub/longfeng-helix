@@ -311,6 +311,6 @@ cp frontend/apps/h5/test-results/**/*.png              $WORK_DIR/test-reports/e2
 
 ## 8 · 与现有 agent.md 的关系
 
-- `ai/agents/coder-agent.md` §4.3 + 铁律补充 6 → **改为引用本文件**，删除 inline 路径细节
-- `ai/agents/test-agent.md` DoR §step 0 → **改为引用本文件 §3 + §4**，删除 inline DoR 4 项细节
+- `.harness/agents/coder-agent.md` §4.3 + 铁律补充 6 → **改为引用本文件**，删除 inline 路径细节
+- `.harness/agents/test-agent.md` DoR §step 0 → **改为引用本文件 §3 + §4**，删除 inline DoR 4 项细节
 - 任何 inline 重复定义都视为已 deprecated，以本文件为准（Rule 7 Surface conflicts, don't average them）
