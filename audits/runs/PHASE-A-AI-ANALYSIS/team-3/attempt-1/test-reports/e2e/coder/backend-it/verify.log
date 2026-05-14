@@ -1,0 +1,110 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< com.longfeng:ai-analysis-service >------------------
+[INFO] Building ai-analysis-service 1.0.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:resources (default-resources) @ ai-analysis-service ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:compile (default-compile) @ ai-analysis-service ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:testResources (default-testResources) @ ai-analysis-service ---
+[INFO] skip non existing resourceDirectory /Users/allen/workspace/longfeng/.claude/worktrees/team-3-ai-analysis/backend/ai-analysis-service/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:testCompile (default-testCompile) @ ai-analysis-service ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.1.2:test (default-test) @ ai-analysis-service ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.longfeng.aianalysis.ApplicationTests
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.090 s -- in com.longfeng.aianalysis.ApplicationTests
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- maven-jar-plugin:3.3.0:jar (default-jar) @ ai-analysis-service ---
+[INFO] 
+[INFO] --- spring-boot-maven-plugin:3.2.5:repackage (repackage) @ ai-analysis-service ---
+[INFO] Replacing main artifact /Users/allen/workspace/longfeng/.claude/worktrees/team-3-ai-analysis/backend/ai-analysis-service/target/ai-analysis-service-1.0.0-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /Users/allen/workspace/longfeng/.claude/worktrees/team-3-ai-analysis/backend/ai-analysis-service/target/ai-analysis-service-1.0.0-SNAPSHOT.jar.original
+[INFO] 
+[INFO] --- maven-failsafe-plugin:3.1.2:integration-test (default) @ ai-analysis-service ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.longfeng.aianalysis.AiAnalysisIT
+23:28:38.824 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.longfeng.aianalysis.AiAnalysisIT]: AiAnalysisIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+23:28:39.057 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.longfeng.aianalysis.Application for test class com.longfeng.aianalysis.AiAnalysisIT
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-05-14T23:28:39.876+04:00  INFO 2617 --- [ai-analysis-service] [           main] com.longfeng.aianalysis.AiAnalysisIT     : Starting AiAnalysisIT using Java 17.0.13 with PID 2617 (started by allen in /Users/allen/workspace/longfeng/.claude/worktrees/team-3-ai-analysis/backend/ai-analysis-service)
+2026-05-14T23:28:39.877+04:00  INFO 2617 --- [ai-analysis-service] [           main] com.longfeng.aianalysis.AiAnalysisIT     : No active profile set, falling back to 1 default profile: "default"
+2026-05-14T23:28:41.775+04:00  INFO 2617 --- [ai-analysis-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-05-14T23:28:41.778+04:00  INFO 2617 --- [ai-analysis-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-14T23:28:41.991+04:00  INFO 2617 --- [ai-analysis-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 203 ms. Found 2 JPA repository interfaces.
+2026-05-14T23:28:42.056+04:00  INFO 2617 --- [ai-analysis-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-05-14T23:28:42.057+04:00  INFO 2617 --- [ai-analysis-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-05-14T23:28:42.081+04:00  INFO 2617 --- [ai-analysis-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.aianalysis.repo.AnalysisResultRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-14T23:28:42.082+04:00  INFO 2617 --- [ai-analysis-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.aianalysis.repo.AnalysisTaskRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-14T23:28:42.082+04:00  INFO 2617 --- [ai-analysis-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 16 ms. Found 0 Redis repository interfaces.
+2026-05-14T23:28:43.346+04:00  INFO 2617 --- [ai-analysis-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+2026-05-14T23:28:43.369+04:00  INFO 2617 --- [ai-analysis-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-14T23:28:43.369+04:00  INFO 2617 --- [ai-analysis-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-05-14T23:28:43.466+04:00  INFO 2617 --- [ai-analysis-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-14T23:28:43.470+04:00  INFO 2617 --- [ai-analysis-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3555 ms
+2026-05-14T23:28:43.811+04:00  INFO 2617 --- [ai-analysis-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-14T23:28:43.873+04:00  INFO 2617 --- [ai-analysis-service] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-05-14T23:28:43.914+04:00  INFO 2617 --- [ai-analysis-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-14T23:28:44.164+04:00  INFO 2617 --- [ai-analysis-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-14T23:28:44.193+04:00  INFO 2617 --- [ai-analysis-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-14T23:28:44.459+04:00  INFO 2617 --- [ai-analysis-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@44e08a7a
+2026-05-14T23:28:44.461+04:00  INFO 2617 --- [ai-analysis-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-14T23:28:45.890+04:00  INFO 2617 --- [ai-analysis-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-14T23:28:45.897+04:00  INFO 2617 --- [ai-analysis-service] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-14T23:28:47.729+04:00  INFO 2617 --- [ai-analysis-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring TestDispatcherServlet ''
+2026-05-14T23:28:47.730+04:00  INFO 2617 --- [ai-analysis-service] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-05-14T23:28:47.733+04:00  INFO 2617 --- [ai-analysis-service] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 2 ms
+2026-05-14T23:28:47.812+04:00  INFO 2617 --- [ai-analysis-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 61208 (http) with context path ''
+2026-05-14T23:28:47.830+04:00  INFO 2617 --- [ai-analysis-service] [           main] com.longfeng.aianalysis.AiAnalysisIT     : Started AiAnalysisIT in 8.551 seconds (process running for 10.502)
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-05-14T23:28:48.963+04:00  INFO 2617 --- [ai-analysis-service] [           main] c.l.a.controller.AiCancelController      : Cancel requested: taskId=unknown-task-id
+2026-05-14T23:28:49.559+04:00  INFO 2617 --- [ai-analysis-service] [           main] c.l.a.controller.AnalyzeController       : analyze-by-url: taskId=it-1d65cb4d-a92c-4583-9b92-cf87b5001c62, subject=数学
+2026-05-14T23:28:50.002+04:00  INFO 2617 --- [ai-analysis-service] [           main] c.l.a.controller.AnalyzeController       : analyze-by-url: taskId=it-full-76c74f74-4777-4818-8e81-d569f316c9ca, subject=数学
+2026-05-14T23:28:51.627+04:00  INFO 2617 --- [ai-analysis-service] [           main] c.l.a.controller.AnalyzeController       : analyze-by-url: taskId=it-cancel-75918c32-4207-477c-ae8d-df831a4b0cb2, subject=英语
+2026-05-14T23:28:51.689+04:00  INFO 2617 --- [ai-analysis-service] [           main] c.l.a.controller.AiCancelController      : Cancel requested: taskId=it-cancel-75918c32-4207-477c-ae8d-df831a4b0cb2
+2026-05-14T23:28:51.744+04:00  INFO 2617 --- [ai-analysis-service] [           main] c.l.a.controller.AnalyzeController       : analyze-by-url: taskId=it-poll-ab43b995-90de-4150-939b-384b9c66ba15, subject=数学
+2026-05-14T23:28:52.818+04:00  INFO 2617 --- [ai-analysis-service] [           main] c.l.a.controller.AnalyzeController       : analyze-by-url: taskId=31f87a40-388f-45f5-b35d-a72be7cc1d8c, subject=物理
+2026-05-14T23:28:52.882+04:00  INFO 2617 --- [ai-analysis-service] [           main] c.l.a.controller.AnalyzeController       : analyze-by-url: taskId=it-fb-9c6c30f2-0599-42f0-9011-51f85d9719a0, subject=数学
+2026-05-14T23:28:53.399+04:00  INFO 2617 --- [ai-analysis-service] [           main] c.l.a.controller.AiFallbackController    : Fallback requested: taskId=it-fb-9c6c30f2-0599-42f0-9011-51f85d9719a0
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 14.97 s -- in com.longfeng.aianalysis.AiAnalysisIT
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- maven-failsafe-plugin:3.1.2:verify (default) @ ai-analysis-service ---
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  22.877 s
+[INFO] Finished at: 2026-05-14T23:28:53+04:00
+[INFO] ------------------------------------------------------------------------
