@@ -17,7 +17,7 @@
    - inflight 文件里 `work_log_dir` 指向一个真实目录（形如 `audits/runs/<task_id>/<team_id>/attempt-<N>/`）。改 `dev_done=true` 之前**必须**在该目录下写两个文件：
      1. **`coder.md`**：按 `## 1. 地形侦察 / ## 2. 编码 / ## 3. 真实 E2E / ## 4. 自检 / ## 5. 提交` 5 段落记录证据。必须包含关键词 `地形侦察`、`编码`、`自检`、`提交`，否则 audit.js 直接判 REDO。所有提到的 commit hash 必须真实存在（`git cat-file -e` 能验真），不要编造。
      2. **`bugs-found.md`**：本轮发现并修复的 bug 列表，每条注明文件路径 + 简短描述 + 修复 commit hash。**0 bug 也必须显式声明** "0 bug" / "无 bug"，否则 audit.js 判 REDO。
-   - 这两个文件是 `harness/audit.js`（Tester PASS 后由 harness 自动调起的**确定性程序**，不是 AI）的硬性检查项。文件不存在、关键章节缺失、commit hash 验真失败 → 退出码 1 → REDO 回到 Coder，attempt 计数 ++。
+   - 这两个文件是 `.harness/audit.js`（Tester PASS 后由 harness 自动调起的**确定性程序**，不是 AI）的硬性检查项。文件不存在、关键章节缺失、commit hash 验真失败 → 退出码 1 → REDO 回到 Coder，attempt 计数 ++。
    - 上一轮 audit REDO 时，inflight 的 `previous_audit_verdict` 字段会带具体 `redo_reason`，必须对照修复，不可重复犯错。
 
 ## 执行流程 (内部小循环与外部大循环)

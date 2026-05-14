@@ -22,7 +22,7 @@
         - 后端：`cp backend/<svc>/target/failsafe-reports/*.xml ./test-reports/` + `cp backend/<svc>/target/surefire-reports/*.xml ./test-reports/`
         - 前端：`pnpm vitest run > ./test-reports/vitest-<page>.log 2>&1` 把 stdout 重定向落盘
         - 目录为空 → audit.js 判 Tester 合规 FAIL → REDO
-   - 这些文件是 `harness/audit.js`（Tester 改 `passes=true` 后由 harness 自动调起的**确定性程序**）的硬性检查项。任何一项不达标 → 退出码 1 → REDO，可能回到 Tester（如对抗 0 轮、test-reports 空、mock 过度），也可能回到 Coder（如 bug 真实性失败）。
+   - 这些文件是 `.harness/audit.js`（Tester 改 `passes=true` 后由 harness 自动调起的**确定性程序**）的硬性检查项。任何一项不达标 → 退出码 1 → REDO，可能回到 Tester（如对抗 0 轮、test-reports 空、mock 过度），也可能回到 Coder（如 bug 真实性失败）。
    - **严禁过度 mock 凑 PASS**：`vi.mock` / `page.route` / `MockMvc` / `jest.mock` / `wx.request.mock` / `miniprogram-simulate` / `wx.cloud.mock` / `mockRequest` 在 `tester.md` + `test-reports/` 内总计出现次数不得 > 5，否则 audit.js 判"测试合理"FAIL。
    - **VRT 阈值红线**：测试脚本/日志里 `maxDiffPixels` 默认不得 > 500；超阈值 audit.js 直接判 FAIL（疑似放宽阈值掩盖 UI 缺陷）。如确需放宽，必须在 `tester.md` 给出合理性说明 + 用 `--vrtMax=N` 调参。
    - 上一轮 audit REDO 时，inflight 的 `previous_audit_verdict` 字段会带具体 `redo_reason`，必须对照修复。
@@ -112,5 +112,5 @@ DoR 任一项不达标 → Tester:
    - **挂载点扫雷**：使用 grep 等命令扫描代码库，确认所有 `testid` 是否真实存在。
    - **全量真实环境执行**：你必须使用终端命令进行验证。**注意：不要自己启动服务！**你必须向 `ops_tickets/` 目录下写入一份 `pending` 工单，让 Ops Agent 去为你**真实启动前后端本地沙盒服务（连接真实数据库/测试数据，绝不准用 Mock API）**。当工单变为 `ready` 后，读取其提供的 `env_urls` 动态地址注入环境变量，然后亲自敲入运行 Playwright 的命令（如 `BASE_URL=... pnpm exec playwright test`）。你必须亲眼在终端 Log 中看到真实的绿灯反馈和像素通过提示，否则绝不放行！测试完毕后将工单设为 `destroy_requested` 释放资源。
 6. **决策与宣判**：
-   - **通过 (PASS)**：**先**在 inflight 指定的 `work_log_dir/` 下落盘 `tester.md` + `adversarial.md` + `test-reports/<files>`（per 铁律 6），**然后**才能将 `.current_task.json` 中该任务的 `passes` 字段设为 `true`。harness 收到 `passes=true` 后会自动调 `harness/audit.js` 做确定性审计；audit PASS 才算真通过，audit REDO 时你或 Coder 必须按 `redo_reason` 重做。
+   - **通过 (PASS)**：**先**在 inflight 指定的 `work_log_dir/` 下落盘 `tester.md` + `adversarial.md` + `test-reports/<files>`（per 铁律 6），**然后**才能将 `.current_task.json` 中该任务的 `passes` 字段设为 `true`。harness 收到 `passes=true` 后会自动调 `.harness/audit.js` 做确定性审计；audit PASS 才算真通过，audit REDO 时你或 Coder 必须按 `redo_reason` 重做。
    - **驳回 (FAIL)**：维持 `passes: false`。在 `work_log_dir/adversarial.md` 写下本轮 REJECT 详情（什么 bug、对应 commit、复现步骤），同 team Coder 会接力修复。

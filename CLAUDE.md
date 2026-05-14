@@ -45,7 +45,7 @@ When the project takes shape, replace the placeholders below with concrete, repo
 
 ### Rule 5 — Use the model only for judgment calls
 模型用于：分类、起草、总结、抽取。**不用于**：路由、重试、确定性变换。If code can answer, code answers.
-**项目映射**：审计规则用 `harness/audit.js`（确定性程序），不用 AI 审计员 —— 这是本项目核心设计决策。
+**项目映射**：审计规则用 `.harness/audit.js`（确定性程序），不用 AI 审计员 —— 这是本项目核心设计决策。
 
 ### Rule 6 — Tool-use budget（token 代理 · 项目适配版 · 不要套用原模板）
 
@@ -163,7 +163,7 @@ LLM 看不到自己的 token 计数器，所以本项目用 **tool use 次数作
 
 ## audit.js 卡口（Tester PASS 后的确定性审计）
 
-Tester 改完 `passes=true` 后，**harness 会自动同步调用 `harness/audit.js`**（确定性 JS 程序，**不是** AI 子代理；规则写死，不容讨价还价）。audit 5 维度全过才真 PASS，任一不过即 REDO 回到 Coder 或 Tester 重做，attempt 计数 ++，audit_retries ≥ 3 触发熔断。
+Tester 改完 `passes=true` 后，**harness 会自动同步调用 `.harness/audit.js`**（确定性 JS 程序，**不是** AI 子代理；规则写死，不容讨价还价）。audit 5 维度全过才真 PASS，任一不过即 REDO 回到 Coder 或 Tester 重做，attempt 计数 ++，audit_retries ≥ 3 触发熔断。
 
 每个 inflight payload 都带这些新字段，sub-agent 必须严格遵循：
 
