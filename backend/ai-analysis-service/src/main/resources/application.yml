@@ -1,0 +1,14 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: ai-analysis-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/wrongbook
+    username: postgres
+    password: wb
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
