@@ -29,4 +29,9 @@ public class StorageProperties {
     public void setPresignTtlSeconds(long presignTtlSeconds) { this.presignTtlSeconds = presignTtlSeconds; }
     public long getMaxUploadSize() { return maxUploadSize; }
     public void setMaxUploadSize(long maxUploadSize) { this.maxUploadSize = maxUploadSize; }
+
+    /** Record-style accessor (used by IT tests). */
+    public String bucket() { return bucket; }
+    public String endpoint() { return endpoint; }
+    public String provider() { return provider; }
 }

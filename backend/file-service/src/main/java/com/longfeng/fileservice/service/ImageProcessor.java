@@ -7,4 +7,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ImageProcessor {
+
+    /** Placeholder · 真实实现解析 EXIF metadata 检测 GPS / camera-id. */
+    public boolean hasSensitiveExif(byte[] bytes) { return false; }
 }
