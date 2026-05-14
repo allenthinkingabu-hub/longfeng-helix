@@ -1,0 +1,52 @@
+# 参数化 docker-compose · 5 team 用同一份, 通过 --env-file team-N.env 起 5 套隔离 sandbox
+# 用法: docker-compose --env-file .harness/docker/team-1.env -f .harness/docker/docker-compose.team.yml up -d
+services:
+  pg:
+    image: postgres:15-alpine
+    container_name: team-${TEAM_ID}-pg
+    environment:
+      POSTGRES_DB: wrongbook
+      POSTGRES_USER: longfeng
+      POSTGRES_PASSWORD: longfeng_dev
+    ports:
+      - "${PG_PORT}:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U longfeng"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: team-${TEAM_ID}-redis
+    ports:
+      - "${REDIS_PORT}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    container_name: team-${TEAM_ID}-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "${MINIO_API_PORT}:9000"
+      - "${MINIO_CONSOLE_PORT}:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9000/minio/health/live || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pg-data:
+  minio-data:
