@@ -1,0 +1,38 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: file-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/wrongbook
+    username: postgres
+    password: wb
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+app:
+  snowflake:
+    worker-id: 6
+  storage:
+    presign-ttl-min: 15
+    minio:
+      bucket: wrongbook-dev
+    lifecycle:
+      ia-after-days: 30
+      archive-after-days: 180
+
+file-service:
+  storage:
+    provider: minio
+    endpoint: http://localhost:9000
+    bucket: wrongbook-dev
+    access-key: minio
+    secret-key: minio12345
+    presign-ttl-seconds: 900
+    max-upload-size: 10485760
