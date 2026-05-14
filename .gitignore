@@ -18,3 +18,4 @@ test-results/
 .idea/
 .vscode/
 *.swp
+**/target/

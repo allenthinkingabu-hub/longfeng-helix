@@ -12,3 +12,20 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+# AI provider configuration
+longfeng:
+  ai:
+    fallback-chain: qianwen,openai,zhipu
+    stream-timeout-seconds: 60
+    chunk-interval-seconds: 15
+    heartbeat-interval-seconds: 30
+  snowflake:
+    worker-id: 4
