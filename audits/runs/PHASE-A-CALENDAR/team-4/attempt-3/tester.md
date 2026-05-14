@@ -1,8 +1,9 @@
 # Tester Work Log · PHASE-A-CALENDAR · team-4 · attempt-3
 
-## audit REDO 修复
+## Previous audit REDO context
 
-attempt-1 REDO 原因: `claimed=6 ≠ xml<testcase>=12` — test-reports/ 下有两份 XML (Coder 的 e2e/coder/backend-it/failsafe-xml/ + Tester 拷的根目录), audit.js 递归扫描计了 12。attempt-3 修复: test-reports/ 只放一份 failsafe XML。
+- attempt-2 audit REDO: `coder_compliance.coder_md_exists` + `coder_compliance.bugs_found_md_exists` missing in attempt-2 dir. Coder fixed in attempt-3 (commit `6935dc7`).
+- attempt-1 audit REDO: `test_validity.tester_md_testcase_count_matches_xml` claimed=6 != xml=12 due to duplicate XML in test-reports/. Fixed: attempt-3 test-reports/ contains only 1 failsafe XML.
 
 ## 验证命令
 
@@ -12,32 +13,33 @@ cd backend/calendar-core && mvn verify
 
 ## 测试结果
 
-- **命令**: `mvn verify` (failsafe integration-test + verify phase)
+- **命令**: `mvn verify` (surefire unit + failsafe integration-test + verify phase)
 - **BUILD**: SUCCESS
-- **Tests run: 6, Failures: 0, Errors: 0, Skipped: 0**
-- **Surefire** (unit): Tests run: 1 (ApplicationTests context load)
-- **Failsafe** (IT): Tests run: 6 (CalendarCoreIT · 真 PG sandbox 15435)
+- **Failsafe** (IT): Tests run: 6, Failures: 0, Errors: 0, Skipped: 0 (CalendarCoreIT · real PG sandbox 15435)
+- **Surefire** (unit): 1 ApplicationTests context load passed
 
 ## Testcase 明细 (= failsafe XML 6 个 `<testcase>`)
 
 | # | Test Method | Endpoint | 验证内容 |
 |---|---|---|---|
 | 1 | batchCreate_7Events | POST /internal/events/batch | 创建 7 个 STUDY 事件, DB count=7 |
-| 2 | batchCreate_idempotent | POST /internal/events/batch ×2 | 幂等重放, DB 仍 7 |
-| 3 | subscribeInternal | POST /internal/calendar/events/{eid}/subscribe | subscribed=true, 幂等重放 |
+| 2 | batchCreate_idempotent | POST /internal/events/batch x2 | 幂等重放, DB 仍 7 |
+| 3 | subscribeInternal | POST /internal/calendar/events/{eid}/subscribe | subscribed=true, 幂等重放, DB 验证 |
 | 4 | subscribePublic | POST /api/calendar/events/{eid}/subscribe | ApiResult.code=0, data.subscribed=true |
-| 5 | forgotCascade_softDelete | DELETE /internal/events | 软删除 7 条, active=0, total=7 |
-| 6 | getNodes_byDate | GET /calendar/nodes?date=2026-05-15 | 返回 1 条 T0 事件 |
+| 5 | forgotCascade_softDelete | DELETE /internal/events | 软删除 7 条, active=0, total=7 (soft-deleted) |
+| 6 | getNodes_byDate | GET /calendar/nodes?date=2026-05-15 | 返回 1 条 T0 事件 (半开区间验证) |
 
 ## 环境
 
-- PG sandbox: localhost:15435 (真 PostgreSQL 容器)
-- Flyway: disabled in IT (common JAR cross-service migration conflict)
-- Schema: JDBC @BeforeEach bootstrap
-- Mock 计数: MockMvc=1 (Spring IT 标准做法, 非 mock 后端)
+- PG sandbox: localhost:15435 (real PostgreSQL container, not H2/embedded)
+- Flyway: disabled in IT (common JAR cross-service migration conflict, pattern aligned with file-service)
+- Schema: JDBC @BeforeEach bootstrap (CREATE TABLE IF NOT EXISTS)
+- MockMvc: 1 (Spring Boot IT standard, not mock backend)
 
-## 对抗修复 (from attempt-1)
+## 代码审查摘要
 
-- REJECT Round 1: `findByOwnerIdAndStartAtBetweenOrderByStartAtAsc` 日期范围边界 bug → 修复为 `@Query` 半开区间 `[from, to)`
-- Fix commit: `b94e6d3`
-- 修复后重跑: 6 IT 全绿, BUILD SUCCESS
+- Entity: soft-delete via @SQLDelete + @SQLRestriction, @Version optimistic lock, SnowflakeId
+- Repository: @Query 半开区间 [from, to), JPQL soft-delete by relation LIKE
+- Service: 幂等 batch create (unique index + DataIntegrityViolation fallback), idempotent subscribe
+- Controllers: internal (Feign target) + public (ApiResult wrapped) + Feign nodes endpoint
+- IT: 6 tests covering all 5 endpoints + DB assertions (JdbcTemplate) + real PG sandbox

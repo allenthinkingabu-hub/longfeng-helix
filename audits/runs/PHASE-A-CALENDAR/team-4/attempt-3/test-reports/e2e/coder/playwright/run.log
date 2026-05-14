@@ -1,0 +1,57 @@
+
+Running 6 tests using 1 worker
+
+  ✓  1 [api] › tests/calendar-api.spec.ts:30:7 › calendar-core REST API E2E › 1-batch-create: POST /internal/events/batch creates events (427ms)
+  ✓  2 [api] › tests/calendar-api.spec.ts:55:7 › calendar-core REST API E2E › 2-batch-create-idempotent: replay same idempotency keys (163ms)
+  ✓  3 [api] › tests/calendar-api.spec.ts:83:7 › calendar-core REST API E2E › 3-subscribe-internal: POST /internal/calendar/events/{eid}/subscribe (152ms)
+  ✓  4 [api] › tests/calendar-api.spec.ts:108:7 › calendar-core REST API E2E › 4-subscribe-public: POST /api/calendar/events/{eid}/subscribe (145ms)
+  ✓  5 [api] › tests/calendar-api.spec.ts:134:7 › calendar-core REST API E2E › 5-forgot-cascade: DELETE /internal/events soft-deletes by relation (152ms)
+  ✓  6 [api] › tests/calendar-api.spec.ts:158:7 › calendar-core REST API E2E › 6-get-nodes: GET /calendar/nodes?date=... (128ms)
+
+  6 passed (1.9s)
+<testsuites id="" name="" tests="6" failures="0" skipped="0" errors="0" time="1.8554610000000002">
+<testsuite name="calendar-api.spec.ts" timestamp="2026-05-14T19:51:54.210Z" hostname="api" tests="6" failures="0" skipped="0" time="1.167" errors="0">
+<testcase name="calendar-core REST API E2E › 1-batch-create: POST /internal/events/batch creates events" classname="calendar-api.spec.ts" time="0.427">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results/calendar-api-calendar-core-b95b6-events-batch-creates-events-api/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="calendar-core REST API E2E › 2-batch-create-idempotent: replay same idempotency keys" classname="calendar-api.spec.ts" time="0.163">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results/calendar-api-calendar-core-14e80-eplay-same-idempotency-keys-api/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="calendar-core REST API E2E › 3-subscribe-internal: POST /internal/calendar/events/{eid}/subscribe" classname="calendar-api.spec.ts" time="0.152">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results/calendar-api-calendar-core-7e2c2-lendar-events-eid-subscribe-api/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="calendar-core REST API E2E › 4-subscribe-public: POST /api/calendar/events/{eid}/subscribe" classname="calendar-api.spec.ts" time="0.145">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results/calendar-api-calendar-core-f2954-lendar-events-eid-subscribe-api/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="calendar-core REST API E2E › 5-forgot-cascade: DELETE /internal/events soft-deletes by relation" classname="calendar-api.spec.ts" time="0.152">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results/calendar-api-calendar-core-8e67e-ts-soft-deletes-by-relation-api/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="calendar-core REST API E2E › 6-get-nodes: GET /calendar/nodes?date=..." classname="calendar-api.spec.ts" time="0.128">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results/calendar-api-calendar-core-b48dc-es-GET-calendar-nodes-date--api/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>
