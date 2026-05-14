@@ -137,7 +137,6 @@ public class QuestionAnalyzerImpl {
         }
     }
 
-    @Transactional
     void persistResult(String taskId, String stem, AiProvider.AnalysisResponse analysis) {
         AnalysisResult result = new AnalysisResult();
         result.setId(idGen.nextId());
