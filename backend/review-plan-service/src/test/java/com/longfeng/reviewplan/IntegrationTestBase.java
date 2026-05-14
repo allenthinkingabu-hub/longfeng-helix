@@ -16,9 +16,9 @@ import org.springframework.test.context.DynamicPropertySource;
  */
 public abstract class IntegrationTestBase {
 
-  protected static final String DB_URL = "jdbc:postgresql://127.0.0.1:15432/wrongbook";
-  protected static final String DB_USER = "postgres";
-  protected static final String DB_PASSWORD = "wb";
+  protected static final String DB_URL = "jdbc:postgresql://127.0.0.1:15436/wrongbook";
+  protected static final String DB_USER = "longfeng";
+  protected static final String DB_PASSWORD = "longfeng_dev";
 
   static {
     // SC-01-C05 · 因 flyway 已禁用，直接 ALTER review_plan_outbox.event_type CHECK 扩展（V1.0.065 等价）
@@ -54,7 +54,7 @@ public abstract class IntegrationTestBase {
     r.add("spring.flyway.baseline-version", () -> "1");
     // SC-01-C05 · review-plan-service 本地 4 个迁移在共享 DB 中可能已被等价对象占位 → 跳过执行避免 'relation already exists'
     r.add("spring.flyway.ignore-migration-patterns", () -> "*:missing,*:future,*:ignored");
-    r.add("spring.flyway.enabled", () -> "false");
+    r.add("spring.flyway.enabled", () -> "true");
     r.add("review.mq.enabled", () -> "false");
     r.add("review.feign.enabled", () -> "false");
     r.add("feign.sentinel.enabled", () -> "false");
