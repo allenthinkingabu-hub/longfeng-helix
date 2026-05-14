@@ -5,7 +5,7 @@
     "team_id": "team-2",
     "title": "PHASE-A · wrongbook-service 业务实施 (Coder 自反推 entity/repo/service/controller + Flyway + IT)",
     "attempt": 3,
-    "phase": "tester",
+    "phase": "done",
     "dev_done": true,
     "passes": true,
     "retries": 0,
@@ -17,7 +17,8 @@
       "21219d8",
       "4666881",
       "7aaa90e",
-      "eca67a4"
+      "eca67a4",
+      "1c55245"
     ]
   },
   "work_log_dir": "audits/runs/PHASE-A-WRONGBOOK/team-2/attempt-3",
@@ -162,7 +163,7 @@
       "task.passes"
     ]
   },
-  "written_at": "2026-05-14T19:47:44.934Z",
+  "written_at": "2026-05-14T19:48:08.358Z",
   "written_by": "TL agent (PHASE-A spawn prep)",
   "deliverables_definition_of_done": [
     "1. 完整实现 src/main/java 业务层 (entity/repo/service/controller/config)",
