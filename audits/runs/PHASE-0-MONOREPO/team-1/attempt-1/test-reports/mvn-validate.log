@@ -1,0 +1,145 @@
+[INFO] Scanning for projects...
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-starter-parent/3.2.5/spring-boot-starter-parent-3.2.5.pom
+Progress (1): 4.1 kBProgress (1): 8.2 kBProgress (1): 12 kB Progress (1): 13 kB                   Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-starter-parent/3.2.5/spring-boot-starter-parent-3.2.5.pom (13 kB at 10 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-dependencies/3.2.5/spring-boot-dependencies-3.2.5.pom
+Progress (1): 4.1 kBProgress (1): 8.2 kBProgress (1): 12 kB Progress (1): 16 kBProgress (1): 20 kBProgress (1): 25 kBProgress (1): 29 kBProgress (1): 33 kBProgress (1): 37 kBProgress (1): 41 kBProgress (1): 45 kBProgress (1): 49 kBProgress (1): 53 kBProgress (1): 57 kBProgress (1): 61 kBProgress (1): 66 kBProgress (1): 70 kBProgress (1): 74 kBProgress (1): 78 kBProgress (1): 82 kBProgress (1): 86 kBProgress (1): 90 kBProgress (1): 94 kBProgress (1): 98 kBProgress (1): 102 kBProgress (1): 106 kBProgress (1): 111 kBProgress (1): 111 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-dependencies/3.2.5/spring-boot-dependencies-3.2.5.pom (111 kB at 285 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-dependencies/2023.0.1/spring-cloud-dependencies-2023.0.1.pom
+Progress (1): 4.1 kBProgress (1): 8.2 kBProgress (1): 10 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-dependencies/2023.0.1/spring-cloud-dependencies-2023.0.1.pom (10 kB at 29 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-dependencies-parent/4.1.1/spring-cloud-dependencies-parent-4.1.1.pom
+Progress (1): 4.1 kBProgress (1): 8.1 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-dependencies-parent/4.1.1/spring-cloud-dependencies-parent-4.1.1.pom (8.1 kB at 25 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-commons-dependencies/4.1.2/spring-cloud-commons-dependencies-4.1.2.pom
+Progress (1): 4.1 kBProgress (1): 7.2 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-commons-dependencies/4.1.2/spring-cloud-commons-dependencies-4.1.2.pom (7.2 kB at 11 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-netflix-dependencies/4.1.1/spring-cloud-netflix-dependencies-4.1.1.pom
+Progress (1): 4.1 kBProgress (1): 8.2 kBProgress (1): 9.8 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-netflix-dependencies/4.1.1/spring-cloud-netflix-dependencies-4.1.1.pom (9.8 kB at 30 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-stream-dependencies/4.1.1/spring-cloud-stream-dependencies-4.1.1.pom
+Progress (1): 4.1 kBProgress (1): 8.2 kBProgress (1): 8.6 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-stream-dependencies/4.1.1/spring-cloud-stream-dependencies-4.1.1.pom (8.6 kB at 26 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-task-dependencies/3.1.1/spring-cloud-task-dependencies-3.1.1.pom
+Progress (1): 4.1 kBProgress (1): 5.8 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-task-dependencies/3.1.1/spring-cloud-task-dependencies-3.1.1.pom (5.8 kB at 15 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-circuitbreaker-dependencies/3.1.1/spring-cloud-circuitbreaker-dependencies-3.1.1.pom
+Progress (1): 4.1 kBProgress (1): 6.7 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-circuitbreaker-dependencies/3.1.1/spring-cloud-circuitbreaker-dependencies-3.1.1.pom (6.7 kB at 20 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-config-dependencies/4.1.1/spring-cloud-config-dependencies-4.1.1.pom
+Progress (1): 4.1 kBProgress (1): 7.5 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-config-dependencies/4.1.1/spring-cloud-config-dependencies-4.1.1.pom (7.5 kB at 14 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-function-dependencies/4.1.1/spring-cloud-function-dependencies-4.1.1.pom
+Progress (1): 4.1 kBProgress (1): 6.8 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-function-dependencies/4.1.1/spring-cloud-function-dependencies-4.1.1.pom (6.8 kB at 20 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-gateway-dependencies/4.1.2/spring-cloud-gateway-dependencies-4.1.2.pom
+Progress (1): 4.1 kBProgress (1): 6.4 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-gateway-dependencies/4.1.2/spring-cloud-gateway-dependencies-4.1.2.pom (6.4 kB at 18 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-consul-dependencies/4.1.1/spring-cloud-consul-dependencies-4.1.1.pom
+Progress (1): 4.1 kBProgress (1): 7.5 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-consul-dependencies/4.1.1/spring-cloud-consul-dependencies-4.1.1.pom (7.5 kB at 23 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-vault-dependencies/4.1.1/spring-cloud-vault-dependencies-4.1.1.pom
+Progress (1): 4.1 kBProgress (1): 6.2 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-vault-dependencies/4.1.1/spring-cloud-vault-dependencies-4.1.1.pom (6.2 kB at 18 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-zookeeper-dependencies/4.1.1/spring-cloud-zookeeper-dependencies-4.1.1.pom
+Progress (1): 4.1 kBProgress (1): 8.2 kBProgress (1): 8.9 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-zookeeper-dependencies/4.1.1/spring-cloud-zookeeper-dependencies-4.1.1.pom (8.9 kB at 24 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-bus-dependencies/4.1.1/spring-cloud-bus-dependencies-4.1.1.pom
+Progress (1): 4.1 kBProgress (1): 6.1 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-bus-dependencies/4.1.1/spring-cloud-bus-dependencies-4.1.1.pom (6.1 kB at 12 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-contract-dependencies/4.1.2/spring-cloud-contract-dependencies-4.1.2.pom
+Progress (1): 4.1 kBProgress (1): 8.2 kBProgress (1): 9.0 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-contract-dependencies/4.1.2/spring-cloud-contract-dependencies-4.1.2.pom (9.0 kB at 28 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-openfeign-dependencies/4.1.1/spring-cloud-openfeign-dependencies-4.1.1.pom
+Progress (1): 4.1 kBProgress (1): 6.5 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-openfeign-dependencies/4.1.1/spring-cloud-openfeign-dependencies-4.1.1.pom (6.5 kB at 17 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/io/github/openfeign/feign-bom/13.2.1/feign-bom-13.2.1.pom
+Progress (1): 4.1 kBProgress (1): 7.5 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/io/github/openfeign/feign-bom/13.2.1/feign-bom-13.2.1.pom (7.5 kB at 21 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-kubernetes-dependencies/3.1.1/spring-cloud-kubernetes-dependencies-3.1.1.pom
+Progress (1): 4.1 kBProgress (1): 8.2 kBProgress (1): 12 kB Progress (1): 13 kB                   Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-kubernetes-dependencies/3.1.1/spring-cloud-kubernetes-dependencies-3.1.1.pom (13 kB at 41 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/com/alibaba/cloud/spring-cloud-alibaba-dependencies/2023.0.1.0/spring-cloud-alibaba-dependencies-2023.0.1.0.pom
+Progress (1): 4.1 kBProgress (1): 8.2 kBProgress (1): 12 kB Progress (1): 12 kB                   Downloaded from central: https://repo.maven.apache.org/maven2/com/alibaba/cloud/spring-cloud-alibaba-dependencies/2023.0.1.0/spring-cloud-alibaba-dependencies-2023.0.1.0.pom (12 kB at 17 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/testcontainers/testcontainers-bom/1.20.1/testcontainers-bom-1.20.1.pom
+Progress (1): 4.1 kBProgress (1): 8.2 kBProgress (1): 11 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/testcontainers/testcontainers-bom/1.20.1/testcontainers-bom-1.20.1.pom (11 kB at 30 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/infinispan/infinispan-bom/14.0.27.Final/infinispan-bom-14.0.27.Final.pom
+Progress (1): 4.1 kBProgress (1): 8.2 kBProgress (1): 12 kB Progress (1): 16 kBProgress (1): 20 kBProgress (1): 25 kB                   Downloaded from central: https://repo.maven.apache.org/maven2/org/infinispan/infinispan-bom/14.0.27.Final/infinispan-bom-14.0.27.Final.pom (25 kB at 56 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/infinispan/infinispan-build-configuration-parent/14.0.27.Final/infinispan-build-configuration-parent-14.0.27.Final.pom
+Progress (1): 4.1 kBProgress (1): 8.2 kBProgress (1): 12 kB Progress (1): 16 kBProgress (1): 20 kBProgress (1): 24 kB                   Downloaded from central: https://repo.maven.apache.org/maven2/org/infinispan/infinispan-build-configuration-parent/14.0.27.Final/infinispan-build-configuration-parent-14.0.27.Final.pom (24 kB at 75 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/glassfish/jersey/jersey-bom/3.1.6/jersey-bom-3.1.6.pom
+Progress (1): 4.1 kBProgress (1): 8.2 kBProgress (1): 12 kB Progress (1): 16 kBProgress (1): 20 kBProgress (1): 21 kB                   Downloaded from central: https://repo.maven.apache.org/maven2/org/glassfish/jersey/jersey-bom/3.1.6/jersey-bom-3.1.6.pom (21 kB at 21 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/eclipse/jetty/ee10/jetty-ee10-bom/12.0.8/jetty-ee10-bom-12.0.8.pom
+Progress (1): 4.1 kBProgress (1): 8.2 kBProgress (1): 9.2 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/eclipse/jetty/ee10/jetty-ee10-bom/12.0.8/jetty-ee10-bom-12.0.8.pom (9.2 kB at 21 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-bom/12.0.8/jetty-bom-12.0.8.pom
+Progress (1): 4.1 kBProgress (1): 8.2 kBProgress (1): 12 kB Progress (1): 14 kB                   Downloaded from central: https://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-bom/12.0.8/jetty-bom-12.0.8.pom (14 kB at 45 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-bom/1.9.23/kotlin-bom-1.9.23.pom
+Progress (1): 4.1 kBProgress (1): 8.2 kBProgress (1): 9.1 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-bom/1.9.23/kotlin-bom-1.9.23.pom (9.1 kB at 26 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/io/micrometer/micrometer-bom/1.12.5/micrometer-bom-1.12.5.pom
+Progress (1): 4.1 kBProgress (1): 7.9 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/io/micrometer/micrometer-bom/1.12.5/micrometer-bom-1.12.5.pom (7.9 kB at 23 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/io/micrometer/micrometer-tracing-bom/1.2.5/micrometer-tracing-bom-1.2.5.pom
+Progress (1): 4.1 kBProgress (1): 4.5 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/io/micrometer/micrometer-tracing-bom/1.2.5/micrometer-tracing-bom-1.2.5.pom (4.5 kB at 14 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/io/netty/netty-bom/4.1.109.Final/netty-bom-4.1.109.Final.pom
+Progress (1): 4.1 kBProgress (1): 8.2 kBProgress (1): 12 kB Progress (1): 14 kB                   Downloaded from central: https://repo.maven.apache.org/maven2/io/netty/netty-bom/4.1.109.Final/netty-bom-4.1.109.Final.pom (14 kB at 36 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/io/projectreactor/reactor-bom/2023.0.5/reactor-bom-2023.0.5.pom
+Progress (1): 4.1 kBProgress (1): 4.8 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/io/projectreactor/reactor-bom/2023.0.5/reactor-bom-2023.0.5.pom (4.8 kB at 12 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/amqp/spring-amqp-bom/3.1.4/spring-amqp-bom-3.1.4.pom
+Progress (1): 3.9 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/amqp/spring-amqp-bom/3.1.4/spring-amqp-bom-3.1.4.pom (3.9 kB at 12 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/data/spring-data-bom/2023.1.5/spring-data-bom-2023.1.5.pom
+Progress (1): 4.1 kBProgress (1): 5.5 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/data/spring-data-bom/2023.1.5/spring-data-bom-2023.1.5.pom (5.5 kB at 16 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/spring-framework-bom/6.1.6/spring-framework-bom-6.1.6.pom
+Progress (1): 4.1 kBProgress (1): 5.8 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/spring-framework-bom/6.1.6/spring-framework-bom-6.1.6.pom (5.8 kB at 18 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/integration/spring-integration-bom/6.2.4/spring-integration-bom-6.2.4.pom
+Progress (1): 4.1 kBProgress (1): 8.2 kBProgress (1): 10 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/integration/spring-integration-bom/6.2.4/spring-integration-bom-6.2.4.pom (10 kB at 30 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/pulsar/spring-pulsar-bom/1.0.5/spring-pulsar-bom-1.0.5.pom
+Progress (1): 2.7 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/pulsar/spring-pulsar-bom/1.0.5/spring-pulsar-bom-1.0.5.pom (2.7 kB at 8.1 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/security/spring-security-bom/6.2.4/spring-security-bom-6.2.4.pom
+Progress (1): 4.1 kBProgress (1): 5.3 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/security/spring-security-bom/6.2.4/spring-security-bom-6.2.4.pom (5.3 kB at 15 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/session/spring-session-bom/3.2.2/spring-session-bom-3.2.2.pom
+Progress (1): 2.9 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/session/spring-session-bom/3.2.2/spring-session-bom-3.2.2.pom (2.9 kB at 9.0 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/testcontainers/testcontainers-bom/1.19.7/testcontainers-bom-1.19.7.pom
+Progress (1): 4.1 kBProgress (1): 8.2 kBProgress (1): 10 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/testcontainers/testcontainers-bom/1.19.7/testcontainers-bom-1.19.7.pom (10 kB at 30 kB/s)
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] wrongbook-parent                                                   [pom]
+[INFO] common                                                             [jar]
+[INFO] file-service                                                       [jar]
+[INFO] wrongbook-service                                                  [jar]
+[INFO] ai-analysis-service                                                [jar]
+[INFO] calendar-core                                                      [jar]
+[INFO] review-plan-service                                                [jar]
+[INFO] wrongbook-backend                                                  [pom]
+[INFO] 
+[INFO] -------------------< com.longfeng:wrongbook-parent >--------------------
+[INFO] Building wrongbook-parent 1.0.0-SNAPSHOT                           [1/8]
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] ------------------------< com.longfeng:common >-------------------------
+[INFO] Building common 1.0.0-SNAPSHOT                                     [2/8]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] ---------------------< com.longfeng:file-service >----------------------
+[INFO] Building file-service 1.0.0-SNAPSHOT                               [3/8]
+[INFO] --------------------------------[ jar ]---------------------------------
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-maven-plugin/3.2.5/spring-boot-maven-plugin-3.2.5.pom
+Progress (1): 4.1 kBProgress (1): 4.2 kB                    Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-maven-plugin/3.2.5/spring-boot-maven-plugin-3.2.5.pom (4.2 kB at 13 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-maven-plugin/3.2.5/spring-boot-maven-plugin-3.2.5.jar
+Progress (1): 4.1/135 kBProgress (1): 7.7/135 kBProgress (1): 12/135 kB Progress (1): 16/135 kBProgress (1): 20/135 kBProgress (1): 24/135 kBProgress (1): 28/135 kBProgress (1): 32/135 kBProgress (1): 36/135 kBProgress (1): 40/135 kBProgress (1): 44/135 kBProgress (1): 48/135 kBProgress (1): 52/135 kBProgress (1): 56/135 kBProgress (1): 61/135 kBProgress (1): 65/135 kBProgress (1): 69/135 kBProgress (1): 73/135 kBProgress (1): 77/135 kBProgress (1): 81/135 kBProgress (1): 85/135 kBProgress (1): 89/135 kBProgress (1): 93/135 kBProgress (1): 97/135 kBProgress (1): 102/135 kBProgress (1): 106/135 kBProgress (1): 110/135 kBProgress (1): 114/135 kBProgress (1): 118/135 kBProgress (1): 122/135 kBProgress (1): 126/135 kBProgress (1): 130/135 kBProgress (1): 134/135 kBProgress (1): 135 kB                        Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-maven-plugin/3.2.5/spring-boot-maven-plugin-3.2.5.jar (135 kB at 256 kB/s)
+[INFO] 
+[INFO] -------------------< com.longfeng:wrongbook-service >-------------------
+[INFO] Building wrongbook-service 1.0.0-SNAPSHOT                          [4/8]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] ------------------< com.longfeng:ai-analysis-service >------------------
+[INFO] Building ai-analysis-service 1.0.0-SNAPSHOT                        [5/8]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] ---------------------< com.longfeng:calendar-core >---------------------
+[INFO] Building calendar-core 1.0.0-SNAPSHOT                              [6/8]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] ------------------< com.longfeng:review-plan-service >------------------
+[INFO] Building review-plan-service 1.0.0-SNAPSHOT                        [7/8]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] -------------------< com.longfeng:wrongbook-backend >-------------------
+[INFO] Building wrongbook-backend 1.0.0-SNAPSHOT                          [8/8]
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for wrongbook-backend 1.0.0-SNAPSHOT:
+[INFO] 
+[INFO] wrongbook-parent ................................... SUCCESS [  0.002 s]
+[INFO] common ............................................. SUCCESS [  0.001 s]
+[INFO] file-service ....................................... SUCCESS [  0.919 s]
+[INFO] wrongbook-service .................................. SUCCESS [  0.002 s]
+[INFO] ai-analysis-service ................................ SUCCESS [  0.001 s]
+[INFO] calendar-core ...................................... SUCCESS [  0.000 s]
+[INFO] review-plan-service ................................ SUCCESS [  0.052 s]
+[INFO] wrongbook-backend .................................. SUCCESS [  0.000 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  19.231 s
+[INFO] Finished at: 2026-05-14T21:53:40+04:00
+[INFO] ------------------------------------------------------------------------
