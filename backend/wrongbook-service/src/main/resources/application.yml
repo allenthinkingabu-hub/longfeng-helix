@@ -1,14 +1,27 @@
 server:
-  port: 8081
+  port: 8082
 
 spring:
   application:
     name: wrongbook-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/wrongbook
-    username: postgres
-    password: wb
+    url: jdbc:postgresql://localhost:15433/wrongbook?stringtype=unspecified
+    username: longfeng
+    password: longfeng_dev
   jpa:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+    properties:
+      hibernate:
+        default_schema: public
+  flyway:
+    enabled: true
+    locations: classpath:db/wrongbook
+    url: ${spring.datasource.url}
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+
+app:
+  snowflake:
+    worker-id: 2
