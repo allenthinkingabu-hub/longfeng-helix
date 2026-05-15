@@ -2,4 +2,3 @@
 > @longfeng/mp@0.1.0 typecheck /Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t03-analyzing/frontend/apps/mp
 > tsc --noEmit
 
---- tsc exit code: 0 ---
