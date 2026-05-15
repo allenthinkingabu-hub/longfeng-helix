@@ -1,64 +1,36 @@
 /**
  * Review API client · MP
- * trace: H5 sibling frontend/apps/h5/src/pages/ReviewExec/index.tsx
- * Endpoints: GET /api/review/sessions/<sid>/nodes/<nid> · POST /api/review/nodes/<nid>/reveal · POST /api/review/nodes/<nid>/grade
- * Port: 8085 (review-plan-service) via _http.ts apiBase('review')
+ * trace: frontend/apps/h5/vite.config.ts → /api/review → localhost:8085
+ *
+ * 函数按 task 分：
+ * - T11: gradeNode (由 T11 task 实现)
+ * - T13: completeSession (本文件)
  */
 
 import { apiBase, httpJSON } from './_http';
 
-// ─── Types ────────────────────────────────────────────────────
+const BASE = apiBase('review');
 
-export interface ReviewNodeResponse {
-  nid: string;
-  nodeIndex: number;
-  tLevel: string;
-  easeFactor: number;
-  question: {
-    qid: string;
-    stem: string;
-    subject: string;
-    kpName: string;
-    difficulty: number;
-    answer: string;
-    steps: string[];
+// ── T13 · completeSession ───────────────────────────────────
+export interface CompleteSessionResp {
+  sessionId: string;
+  status: string;
+  completedAt: string;
+  stats: {
+    mastered: number;
+    partial: number;
+    forgot: number;
+    total: number;
   };
 }
 
-export interface RevealResponse {
-  revealedAt: string;
-}
-
-export interface GradeRequest {
-  grade: 'FORGOT' | 'PARTIAL' | 'MASTERED';
-  timeSpentMs: number;
-}
-
-export interface GradeResponse {
-  newTLevel: string;
-  newEaseFactor: number;
-}
-
-// ─── API functions ────────────────────────────────────────────
-
-const BASE = apiBase('review');
-
-/** GET /api/review/sessions/{sid}/nodes/{nid} */
-export function getNode(sid: string, nid: string): Promise<ReviewNodeResponse> {
-  return httpJSON<ReviewNodeResponse>(`${BASE}/api/review/sessions/${sid}/nodes/${nid}`);
-}
-
-/** POST /api/review/nodes/{nid}/reveal */
-export function revealNode(nid: string): Promise<RevealResponse> {
-  return httpJSON<RevealResponse>(`${BASE}/api/review/nodes/${nid}/reveal`, {
-    method: 'POST',
-  });
-}
-
-/** POST /api/review/nodes/{nid}/grade */
-export function gradeNode(nid: string, body: GradeRequest): Promise<GradeResponse> {
-  return httpJSON<GradeResponse>(`${BASE}/api/review/nodes/${nid}/grade`, {
-    method: 'POST',
-    body,
-  });
+/**
+ * POST /api/review/sessions/{sid}/complete
+ * 标记一个 review session 完成 · H5 sibling: ReviewDone handleEnd
+ */
+export async function completeSession(sid: string): Promise<CompleteSessionResp> {
+  return httpJSON<CompleteSessionResp>(
+    `${BASE}/api/review/sessions/${sid}/complete`,
+    { method: 'POST' },
+  );
 }
