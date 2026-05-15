@@ -1,0 +1,12 @@
+<testsuites id="" name="" tests="4" failures="0" skipped="0" errors="0" time="4.713939">
+<testsuite name="sc-01/t05-result-save.spec.ts" timestamp="2026-05-15T04:44:54.915Z" hostname="chromium" tests="4" failures="0" skipped="0" time="3.832" errors="0">
+<testcase name="SC01-T05 · P04 Save to Wrongbook › AC1+AC2: happy path — tap save → loading → SAVED → navigate to /wrongbook" classname="sc-01/t05-result-save.spec.ts" time="1.487">
+</testcase>
+<testcase name="SC01-T05 · P04 Save to Wrongbook › AC5: save failure — 5xx → toast + stay on P04" classname="sc-01/t05-result-save.spec.ts" time="0.671">
+</testcase>
+<testcase name="SC01-T05 · P04 Save to Wrongbook › AC4: idempotent save — 2nd tap same qid returns snapshot" classname="sc-01/t05-result-save.spec.ts" time="0.797">
+</testcase>
+<testcase name="SC01-T05 · P04 Save to Wrongbook › low confidence path — save requires confirm modal (TC-01.04)" classname="sc-01/t05-result-save.spec.ts" time="0.877">
+</testcase>
+</testsuite>
+</testsuites>

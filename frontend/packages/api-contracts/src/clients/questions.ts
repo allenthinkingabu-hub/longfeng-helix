@@ -140,10 +140,15 @@ export const questionsClient = {
     }
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      'X-Request-Id': crypto.randomUUID(),
     };
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
-    const body: SaveQuestionReq = { qid, ...(edits ? { edits } : {}) };
+    const body: SaveQuestionReq & { strategyCode: string } = {
+      qid,
+      strategyCode: 'EBBINGHAUS_STD',
+      ...(edits ? { edits } : {}),
+    };
     const res = await fetch(`${BASE_PATH}/${encodeURIComponent(qid)}/save`, {
       method: 'POST',
       headers,

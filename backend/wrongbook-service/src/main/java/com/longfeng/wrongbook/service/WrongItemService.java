@@ -3,6 +3,8 @@ package com.longfeng.wrongbook.service;
 import com.longfeng.common.exception.BusinessException;
 import com.longfeng.common.exception.ErrCode;
 import com.longfeng.wrongbook.entity.WrongItem;
+import com.longfeng.wrongbook.entity.WrongItemOutbox;
+import com.longfeng.wrongbook.repo.WrongItemOutboxRepository;
 import com.longfeng.wrongbook.repo.WrongItemRepository;
 import com.longfeng.wrongbook.support.SnowflakeIdGenerator;
 import java.time.OffsetDateTime;
@@ -16,10 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class WrongItemService {
 
     private final WrongItemRepository repo;
+    private final WrongItemOutboxRepository outboxRepo;
     private final SnowflakeIdGenerator idGen;
 
-    public WrongItemService(WrongItemRepository repo, SnowflakeIdGenerator idGen) {
+    public WrongItemService(WrongItemRepository repo,
+                            WrongItemOutboxRepository outboxRepo,
+                            SnowflakeIdGenerator idGen) {
         this.repo = repo;
+        this.outboxRepo = outboxRepo;
         this.idGen = idGen;
     }
 
@@ -59,13 +65,36 @@ public class WrongItemService {
         return repo.save(item);
     }
 
+    /**
+     * Confirm (save) a question: status → CONFIRMED(3) + write outbox event
+     * in same TX (AC3 transactional consistency). Idempotent: if already ≥ 3,
+     * returns current snapshot without duplicate outbox (AC4 / TI2).
+     */
     @Transactional
     public WrongItem save(Long id) {
         WrongItem item = getById(id);
         if (item.getStatus() < 3) {
             item.setStatus((short) 3); // CONFIRMED
             item.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-            return repo.save(item);
+            item = repo.save(item);
+
+            // AC3: write question.created.topic outbox event in same TX
+            // TI1: payload {itemId, userId, subject, occurredAt}
+            if (!outboxRepo.existsByWrongItemIdAndEventType(item.getId(), "question.created.topic")) {
+                WrongItemOutbox outbox = new WrongItemOutbox();
+                outbox.setId(idGen.nextId());
+                outbox.setWrongItemId(item.getId());
+                outbox.setEventType("question.created.topic");
+                outbox.setPayload(String.format(
+                        "{\"itemId\":%d,\"userId\":%d,\"subject\":\"%s\",\"occurredAt\":\"%s\"}",
+                        item.getId(),
+                        item.getStudentId(),
+                        item.getSubject(),
+                        item.getUpdatedAt().toString()));
+                outbox.setSent(false);
+                outbox.setCreatedAt(OffsetDateTime.now(ZoneOffset.UTC));
+                outboxRepo.save(outbox);
+            }
         }
         return item;
     }

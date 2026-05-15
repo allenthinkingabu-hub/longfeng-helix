@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "SC01-T05",
+    "team_id": "team-2",
+    "title": "PHASE-B SC-01-T05 · Tap「保存到错题本」· POST /save · 触发 plan + 7 nodes 生成",
+    "attempt": 1,
+    "phase": "coder",
+    "dev_done": true,
+    "passes": false,
+    "retries": 0,
+    "audit_retries": 0,
+    "git_commits": ["42d3604"]
+  },
+  "work_log_dir": "audits/runs/SC01-T05/team-2/attempt-1",
+  "log_requirements": {
+    "must_write": [
+      "coder.md",
+      "bugs-found.md"
+    ]
+  },
+  "audit_gate": "audit.js v1 五维度严卡 · 用户红线: 真实测试不可妥协 · dim 5 spec_alignment DoR C-1..C-6 必过 (Playwright 真 sandbox 跑) · mock ≤ 5 · 数字对齐 · maxDiffPixels ≤ 500 · IT/E2E 接 sandbox 真容器 · 禁 H2/embedded/Mock 后端",
+  "previous_audit_verdict": null,
+  "context": {
+    "scenario": "PHASE-B SC-01 · TC-01.01 步 9 · Tap「保存到错题本」· POST /save · 触发 plan + 7 nodes 生成",
+    "target_page": "P04-result",
+    "page_state_machine": "result.DRAFT → SAVING → SAVED",
+    "biz_step_range": "biz §2B.2 步 9",
+    "biz_refs": [
+      "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 9",
+      "biz §2A.4 P04 规格卡 后端副作用"
+    ],
+    "spec_refs": [
+      "design/system/pages/P04-result.spec.md §5 API 触点 (POST /save)"
+    ],
+    "primary_services": [
+      "frontend/apps/h5",
+      "backend/wrongbook-service"
+    ],
+    "primary_apis": [
+      "POST /api/wb/questions/{qid}/save"
+    ],
+    "acceptance_criteria": [
+      {
+        "id": "AC1",
+        "text": "Tap 蓝色「保存到错题本」按钮 · loading spinner + 触觉 success"
+      },
+      {
+        "id": "AC2",
+        "text": "POST /api/wb/questions/{qid}/save body{strategyCode=EBBINGHAUS_STD} Header X-Request-Id → 200 SaveQuestionResp"
+      },
+      {
+        "id": "AC3",
+        "text": "DB: wb_question.status DRAFT → ACTIVE · 同步发 question.created.topic outbox event"
+      },
+      {
+        "id": "AC4",
+        "text": "重放 save (同 qid) 不产生重复计划 · 第 2 次返回当前快照 (幂等)"
+      },
+      {
+        "id": "AC5",
+        "text": "save 失败 (5xx) → 留 P04 + ERROR banner + 不写 plan + outbox 不发"
+      }
+    ],
+    "test_invariants": [
+      "TI1: question.created.topic outbox 1 条 (payload {itemId, userId, subject, occurredAt})",
+      "TI2: save 幂等基于 qid 唯一索引 (重放 INSERT 撞 unique → 走 catch 返当前快照)",
+      "TI3: 埋点 wb_result_save{subject,kpCount} 1 条",
+      "TI4: save 全链耗时 ≤ 800ms (P95)"
+    ],
+    "key_invariants": [
+      "save 200 + question.created.topic outbox 必须事务一致 (同一 DB tx 内)"
+    ],
+    "sandbox": {
+      "pg_port": 15433,
+      "redis_port": 16380,
+      "minio_api_port": 9002,
+      "pg_user": "longfeng",
+      "pg_password": "longfeng_dev",
+      "pg_db": "wrongbook",
+      "pg_jdbc": "jdbc:postgresql://localhost:15433/wrongbook",
+      "redis_url": "redis://localhost:16380",
+      "minio_s3": "http://localhost:9002"
+    },
+    "frontend_setup": "frontend/apps/h5 是 pnpm workspace · 先 corepack enable && corepack prepare pnpm@10 --activate · 然后 cd frontend && pnpm install · 启 dev: pnpm --filter @longfeng/h5 dev",
+    "backend_running_required": "PHASE-A 已在 main 完成 5 service · 起对应 backend service: cd backend/<svc> && mvn spring-boot:run (Spring Boot 默认从 application.yml 读 sandbox endpoint · 已配 sandbox PG/Redis/MinIO)",
+    "anti_stub_gap_directive": "基于 PHASE-A 教训: 写代码前先 grep -rE 测试文件外部符号 + 现有源代码引用 一次性补齐",
+    "e2e_protocol": ".harness/agents/SHARED-E2E-PROTOCOL.md DoR C-1..C-6 必须执行 · 12 张截图 (4 态×3类) · spec-trace.md · env-snapshot.md docker ps · run.log BUILD SUCCESS · 真 Playwright headed mode 跑 sandbox"
+  },
+  "isolation": {
+    "worktree_disabled": false,
+    "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t05-result",
+    "branch_name": "claude/sc01-t05-result"
+  },
+  "physical_verification": {
+    "dor_c1_to_c6_required": true,
+    "rationale": "PHASE-B 前端业务 task · 必须 Playwright headed E2E + 4 态截图 + DoR C-1..C-6 全过"
+  },
+  "permissions": {
+    "writable_fields": [
+      "task.dev_done",
+      "task.git_commits"
+    ]
+  },
+  "written_at": "2026-05-15T04:09:50.520Z",
+  "written_by": "TL agent (PHASE-B first-wave spawn prep)",
+  "deliverables_definition_of_done": [
+    "1. 前端 page 组件 + 状态机 (per spec.md §6) + testid (per spec.md)",
+    "2. API call (per primary_apis · 真 backend 端点)",
+    "3. Playwright spec.ts (frontend/apps/h5/tests/e2e/sc-01/<task-id>.spec.ts · trace 头 + 4 态)",
+    "4. 起 backend service (mvn spring-boot:run · sandbox 端口) + 起 frontend (pnpm dev)",
+    "5. 真 Playwright headed 跑 BUILD SUCCESS · 12 张截图 (idle/uploading/success/error × baseline/actual/diff)",
+    "6. work_log_dir/test-reports/e2e/coder/{playwright,backend-it,screenshots,spec-trace.md,env-snapshot.md}",
+    "7. coder.md (5 段落) + bugs-found.md (真 bug list)",
+    "8. git commits 分批 · hash 全部 git cat-file -e 验真",
+    "9. inflight dev_done=true + git_commits[]",
+    "10. node .harness/harness.js --advance=SC01-T05"
+  ],
+  "rule_6_tool_budget_guidance": "PHASE-B 前端+E2E task · 复杂 · 预计 ~70-100 tool use · 过 50 自检 · 过 70 surface · 过 85 立即 Rule 6.5 compaction"
+}
