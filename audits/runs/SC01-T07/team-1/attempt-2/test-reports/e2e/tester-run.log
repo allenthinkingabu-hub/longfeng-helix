@@ -1,0 +1,11 @@
+
+Running 6 tests using 1 worker
+
+  ✓  1 [chromium] › tests/e2e/sc-01/t07-list-highlight-newest.spec.ts:232:3 › SC01-T07 · P04→P05 transition + highlight › AC1+AC2+AC3: P04 save → P05 with highlight → green border 3s fade (5.4s)
+  ✓  2 [chromium] › tests/e2e/sc-01/t07-list-highlight-newest.spec.ts:291:3 › SC01-T07 · P04→P05 transition + highlight › AC4: highlighted card renders all required elements (309ms)
+  ✓  3 [chromium] › tests/e2e/sc-01/t07-list-highlight-newest.spec.ts:333:3 › SC01-T07 · P04→P05 transition + highlight › TI1: highlight={qid} not in list → fallback no highlight (252ms)
+  ✓  4 [chromium] › tests/e2e/sc-01/t07-list-highlight-newest.spec.ts:353:3 › SC01-T07 · P04→P05 transition + highlight › 4-state VRT: loading state (758ms)
+  ✓  5 [chromium] › tests/e2e/sc-01/t07-list-highlight-newest.spec.ts:382:3 › SC01-T07 · P04→P05 transition + highlight › 4-state VRT: empty state (278ms)
+  ✓  6 [chromium] › tests/e2e/sc-01/t07-list-highlight-newest.spec.ts:395:3 › SC01-T07 · P04→P05 transition + highlight › 4-state VRT: error state (2.2s)
+
+  6 passed (10.2s)

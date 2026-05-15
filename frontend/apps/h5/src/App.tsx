@@ -2,16 +2,12 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { CapturePage } from './pages/Capture/index';
 import { AnalyzingPage } from './pages/Analyzing/index';
+import { ResultPage } from './pages/Result/index';
+import { WrongbookListPage } from './pages/WrongbookList/index';
 
 const HomeStub: React.FC = () => (
   <div style={{ padding: 20, color: '#333' }}>
     <h2>首页</h2>
-  </div>
-);
-
-const WrongbookStub: React.FC = () => (
-  <div data-testid="p05-root" style={{ padding: 20, color: '#333' }}>
-    <h2>错题本</h2>
   </div>
 );
 
@@ -26,8 +22,9 @@ export const App: React.FC = () => (
     <Route path="/" element={<HomeStub />} />
     <Route path="/capture" element={<CapturePage />} />
     <Route path="/analyzing/:taskId" element={<AnalyzingPage />} />
-    <Route path="/question/:qid/result" element={<div data-testid="p04-root">Result</div>} />
-    <Route path="/manual-entry" element={<div data-testid="manual-entry-root">Manual Entry</div>} />
+    <Route path="/question/:qid/result" element={<ResultPage />} />
+    <Route path="/wrongbook" element={<WrongbookListPage />} />
+    <Route path="/manual-entry" element={<ManualEntryStub />} />
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 );

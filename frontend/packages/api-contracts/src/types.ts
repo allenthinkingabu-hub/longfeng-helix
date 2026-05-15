@@ -54,6 +54,45 @@ export interface TagUpdatePayload {
   version: number; // If-Match optimistic lock
 }
 
+// ==================== P05 WrongbookList · GET /api/wb/questions (list) ====================
+// 1:1 aligned with backend QuestionListResp + QuestionListItem DTO
+// SC-01-T07: list endpoint returns paginated items with highlight support
+export interface QuestionListItem {
+  qid: string;
+  subject: string;
+  kp: string[];
+  stemSnippet: string;
+  thumb: string;
+  masteryPct: number;
+  masteryLabel: 'NOT_MASTERED' | 'PARTIAL' | 'MASTERED';
+  nextDueAt: string;
+  nodeStage: number;
+  createdAt: string;
+  errorType?: string;
+  difficulty: number;
+  questionNo?: string;
+}
+
+export interface QuestionListResp {
+  items: QuestionListItem[];
+  total: number;
+  page: number;
+  size: number;
+  sort: string;
+}
+
+export interface QuestionListParams {
+  subject?: string;
+  mastery?: string;
+  kp?: string[];
+  q?: string;
+  qMode?: 'kw' | 'sem';
+  page?: number;
+  size?: number;
+  sort?: string;
+  highlight?: string;
+}
+
 // ==================== S4 ai-analysis ====================
 export interface SimilarItem {
   id: string;
