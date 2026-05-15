@@ -90,6 +90,7 @@ Page({
       // Demo mode: simulate analyzing state
       this.setData({
         pageState: 'analyzing',
+        statusText: 'AI 正在分析…',
         steps: buildSteps(3, 'analyzing'),
         doneCount: 2,
       });
@@ -102,7 +103,7 @@ Page({
 
   async _startAnalysis(imageUrl: string, subject: string) {
     try {
-      this.setData({ pageState: 'analyzing', steps: buildSteps(1, 'analyzing'), doneCount: 0 });
+      this.setData({ pageState: 'analyzing', statusText: 'AI 正在分析…', steps: buildSteps(1, 'analyzing'), doneCount: 0 });
       const resp = await startAnalyze({ imageUrl, subject });
       this.setData({ taskId: resp.taskId });
       this._startPolling(resp.taskId);
