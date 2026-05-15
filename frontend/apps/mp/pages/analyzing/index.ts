@@ -79,9 +79,13 @@ Page({
   _pollTimer: 0 as unknown as number,
   _pollCount: 0,
 
+  /** qid received from capture page (P02) for result page transition */
+  _qid: '',
+
   onLoad(options: Record<string, string | undefined>) {
     const imageUrl = options.imageUrl || '';
     const subject = options.subject || '数学';
+    this._qid = options.qid || '';
     this.setData({ subjectLabel: subject });
 
     if (imageUrl) {
@@ -153,6 +157,13 @@ Page({
           steps: buildSteps(5, 'analyzing'),
           streamOutput: resp.result ? JSON.stringify(resp.result, null, 2) : this.data.streamOutput,
         });
+        // Transition P03→P04: navigate to result page after brief delay
+        const qid = this._qid || this.data.taskId;
+        if (qid) {
+          setTimeout(() => {
+            wx.navigateTo({ url: `/pages/result/index?qid=${qid}` });
+          }, 300);
+        }
       } else if (resp.status === 'FAILED') {
         this._clearPoll();
         this.setData({

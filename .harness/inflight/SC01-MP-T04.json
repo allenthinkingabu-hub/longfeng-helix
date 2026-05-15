@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "SC01-MP-T04",
+    "team_id": "team-2",
+    "title": "PHASE-C MP wave-2 · SC01-MP-T04 · P03→P04 (analyzing→result)",
+    "attempt": 1,
+    "phase": "coder",
+    "dev_done": true,
+    "passes": false,
+    "retries": 0,
+    "audit_retries": 0,
+    "git_commits": ["39bdc90", "97dc5b6"]
+  },
+  "work_log_dir": "audits/runs/SC01-MP-T04/team-2/attempt-1",
+  "log_requirements": {"must_write": ["coder.md", "bugs-found.md"]},
+  "audit_gate": "audit.js v1 relaxed · 真 API + integration test 0 mock backend · tsc PASS · transition action verified · 强制 git commit",
+  "previous_audit_verdict": null,
+  "context": {
+    "scenario": "PHASE-C MP wave-2 · transition + backend transparency · 依赖 wave-1 5 page 已 merge",
+    "transition": "wx.navigateTo /pages/result/index?qid=Y 在 analyze 完成后",
+    "h5_sibling": "SC01-T04 (frontend/apps/h5 已 merge · 看 transition 实现细节对齐)",
+    "scope_in": [
+      "改 pages/<src-page>/index.ts 加 transition action (wx.navigateTo / wx.redirectTo / wx.reLaunch 适用)",
+      "vitest 测试: test/transitions/<flow>.spec.ts (mock 只允许 wx runtime API · 禁 mock backend · 0 backend mock)",
+      "或: test/api/<service>.integration.spec.ts 扩充 · 真接 backend 验 transition 必要 API",
+      "tsc --noEmit pass",
+      "spec-trace.md · coder.md (5段) · bugs-found.md"
+    ],
+    "scope_out": [
+      "新建 page (本任务只 transition · wave-1 page 已存在)",
+      "新 API 端点 (backend 已 PHASE-A 全实现)",
+      "automator E2E · 真起 IDE (跳)"
+    ],
+    "backend_ports": {"file": 8084, "wb": 8082, "ai": 8083, "review": 8085},
+    "mockup_refs": "design/mockups/wrongbook/ · transition 涉及的 from-page + to-page mockup"
+  },
+  "isolation": {
+    "worktree_disabled": false,
+    "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t04-analyzing-to-result",
+    "branch_name": "claude/sc01-mp-t04-analyzing-to-result"
+  },
+  "physical_verification": {"dor_c1_to_c6_required": false, "rationale": "wave-2 transition · 无 UI E2E · vitest + 真 backend API 验 + tsc"},
+  "permissions": {"writable_fields": ["task.dev_done", "task.git_commits"]},
+  "deliverables_definition_of_done": [
+    "1. transition action 落 pages/<src>/index.ts (wx.navigateTo)",
+    "2. vitest test/transitions/ 或扩充 test/api/ · 0 backend mock",
+    "3. tsc --noEmit pass",
+    "4. spec-trace.md · coder.md · bugs-found.md → audits/runs/SC01-MP-T04/team-2/attempt-1/",
+    "5. **强制 git commit + advance**"
+  ],
+  "rule_6_tool_budget_guidance": "wave-2 transition · 改 1-2 file + 1 vitest spec · 预计 25-40 tool use",
+  "written_at": "2026-05-15T09:30:00.000Z",
+  "written_by": "TL agent (PHASE-C wave-2 spawn prep)"
+}

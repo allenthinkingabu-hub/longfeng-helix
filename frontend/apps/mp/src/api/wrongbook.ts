@@ -1,5 +1,5 @@
 /**
- * Wrongbook API client · GET /api/wb/questions/<qid>
+ * Wrongbook API client
  * Port: 8082 (wrongbook-service)
  * Uses shared _http.ts dual-runtime adapter (wx.request in MP, fetch in vitest)
  */
@@ -50,6 +50,8 @@ export function getQuestionById(qid: string): Promise<GetQuestionByIdResp> {
   );
 }
 
+// ── create question (used by P02 capture page) ──────────────────
+
 export interface CreateQuestionReq {
   studentId: number;
   subject: string;
@@ -60,6 +62,7 @@ export interface CreateQuestionReq {
 
 export interface CreateQuestionResp {
   qid: string;
+  status: string;
 }
 
 /** POST /api/wb/questions */

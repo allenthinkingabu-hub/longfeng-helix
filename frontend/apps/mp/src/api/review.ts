@@ -34,3 +34,34 @@ export async function completeSession(sid: string): Promise<CompleteSessionResp>
     { method: 'POST' },
   );
 }
+
+// ── T11 · node-level review APIs ────────────────────────────────
+
+export interface ReviewNodeResp {
+  nid: string;
+  status: string;
+}
+
+/** GET /api/review/nodes/:nid */
+export function getNode(nid: string): Promise<ReviewNodeResp> {
+  return httpJSON<ReviewNodeResp>(`${BASE}/api/review/nodes/${nid}`);
+}
+
+/** POST /api/review/nodes/:nid/reveal */
+export function revealNode(nid: string): Promise<ReviewNodeResp> {
+  return httpJSON<ReviewNodeResp>(
+    `${BASE}/api/review/nodes/${nid}/reveal`,
+    { method: 'POST' },
+  );
+}
+
+/** POST /api/review/nodes/:nid/grade */
+export function gradeNode(
+  nid: string,
+  body: { grade: string; timeSpentMs: number },
+): Promise<ReviewNodeResp> {
+  return httpJSON<ReviewNodeResp>(
+    `${BASE}/api/review/nodes/${nid}/grade`,
+    { method: 'POST', body },
+  );
+}
