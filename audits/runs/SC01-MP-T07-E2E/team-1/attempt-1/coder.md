@@ -61,5 +61,5 @@ spec 文件结构对照:
 
 ## 5. 提交
 
-- commit hash: (见 git_commits)
+- commit hash: 5448d14
 - 文件变更: `frontend/apps/mp/test/e2e/wrongbook-list.spec.ts` (+136 行新文件)
