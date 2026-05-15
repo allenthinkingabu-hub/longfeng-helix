@@ -1,100 +1,221 @@
 /**
- * P03 · AI 分析中 · Mood C dark-camera
- * STYLE-TRUTH §3 Mood C: 暗底渐变 · 沿用 P02 暗底 · 视觉无缝衔接
+ * P03 · AI 分析中 · Light iOS theme
+ * STYLE-TRUTH: design/mockups/wrongbook/03_analyzing.html (SoT · 1:1 mirror)
  *
- * Archive 1:1 参考: design/mockups/wrongbook/03_analyzing.html
- * 颜色:
- *   --bg-top  : #1A1A2E (深紫灰)
- *   --bg-bot  : #0F0F23 (深海蓝黑)
- *   --card    : rgba(255,255,255,0.08)
- *   --text    : #F5F5F7
- *   --text2   : rgba(255,255,255,0.7)
- *   --text3   : rgba(255,255,255,0.45)
- *   --accent  : #5AC8FA (P03 accent · pipeline active)
- *   --green   : #34C759
- *   --red     : #FF3B30
- *   --yellow  : #FFD60A
+ * 颜色 (from mockup :root):
+ *   --blue:   #007AFF   --red:   #FF3B30
+ *   --green:  #34C759   --yellow:#FFCC00
+ *   --bg:     #F2F2F7   --card:  #FFFFFF
+ *   --text:   #1C1C1E   --text2: #3C3C43
+ *   --text3:  #8E8E93   --sep:   rgba(60,60,67,.14)
  */
 
 /* ─── Root ──────────────────────────────────────────────────────── */
 .root {
-  --bg-top: #1A1A2E;
-  --bg-bot: #0F0F23;
-  --card:   rgba(255, 255, 255, 0.08);
-  --text:   #F5F5F7;
-  --text2:  rgba(255, 255, 255, 0.7);
-  --text3:  rgba(255, 255, 255, 0.45);
-  --accent: #5AC8FA;
-  --green:  #34C759;
+  --blue:   #007AFF;
   --red:    #FF3B30;
-  --yellow: #FFD60A;
+  --orange: #FF9500;
+  --green:  #34C759;
+  --indigo: #5856D6;
+  --yellow: #FFCC00;
+  --bg:     #F2F2F7;
+  --card:   #FFFFFF;
+  --text:   #1C1C1E;
+  --text2:  #3C3C43;
+  --text3:  #8E8E93;
+  --sep:    rgba(60, 60, 67, .14);
+  --font:   -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+            "PingFang SC", "Helvetica Neue", sans-serif;
+  --mono:   "SF Mono", "JetBrains Mono", ui-monospace, Menlo, monospace;
 
   position: relative;
   width: 100%;
   min-height: 100svh;
-  background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bot) 100%);
+  background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'Helvetica Neue', sans-serif;
+  font-family: var(--font);
   -webkit-font-smoothing: antialiased;
   display: flex;
   flex-direction: column;
 }
 
-/* ─── Page section ─────────────────────────────────────────────── */
-.page {
-  flex: 1;
+/* ─── Nav bar (mockup: .nav) ───────────────────────────────────── */
+.nav {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 6px 20px 8px;
+  background: rgba(242, 242, 247, .78);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border-bottom: .5px solid var(--sep);
+  z-index: 20;
+}
+.navRow {
   display: flex;
-  flex-direction: column;
-  padding: 54px 16px 0; /* 顶部安全区 */
-  padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)); /* Tab Bar */
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+}
+.back {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--blue);
+  font-size: 17px;
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+.back svg {
+  width: 12px;
+  height: 20px;
+}
+.navCancel {
+  color: var(--text3);
+  font-size: 15px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+.navTitle {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: .36px;
+  margin-top: 2px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #5FA8FF, #5856D6);
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: .4px;
 }
 
-/* ─── Thumb card + model badge ──────────────────────────────────── */
-.thumbCard {
+/* ─── Content area ─────────────────────────────────────────────── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px 16px;
+  /* Leave room for cancel button + tab bar */
+  padding-bottom: calc(50px + 84px + 32px);
+}
+
+/* ─── Preview card (mockup: .preview) ──────────────────────────── */
+.preview {
   display: flex;
-  align-items: center;
   gap: 12px;
-  padding: 12px 14px;
+  align-items: center;
   background: var(--card);
   border-radius: 14px;
-  margin-bottom: 12px;
-  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .03), 0 8px 22px rgba(40, 50, 90, .05);
 }
-.thumbImg {
+.thumb {
   width: 72px;
   height: 88px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  background: linear-gradient(180deg, #fbf8f0, #f1ece0);
+  position: relative;
   overflow: hidden;
   flex: 0 0 72px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .05);
 }
-.thumbImg svg {
-  width: 32px;
-  height: 32px;
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
-.thumbInfo {
+.thumbPlaceholderLbl {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  font-size: 6px;
+  color: #a78a3c;
+  letter-spacing: .18em;
+  font-weight: 700;
+}
+.thumbPlaceholderQno {
+  position: absolute;
+  top: 14px;
+  left: 6px;
+  font-size: 7px;
+  font-weight: 700;
+  color: #7a3b3b;
+  background: #fde9e9;
+  border-radius: 2px;
+  padding: 1px 3px;
+}
+.thumbPlaceholderH3 {
+  position: absolute;
+  top: 24px;
+  left: 6px;
+  right: 6px;
+  font-family: Georgia, serif;
+  font-size: 7px;
+  line-height: 1.4;
+  color: #222;
+  font-weight: 600;
+}
+.meta {
   flex: 1;
   min-width: 0;
 }
-.thumbTitle {
+.metaTitle {
   font-size: 14px;
   font-weight: 600;
-  color: var(--text);
-  letter-spacing: 0.1px;
+  letter-spacing: .1px;
 }
+.metaChips {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 3px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #F2F2F7;
+  padding: 3px 7px;
+  border-radius: 999px;
+  border: .5px solid var(--sep);
+}
+
+/* ─── Model badge (mockup: .model) ─────────────────────────────── */
 .modelBadge {
-  display: inline-block;
-  margin-top: 6px;
-  padding: 3px 8px;
-  border-radius: 6px;
-  background: rgba(90, 200, 250, 0.15);
-  color: var(--accent);
-  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text3);
+  padding: 0 4px;
+}
+.modelDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 4px rgba(52, 199, 89, .18);
+}
+.modelBadge strong {
+  color: var(--text2);
   font-weight: 600;
-  letter-spacing: 0.3px;
 }
 
 /* ─── Banner (SLOW yellow / ERROR red) ─────────────────────────── */
@@ -106,45 +227,47 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-top: 10px;
 }
 .bannerSlow {
-  background: rgba(255, 214, 10, 0.15);
-  border: 0.5px solid rgba(255, 214, 10, 0.4);
-  color: var(--yellow);
+  background: rgba(255, 204, 0, .1);
+  border: .5px solid rgba(255, 204, 0, .35);
+  color: #CC8800;
 }
 .bannerError {
-  background: rgba(255, 59, 48, 0.15);
-  border: 0.5px solid rgba(255, 59, 48, 0.4);
+  background: rgba(255, 59, 48, .08);
+  border: .5px solid rgba(255, 59, 48, .3);
   color: var(--red);
 }
 
-/* ─── Pipeline (4 step) ─────────────────────────────────────────── */
-.pipeline {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  margin-bottom: 16px;
-}
-.pipelineStep {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
+/* ─── Stages card (mockup: .stages) ────────────────────────────── */
+.stages {
+  margin-top: 14px;
   background: var(--card);
-  border-bottom: 0.5px solid rgba(255, 255, 255, 0.06);
-  transition: background 0.2s ease;
-}
-.pipelineStep:first-child {
-  border-radius: 14px 14px 0 0;
-}
-.pipelineStep:last-child {
-  border-radius: 0 0 14px 14px;
-  border-bottom: none;
+  border-radius: 18px;
+  padding: 8px 4px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .03), 0 8px 22px rgba(40, 50, 90, .05);
 }
 
-/* Step circle */
+/* ─── Step (mockup: .step) ─────────────────────────────────────── */
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 14px;
+  position: relative;
+}
+.step + .step::before {
+  content: "";
+  position: absolute;
+  left: 24.5px;
+  top: -6px;
+  width: 1px;
+  height: 14px;
+  background: var(--sep);
+}
+
+/* Step circle (mockup: .ico) */
 .stepCircle {
   width: 28px;
   height: 28px;
@@ -152,101 +275,163 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
   flex: 0 0 28px;
-  transition: all 0.25s ease;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+.stepCircle svg {
+  width: 14px;
+  height: 14px;
 }
 
-/* Step label + meta */
-.stepLabel {
+/* Step body */
+.stepBody {
   flex: 1;
-  font-size: 14px;
-  font-weight: 500;
   min-width: 0;
 }
-.stepMeta {
-  font-size: 12px;
+.stepTitle {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .1px;
+}
+.stepDuration {
+  color: var(--text3);
   font-weight: 500;
-  letter-spacing: 0.2px;
+  font-size: 12px;
+  margin-left: 6px;
+}
+.stepDesc {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 2px;
+  line-height: 1.45;
 }
 
 /* ── Step states ──────────────────────────────────────────────── */
-.stepWait .stepCircle {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text3);
-}
-.stepWait .stepLabel { color: var(--text3); }
-.stepWait .stepMeta  { color: var(--text3); }
-
-.stepNow {
-  background: rgba(90, 200, 250, 0.08);
-}
-.stepNow .stepCircle {
-  background: linear-gradient(180deg, #5AC8FA, #007AFF);
-  color: #fff;
-  box-shadow: 0 0 0 4px rgba(90, 200, 250, 0.2);
-  animation: ssePulse 1.5s ease-in-out infinite;
-}
-.stepNow .stepLabel { color: var(--accent); }
-.stepNow .stepMeta  { color: var(--accent); }
-
+/* done */
 .stepDone .stepCircle {
   background: var(--green);
-  color: #fff;
 }
-.stepDone .stepLabel { color: var(--text); }
-.stepDone .stepMeta  { color: var(--green); }
 
+/* now */
+.stepNow .stepTitle {
+  color: var(--blue);
+}
+.stepNow .stepDesc {
+  color: var(--text2);
+}
+.stepNow .stepCircle {
+  background: linear-gradient(180deg, #5FA8FF, var(--blue));
+  box-shadow: 0 0 0 5px rgba(0, 122, 255, .18);
+}
+
+/* wait */
+.stepWait .stepCircle {
+  background: #E5E5EA;
+  color: var(--text3);
+}
+.stepWait .stepTitle {
+  color: var(--text3);
+}
+
+/* fail */
 .stepFail .stepCircle {
   background: var(--red);
-  color: #fff;
 }
-.stepFail .stepLabel { color: var(--red); }
-.stepFail .stepMeta  { color: var(--red); }
-
-/* SSE pulse animation */
-@keyframes ssePulse {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(90, 200, 250, 0.2); }
-  50%      { box-shadow: 0 0 0 8px rgba(90, 200, 250, 0.05); }
+.stepFail .stepTitle {
+  color: var(--red);
+}
+.stepFail .stepDesc {
+  color: var(--red);
 }
 
+/* Shimmer (mockup: .shim) — only on now steps */
+.shim {
+  position: relative;
+  height: 4px;
+  background: rgba(0, 122, 255, .10);
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+.shim::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 38%;
+  background: linear-gradient(90deg, transparent, rgba(0, 122, 255, .85), transparent);
+  border-radius: 2px;
+  animation: shimmerSlide 1.5s ease-in-out infinite;
+}
+@keyframes shimmerSlide {
+  0%   { left: -38%; }
+  100% { left: 100%; }
+}
 @media (prefers-reduced-motion: reduce) {
-  .stepNow .stepCircle { animation: none; }
+  .shim::after { animation: none; left: 24%; }
 }
 
-/* ─── JSON stream / typewriter ──────────────────────────────────── */
-.typewriterRoot {
-  margin-bottom: 16px;
+/* ─── Streaming JSON card (mockup: .stream) ────────────────────── */
+.stream {
+  margin-top: 14px;
+  background: #0F1422;
+  color: #E2E8F0;
+  border-radius: 14px;
+  padding: 14px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.55;
+  letter-spacing: .2px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .04), 0 12px 28px rgba(40, 50, 90, .10);
+  position: relative;
 }
-.jsonStream {
-  background: rgba(0, 0, 0, 0.35);
-  border: 0.5px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 14px 16px;
-  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
-  font-size: 12px;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.85);
+.streamHdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 10px;
+  color: #94A3B8;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+}
+.streamDots {
+  display: flex;
+  gap: 5px;
+}
+.streamDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: block;
+}
+.streamDotRed    { background: #FF5F57; }
+.streamDotYellow { background: #FEBC2E; }
+.streamDotGreen  { background: #28C840; }
+
+.streamPre {
   white-space: pre-wrap;
-  word-break: break-all;
-  min-height: 120px;
-  max-height: 200px;
-  overflow-y: auto;
+  word-break: break-word;
   margin: 0;
+  font: inherit;
 }
-.jsonPunc { color: rgba(255, 255, 255, 0.4); }
-.jsonKey  { color: var(--accent); }
-.jsonStr  { color: var(--green); }
+/* JSON syntax colours */
+.jsonKey  { color: #7DD3FC; }
+.jsonStr  { color: #FDE68A; }
+.jsonNum  { color: #F0ABFC; }
+.jsonBool { color: #86EFAC; }
+.jsonPunc { color: #64748B; }
 
 /* Blinking cursor */
 .streamCursor {
   display: inline-block;
   width: 8px;
-  height: 14px;
-  background: var(--accent);
-  animation: cursorBlink 0.8s step-end infinite;
-  vertical-align: text-bottom;
+  height: 13px;
+  background: #7DD3FC;
+  vertical-align: -2px;
+  margin-left: 1px;
+  animation: cursorBlink 1s steps(1) infinite;
 }
 @keyframes cursorBlink {
   50% { opacity: 0; }
@@ -255,20 +440,28 @@
   .streamCursor { animation: none; }
 }
 
-/* ─── Cancel button (sticky) ────────────────────────────────────── */
-.cancelBtnWrap {
-  padding: 0 0 16px;
+/* ─── Cancel sticky button (mockup: .cancel) ───────────────────── */
+.cancelWrap {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 104px;
+  z-index: 15;
 }
 .cancelBtn {
   width: 100%;
   height: 50px;
-  border: 0.5px solid rgba(255, 59, 48, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, .75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: 14px;
-  background: rgba(255, 59, 48, 0.1);
   color: var(--red);
-  font-size: 15px;
   font-weight: 600;
-  letter-spacing: 0.2px;
+  font-size: 15px;
+  border: .5px solid var(--sep);
   cursor: pointer;
   font-family: inherit;
   -webkit-tap-highlight-color: transparent;
@@ -282,12 +475,50 @@
   opacity: 0.7;
 }
 
+/* ─── Tab bar (mockup: .tabbar) ────────────────────────────────── */
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 84px;
+  padding: 8px 0 24px;
+  background: rgba(255, 255, 255, .78);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border-top: .5px solid var(--sep);
+  display: flex;
+  z-index: 15;
+}
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: var(--text3);
+  font-size: 10px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+.tab svg {
+  width: 24px;
+  height: 24px;
+}
+.tabActive {
+  color: var(--blue);
+}
+
 /* ─── Desktop clamp ──────────────────────────────────────────────── */
 @media (min-width: 768px) {
   .root {
     max-width: 414px;
     margin: 0 auto;
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.15);
     min-height: 100vh;
   }
 }

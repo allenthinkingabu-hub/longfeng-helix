@@ -1,12 +1,12 @@
 /**
  * P03 · AI 分析中
- * Mood C · dark-camera (沿用 P02 暗底 · 视觉无缝衔接)
- * STYLE-TRUTH §3 Mood C / P03 spec
+ * STYLE-TRUTH: design/mockups/wrongbook/03_analyzing.html (SoT · 1:1 mirror)
+ * Light iOS theme · radial-gradient bg · white cards · dark terminal stream
  *
  * 4 步 SSE 流水线：图像预处理 → OCR 题干 → 错因诊断 → 生成解法
  * D-AI-Cancel: 关闭 EventSource 时 POST /api/ai/cancel/{taskId}
  * A11y: aria-live="polite" on pipeline (B3)
- *        prefers-reduced-motion: sse-pulse animation fallback in CSS
+ *        prefers-reduced-motion: shimmer animation fallback in CSS
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -29,26 +29,67 @@ const ALIAS_TESTIDS = {
 } as const;
 
 // ─── Types ──────────────────────────────────────────────────────
-
 type Model = 'qwen-vl-max' | 'gpt-4o-mini';
 
-// ─── Helpers ────────────────────────────────────────────────────
+// ─── Step descriptions (from mockup: .step .desc) ───────────────
+const STEP_DESCS: Record<StreamStep, { wait: string; now: string; done: string }> = {
+  1: {
+    wait: '等待中',
+    now: '正在预处理图像…',
+    done: '已提取 132 字符，置信度 99.4%',
+  },
+  2: {
+    wait: '等待中',
+    now: '正在识别题干文本…',
+    done: '数学 · 二次函数 · 顶点式 · Bloom: APPLY',
+  },
+  3: {
+    wait: '将输出 JSON Schema · 含公式 LaTeX',
+    now: '正在比对学生作答与正确解法的差异',
+    done: '错因诊断完成',
+  },
+  4: {
+    wait: '将输出 JSON Schema · 含公式 LaTeX',
+    now: '正在生成解答步骤…',
+    done: '解答生成完成',
+  },
+};
+
+// ─── SVG Helpers ────────────────────────────────────────────────
 
 function CheckIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <path d="M2 7L6 11L12 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="m5 12.5 4.5 4.5L19 7.5" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   );
 }
 
 function XIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <path d="M3 3L11 11M11 3L3 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M6 6L18 18M18 6L6 18" stroke="#fff" strokeWidth="2.4" strokeLinecap="round"/>
     </svg>
   );
 }
+
+function BackChevron() {
+  return (
+    <svg viewBox="0 0 12 20" fill="none" aria-hidden="true">
+      <path d="M10 2 2 10l8 8" stroke="#007AFF" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
+// ─── Tab bar icons (from mockup) ────────────────────────────────
+
+const TAB_ICONS = {
+  home: <svg viewBox="0 0 24 24" fill="none"><path d="M3 11 L12 3 L21 11 V20 a1 1 0 0 1 -1 1 H14 V14 H10 V21 H4 a1 1 0 0 1 -1 -1 Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" strokeLinecap="round"/></svg>,
+  book: <svg viewBox="0 0 24 24" fill="none"><path d="M5 4h11l3 3v13H5V4Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/><path d="M8 11h8M8 14h6M8 17h5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>,
+  camera: <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="4.5" stroke="currentColor" strokeWidth="1.8"/><path d="M5 8h3l1.5-2h5L16 8h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/></svg>,
+  review: <svg viewBox="0 0 24 24" fill="none"><path d="M12 3.5c-3.6 0-6.2 2.6-6.2 6.2v3.4L4 15.5v1.3h16v-1.3l-1.8-2.4V9.7c0-3.6-2.6-6.2-6.2-6.2Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/><path d="M10 19.5a2 2 0 0 0 4 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>,
+  profile: <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.5" r="3.8" stroke="currentColor" strokeWidth="1.8"/><path d="M4.5 20c1.2-3.8 4.2-5.6 7.5-5.6s6.3 1.8 7.5 5.6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>,
+};
 
 // ─── Component ──────────────────────────────────────────────────
 
@@ -61,13 +102,12 @@ export const AnalyzingPage: React.FC = () => {
   const subjectLabel = searchParams.get('subject') ?? '数学';
 
   // SC-07: fallback taskId → mount 时立即显示 fallback banner + 切到备用模型
-  // 不依赖 SSE event · banner 在 mount 时就出现（test 跑完整 SSE 太慢）
   const isFallbackTask = taskId.includes('fallback') || taskId.includes('FALLBACK');
   const [model, setModel] = useState<Model>(isFallbackTask ? 'gpt-4o-mini' : 'qwen-vl-max');
   const [slowBanner, setSlowBanner] = useState<boolean>(isFallbackTask);
   const [errorBanner, setErrorBanner] = useState<string | null>(null);
 
-  // Mount-time enforcement: 即使 state 被 race 重置 · 也保证 fallback banner 立即可见
+  // Mount-time enforcement
   useEffect(() => {
     if (isFallbackTask) {
       setSlowBanner(true);
@@ -78,19 +118,17 @@ export const AnalyzingPage: React.FC = () => {
 
   const navigatedRef = useRef(false);
   const userCancelledRef = useRef(false);
-  // SC-01-E03c · 累计 FAIL count → 第 2 次时自动触发跳手填降级
   const failCountRef = useRef(0);
   const fallbackTriggeredRef = useRef(false);
 
   const onDone = useCallback(() => {
     if (navigatedRef.current) return;
-    if (userCancelledRef.current) return; // SC-01 异常: 用户已 cancel · 不要 race nav 到 result
+    if (userCancelledRef.current) return;
     navigatedRef.current = true;
-    // SC-12: 游客无 lf:token · 不要跳 /question/x/result (登录态页) · 回到 /guest/capture (含 register CTA)
     const isGuest = typeof localStorage !== 'undefined' && !localStorage.getItem('lf:token');
     const dest = isGuest ? '/guest/capture' : `/question/${qid}/result`;
     setTimeout(() => {
-      if (userCancelledRef.current) return; // double-check 在 setTimeout 触发瞬间
+      if (userCancelledRef.current) return;
       nav(dest);
     }, 200);
   }, [nav, qid]);
@@ -100,11 +138,8 @@ export const AnalyzingPage: React.FC = () => {
     setModel('gpt-4o-mini');
   }, []);
 
-  // SC-01-E03b · FALLBACK_MODEL event (from BE C04 FallbackOrchestrator) ·
-  // chunk 形如 "qianwen→openai" · 按 spec 顶部黄条 + 切 model badge · 非终结。
   const onFallbackModel = useCallback((fromTo: string) => {
     setSlowBanner(true);
-    // 解析 "from→to" · 切 model badge 到实际命中 provider
     const toProvider = fromTo.split('→')[1]?.trim();
     if (toProvider === 'openai' || toProvider === 'gpt-4o-mini') {
       setModel('gpt-4o-mini');
@@ -113,22 +148,18 @@ export const AnalyzingPage: React.FC = () => {
   }, [taskId]);
 
   const onFail = useCallback((code?: string) => {
-    // SC-01-E03b · 网络中断 → 红色 toast；其它 → 通用文案
     if (code === 'NETWORK_ERROR') {
       setErrorBanner('网络中断，请重试');
     } else {
       setErrorBanner('AI 暂时帮不上忙，请稍后重试');
     }
-    // SC-01-E03c · spec P03 §9 · 累计 2 次 FAIL → 跳手填降级
-    // 调 POST /api/ai/fallback/{taskId} → navigate /manual-entry?qid&taskId
     failCountRef.current += 1;
     track('wb_ai_stream_fail', { code: code ?? 'UNKNOWN', count: failCountRef.current, taskId });
     if (failCountRef.current >= 2 && !fallbackTriggeredRef.current) {
       fallbackTriggeredRef.current = true;
-      navigatedRef.current = true; // 防 onDone race
-      // best-effort · 即使 BE 504 也要把用户领去手填页（不阻塞）
+      navigatedRef.current = true;
       void analyzeClient.fallback(taskId)
-        .catch(() => { /* spec §5 失败降级：直接跳手填 */ })
+        .catch(() => { /* spec §5 失败降级 */ })
         .finally(() => {
           const params = new URLSearchParams({ qid, taskId });
           nav(`/manual-entry?${params.toString()}`);
@@ -138,15 +169,10 @@ export const AnalyzingPage: React.FC = () => {
 
   const onCancelled = useCallback(() => {
     userCancelledRef.current = true;
-    navigatedRef.current = true; // 防再次 nav
-    // SC-01-E03c · 取消后回 P-HOME（task 指令优先 · 替代原 spec §6 的 /capture）
+    navigatedRef.current = true;
     nav('/');
   }, [nav]);
 
-  // SC-01-E03a · §10 wb_ai_stream_step emitted on STEP_DONE. Real
-  // SSE wiring lives in E03b; here we already pipe durMs through the
-  // existing hook contract so the event fires the moment SSE backends
-  // start sending real STEP_DONE frames.
   const onStep = useCallback(
     (step: StreamStep, phase: 'start' | 'done', durMs?: number) => {
       if (phase === 'done') {
@@ -166,28 +192,24 @@ export const AnalyzingPage: React.FC = () => {
     onFallbackModel,
   });
 
-  // Update slow banner when status becomes SLOW
-  // SC-07: fallback task 的 banner 在 SUCCEEDED 后**不清** · 因 fallback 状态横贯整个分析过程
   useEffect(() => {
     if (status === 'SLOW') setSlowBanner(true);
     if (status === 'SUCCEEDED' && !isFallbackTask) setSlowBanner(false);
   }, [status, isFallbackTask]);
 
   const handleCancel = async () => {
-    // 先同步标记 · 防 onDone setTimeout 抢先 nav 到 /result
     userCancelledRef.current = true;
     navigatedRef.current = true;
-    // SC-01-E03c · spec P03 §5 · 显式调用 analyzeClient.cancel (P-HOME 流程 · 替代 hook 内 cancel)
-    // 既保留对 useEventSource 的 cleanup（关闭 SSE）· 又走 typed client 留埋点 / 后续可换 mutation。
     try { await cancel(); } catch { /* noop */ }
-    try { await analyzeClient.cancel(taskId); } catch { /* spec §5 失败降级：保留 PENDING task · 不阻塞 */ }
+    try { await analyzeClient.cancel(taskId); } catch { /* spec §5 */ }
     track('wb_ai_stream_cancel', { taskId });
-    // task 指令：取消后回 P-HOME（/）· 不论 SSE 是否已 SUCCEEDED
     if (status === 'SUCCEEDED' || status === 'CANCELLED') {
       nav('/');
     }
-    // 其它 status 由 onCancelled 触发 nav('/')
   };
+
+  // Compute current active step count for badge
+  const doneCount = [1, 2, 3, 4].filter((n) => stepStatuses[n as StreamStep] === 'done').length;
 
   const steps: Array<{ step: StreamStep; label: string; testid: string; aliasTestid: string }> = [
     { step: 1, label: STEP_LABELS[1], testid: TEST_IDS.p03.step1, aliasTestid: ALIAS_TESTIDS.step1 },
@@ -196,7 +218,7 @@ export const AnalyzingPage: React.FC = () => {
     { step: 4, label: STEP_LABELS[4], testid: TEST_IDS.p03.step4, aliasTestid: ALIAS_TESTIDS.step4 },
   ];
 
-  const stepStatusClass = (step: StreamStep): string => {
+  const stepStateClass = (step: StreamStep): string => {
     const st = stepStatuses[step];
     if (st === 'done') return s.stepDone;
     if (st === 'now')  return s.stepNow;
@@ -204,57 +226,76 @@ export const AnalyzingPage: React.FC = () => {
     return s.stepWait;
   };
 
-  const stepMetaText = (step: StreamStep): string => {
+  const stepDesc = (step: StreamStep): string => {
     const st = stepStatuses[step];
-    if (st === 'done') {
-      const dur = stepDurations[step];
-      return dur ? `${dur} ms` : '完成';
-    }
-    if (st === 'now')  return '进行中';
+    if (st === 'done') return STEP_DESCS[step].done;
+    if (st === 'now')  return STEP_DESCS[step].now;
     if (st === 'fail') return '失败';
-    return '等待';
+    return STEP_DESCS[step].wait;
   };
 
   return (
     <div
       className={s.root}
       data-testid={TEST_IDS.p03.root}
-      data-mood="C"
     >
-      {/* StatusBar 已删 · iOS chrome · _archive data-mockup-chrome="iphone-statusbar" */}
+      {/* ── Nav bar (mockup: .nav) ──────────────────────────────── */}
+      <nav className={s.nav}>
+        <div className={s.navRow}>
+          <button className={s.back} onClick={() => nav(-1)} type="button">
+            <BackChevron />
+            拍题
+          </button>
+          <button className={s.navCancel} onClick={handleCancel} type="button">
+            取消
+          </button>
+        </div>
+        <h1 className={s.navTitle}>
+          AI 正在分析… <span className={s.badge}>{doneCount} / 4</span>
+        </h1>
+      </nav>
 
-      {/* ── Page ───────────────────────────────────────────── */}
-      <section className={s.page} data-mood="C" data-section="analyzing">
+      {/* ── Content ─────────────────────────────────────────────── */}
+      <div className={s.content}>
 
-        {/* ── B2 · Thumb card + model badge ─────────────── */}
-        <div className={s.thumbCard} data-testid={TEST_IDS.p03.thumbCard}>
-          <div className={s.thumbImg} data-testid={TEST_IDS.p03.thumbImage} aria-hidden="true">
-            {thumbnailUrl
-              ? <img src={thumbnailUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
-              : (
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <rect x="3" y="5" width="18" height="14" rx="2" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5"/>
-                  <path d="M7 12 L11 12 M7 9 L15 9 M7 15 L13 15" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeLinecap="round"/>
-                </svg>
-              )
-            }
+        {/* ── Preview card (mockup: .preview) ────────────────────── */}
+        <div className={s.preview} data-testid={TEST_IDS.p03.thumbCard}>
+          <div className={s.thumb} data-testid={TEST_IDS.p03.thumbImage} aria-hidden="true">
+            {thumbnailUrl ? (
+              <img src={thumbnailUrl} alt="" />
+            ) : (
+              <>
+                <span className={s.thumbPlaceholderLbl}>{subjectLabel} · 12</span>
+                <span className={s.thumbPlaceholderQno}>17</span>
+                <span className={s.thumbPlaceholderH3}>已知 f(x)=x²−4x+3</span>
+              </>
+            )}
           </div>
-          <div className={s.thumbInfo}>
-            <div className={s.thumbTitle} data-testid={TEST_IDS.p03.thumbTitle}>
-              {subjectLabel} · 二次函数
+          <div className={s.meta}>
+            <div className={s.metaTitle} data-testid={TEST_IDS.p03.thumbTitle}>
+              第 17 题 · 顶点与对称轴
             </div>
-            <span
-              className={s.modelBadge}
-              data-testid={TEST_IDS.p03.modelBadge}
-              aria-label={`当前 AI 模型：${model}`}
-            >
-              {model}
-            </span>
+            <div className={s.metaChips}>
+              <span className={s.chip}>{subjectLabel}</span>
+              <span className={s.chip}>G9</span>
+              <span className={s.chip}>2026-04-21 14:28</span>
+            </div>
           </div>
         </div>
 
-        {/* ── Banners ─────────────────────────────────────── */}
-        {/* SC-07: fallback banner 在 provider 降级（SLOW）或 error 时都显示 */}
+        {/* ── Model badge (mockup: .model) ────────────────────────── */}
+        <div
+          className={s.modelBadge}
+          data-testid={TEST_IDS.p03.modelBadge}
+          aria-label={`当前 AI 模型：${model}`}
+        >
+          <span className={s.modelDot} />
+          <span>
+            已选模型 <strong>{model}</strong> · 备用 <strong>{model === 'qwen-vl-max' ? 'gpt-4o-mini' : 'qwen-vl-max'}</strong> · 平均时延 <strong>4.2s</strong>
+          </span>
+        </div>
+
+        {/* ── Banners ─────────────────────────────────────────────── */}
         {(slowBanner || errorBanner) && (
           <div
             className={`${s.banner} ${errorBanner ? s.bannerError : s.bannerSlow}`}
@@ -262,17 +303,15 @@ export const AnalyzingPage: React.FC = () => {
             data-testid={TEST_IDS.p03.fallbackBanner}
             data-alias-testid={ALIAS_TESTIDS.fallbackBanner}
           >
-            {/* SC-01-E03a · alias `ai-fallback-banner` lives on inner span so
-                queries by either id resolve to a real node. */}
             <span data-testid={ALIAS_TESTIDS.fallbackBanner}>
               {errorBanner ?? '切换备用模型中（gpt-4o-mini）…'}
             </span>
           </div>
         )}
 
-        {/* ── B3 · 4-step pipeline ────────────────────────── */}
-        <main
-          className={s.pipeline}
+        {/* ── 4-step pipeline (mockup: .stages) ───────────────────── */}
+        <div
+          className={s.stages}
           data-testid={TEST_IDS.p03.pipeline}
           role="main"
           aria-live="polite"
@@ -280,16 +319,15 @@ export const AnalyzingPage: React.FC = () => {
         >
           {steps.map(({ step, label, testid, aliasTestid }) => {
             const st = stepStatuses[step];
+            const dur = stepDurations[step];
             return (
               <div
                 key={step}
-                className={`${s.pipelineStep} ${stepStatusClass(step)}`}
+                className={`${s.step} ${stepStateClass(step)}`}
                 data-testid={testid}
                 data-state={st}
                 aria-busy={st === 'now' ? true : undefined}
               >
-                {/* SC-01-E03a · alias testid for `ai-pipeline-step-N`; mirrors
-                    canonical id state via the same data-state attr. */}
                 <span
                   className={s.stepCircle}
                   aria-hidden="true"
@@ -300,59 +338,94 @@ export const AnalyzingPage: React.FC = () => {
                    st === 'fail' ? <XIcon /> :
                    step}
                 </span>
-                <span className={s.stepLabel}>{label}</span>
-                <span className={s.stepMeta}>{stepMetaText(step)}</span>
+                <div className={s.stepBody}>
+                  <div className={s.stepTitle}>
+                    {label}
+                    {st === 'done' && dur != null && (
+                      <span className={s.stepDuration}>· {(dur / 1000).toFixed(1)}s</span>
+                    )}
+                  </div>
+                  <div className={s.stepDesc}>{stepDesc(step)}</div>
+                  {st === 'now' && <div className={s.shim} />}
+                </div>
               </div>
             );
           })}
-        </main>
-
-        {/* ── B4 · JSON stream / typewriter ─────────────────── */}
-        {/* SC-01-E03a · alias `ai-typewriter` exposed on wrapping div so
-            getByTestId resolves both canonical + alias ids. */}
-        <div data-testid={ALIAS_TESTIDS.typewriter} className={s.typewriterRoot}>
-        <pre
-          className={s.jsonStream}
-          data-testid={TEST_IDS.p03.jsonStream}
-          aria-label="AI 流式输出"
-        >
-          {partialJson || (
-            <>
-              <span className={s.jsonPunc}>{'{'}</span>{'\n'}
-              {'  '}<span className={s.jsonKey}>"stem"</span>
-              <span className={s.jsonPunc}>: </span>
-              <span className={s.jsonStr}>"已知函数 f(x)=x²-4x+3..."</span>
-              <span className={s.jsonPunc}>,</span>
-              {'\n'}
-              {'  '}<span className={s.jsonKey}>"subject"</span>
-              <span className={s.jsonPunc}>: </span>
-              <span className={s.jsonStr}>"math"</span>
-              <span className={s.jsonPunc}>,</span>
-              {'\n'}
-              {'  '}
-              <span className={s.streamCursor} aria-hidden="true" />
-            </>
-          )}
-        </pre>
         </div>
 
-        {/* ── B5 · Cancel ──────────────────────────────────── */}
-        {/* SC-01-E03a · alias `ai-cancel-btn` on wrapper so queries by
-            either id resolve to a real node. */}
-        <div data-testid={ALIAS_TESTIDS.cancelBtn} className={s.cancelBtnWrap}>
-          <button
-            className={s.cancelBtn}
-            data-testid={TEST_IDS.p03.cancelBtn}
-            aria-label="取消分析"
-            type="button"
-            onClick={handleCancel}
-            disabled={status === 'CANCELLED'}
+        {/* ── JSON stream / typewriter (mockup: .stream) ──────────── */}
+        <div data-testid={ALIAS_TESTIDS.typewriter} className={s.stream}>
+          <div className={s.streamHdr}>
+            <span>SSE · /api/ai/stream/{taskId.slice(0, 12)} · {model}</span>
+            <span className={s.streamDots}>
+              <i className={`${s.streamDot} ${s.streamDotRed}`} />
+              <i className={`${s.streamDot} ${s.streamDotYellow}`} />
+              <i className={`${s.streamDot} ${s.streamDotGreen}`} />
+            </span>
+          </div>
+          <pre
+            className={s.streamPre}
+            data-testid={TEST_IDS.p03.jsonStream}
+            aria-label="AI 流式输出"
           >
-            取消分析
-          </button>
+            {partialJson || (
+              <>
+                <span className={s.jsonPunc}>{'{'}</span>{'\n'}
+                {'  '}<span className={s.jsonKey}>"stem"</span>
+                <span className={s.jsonPunc}>: </span>
+                <span className={s.jsonStr}>"已知函数 f(x)=x²−4x+3，求其顶点坐标与对称轴方程。"</span>
+                <span className={s.jsonPunc}>,</span>{'\n'}
+                {'  '}<span className={s.jsonKey}>"studentAnswer"</span>
+                <span className={s.jsonPunc}>: </span>
+                <span className={s.jsonStr}>"B. (2, −1)"</span>
+                <span className={s.jsonPunc}>,</span>{'\n'}
+                {'  '}<span className={s.jsonKey}>"correctAnswer"</span>
+                <span className={s.jsonPunc}>: </span>
+                <span className={s.jsonStr}>"A. (1, −2)"</span>
+                <span className={s.jsonPunc}>,</span>{'\n'}
+                {'  '}<span className={s.jsonKey}>"errorType"</span>
+                <span className={s.jsonPunc}>: </span>
+                <span className={s.jsonBool}>"CONCEPT"</span>
+                <span className={s.jsonPunc}>,</span>{'\n'}
+                {'  '}<span className={s.jsonKey}>"solutionSteps"</span>
+                <span className={s.jsonPunc}>: [</span>{'\n'}
+                {'    '}{'{ '}<span className={s.jsonKey}>"step"</span>
+                <span className={s.jsonPunc}>: </span>
+                <span className={s.jsonNum}>1</span>
+                <span className={s.jsonPunc}>, </span>
+                <span className={s.jsonKey}>"explain"</span>
+                <span className={s.jsonPunc}>: </span>
+                <span className={s.jsonStr}>"配方：f(x)=(x−2)²−1"</span>
+                {' }'}
+                <span className={s.streamCursor} aria-hidden="true" />
+              </>
+            )}
+          </pre>
         </div>
+      </div>
 
-      </section>
+      {/* ── Cancel sticky (mockup: .cancel) ──────────────────────── */}
+      <div data-testid={ALIAS_TESTIDS.cancelBtn} className={s.cancelWrap}>
+        <button
+          className={s.cancelBtn}
+          data-testid={TEST_IDS.p03.cancelBtn}
+          aria-label="取消分析"
+          type="button"
+          onClick={handleCancel}
+          disabled={status === 'CANCELLED'}
+        >
+          放弃本次分析
+        </button>
+      </div>
+
+      {/* ── Tab bar (mockup: .tabbar) ────────────────────────────── */}
+      <div className={s.tabbar}>
+        <button className={s.tab} type="button">{TAB_ICONS.home}<span>首页</span></button>
+        <button className={s.tab} type="button">{TAB_ICONS.book}<span>错题本</span></button>
+        <button className={`${s.tab} ${s.tabActive}`} type="button">{TAB_ICONS.camera}<span>拍题</span></button>
+        <button className={s.tab} type="button">{TAB_ICONS.review}<span>复习</span></button>
+        <button className={s.tab} type="button">{TAB_ICONS.profile}<span>我的</span></button>
+      </div>
     </div>
   );
 };
