@@ -2,13 +2,13 @@
 <!-- trace: design/mockups/wrongbook/01_home_ios_refined.html · @longfeng/testids pHome -->
 <!-- 状态机: LOADING → READY | EMPTY | ERROR -->
 
-<view class="home-page" data-test-id="{{testIds.root}}">
+<view class="home-page" data-test-id="p-home-root">
 
   <!-- ── Hero aurora gradient ──────────────────────────── -->
   <view class="hero"></view>
 
   <!-- ── Greeting ──────────────────────────────────────── -->
-  <view class="greeting" data-test-id="{{testIds.greetingHero}}">
+  <view class="greeting" data-test-id="greeting-hero">
     <view class="hello-row">
       <view>
         <view class="hello">{{greeting}}</view>
@@ -17,9 +17,9 @@
       <view class="avatar">A</view>
     </view>
     <view class="streak-bar">
-      <view class="flame" data-test-id="{{testIds.streakFireIcon}}">
+      <view class="flame" data-test-id="streak-bar-fire-icon">
         <text class="flame-icon">🔥</text>
-        <text data-test-id="{{testIds.streakDaysNumber}}">连续 {{streak}} 天</text>
+        <text data-test-id="streak-bar-days-number">连续 {{streak}} 天</text>
       </view>
       <view class="dot"></view>
       <text>掌握 <text class="mastered-num">{{mastered}}</text> 题</text>
@@ -51,17 +51,17 @@
     <!-- ── READY: Review hero card ───────────────────── -->
     <block wx:if="{{pageState === 'READY'}}">
 
-      <view class="review-card" data-test-id="{{testIds.todayReviewCard}}">
+      <view class="review-card" data-test-id="today-review-card">
         <view class="rh-top">
           <view>
             <view class="rh-kicker">TODAY'S REVIEW</view>
             <view class="rh-title">
-              <text class="rh-title-em" data-test-id="{{testIds.totalLabel}}">{{todayTotal}} 题</text>
+              <text class="rh-title-em" data-test-id="today-review-card-total">{{todayTotal}} 题</text>
               <text> 待复习</text>
             </view>
             <view class="rh-sub">预计 {{estMin}} 分钟 · 下一节点 10:15</view>
           </view>
-          <view class="rh-circle" data-test-id="{{testIds.circleProgress}}">
+          <view class="rh-circle" data-test-id="today-review-card-circle-progress">
             <view class="rh-circle-bg"></view>
             <view class="rh-circle-track" style="--progress: {{circleProgress}};"></view>
             <view class="rh-pct">
@@ -81,7 +81,7 @@
 
         <!-- CTA -->
         <view class="rh-cta">
-          <view class="rh-btn" bind:tap="onStartAll" data-test-id="{{testIds.startAllBtn}}">
+          <view class="rh-btn" bind:tap="onStartAll" data-test-id="today-review-card-start-all-btn">
             <text class="rh-btn-play">▶</text>
             <text>全部开始</text>
           </view>
@@ -96,7 +96,7 @@
         <text class="sec-t">本周回顾</text>
         <text class="sec-m">查看全部 ›</text>
       </view>
-      <view class="weekly" data-test-id="{{testIds.weeklySparkline}}">
+      <view class="weekly" data-test-id="p-home-weekly-sparkline">
         <view class="weekly-row">
           <view class="stat">
             <text class="stat-n stat-green">{{weekStats.mastered}}</text>
@@ -125,7 +125,7 @@
         <text class="sec-t">本周日程</text>
         <text class="sec-m">月视图 ›</text>
       </view>
-      <view class="weekcard" data-test-id="{{testIds.weekStrip}}">
+      <view class="weekcard" data-test-id="week-strip">
         <view class="wc-head">
           <view class="wc-head-l">
             <van-icon name="calendar-o" size="14px" color="#1C1C1E" />
@@ -160,9 +160,9 @@
       <!-- ── Messages ────────────────────────────────── -->
       <view class="sec">
         <text class="sec-t">最近消息</text>
-        <text class="sec-m" data-test-id="{{testIds.messagesMoreLink}}">全部 2 ›</text>
+        <text class="sec-m" data-test-id="p-home-messages-more-link">全部 2 ›</text>
       </view>
-      <view class="msgs" data-test-id="{{testIds.messages}}">
+      <view class="msgs" data-test-id="p-home-messages">
         <view wx:for="{{messages}}" wx:key="title" class="msg">
           <view class="msg-ic msg-ic-{{item.theme}}">
             <van-icon name="{{item.icon}}" color="{{item.iconColor}}" size="16px" />
@@ -180,7 +180,7 @@
         <text class="sec-t">AI 发现的薄弱点</text>
         <text class="sec-m sec-m-orange">1 条待练</text>
       </view>
-      <view class="kpcard" data-test-id="{{testIds.weakKp}}">
+      <view class="kpcard" data-test-id="p-home-weak-kp">
         <view class="kp-head">
           <view class="kp-head-ic">
             <van-icon name="warning-o" color="#fff" size="14px" />
@@ -201,7 +201,7 @@
       </view>
 
       <!-- ── Quick entries ───────────────────────────── -->
-      <view class="quick" data-test-id="{{testIds.quickEntries}}">
+      <view class="quick" data-test-id="p-home-quick-entries">
         <view wx:for="{{quickEntries}}" wx:key="title" class="qcard" bind:tap="onQuickTap" data-url="{{item.url}}">
           <view class="qcard-ic qcard-ic-{{item.theme}}">
             <van-icon name="{{item.icon}}" color="#fff" size="18px" />
