@@ -3,6 +3,7 @@
     "pages/capture/index",
     "pages/analyzing/index",
     "pages/result/index",
+    "pages/review-today/index",
     "pages/review-exec/index",
     "pages/review-done/index"
   ],

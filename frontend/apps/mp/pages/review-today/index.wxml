@@ -1,0 +1,58 @@
+<!-- P07 · 今日待复习 (review-today) · T09 stub + T10 tap transition -->
+<view class="root">
+
+  <!-- Nav -->
+  <view class="nav">
+    <view class="nav-row">
+      <view class="back" bindtap="onBackTap">
+        <van-icon name="arrow-left" color="#007AFF" size="18px" />
+        <text>首页</text>
+      </view>
+      <text class="nav-right">排序 · 时间</text>
+    </view>
+    <view class="nav-title">今日复习</view>
+  </view>
+
+  <!-- Hero summary card -->
+  <view class="hero">
+    <view class="hero-tag">
+      <view class="live-dot"></view>
+      <text>{{dateStr}} · {{weekday}} · GMT+8</text>
+    </view>
+    <view class="hero-h2">{{total}} 题待复习 <text class="hero-sz">预计 {{estMinutes}} 分钟</text></view>
+    <view class="stats-row">
+      <view class="st"><text class="st-v">{{doneCount}}</text><text class="st-l">已完成</text></view>
+      <view class="st"><text class="st-v">{{inProgressCount}}</text><text class="st-l">进行中</text></view>
+      <view class="st"><text class="st-v">{{waitCount}}</text><text class="st-l">未开始</text></view>
+    </view>
+    <view class="pg"><view class="pg-fill" style="width: {{progressPct}}%;"></view></view>
+    <view class="pg-txt">
+      <text>进度 {{progressPct}}%</text>
+      <text>掌握度 72%</text>
+    </view>
+  </view>
+
+  <!-- Item list -->
+  <view wx:for="{{items}}" wx:key="nid" class="it {{item.sideColor}}" data-nid="{{item.nid}}" bindtap="onItemTap">
+    <view class="side"></view>
+    <view class="tc">
+      <text class="hh">{{item.hhmm}}</text>
+      <text class="lv">{{item.tLevel}}</text>
+    </view>
+    <view class="body">
+      <text class="subject">{{item.subject}} · {{item.kp}}</text>
+      <text class="stem">{{item.stem}}</text>
+    </view>
+    <view class="right">
+      <text class="cd {{item.countdownState}}">{{item.countdownLabel}}</text>
+      <van-icon name="arrow" color="#C7C7CC" size="13px" />
+    </view>
+  </view>
+
+  <!-- CTA: 全部开始 -->
+  <view class="cta" bindtap="onStartAllTap">
+    <text>全部开始</text>
+    <text class="cta-sz">{{total}} 题 · {{estMinutes}} min</text>
+  </view>
+
+</view>

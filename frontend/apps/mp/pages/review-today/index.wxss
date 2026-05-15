@@ -1,0 +1,42 @@
+/* P07 · 今日待复习 · T09 stub + T10 tap transition */
+.root { background: #F2F2F7; min-height: 100vh; padding-bottom: 160rpx; }
+
+.nav { padding: 120rpx 32rpx 20rpx; background: rgba(242,242,247,.78); }
+.nav-row { display: flex; justify-content: space-between; align-items: center; }
+.back { display: flex; align-items: center; gap: 8rpx; color: #007AFF; font-size: 34rpx; }
+.nav-right { color: #007AFF; font-size: 30rpx; font-weight: 600; }
+.nav-title { font-size: 68rpx; font-weight: 700; margin-top: 8rpx; }
+
+.hero { margin: 24rpx 32rpx; background: linear-gradient(160deg,#0F1A3D,#1F3C8C,#5F5BDB); border-radius: 40rpx; padding: 32rpx; color: #fff; }
+.hero-tag { font-size: 24rpx; opacity: .85; display: flex; align-items: center; gap: 12rpx; }
+.live-dot { width: 12rpx; height: 12rpx; border-radius: 50%; background: #FFCC00; }
+.hero-h2 { font-size: 56rpx; font-weight: 700; margin-top: 8rpx; }
+.hero-sz { font-size: 28rpx; font-weight: 500; opacity: .85; }
+.stats-row { display: flex; gap: 20rpx; margin-top: 28rpx; }
+.st { flex: 1; background: rgba(255,255,255,.10); border-radius: 24rpx; padding: 20rpx 24rpx; }
+.st-v { font-size: 40rpx; font-weight: 700; }
+.st-l { font-size: 22rpx; opacity: .75; }
+.pg { margin-top: 24rpx; height: 12rpx; border-radius: 6rpx; background: rgba(255,255,255,.18); overflow: hidden; }
+.pg-fill { height: 100%; border-radius: 6rpx; background: linear-gradient(90deg,#FFCC00,#FFB0C4,#FFFFFF); }
+.pg-txt { display: flex; justify-content: space-between; margin-top: 12rpx; font-size: 22rpx; opacity: .8; }
+
+.it { background: #fff; border-radius: 32rpx; padding: 24rpx; display: flex; gap: 24rpx; margin: 0 32rpx 20rpx; position: relative; overflow: hidden; }
+.side { position: absolute; left: 0; top: 0; bottom: 0; width: 6rpx; }
+.it.red .side { background: #FF3B30; }
+.it.orange .side { background: #FF9500; }
+.it.indigo .side { background: #5856D6; }
+.it.green .side { background: #34C759; }
+.tc { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4rpx; min-width: 116rpx; border-right: 1rpx solid rgba(60,60,67,.14); padding-right: 16rpx; }
+.hh { font-size: 44rpx; font-weight: 700; }
+.lv { font-size: 20rpx; font-weight: 700; color: #007AFF; background: rgba(0,122,255,.10); padding: 4rpx 12rpx; border-radius: 999rpx; }
+.body { flex: 1; min-width: 0; }
+.subject { font-size: 22rpx; color: #8E8E93; font-weight: 600; }
+.stem { font-size: 27rpx; line-height: 1.45; margin-top: 6rpx; font-weight: 500; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.right { display: flex; flex-direction: column; align-items: flex-end; gap: 8rpx; min-width: 120rpx; }
+.cd { font-size: 22rpx; font-weight: 700; padding: 8rpx 14rpx; border-radius: 999rpx; }
+.cd.now { background: #FF3B30; color: #fff; }
+.cd.soon { background: rgba(255,149,0,.15); color: #FF9500; }
+.cd.wait { background: #F2F2F7; color: #8E8E93; }
+
+.cta { position: fixed; left: 32rpx; right: 32rpx; bottom: 200rpx; height: 108rpx; border-radius: 32rpx; background: linear-gradient(180deg,#5FA8FF,#007AFF); color: #fff; font-size: 32rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 20rpx; }
+.cta-sz { font-size: 26rpx; font-weight: 600; opacity: .9; background: rgba(255,255,255,.2); padding: 6rpx 16rpx; border-radius: 999rpx; }
