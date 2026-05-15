@@ -1,0 +1,18 @@
+<testsuites id="" name="" tests="7" failures="0" skipped="0" errors="0" time="3.3504270000000003">
+<testsuite name="sc-01/t03-ai-stream-pipeline.spec.ts" timestamp="2026-05-15T05:10:18.104Z" hostname="chromium" tests="7" failures="0" skipped="0" time="2.785" errors="0">
+<testcase name="SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › AC1-4 · happy path · 4 步流水线 wait→now→done + JSON 流式 + DONE → nav P04" classname="sc-01/t03-ai-stream-pipeline.spec.ts" time="0.649">
+</testcase>
+<testcase name="SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › AC5 · TC-01.03 · qwen timeout → FALLBACK_MODEL → 黄条 + model badge switch" classname="sc-01/t03-ai-stream-pipeline.spec.ts" time="0.44">
+</testcase>
+<testcase name="SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › AC6 · cancel button → POST /cancel → nav P-HOME (/)" classname="sc-01/t03-ai-stream-pipeline.spec.ts" time="0.402">
+</testcase>
+<testcase name="SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › TI3 · pipeline step order strict: step N done before step N+1 starts" classname="sc-01/t03-ai-stream-pipeline.spec.ts" time="0.429">
+</testcase>
+<testcase name="SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › alias testids render alongside canonical testids" classname="sc-01/t03-ai-stream-pipeline.spec.ts" time="0.294">
+</testcase>
+<testcase name="SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › FAIL events: 2x FAIL triggers fallback to /manual-entry" classname="sc-01/t03-ai-stream-pipeline.spec.ts" time="0.203">
+</testcase>
+<testcase name="SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › a11y: pipeline has aria-live=polite, active step has aria-busy" classname="sc-01/t03-ai-stream-pipeline.spec.ts" time="0.368">
+</testcase>
+</testsuite>
+</testsuites>

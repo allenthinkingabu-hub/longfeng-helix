@@ -1,0 +1,18 @@
+<testsuites id="" name="" tests="7" failures="0" skipped="0" errors="0" time="3.068653">
+<testsuite name="_adversarial-t03.spec.ts" timestamp="2026-05-15T05:10:22.227Z" hostname="chromium" tests="7" failures="0" skipped="0" time="2.551" errors="0">
+<testcase name="Adversarial · SC01-T03 › AC3 · PARTIAL_JSON chunks render in jsonStream element" classname="_adversarial-t03.spec.ts" time="0.329">
+</testcase>
+<testcase name="Adversarial · SC01-T03 › PARTIAL_JSON with empty chunk does not crash" classname="_adversarial-t03.spec.ts" time="0.435">
+</testcase>
+<testcase name="Adversarial · SC01-T03 › 连点防抖: cancel 按钮点击后 navigatedRef 防止重复导航" classname="_adversarial-t03.spec.ts" time="0.285">
+</testcase>
+<testcase name="Adversarial · SC01-T03 › rapid SSE burst: all 4 steps reach done state" classname="_adversarial-t03.spec.ts" time="0.423">
+</testcase>
+<testcase name="Adversarial · SC01-T03 › single FAIL sets step state to fail + shows error banner" classname="_adversarial-t03.spec.ts" time="0.294">
+</testcase>
+<testcase name="Adversarial · SC01-T03 › DOM 注入 + 超长数据: PARTIAL_JSON 含 HTML tag + 超长字符串不导致 XSS 或 UI 破版" classname="_adversarial-t03.spec.ts" time="0.432">
+</testcase>
+<testcase name="Adversarial · SC01-T03 › race condition: STEP events 在 cancel 后到达不导致状态机异常" classname="_adversarial-t03.spec.ts" time="0.353">
+</testcase>
+</testsuite>
+</testsuites>

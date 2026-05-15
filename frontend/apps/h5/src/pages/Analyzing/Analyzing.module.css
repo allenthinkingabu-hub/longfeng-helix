@@ -1,0 +1,524 @@
+/**
+ * P03 · AI 分析中 · Light iOS theme
+ * STYLE-TRUTH: design/mockups/wrongbook/03_analyzing.html (SoT · 1:1 mirror)
+ *
+ * 颜色 (from mockup :root):
+ *   --blue:   #007AFF   --red:   #FF3B30
+ *   --green:  #34C759   --yellow:#FFCC00
+ *   --bg:     #F2F2F7   --card:  #FFFFFF
+ *   --text:   #1C1C1E   --text2: #3C3C43
+ *   --text3:  #8E8E93   --sep:   rgba(60,60,67,.14)
+ */
+
+/* ─── Root ──────────────────────────────────────────────────────── */
+.root {
+  --blue:   #007AFF;
+  --red:    #FF3B30;
+  --orange: #FF9500;
+  --green:  #34C759;
+  --indigo: #5856D6;
+  --yellow: #FFCC00;
+  --bg:     #F2F2F7;
+  --card:   #FFFFFF;
+  --text:   #1C1C1E;
+  --text2:  #3C3C43;
+  --text3:  #8E8E93;
+  --sep:    rgba(60, 60, 67, .14);
+  --font:   -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+            "PingFang SC", "Helvetica Neue", sans-serif;
+  --mono:   "SF Mono", "JetBrains Mono", ui-monospace, Menlo, monospace;
+
+  position: relative;
+  width: 100%;
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Nav bar (mockup: .nav) ───────────────────────────────────── */
+.nav {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 6px 20px 8px;
+  background: rgba(242, 242, 247, .78);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border-bottom: .5px solid var(--sep);
+  z-index: 20;
+}
+.navRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+}
+.back {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--blue);
+  font-size: 17px;
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+.back svg {
+  width: 12px;
+  height: 20px;
+}
+.navCancel {
+  color: var(--text3);
+  font-size: 15px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+.navTitle {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: .36px;
+  margin-top: 2px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #5FA8FF, #5856D6);
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: .4px;
+}
+
+/* ─── Content area ─────────────────────────────────────────────── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px 16px;
+  /* Leave room for cancel button + tab bar */
+  padding-bottom: calc(50px + 84px + 32px);
+}
+
+/* ─── Preview card (mockup: .preview) ──────────────────────────── */
+.preview {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: var(--card);
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .03), 0 8px 22px rgba(40, 50, 90, .05);
+}
+.thumb {
+  width: 72px;
+  height: 88px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #fbf8f0, #f1ece0);
+  position: relative;
+  overflow: hidden;
+  flex: 0 0 72px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .05);
+}
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.thumbPlaceholderLbl {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  font-size: 6px;
+  color: #a78a3c;
+  letter-spacing: .18em;
+  font-weight: 700;
+}
+.thumbPlaceholderQno {
+  position: absolute;
+  top: 14px;
+  left: 6px;
+  font-size: 7px;
+  font-weight: 700;
+  color: #7a3b3b;
+  background: #fde9e9;
+  border-radius: 2px;
+  padding: 1px 3px;
+}
+.thumbPlaceholderH3 {
+  position: absolute;
+  top: 24px;
+  left: 6px;
+  right: 6px;
+  font-family: Georgia, serif;
+  font-size: 7px;
+  line-height: 1.4;
+  color: #222;
+  font-weight: 600;
+}
+.meta {
+  flex: 1;
+  min-width: 0;
+}
+.metaTitle {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .1px;
+}
+.metaChips {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 3px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #F2F2F7;
+  padding: 3px 7px;
+  border-radius: 999px;
+  border: .5px solid var(--sep);
+}
+
+/* ─── Model badge (mockup: .model) ─────────────────────────────── */
+.modelBadge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text3);
+  padding: 0 4px;
+}
+.modelDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 4px rgba(52, 199, 89, .18);
+}
+.modelBadge strong {
+  color: var(--text2);
+  font-weight: 600;
+}
+
+/* ─── Banner (SLOW yellow / ERROR red) ─────────────────────────── */
+.banner {
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.bannerSlow {
+  background: rgba(255, 204, 0, .1);
+  border: .5px solid rgba(255, 204, 0, .35);
+  color: #CC8800;
+}
+.bannerError {
+  background: rgba(255, 59, 48, .08);
+  border: .5px solid rgba(255, 59, 48, .3);
+  color: var(--red);
+}
+
+/* ─── Stages card (mockup: .stages) ────────────────────────────── */
+.stages {
+  margin-top: 14px;
+  background: var(--card);
+  border-radius: 18px;
+  padding: 8px 4px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .03), 0 8px 22px rgba(40, 50, 90, .05);
+}
+
+/* ─── Step (mockup: .step) ─────────────────────────────────────── */
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 14px;
+  position: relative;
+}
+.step + .step::before {
+  content: "";
+  position: absolute;
+  left: 24.5px;
+  top: -6px;
+  width: 1px;
+  height: 14px;
+  background: var(--sep);
+}
+
+/* Step circle (mockup: .ico) */
+.stepCircle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 28px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+.stepCircle svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Step body */
+.stepBody {
+  flex: 1;
+  min-width: 0;
+}
+.stepTitle {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .1px;
+}
+.stepDuration {
+  color: var(--text3);
+  font-weight: 500;
+  font-size: 12px;
+  margin-left: 6px;
+}
+.stepDesc {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 2px;
+  line-height: 1.45;
+}
+
+/* ── Step states ──────────────────────────────────────────────── */
+/* done */
+.stepDone .stepCircle {
+  background: var(--green);
+}
+
+/* now */
+.stepNow .stepTitle {
+  color: var(--blue);
+}
+.stepNow .stepDesc {
+  color: var(--text2);
+}
+.stepNow .stepCircle {
+  background: linear-gradient(180deg, #5FA8FF, var(--blue));
+  box-shadow: 0 0 0 5px rgba(0, 122, 255, .18);
+}
+
+/* wait */
+.stepWait .stepCircle {
+  background: #E5E5EA;
+  color: var(--text3);
+}
+.stepWait .stepTitle {
+  color: var(--text3);
+}
+
+/* fail */
+.stepFail .stepCircle {
+  background: var(--red);
+}
+.stepFail .stepTitle {
+  color: var(--red);
+}
+.stepFail .stepDesc {
+  color: var(--red);
+}
+
+/* Shimmer (mockup: .shim) — only on now steps */
+.shim {
+  position: relative;
+  height: 4px;
+  background: rgba(0, 122, 255, .10);
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+.shim::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 38%;
+  background: linear-gradient(90deg, transparent, rgba(0, 122, 255, .85), transparent);
+  border-radius: 2px;
+  animation: shimmerSlide 1.5s ease-in-out infinite;
+}
+@keyframes shimmerSlide {
+  0%   { left: -38%; }
+  100% { left: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shim::after { animation: none; left: 24%; }
+}
+
+/* ─── Streaming JSON card (mockup: .stream) ────────────────────── */
+.stream {
+  margin-top: 14px;
+  background: #0F1422;
+  color: #E2E8F0;
+  border-radius: 14px;
+  padding: 14px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.55;
+  letter-spacing: .2px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .04), 0 12px 28px rgba(40, 50, 90, .10);
+  position: relative;
+}
+.streamHdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 10px;
+  color: #94A3B8;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+}
+.streamDots {
+  display: flex;
+  gap: 5px;
+}
+.streamDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: block;
+}
+.streamDotRed    { background: #FF5F57; }
+.streamDotYellow { background: #FEBC2E; }
+.streamDotGreen  { background: #28C840; }
+
+.streamPre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+  font: inherit;
+}
+/* JSON syntax colours */
+.jsonKey  { color: #7DD3FC; }
+.jsonStr  { color: #FDE68A; }
+.jsonNum  { color: #F0ABFC; }
+.jsonBool { color: #86EFAC; }
+.jsonPunc { color: #64748B; }
+
+/* Blinking cursor */
+.streamCursor {
+  display: inline-block;
+  width: 8px;
+  height: 13px;
+  background: #7DD3FC;
+  vertical-align: -2px;
+  margin-left: 1px;
+  animation: cursorBlink 1s steps(1) infinite;
+}
+@keyframes cursorBlink {
+  50% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .streamCursor { animation: none; }
+}
+
+/* ─── Cancel sticky button (mockup: .cancel) ───────────────────── */
+.cancelWrap {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 104px;
+  z-index: 15;
+}
+.cancelBtn {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, .75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 14px;
+  color: var(--red);
+  font-weight: 600;
+  font-size: 15px;
+  border: .5px solid var(--sep);
+  cursor: pointer;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s ease;
+}
+.cancelBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.cancelBtn:active:not(:disabled) {
+  opacity: 0.7;
+}
+
+/* ─── Tab bar (mockup: .tabbar) ────────────────────────────────── */
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 84px;
+  padding: 8px 0 24px;
+  background: rgba(255, 255, 255, .78);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border-top: .5px solid var(--sep);
+  display: flex;
+  z-index: 15;
+}
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: var(--text3);
+  font-size: 10px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+.tab svg {
+  width: 24px;
+  height: 24px;
+}
+.tabActive {
+  color: var(--blue);
+}
+
+/* ─── Desktop clamp ──────────────────────────────────────────────── */
+@media (min-width: 768px) {
+  .root {
+    max-width: 414px;
+    margin: 0 auto;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.15);
+    min-height: 100vh;
+  }
+}

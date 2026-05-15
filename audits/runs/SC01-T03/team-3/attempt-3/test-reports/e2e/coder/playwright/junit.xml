@@ -1,0 +1,51 @@
+<testsuites id="" name="" tests="1" failures="1" skipped="0" errors="0" time="7.491117">
+<testsuite name="sc-01/t03-ai-stream-pipeline.spec.ts" timestamp="2026-05-15T04:44:29.122Z" hostname="chromium" tests="1" failures="1" skipped="0" time="6.17" errors="0">
+<testcase name="SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › a11y: pipeline has aria-live=polite, active step has aria-busy" classname="sc-01/t03-ai-stream-pipeline.spec.ts" time="6.17">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/sc-01-t03-ai-stream-pipeli-be14a-e-active-step-has-aria-busy-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/sc-01-t03-ai-stream-pipeli-be14a-e-active-step-has-aria-busy-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/sc-01-t03-ai-stream-pipeli-be14a-e-active-step-has-aria-busy-chromium/error-context.md]]
+]]>
+</system-out>
+<failure message="expect(locator).toBeVisible() failed" type="expect.toBeVisible">
+<![CDATA[  [chromium] › sc-01/t03-ai-stream-pipeline.spec.ts:402:3 › SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › a11y: pipeline has aria-live=polite, active step has aria-busy 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('[data-testid="p03-root"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('[data-testid="p03-root"]')
+
+
+      163 |   });
+      164 |
+    > 165 |   await expect(page.locator(`[data-testid="${TID.root}"]`)).toBeVisible({ timeout: 5_000 });
+          |                                                             ^
+      166 | }
+      167 |
+      168 | // ─── 测试套件 ────────────────────────────────────────────────────
+        at setupP03 (/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t03-analyzing/frontend/apps/h5/tests/e2e/sc-01/t03-ai-stream-pipeline.spec.ts:165:61)
+        at /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t03-analyzing/frontend/apps/h5/tests/e2e/sc-01/t03-ai-stream-pipeline.spec.ts:409:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t03-ai-stream-pipeli-be14a-e-active-step-has-aria-busy-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t03-ai-stream-pipeli-be14a-e-active-step-has-aria-busy-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/sc-01-t03-ai-stream-pipeli-be14a-e-active-step-has-aria-busy-chromium/error-context.md
+]]>
+</failure>
+</testcase>
+</testsuite>
+</testsuites>
