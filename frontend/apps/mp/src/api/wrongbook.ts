@@ -49,3 +49,23 @@ export function getQuestionById(qid: string): Promise<GetQuestionByIdResp> {
     `${apiBase('wb')}/api/wb/questions/${qid}`,
   );
 }
+
+export interface CreateQuestionReq {
+  studentId: number;
+  subject: string;
+  image_key: string;
+  mime: string;
+  source_type: number;
+}
+
+export interface CreateQuestionResp {
+  qid: string;
+}
+
+/** POST /api/wb/questions */
+export function createQuestion(req: CreateQuestionReq): Promise<CreateQuestionResp> {
+  return httpJSON<CreateQuestionResp>(
+    `${apiBase('wb')}/api/wb/questions`,
+    { method: 'POST', body: req },
+  );
+}
