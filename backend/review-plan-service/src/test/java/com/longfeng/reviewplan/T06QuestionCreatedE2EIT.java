@@ -271,6 +271,11 @@ class T06QuestionCreatedE2EIT {
 
     consumer.onMessage(makeEvent(T06_ITEM_503, T06_STUDENT, BASE));
 
+    // AC5 · @Retryable(maxAttempts=3) 验证：stub 应被调用 3 次后 fallback 到 outbox
+    assertThat(calendarStub.invocationCount())
+        .as("AC5 · Feign batchCreateEvents retried 3 times before outbox fallback")
+        .isEqualTo(3);
+
     // TI4: plan 7 行仍在 (calendar 失败不回滚 plan)
     int planCount = jdbc.queryForObject(
         "SELECT count(*) FROM review_plan WHERE wrong_item_id = ?",
