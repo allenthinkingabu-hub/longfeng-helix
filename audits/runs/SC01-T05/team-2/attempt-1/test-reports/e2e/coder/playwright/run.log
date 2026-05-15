@@ -1,0 +1,9 @@
+
+Running 4 tests using 1 worker
+
+  ✓  1 [chromium] › tests/e2e/sc-01/t05-result-save.spec.ts:144:3 › SC01-T05 · P04 Save to Wrongbook › AC1+AC2: happy path — tap save → loading → SAVED → navigate to /wrongbook (1.5s)
+  ✓  2 [chromium] › tests/e2e/sc-01/t05-result-save.spec.ts:204:3 › SC01-T05 · P04 Save to Wrongbook › AC5: save failure — 5xx → toast + stay on P04 (671ms)
+  ✓  3 [chromium] › tests/e2e/sc-01/t05-result-save.spec.ts:233:3 › SC01-T05 · P04 Save to Wrongbook › AC4: idempotent save — 2nd tap same qid returns snapshot (797ms)
+  ✓  4 [chromium] › tests/e2e/sc-01/t05-result-save.spec.ts:273:3 › SC01-T05 · P04 Save to Wrongbook › low confidence path — save requires confirm modal (TC-01.04) (877ms)
+
+  4 passed (4.7s)
