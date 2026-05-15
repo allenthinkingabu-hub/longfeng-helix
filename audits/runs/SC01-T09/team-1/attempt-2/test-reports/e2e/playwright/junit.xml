@@ -1,85 +1,24 @@
-<testsuites id="" name="" tests="7" failures="1" skipped="0" errors="0" time="7.071424">
-<testsuite name="sc-01/t09-home-to-review-target.spec.ts" timestamp="2026-05-15T07:32:26.656Z" hostname="chromium" tests="7" failures="1" skipped="0" time="5.042" errors="0">
-<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › P-HOME renders with hero card and start button" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.941">
+<testsuites id="" name="" tests="10" failures="0" skipped="0" errors="0" time="4.666252999999999">
+<testsuite name="sc-01/t09-home-to-review-target.spec.ts" timestamp="2026-05-15T07:57:53.947Z" hostname="chromium" tests="10" failures="0" skipped="0" time="3.918" errors="0">
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › P-HOME renders with hero card and start button" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.655">
 </testcase>
-<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC1+AC2+AC3: Tap 全部开始 → POST /sessions → navigate P07" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.687">
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC1+AC2+AC3: Tap 全部开始 → POST /sessions → navigate P07" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.401">
 </testcase>
-<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC4: P07 完整渲染 - Hero + 3 stat + progress + slots + CTA" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.839">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../tests/e2e/sc-01/t09-home-to-review-target.spec.ts-snapshots/p07-list-baseline-chromium-darwin.png]]
-
-[[ATTACHMENT|../test-results/sc-01-t09-home-to-review-t-2a300-o-3-stat-progress-slots-CTA-chromium/p07-list-baseline-actual.png]]
-
-[[ATTACHMENT|../test-results/sc-01-t09-home-to-review-t-2a300-o-3-stat-progress-slots-CTA-chromium/p07-list-baseline-diff.png]]
-
-[[ATTACHMENT|../test-results/sc-01-t09-home-to-review-t-2a300-o-3-stat-progress-slots-CTA-chromium/test-failed-1.png]]
-
-[[ATTACHMENT|../test-results/sc-01-t09-home-to-review-t-2a300-o-3-stat-progress-slots-CTA-chromium/video.webm]]
-
-[[ATTACHMENT|../test-results/sc-01-t09-home-to-review-t-2a300-o-3-stat-progress-slots-CTA-chromium/error-context.md]]
-]]>
-</system-out>
-<failure message="expect(page).toHaveScreenshot(expected) failed" type="expect.toHaveScreenshot">
-<![CDATA[  [chromium] › sc-01/t09-home-to-review-target.spec.ts:170:3 › SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC4: P07 完整渲染 - Hero + 3 stat + progress + slots + CTA 
-
-    Error: expect(page).toHaveScreenshot(expected) failed
-
-      2510 pixels (ratio 0.01 of all image pixels) are different.
-
-      Snapshot: p07-list-baseline.png
-
-    Call log:
-      - Expect "toHaveScreenshot(p07-list-baseline.png)" with timeout 5000ms
-        - verifying given screenshot expectation
-      - taking page screenshot
-        - disabled all CSS animations
-      - waiting for fonts to load...
-      - fonts loaded
-      - 2510 pixels (ratio 0.01 of all image pixels) are different.
-      - waiting 100ms before taking screenshot
-      - taking page screenshot
-        - disabled all CSS animations
-      - waiting for fonts to load...
-      - fonts loaded
-      - captured a stable screenshot
-      - 2510 pixels (ratio 0.01 of all image pixels) are different.
-
-
-      202 |
-      203 |     // TI4: VRT screenshot - P07 list state
-    > 204 |     await expect(page).toHaveScreenshot('p07-list-baseline.png', { maxDiffPixels: 500 });
-          |                        ^
-      205 |   });
-      206 |
-      207 |   test('AC4: P07 slot groups render correctly', async ({ page }) => {
-        at /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t09-home-to-review-target/frontend/apps/h5/tests/e2e/sc-01/t09-home-to-review-target.spec.ts:204:24
-
-    attachment #1: p07-list-baseline (image/png) ───────────────────────────────────────────────────
-    Expected: sc-01/t09-home-to-review-target.spec.ts-snapshots/p07-list-baseline-chromium-darwin.png
-    Received: ../../test-results/sc-01-t09-home-to-review-t-2a300-o-3-stat-progress-slots-CTA-chromium/p07-list-baseline-actual.png
-    Diff:     ../../test-results/sc-01-t09-home-to-review-t-2a300-o-3-stat-progress-slots-CTA-chromium/p07-list-baseline-diff.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ../../test-results/sc-01-t09-home-to-review-t-2a300-o-3-stat-progress-slots-CTA-chromium/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #3: video (video/webm) ──────────────────────────────────────────────────────────────
-    ../../test-results/sc-01-t09-home-to-review-t-2a300-o-3-stat-progress-slots-CTA-chromium/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../../test-results/sc-01-t09-home-to-review-t-2a300-o-3-stat-progress-slots-CTA-chromium/error-context.md
-]]>
-</failure>
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC4: P07 完整渲染 - Hero + 3 stat + progress + slots + CTA" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.321">
 </testcase>
-<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC4: P07 slot groups render correctly" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.718">
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC4: P07 slot groups render correctly" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.263">
 </testcase>
-<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC2: POST /sessions request body is correct" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.648">
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC2: POST /sessions request body is correct" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.361">
 </testcase>
-<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › P07 error state: POST /sessions fails → toast" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.603">
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › P07 error state: POST /sessions fails → toast" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.353">
 </testcase>
-<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › P07 back navigation returns to P-HOME" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.606">
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › P07 back navigation returns to P-HOME" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.345">
+</testcase>
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › ADV-1: Rapid double-click &quot;全部开始&quot; should not fire POST twice" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.695">
+</testcase>
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › ADV-2: P07 with missing sid param still renders gracefully" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.246">
+</testcase>
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › ADV-3: P-HOME CTA disabled when total=0" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.278">
 </testcase>
 </testsuite>
 </testsuites>
