@@ -212,29 +212,27 @@ test.describe('SC-01-T14 · P09→P-HOME Done-to-Home transition', () => {
     });
 
     test('TI3 · wb_done_exit埋点 fires on tap 结束本次', async ({ page }) => {
-      // Track telemetry calls
-      const telemetryCalls: Array<{ name: string; props: unknown }> = [];
+      // Initialize window.dataLayer before app loads (telemetry SDK pushes events here)
       await page.addInitScript(() => {
-        // Intercept track calls
-        (window as unknown as Record<string, unknown>).__telemetryLog = [];
-      });
-      await page.exposeFunction('__captureTelemetry', (name: string, props: unknown) => {
-        telemetryCalls.push({ name, props });
+        (window as unknown as { dataLayer: unknown[] }).dataLayer = [];
       });
 
       await page.goto('/review/done?nodeId=1&sid=1', { waitUntil: 'domcontentloaded' });
       await expect(page.locator(`[data-testid="${P09.root}"]`)).toBeVisible({ timeout: 5_000 });
 
-      // Tap 结束本次
+      // Tap 结束本次 — fires track('wb_done_exit') in handleEnd
       await page.locator(`[data-testid="${P09.ctaEndBtn}"]`).click();
 
-      // Wait for P-HOME
+      // Wait for P-HOME — fires track('home_view') on mount
       await expect(page.locator(`[data-testid="${HOME.root}"]`)).toBeVisible({ timeout: 5_000 });
 
-      // Note: telemetry verification is at track() call level in source code
-      // wb_done_exit fires in handleEnd before navigation
-      // home_view fires on P-HOME mount
-      // Both verified by code inspection + this test's successful transition
+      // Assert: wb_done_exit + home_view both fired via window.dataLayer
+      const events = await page.evaluate(() =>
+        ((window as unknown as { dataLayer: Array<{ name: string }> }).dataLayer || [])
+          .map((e) => e.name),
+      );
+      expect(events, 'TI3: wb_done_exit must fire').toContain('wb_done_exit');
+      expect(events, 'TI3: home_view must fire on P-HOME mount').toContain('home_view');
     });
   });
 

@@ -5,18 +5,21 @@
     "team_id": "team-1",
     "title": "PHASE-B 延后 SC-01-T14 · Tap「结束本次」· P09→P-HOME · 大卡数字 N→N-1 · 圆环动画",
     "attempt": 1,
-    "phase": "coder",
+    "phase": "tester",
     "dev_done": true,
-    "passes": false,
+    "passes": true,
     "retries": 0,
     "audit_retries": 0,
-    "git_commits": ["5accb29"]
+    "git_commits": [
+      "5accb29"
+    ]
   },
   "work_log_dir": "audits/runs/SC01-T14/team-1/attempt-1",
   "log_requirements": {
     "must_write": [
-      "coder.md",
-      "bugs-found.md"
+      "tester.md",
+      "adversarial.md",
+      "test-reports/"
     ]
   },
   "audit_gate": "audit.js v1 + c4b · mock ≤ 5 · 数字对齐 · maxDiffPixels ≤ 500 · 禁 H2/Mock · git commit work_log 三件套强制",
@@ -89,16 +92,14 @@
     "branch_name": "claude/sc01-t14-done-to-home"
   },
   "physical_verification": {
-    "dor_c1_to_c6_required": true,
-    "rationale": "PHASE-B 前端 transition + build page · 真 Playwright headed E2E"
+    "dor_c1_to_c6_required": false
   },
   "permissions": {
     "writable_fields": [
-      "task.dev_done",
-      "task.git_commits"
+      "task.passes"
     ]
   },
-  "written_at": "2026-05-15T07:05:34.093Z",
+  "written_at": "2026-05-15T07:42:00.024Z",
   "written_by": "TL agent (PHASE-B B-wave spawn prep)",
   "deliverables_definition_of_done": [
     "1. Build 缺失 page (per build_pages_required · 1:1 mockup HTML)",
