@@ -57,4 +57,4 @@ Phase 1 scope: 只写 spec 不跑 automator (Phase 2 TL 串行跑)。
 
 ## 5. 提交
 
-- commit hash: (pending)
+- commit hash: ef77ba1
