@@ -1,0 +1,10 @@
+
+Running 5 tests using 1 worker
+
+  ✓  1 [chromium] › tests/e2e/sc-01/t08-home-to-wrongbook.spec.ts:92:5 › SC-01-T08 · P05→P-HOME transition + counter tick › P-HOME READY state (TC-01.01 步 12-13) › AC1+AC2 · Tap Tab 1 from P05 → P-HOME renders with data from GET /today (1.9s)
+  ✓  2 [chromium] › tests/e2e/sc-01/t08-home-to-wrongbook.spec.ts:153:5 › SC-01-T08 · P05→P-HOME transition + counter tick › P-HOME READY state (TC-01.01 步 12-13) › AC3+AC4 · counter N→N+1 animation + circle progress animation (1.3s)
+  ✓  3 [chromium] › tests/e2e/sc-01/t08-home-to-wrongbook.spec.ts:201:5 › SC-01-T08 · P05→P-HOME transition + counter tick › EMPTY state (TI2) › TI2 · total=0 → 显示空态 hero (689ms)
+  ✓  4 [chromium] › tests/e2e/sc-01/t08-home-to-wrongbook.spec.ts:235:5 › SC-01-T08 · P05→P-HOME transition + counter tick › ERROR state (spec §9) › spec §9 · GET /today 500 → 黄条降级 (2.5s)
+  ✓  5 [chromium] › tests/e2e/sc-01/t08-home-to-wrongbook.spec.ts:266:3 › SC-01-T08 · P05→P-HOME transition + counter tick › TI1 · GET /today request includes tz parameter (500ms)
+
+  5 passed (8.3s)
