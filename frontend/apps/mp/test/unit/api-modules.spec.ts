@@ -25,6 +25,9 @@ describe('api/wrongbook.ts exports', () => {
   it('exports getQuestionById function', () => {
     expect(typeof wrongbookApi.getQuestionById).toBe('function');
   });
+  it('exports listWrongQuestions function (T07)', () => {
+    expect(typeof wrongbookApi.listWrongQuestions).toBe('function');
+  });
 });
 
 describe('api/ai.ts exports', () => {

@@ -1,0 +1,126 @@
+<!-- P05 错题本列表 · 1:1 mirror design/mockups/wrongbook/05_wrongbook_list.html -->
+<!-- trace: design/mockups/wrongbook/05_wrongbook_list.html · H5 WrongbookList/index.tsx -->
+
+<view class="wrongbook-list-page">
+
+  <!-- ── Nav ──────────────────────────────────────────── -->
+  <view class="nav">
+    <view class="nav-row">
+      <text class="nav-h1">错题本</text>
+      <view class="nav-actions">
+        <van-icon name="bars" color="#007AFF" size="22px" />
+      </view>
+    </view>
+
+    <!-- Search -->
+    <view class="search">
+      <van-icon name="search" color="#8E8E93" size="14px" />
+      <text class="search-text">二次函数 顶点</text>
+      <text class="ai-badge">AI 语义</text>
+    </view>
+
+    <!-- Subject chips -->
+    <scroll-view class="chips-row" scroll-x="true">
+      <text class="sc {{activeSubject === '' ? 'sc-on' : ''}}" data-subject="" bind:tap="onSubjectTap">全部 <text class="ct">{{totalCount}}</text></text>
+      <text class="sc {{activeSubject === 'math' ? 'sc-on' : ''}}" data-subject="math" bind:tap="onSubjectTap">数学 <text class="ct">{{subjectCounts.math || 0}}</text></text>
+      <text class="sc {{activeSubject === 'physics' ? 'sc-on' : ''}}" data-subject="physics" bind:tap="onSubjectTap">物理 <text class="ct">{{subjectCounts.physics || 0}}</text></text>
+      <text class="sc {{activeSubject === 'chemistry' ? 'sc-on' : ''}}" data-subject="chemistry" bind:tap="onSubjectTap">化学 <text class="ct">{{subjectCounts.chemistry || 0}}</text></text>
+      <text class="sc {{activeSubject === 'english' ? 'sc-on' : ''}}" data-subject="english" bind:tap="onSubjectTap">英语 <text class="ct">{{subjectCounts.english || 0}}</text></text>
+      <text class="sc {{activeSubject === 'chinese' ? 'sc-on' : ''}}" data-subject="chinese" bind:tap="onSubjectTap">语文 <text class="ct">{{subjectCounts.chinese || 0}}</text></text>
+    </scroll-view>
+  </view>
+
+  <!-- ── Content ──────────────────────────────────────── -->
+  <scroll-view class="content" scroll-y="true">
+
+    <!-- Loading -->
+    <view wx:if="{{pageState === 'LOADING'}}" class="skeleton">
+      <van-loading size="24px" vertical>加载中...</van-loading>
+    </view>
+
+    <!-- Error -->
+    <view wx:elif="{{pageState === 'ERROR'}}" class="error-banner" bind:tap="onRetryTap">
+      <text>加载失败，点击重试</text>
+    </view>
+
+    <!-- Empty -->
+    <view wx:elif="{{pageState === 'EMPTY'}}" class="empty">
+      <text class="empty-title">还没有错题</text>
+      <text class="empty-hint">拍一道试试，AI 会帮你分析</text>
+      <view class="empty-btn" bind:tap="onCaptureTap">拍第一道错题</view>
+    </view>
+
+    <!-- List -->
+    <block wx:elif="{{pageState === 'LIST'}}">
+      <!-- Mastery filter row -->
+      <view class="mr">
+        <view class="mf mf-red {{activeMastery === 'NOT_MASTERED' ? 'mf-on' : ''}}" data-mastery="NOT_MASTERED" bind:tap="onMasteryTap">
+          <view class="mf-bar"></view>
+          <text class="mf-v">{{masteryCounts.notMastered}}</text>
+          <text class="mf-t">未掌握</text>
+        </view>
+        <view class="mf mf-orange {{activeMastery === 'PARTIAL' ? 'mf-on' : ''}}" data-mastery="PARTIAL" bind:tap="onMasteryTap">
+          <view class="mf-bar"></view>
+          <text class="mf-v">{{masteryCounts.partial}}</text>
+          <text class="mf-t">部分掌握</text>
+        </view>
+        <view class="mf mf-green {{activeMastery === 'MASTERED' ? 'mf-on' : ''}}" data-mastery="MASTERED" bind:tap="onMasteryTap">
+          <view class="mf-bar"></view>
+          <text class="mf-v">{{masteryCounts.mastered}}</text>
+          <text class="mf-t">已掌握</text>
+        </view>
+      </view>
+
+      <!-- Sort hint -->
+      <view class="sort">
+        <text class="sort-l">按 <text class="sort-strong">下次复习时间</text> · 升序</text>
+        <text>共 <text class="sort-strong">{{items.length}}</text> 条</text>
+      </view>
+
+      <!-- Cards -->
+      <view
+        wx:for="{{items}}"
+        wx:key="qid"
+        class="card {{item.qid === highlightQid ? 'card-highlighted' : ''}}"
+        data-qid="{{item.qid}}"
+        bind:tap="onCardTap"
+      >
+        <view class="left-bar left-bar-{{item.masteryColor}}"></view>
+        <view class="thumb">
+          <text class="qno">{{item.questionNo}}</text>
+          <text class="thumb-h3">{{item.stemShort}}</text>
+          <view class="strk"></view>
+        </view>
+        <view class="body">
+          <view class="h">
+            <text class="h-sub" style="color: {{item.subjectColor}};">{{item.subjectLabel}}</text>
+            <view class="h-dot"></view>
+            <text>{{item.kp[0] || ''}}</text>
+            <view class="h-dot"></view>
+            <text class="h-time">{{item.timeAgo}}</text>
+          </view>
+          <text class="stem">{{item.stemSnippet}}</text>
+          <view class="tags">
+            <text wx:for="{{item.kp}}" wx:for-item="kpItem" wx:key="*this" class="tg tg-kp">{{kpItem}}</text>
+            <text wx:if="{{item.errorType}}" class="tg tg-err">{{item.errorType}}</text>
+            <text class="tg tg-diff">{{item.starsLabel}}</text>
+          </view>
+        </view>
+        <view class="right">
+          <text class="pillbg pillbg-{{item.masteryColor}}">{{item.masteryText}}</text>
+          <view class="stage-bar">
+            <view wx:for="{{item.stageDots}}" wx:for-item="dot" wx:key="idx" class="sb {{dot.cls}}"></view>
+          </view>
+          <text class="due">{{item.dueLabel}}</text>
+        </view>
+      </view>
+    </block>
+
+  </scroll-view>
+
+  <!-- ── FAB ──────────────────────────────────────────── -->
+  <view class="fab" bind:tap="onCaptureTap">
+    <van-icon name="photograph" color="#fff" size="26px" />
+  </view>
+
+</view>
