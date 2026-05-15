@@ -4,17 +4,17 @@
     "id": "SC01-MP-T11",
     "team_id": "team-4",
     "title": "PHASE-C MP wave-1 · SC01-MP-T11 · P08 review-exec 1:1 mirror H5 mockup (人工视觉验收路线)",
-    "attempt": 3,
+    "attempt": 4,
     "phase": "tester",
     "dev_done": true,
     "passes": true,
     "retries": 0,
-    "audit_retries": 2,
+    "audit_retries": 3,
     "git_commits": [
       "e609eae"
     ]
   },
-  "work_log_dir": "audits/runs/SC01-MP-T11/team-4/attempt-3",
+  "work_log_dir": "audits/runs/SC01-MP-T11/team-4/attempt-4",
   "log_requirements": {
     "must_write": [
       "tester.md",
@@ -25,41 +25,71 @@
   "audit_gate": "audit.js v1 relaxed (PHASE-C 人工视觉路线) · 验 tsc PASS + mockup baseline 4-state 截图落盘 + spec-trace.md · NO automator E2E · mock ≤ 5 · 强制 git commit work_log",
   "previous_audit_verdict": {
     "task_id": "SC01-MP-T11",
-    "attempt": 2,
+    "attempt": 3,
     "team_id": "team-4",
-    "audited_at": "2026-05-15T13:01:55.102Z",
+    "audited_at": "2026-05-15T13:04:19.173Z",
     "audited_by": "audit.js v1 (deterministic · 5 dims)",
     "pass": false,
     "checks": [
       {
         "dimension": "coder_compliance",
         "name": "coder_md_exists",
-        "pass": false,
-        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t11-review-exec/audits/runs/SC01-MP-T11/team-4/attempt-2/coder.md"
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t11-review-exec/audits/runs/SC01-MP-T11/team-4/attempt-3/coder.md"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_地形侦察",
+        "pass": true,
+        "evidence": "1×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_编码",
+        "pass": true,
+        "evidence": "1×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_自检",
+        "pass": true,
+        "evidence": "1×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_提交",
+        "pass": true,
+        "evidence": "1×"
       },
       {
         "dimension": "coder_compliance",
         "name": "bugs_found_md_exists",
-        "pass": false,
-        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t11-review-exec/audits/runs/SC01-MP-T11/team-4/attempt-2/bugs-found.md"
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t11-review-exec/audits/runs/SC01-MP-T11/team-4/attempt-3/bugs-found.md"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "bugs_found_md_has_declaration",
+        "pass": true,
+        "evidence": "bug list found"
       },
       {
         "dimension": "tester_compliance",
         "name": "tester_md_exists",
         "pass": true,
-        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t11-review-exec/audits/runs/SC01-MP-T11/team-4/attempt-2/tester.md"
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t11-review-exec/audits/runs/SC01-MP-T11/team-4/attempt-3/tester.md"
       },
       {
         "dimension": "tester_compliance",
         "name": "adversarial_md_exists",
         "pass": true,
-        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t11-review-exec/audits/runs/SC01-MP-T11/team-4/attempt-2/adversarial.md"
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t11-review-exec/audits/runs/SC01-MP-T11/team-4/attempt-3/adversarial.md"
       },
       {
         "dimension": "tester_compliance",
         "name": "test_reports_nonempty",
         "pass": true,
-        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t11-review-exec/audits/runs/SC01-MP-T11/team-4/attempt-2/test-reports"
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t11-review-exec/audits/runs/SC01-MP-T11/team-4/attempt-3/test-reports"
       },
       {
         "dimension": "tester_compliance",
@@ -94,14 +124,14 @@
       {
         "dimension": "test_validity",
         "name": "tester_md_testcase_count_matches_xml",
-        "pass": true,
-        "evidence": "no explicit testcase count in tester.md — skip (advisory)"
+        "pass": false,
+        "evidence": "claimed=7 but no <testcase> in XML — tester.md may inflate"
       },
       {
         "dimension": "test_validity",
         "name": "adversarial_has_exploratory_keywords",
         "pass": true,
-        "evidence": "7 matched: [连点,debounce,DOM,注入,超长]"
+        "evidence": "6 matched: [连点,debounce,DOM,注入,超长]"
       },
       {
         "dimension": "spec_alignment",
@@ -110,8 +140,8 @@
         "evidence": "inflight.physical_verification.dor_c1_to_c6_required=false — DoR skipped (P0 audit task)"
       }
     ],
-    "redo_target": "coder",
-    "redo_reason": "[coder_compliance.coder_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t11-review-exec/audits/runs/SC01-MP-T11/team-4/attempt-2/coder.md · [coder_compliance.bugs_found_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t11-review-exec/audits/runs/SC01-MP-T11/team-4/attempt-2/bugs-found.md"
+    "redo_target": "tester",
+    "redo_reason": "[test_validity.tester_md_testcase_count_matches_xml] claimed=7 but no <testcase> in XML — tester.md may inflate"
   },
   "context": {
     "scenario": "PHASE-C MP 14 mirror 第一波 · SC01-MP-T11 · P08 页 1:1 mirror H5 同名 mockup",
@@ -166,6 +196,6 @@
     "9. node .harness/harness.js --advance=SC01-MP-T11"
   ],
   "rule_6_tool_budget_guidance": "PHASE-C wave-1 单 page 1:1 mirror + 4 screenshot + tsc · 预计 ~40-60 tool use · 软线 50 self-check · 70 surface · 85 forced compaction summary",
-  "written_at": "2026-05-15T13:03:16.919Z",
+  "written_at": "2026-05-15T13:04:19.181Z",
   "written_by": "TL agent (PHASE-C wave-1 spawn prep · 人工视觉路线)"
 }
