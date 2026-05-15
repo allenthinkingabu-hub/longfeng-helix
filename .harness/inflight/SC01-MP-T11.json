@@ -4,17 +4,17 @@
     "id": "SC01-MP-T11",
     "team_id": "team-4",
     "title": "PHASE-C MP wave-1 · SC01-MP-T11 · P08 review-exec 1:1 mirror H5 mockup (人工视觉验收路线)",
-    "attempt": 4,
-    "phase": "circuit_break",
+    "attempt": 3,
+    "phase": "tester",
     "dev_done": true,
     "passes": true,
     "retries": 0,
-    "audit_retries": 3,
+    "audit_retries": 2,
     "git_commits": [
       "e609eae"
     ]
   },
-  "work_log_dir": "audits/runs/SC01-MP-T11/team-4/attempt-4",
+  "work_log_dir": "audits/runs/SC01-MP-T11/team-4/attempt-3",
   "log_requirements": {
     "must_write": [
       "tester.md",
@@ -196,6 +196,6 @@
     "9. node .harness/harness.js --advance=SC01-MP-T11"
   ],
   "rule_6_tool_budget_guidance": "PHASE-C wave-1 单 page 1:1 mirror + 4 screenshot + tsc · 预计 ~40-60 tool use · 软线 50 self-check · 70 surface · 85 forced compaction summary",
-  "written_at": "2026-05-15T13:09:03.299Z",
+  "written_at": "2026-05-15T13:09:50.032Z",
   "written_by": "TL agent (PHASE-C wave-1 spawn prep · 人工视觉路线)"
 }
