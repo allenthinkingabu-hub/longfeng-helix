@@ -11,6 +11,63 @@ import { apiBase, httpJSON } from './_http';
 
 const BASE = apiBase('review');
 
+// ── T11 · getNode / revealNode / gradeNode ──────────────────
+
+export interface NodeResponse {
+  nid: string;
+  question: {
+    qid: string;
+    stem: string;
+    subject: string;
+    kpName: string;
+    difficulty: number;
+    answer: string;
+    steps: string[];
+  };
+  nodeIndex: number;
+  tLevel: string;
+  easeFactor: number;
+}
+
+/** GET /api/review/sessions/{sid}/nodes/{nid} */
+export async function getNode(sid: string, nid: string): Promise<NodeResponse> {
+  return httpJSON<NodeResponse>(
+    `${BASE}/api/review/sessions/${sid}/nodes/${nid}`,
+  );
+}
+
+export interface RevealResponse {
+  revealedAt: string;
+}
+
+/** POST /api/review/nodes/{nid}/reveal */
+export async function revealNode(nid: string): Promise<RevealResponse> {
+  return httpJSON<RevealResponse>(
+    `${BASE}/api/review/nodes/${nid}/reveal`,
+    { method: 'POST' },
+  );
+}
+
+export interface GradeRequest {
+  grade: 'FORGOT' | 'PARTIAL' | 'MASTERED';
+  timeSpentMs: number;
+}
+
+export interface GradeResponse {
+  nodeId: string;
+  newNodeIndex: number;
+  newEase: number;
+  nextDueAt: string;
+}
+
+/** POST /api/review/nodes/{nid}/grade */
+export async function gradeNode(nid: string, body: GradeRequest): Promise<GradeResponse> {
+  return httpJSON<GradeResponse>(
+    `${BASE}/api/review/nodes/${nid}/grade`,
+    { method: 'POST', body },
+  );
+}
+
 // ── T13 · completeSession ───────────────────────────────────
 export interface CompleteSessionResp {
   sessionId: string;
