@@ -1,4 +1,4 @@
-# coder.md · SC01-MP-T01 · attempt-3
+# coder.md · SC01-MP-T01 · attempt-1
 
 ## 1. 地形侦察
 
@@ -65,6 +65,4 @@ PHASE-C 人工视觉路线 · automator E2E 不适用 · 改 tsc PASS + 4 截图
 
 ## 5. 提交
 
-- commit (feat): df8188e
-- commit (2 bugs fixed: flash icon no-op ternary + tab4 icon mockup drift): dfb88c8
-- commit (adversarial 探索性测试补齐): d936f7a
+- commit: df8188e

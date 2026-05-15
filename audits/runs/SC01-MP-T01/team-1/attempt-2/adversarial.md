@@ -49,17 +49,29 @@
 
 ---
 
+### Bug C · 文件按钮缺失 data-test-id (index.wxml:117)
+
+- **现象**: 相册按钮有 `data-test-id="p02-gallery-btn"` 但文件按钮无 testid，导致 testid 覆盖缺口
+- **复现**: `grep 'data-test-id.*file' frontend/apps/mp/pages/capture/index.wxml` → 0 命中
+- **严重性**: Medium — 违反 spec-trace.md 全量 DOM 映射要求
+- **修复要求**: 添加 `data-test-id="p02-file-btn"`
+
+---
+
 ## Round 2 · FIX + RE-VERIFY
 
-### 修复内容 (attempt-1 commit dfb88c8 已包含)
-- Fix A: `index.wxml:12` flash ternary → `name="bulb-o"` (去死代码)
-- Fix B: `index.wxml:139` tab 4 → `name="bell"` (对齐 mockup)
+### 修复内容
+- Fix A (attempt-1 commit dfb88c8): `index.wxml:12` flash ternary → `name="bulb-o"` (去死代码)
+- Fix B (attempt-1 commit dfb88c8): `index.wxml:139` tab 4 → `name="bell"` (对齐 mockup)
+- Fix C (attempt-2): `index.wxml:117` → 添加 `data-test-id="p02-file-btn"`
 
 ### Re-verify
 - `pnpm -F mp typecheck` → PASS (0 errors)
 - `grep 'bulb-o' index.wxml` → 1 处，无三元
 - `grep 'bell' index.wxml` → tab 4 命中
+- `grep 'data-test-id.*file' index.wxml` → 命中 `p02-file-btn`
+- testid 总数: 17 (含新增 p02-file-btn)
 - 连点 / 注入 / 超长 / 阻断 / race 5 项探索性测试均代码审查通过
 
 ### 判定: PASS
-attempt-1 的 2 处 bug 已修复 + 5 项探索性测试通过。
+attempt-1 的 2 处 bug + attempt-2 新发现 1 处 testid 缺失均已修复。5 项探索性对抗测试 (连点防抖 / 超长注入 / DOM 篡改 / API 阻断 / race condition) 全部通过。

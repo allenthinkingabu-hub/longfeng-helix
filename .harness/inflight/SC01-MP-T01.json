@@ -5,13 +5,15 @@
     "team_id": "team-1",
     "title": "PHASE-C MP wave-1 · SC01-MP-T01 · P02 capture 1:1 mirror H5 mockup (人工视觉验收路线)",
     "attempt": 3,
-    "phase": "tester",
+    "phase": "done",
     "dev_done": true,
     "passes": true,
     "retries": 0,
     "audit_retries": 2,
     "git_commits": [
-      "df8188e"
+      "df8188e",
+      "dfb88c8",
+      "d936f7a"
     ]
   },
   "work_log_dir": "audits/runs/SC01-MP-T01/team-1/attempt-3",
@@ -166,6 +168,6 @@
     "9. node .harness/harness.js --advance=SC01-MP-T01"
   ],
   "rule_6_tool_budget_guidance": "PHASE-C wave-1 单 page 1:1 mirror + 4 screenshot + tsc · 预计 ~40-60 tool use · 软线 50 self-check · 70 surface · 85 forced compaction summary",
-  "written_at": "2026-05-15T13:00:46.235Z",
+  "written_at": "2026-05-15T13:01:24.795Z",
   "written_by": "TL agent (PHASE-C wave-1 spawn prep · 人工视觉路线)"
 }

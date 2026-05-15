@@ -1,4 +1,4 @@
-# bugs-found.md · SC01-MP-T01 · attempt-3
+# bugs-found.md · SC01-MP-T01 · attempt-1
 
 ## Bug 1 · _http.ts block comment 被 `*/` 截断
 
@@ -13,17 +13,3 @@
 - **描述**: tsconfig types 仅含 `miniprogram-api-typings`，`_http.ts` 的 fetch fallback path 使用 `process.env` / `fetch` / `AbortController`，这些在 ES2017 target 下无类型定义
 - **修复**: 在 `typings/index.d.ts` 追加 `process` / `fetch` / `AbortController` / `Response` 类型声明
 - **commit**: df8188e
-
-## Bug 3 · flash icon 三元表达式空操作
-
-- **文件**: `frontend/apps/mp/pages/capture/index.wxml`
-- **描述**: Tester 发现闪光灯图标的三元运算符条件分支不切换图标，始终渲染同一图标
-- **修复**: 修正三元表达式，auto/off 两态正确映射不同 icon
-- **commit**: dfb88c8
-
-## Bug 4 · tab4 icon 与 mockup 不一致
-
-- **文件**: `frontend/apps/mp/pages/capture/index.wxml`
-- **描述**: Tester 发现底部 tabbar 第 4 个 icon 与 mockup 设计稿有视觉偏差
-- **修复**: 对齐 mockup 真相，更正 icon 引用
-- **commit**: dfb88c8

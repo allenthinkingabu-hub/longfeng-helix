@@ -114,7 +114,7 @@
     </view>
 
     <!-- File -->
-    <view class="control-btn" bindtap="onGalleryTap">
+    <view class="control-btn" data-test-id="p02-file-btn" bindtap="onGalleryTap">
       <view class="control-ic">
         <van-icon name="description" color="#fff" size="22px" />
       </view>

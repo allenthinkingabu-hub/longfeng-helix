@@ -8,7 +8,7 @@
 |---|------|------|
 | 1 | `pnpm -F mp typecheck` | PASS · 0 errors (tsc --noEmit) |
 | 2 | `ls design/system/screenshots/mp-baseline/p02-*.png` | 4 文件: idle, focusing, uploading, captured |
-| 3 | `grep 'data-test-id' pages/capture/index.wxml` | 14 个 testid 全部挂载 |
+| 3 | `grep 'data-test-id' pages/capture/index.wxml` | 17 个 testid 全部挂载 (含新增 p02-file-btn) |
 | 4 | `grep "bulb-o" index.wxml` | 1 处，已修复无三元 |
 | 5 | `grep "bell" index.wxml` | tab 4 命中，已修复 |
 | 6 | code review: onShutterTap guard | `if (state === 'UPLOADING') return` 连点防抖 ✓ |
@@ -19,8 +19,8 @@
 ## 对抗记录摘要
 
 见 `adversarial.md`:
-- **Round 1 REJECT**: 2 bugs (flash ternary no-op + tab4 icon drift) + 5 项探索性测试 (连点防抖 / 超长注入 / API 阻断 / race condition / DOM 篡改)
-- **Round 2 FIX**: 2 bugs 已修 (commit dfb88c8) → tsc re-verify PASS → 探索性测试全通过 → PASS
+- **Round 1 REJECT**: 2 bugs (flash ternary no-op + tab4 icon drift) + 1 bug (文件按钮缺 testid) + 5 项探索性测试 (连点防抖 / 超长注入 / API 阻断 / race condition / DOM 篡改)
+- **Round 2 FIX**: 3 bugs 已修 (A+B: commit dfb88c8, C: attempt-2 fix) → tsc re-verify PASS → 探索性测试全通过 → PASS
 
 ## 验收路线
 
