@@ -5,7 +5,7 @@
     "team_id": "team-1",
     "title": "PHASE-B 延后 SC-01-T09 · Tap 大卡「全部开始」→ POST /sessions → P-HOME→P07",
     "attempt": 3,
-    "phase": "tester",
+    "phase": "done",
     "dev_done": true,
     "passes": true,
     "retries": 0,
@@ -219,7 +219,7 @@
       "task.passes"
     ]
   },
-  "written_at": "2026-05-15T08:01:04.019Z",
+  "written_at": "2026-05-15T08:05:36.084Z",
   "written_by": "TL agent (PHASE-B B-wave spawn prep)",
   "deliverables_definition_of_done": [
     "1. Build 缺失 page (per build_pages_required · 1:1 mockup HTML)",
