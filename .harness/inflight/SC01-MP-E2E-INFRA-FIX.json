@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "task": {"id": "SC01-MP-E2E-INFRA-FIX", "team_id": "team-1", "title": "PHASE-C MP E2E 批量修 14 spec · drop pixelmatch · 用 mp.reLaunch · assert testid", "attempt": 1, "phase": "coder", "dev_done": true, "passes": false, "retries": 0, "audit_retries": 0, "git_commits": ["558c806"]},
+  "work_log_dir": "audits/runs/SC01-MP-E2E-INFRA-FIX/team-1/attempt-1",
+  "log_requirements": {"must_write": ["coder.md", "bugs-found.md"]},
+  "audit_gate": "Phase 3 infra batch fix · 14 spec 统一改 · lint + typecheck + test:unit pass · 强制 git commit",
+  "previous_audit_verdict": {
+    "phase": "Phase 2 TL serial run",
+    "summary": "14 spec · 40 fail / 9 pass · 2 systemic bugs: (a) Coder 写 wx.navigateTo 而非 mp.reLaunch 导致 currentPage 不变·停 home; (b) pixelmatch HTML mockup baseline diff 31964 远超 5000 阈值 (MP runtime 渲染 vs HTML 本质差)",
+    "redo_target": "coder",
+    "redo_reason": "改 14 spec: 用 mp.reLaunch / mp.navigateTo (automator API) · 不用 wx.* · drop pixelmatch (留 actual screenshot 落盘但不 diff) · 加 testid-based assertion · 加 health check skip"
+  },
+  "context": {
+    "scenario": "Phase 3 · 14 spec 批量修 infra bug",
+    "scope_in": [
+      "改 frontend/apps/mp/test/e2e/*.spec.ts 全部 14 个 (capture/analyzing/result/home/review-today/review-exec/review-done/wrongbook-list + transition 5 个 + api-only 1 个)",
+      "每个 spec 改:",
+      "  a. 用 mp.reLaunch('/pages/X/index') 代替 wx.navigateTo (automator API · 通过 socket 真触发 IDE 切页)",
+      "  b. 删除 pixelmatch import + diff assert (留 mp.screenshot 落盘当 artifact 但不断言 diff)",
+      "  c. 用 page.\\$('[data-test-id=...]') 或 .class-name 断言关键 DOM 在",
+      "  d. 测前若 backend service down → return early (soft-skip · 不算 fail)",
+      "transition spec (capture-to-analyzing/analyzing-to-result/today-to-exec/exec-to-done/done-to-home): mp.reLaunch 起点 → 调 page method 模拟用户操作 → currentPage.path 验跳转",
+      "review-api-contract: 已用 fetch 不用 automator · 保留",
+      "automator-smoke: 不变 (已 PASS)",
+      "跑 pnpm -F mp lint + typecheck + test:unit · 必 0 error · 不准 --no-verify (husky 已修)",
+      "**Phase 3 不跑 automator** (Phase 4 TL 串行 verify)"
+    ],
+    "scope_out": ["改 page 代码 (pages/*/) · 这是后续 fix Coder 工作", "改 _helpers.ts (已写好)"],
+    "verify_after": "TL 跑 pnpm -F mp test:e2e:automator 串行 14 spec · 期 60+/61 PASS"
+  },
+  "isolation": {"worktree_disabled": false, "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-e2e-infra-fix", "branch_name": "claude/sc01-mp-e2e-infra-fix"},
+  "physical_verification": {"dor_c1_to_c6_required": false, "rationale": "Phase 3 batch fix · 不跑 automator · TL Phase 4 验"},
+  "permissions": {"writable_fields": ["task.dev_done", "task.git_commits"]},
+  "deliverables_definition_of_done": [
+    "1. 14 e2e spec 全改完 · 用 mp.reLaunch + assert testid",
+    "2. pnpm -F mp lint + typecheck + test:unit PASS (97/97 unit · husky pre-commit 真触发)",
+    "3. coder.md + bugs-found.md → audits/runs/SC01-MP-E2E-INFRA-FIX/team-1/attempt-1/",
+    "4. 强制 git commit (禁 --no-verify) + advance"
+  ],
+  "rule_6_tool_budget_guidance": "14 spec 机械重构 · 预计 30-50 tool use",
+  "written_at": "2026-05-15T16:00:00.000Z",
+  "written_by": "TL (Phase 3 infra batch fix spawn)"
+}

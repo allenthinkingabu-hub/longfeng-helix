@@ -49,4 +49,4 @@ Previous audit verdict (Phase 2):
 
 ## 4. 提交
 
-- Commit hash: (见下方 git commit 产出)
+- Commit hash: 558c806
