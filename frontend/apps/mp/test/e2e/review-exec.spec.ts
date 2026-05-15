@@ -76,7 +76,7 @@ describe('P08 review-exec page-vrt (真 IDE)', () => {
   });
 
   // ── Test 3: revealBtn 在初始态可见 ────────────────────────────
-  it('revealBtn 初始态存在且 disabled (READING state)', async () => {
+  it('revealBtn 初始态存在 (READING state)', async () => {
     const revealBtn = await page.$('[data-test-id="p08-reveal-btn"]');
     expect(revealBtn).toBeTruthy();
   });
