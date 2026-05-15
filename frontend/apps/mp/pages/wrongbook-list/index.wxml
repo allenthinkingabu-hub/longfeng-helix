@@ -1,26 +1,26 @@
 <!-- P05 错题本列表 · 1:1 mirror design/mockups/wrongbook/05_wrongbook_list.html -->
 <!-- trace: design/mockups/wrongbook/05_wrongbook_list.html · H5 WrongbookList/index.tsx -->
 
-<view class="wrongbook-list-page">
+<view class="wrongbook-list-page" data-test-id="{{testIds.root}}">
 
   <!-- ── Nav ──────────────────────────────────────────── -->
   <view class="nav">
     <view class="nav-row">
-      <text class="nav-h1">错题本</text>
+      <text class="nav-h1" data-test-id="{{testIds['page-header-title']}}">错题本</text>
       <view class="nav-actions">
         <van-icon name="bars" color="#007AFF" size="22px" />
       </view>
     </view>
 
     <!-- Search -->
-    <view class="search">
+    <view class="search" data-test-id="{{testIds['page-header-search']}}">
       <van-icon name="search" color="#8E8E93" size="14px" />
       <text class="search-text">二次函数 顶点</text>
-      <text class="ai-badge">AI 语义</text>
+      <text class="ai-badge" data-test-id="{{testIds['page-header-semantic-badge']}}">AI 语义</text>
     </view>
 
     <!-- Subject chips -->
-    <scroll-view class="chips-row" scroll-x="true">
+    <scroll-view class="chips-row" scroll-x="true" data-test-id="{{testIds['subject-chips']}}">
       <text class="sc {{activeSubject === '' ? 'sc-on' : ''}}" data-subject="" bind:tap="onSubjectTap">全部 <text class="ct">{{totalCount}}</text></text>
       <text class="sc {{activeSubject === 'math' ? 'sc-on' : ''}}" data-subject="math" bind:tap="onSubjectTap">数学 <text class="ct">{{subjectCounts.math || 0}}</text></text>
       <text class="sc {{activeSubject === 'physics' ? 'sc-on' : ''}}" data-subject="physics" bind:tap="onSubjectTap">物理 <text class="ct">{{subjectCounts.physics || 0}}</text></text>
@@ -44,16 +44,16 @@
     </view>
 
     <!-- Empty -->
-    <view wx:elif="{{pageState === 'EMPTY'}}" class="empty">
+    <view wx:elif="{{pageState === 'EMPTY'}}" class="empty" data-test-id="{{testIds['empty-state']}}">
       <text class="empty-title">还没有错题</text>
       <text class="empty-hint">拍一道试试，AI 会帮你分析</text>
-      <view class="empty-btn" bind:tap="onCaptureTap">拍第一道错题</view>
+      <view class="empty-btn" bind:tap="onCaptureTap" data-test-id="{{testIds['empty-capture-btn']}}">拍第一道错题</view>
     </view>
 
     <!-- List -->
     <block wx:elif="{{pageState === 'LIST'}}">
       <!-- Mastery filter row -->
-      <view class="mr">
+      <view class="mr" data-test-id="{{testIds['mastery-status']}}">
         <view class="mf mf-red {{activeMastery === 'NOT_MASTERED' ? 'mf-on' : ''}}" data-mastery="NOT_MASTERED" bind:tap="onMasteryTap">
           <view class="mf-bar"></view>
           <text class="mf-v">{{masteryCounts.notMastered}}</text>
@@ -72,7 +72,7 @@
       </view>
 
       <!-- Sort hint -->
-      <view class="sort">
+      <view class="sort" data-test-id="{{testIds['sort-bar']}}">
         <text class="sort-l">按 <text class="sort-strong">下次复习时间</text> · 升序</text>
         <text>共 <text class="sort-strong">{{items.length}}</text> 条</text>
       </view>
@@ -119,7 +119,7 @@
   </scroll-view>
 
   <!-- ── FAB ──────────────────────────────────────────── -->
-  <view class="fab" bind:tap="onCaptureTap">
+  <view class="fab" bind:tap="onCaptureTap" data-test-id="{{testIds['fab-capture']}}">
     <van-icon name="photograph" color="#fff" size="26px" />
   </view>
 

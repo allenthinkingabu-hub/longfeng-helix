@@ -2,7 +2,7 @@
  * E2E · P05 错题本列表 · page-load + DOM assert
  *
  * Phase 3: drop pixelmatch VRT · use mp.reLaunch · assert DOM selectors · screenshot artifact only
- * Note: wrongbook-list wxml 暂无 data-test-id · 用 class selector 断言
+ * Phase 5: wxml now has data-test-id via {{testIds}} · selectors updated to [data-test-id]
  *
  * trace: SC01-MP-T07-E2E · pages/wrongbook-list/index
  */
@@ -38,20 +38,20 @@ describe('P05 wrongbook-list page-load + DOM (真 IDE)', () => {
     expect(page.path).toBe('pages/wrongbook-list/index');
   });
 
-  it('页面 DOM 包含导航栏 + 内容区域关键节点', async () => {
+  it('页面 DOM 包含导航栏 + 内容区域关键节点 (data-test-id)', async () => {
     const page = await mp.currentPage();
 
-    const navH1 = await page.$('.nav-h1');
-    expect(navH1).toBeTruthy();
+    const root = await page.$('[data-test-id="wrongbook.list.root"]');
+    expect(root).toBeTruthy();
 
-    const search = await page.$('.search');
+    const title = await page.$('[data-test-id="p05-page-header-title"]');
+    expect(title).toBeTruthy();
+
+    const search = await page.$('[data-test-id="p05-page-header-search"]');
     expect(search).toBeTruthy();
 
-    const chipsRow = await page.$('.chips-row');
-    expect(chipsRow).toBeTruthy();
-
-    const content = await page.$('.content');
-    expect(content).toBeTruthy();
+    const chips = await page.$('[data-test-id="p05-subject-chips"]');
+    expect(chips).toBeTruthy();
   });
 
   it('mp.screenshot 截图落 artifact', async () => {

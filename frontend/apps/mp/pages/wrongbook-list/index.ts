@@ -7,10 +7,12 @@
  */
 import { listWrongQuestions } from '../../src/api/wrongbook';
 import { enrichItem } from './helpers';
+import { TEST_IDS } from '@longfeng/testids';
 
 // ─── Page data shape ─────────────────────────────────────────
 
 interface PageData {
+  testIds: typeof TEST_IDS.wrongbookList;
   pageState: 'LOADING' | 'LIST' | 'EMPTY' | 'ERROR';
   items: ReturnType<typeof enrichItem>[];
   totalCount: number;
@@ -25,6 +27,7 @@ interface PageData {
 
 Page<PageData, WechatMiniprogram.IAnyObject>({
   data: {
+    testIds: TEST_IDS.wrongbookList,
     pageState: 'LOADING',
     items: [],
     totalCount: 0,
