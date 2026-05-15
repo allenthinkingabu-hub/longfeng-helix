@@ -1,0 +1,12 @@
+
+Running 7 tests using 1 worker
+
+  ✓  1 [chromium] › tests/e2e/sc-01/t09-home-to-review-target.spec.ts:135:3 › SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › P-HOME renders with hero card and start button (737ms)
+  ✓  2 [chromium] › tests/e2e/sc-01/t09-home-to-review-target.spec.ts:151:3 › SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC1+AC2+AC3: Tap 全部开始 → POST /sessions → navigate P07 (670ms)
+  ✓  3 [chromium] › tests/e2e/sc-01/t09-home-to-review-target.spec.ts:170:3 › SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC4: P07 完整渲染 - Hero + 3 stat + progress + slots + CTA (591ms)
+  ✓  4 [chromium] › tests/e2e/sc-01/t09-home-to-review-target.spec.ts:209:3 › SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC4: P07 slot groups render correctly (519ms)
+  ✓  5 [chromium] › tests/e2e/sc-01/t09-home-to-review-target.spec.ts:224:3 › SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC2: POST /sessions request body is correct (745ms)
+  ✓  6 [chromium] › tests/e2e/sc-01/t09-home-to-review-target.spec.ts:251:3 › SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › P07 error state: POST /sessions fails → toast (566ms)
+  ✓  7 [chromium] › tests/e2e/sc-01/t09-home-to-review-target.spec.ts:270:3 › SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › P07 back navigation returns to P-HOME (595ms)
+
+  7 passed (5.3s)

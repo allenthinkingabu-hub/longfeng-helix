@@ -332,3 +332,27 @@ export interface CreateReviewSessionResp {
   /** 节点总数 */
   total: number;
 }
+
+// ==================== SC-01-C05 · review-plan-service · GET /api/review/today ====================
+// 对齐 backend dto: TodayResp (items[] + total + tz)
+// spec: design/system/pages/P07-review-today.spec.md §5
+export interface TodayReviewItem {
+  id: number;
+  wrongItemId: number;
+  studentId: number;
+  nodeIndex: number;
+  strategyCode: string;
+  startAt: string;
+  easeFactor: number;
+  status: string;
+  nextDueAt: string;
+  completedAt: string | null;
+  totalReview: number;
+  totalForget: number;
+}
+
+export interface TodayReviewResp {
+  items: TodayReviewItem[];
+  total: number;
+  tz: string;
+}
