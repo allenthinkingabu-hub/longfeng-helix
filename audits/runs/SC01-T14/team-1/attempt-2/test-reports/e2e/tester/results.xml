@@ -1,16 +1,16 @@
-<testsuites id="" name="" tests="6" failures="0" skipped="0" errors="0" time="6.076532">
-<testsuite name="sc-01/t14-done-to-home.spec.ts" timestamp="2026-05-15T07:38:52.127Z" hostname="chromium" tests="6" failures="0" skipped="0" time="5.175" errors="0">
-<testcase name="SC-01-T14 · P09→P-HOME Done-to-Home transition › Normal path (TC-01.01 步 20) › AC1+AC2 · tap 结束本次 → P09→P-HOME transition ≤500ms" classname="sc-01/t14-done-to-home.spec.ts" time="1.047">
+<testsuites id="" name="" tests="6" failures="0" skipped="0" errors="0" time="3.650508">
+<testsuite name="sc-01/t14-done-to-home.spec.ts" timestamp="2026-05-15T07:52:29.535Z" hostname="chromium" tests="6" failures="0" skipped="0" time="3.019" errors="0">
+<testcase name="SC-01-T14 · P09→P-HOME Done-to-Home transition › Normal path (TC-01.01 步 20) › AC1+AC2 · tap 结束本次 → P09→P-HOME transition ≤500ms" classname="sc-01/t14-done-to-home.spec.ts" time="0.53">
 </testcase>
-<testcase name="SC-01-T14 · P09→P-HOME Done-to-Home transition › Normal path (TC-01.01 步 20) › AC3+AC4 · P-HOME renders with correct data after transition" classname="sc-01/t14-done-to-home.spec.ts" time="0.772">
+<testcase name="SC-01-T14 · P09→P-HOME Done-to-Home transition › Normal path (TC-01.01 步 20) › AC3+AC4 · P-HOME renders with correct data after transition" classname="sc-01/t14-done-to-home.spec.ts" time="0.415">
 </testcase>
-<testcase name="SC-01-T14 · P09→P-HOME Done-to-Home transition › Normal path (TC-01.01 步 20) › TI3 · wb_done_exit埋点 fires on tap 结束本次" classname="sc-01/t14-done-to-home.spec.ts" time="0.703">
+<testcase name="SC-01-T14 · P09→P-HOME Done-to-Home transition › Normal path (TC-01.01 步 20) › TI3 · wb_done_exit埋点 fires on tap 结束本次" classname="sc-01/t14-done-to-home.spec.ts" time="0.407">
 </testcase>
-<testcase name="SC-01-T14 · P09→P-HOME Done-to-Home transition › ALL_DONE path (AC5 · TC-02.01 步 12) › AC5 · done==total → hero 切「今天已完成」+ 大卡显示 0" classname="sc-01/t14-done-to-home.spec.ts" time="0.802">
+<testcase name="SC-01-T14 · P09→P-HOME Done-to-Home transition › ALL_DONE path (AC5 · TC-02.01 步 12) › AC5 · done==total → hero 切「今天已完成」+ 大卡显示 0" classname="sc-01/t14-done-to-home.spec.ts" time="0.514">
 </testcase>
-<testcase name="SC-01-T14 · P09→P-HOME Done-to-Home transition › P-HOME standalone rendering › P-HOME renders READY state with data from API" classname="sc-01/t14-done-to-home.spec.ts" time="0.664">
+<testcase name="SC-01-T14 · P09→P-HOME Done-to-Home transition › P-HOME standalone rendering › P-HOME renders READY state with data from API" classname="sc-01/t14-done-to-home.spec.ts" time="0.329">
 </testcase>
-<testcase name="SC-01-T14 · P09→P-HOME Done-to-Home transition › P-HOME standalone rendering › P-HOME VRT · toHaveScreenshot baseline" classname="sc-01/t14-done-to-home.spec.ts" time="1.187">
+<testcase name="SC-01-T14 · P09→P-HOME Done-to-Home transition › P-HOME standalone rendering › P-HOME VRT · toHaveScreenshot baseline" classname="sc-01/t14-done-to-home.spec.ts" time="0.824">
 </testcase>
 </testsuite>
 </testsuites>

@@ -307,6 +307,13 @@ test.describe('SC-01-T14 · P09→P-HOME Done-to-Home transition', () => {
       // CTA should say "拍一道新题" instead of "开始复习"
       const startBtn = page.locator(`[data-testid="${HOME.startAllBtn}"]`);
       await expect(startBtn).toContainText('拍一道新题');
+
+      // AC5: Tab 3 拍题入口高亮 — verify highlight class applied
+      const tab3 = page.locator('[data-testid="p-home-root"] .tabbar div:nth-child(3)');
+      // Fallback: locate tab containing text "拍题"
+      const photoTab = page.getByText('拍题', { exact: true }).locator('..');
+      const tabClasses = await photoTab.getAttribute('class');
+      expect(tabClasses, 'AC5: Tab 3 must have tabHighlight class').toMatch(/tabHighlight|Highlight/i);
     });
   });
 
