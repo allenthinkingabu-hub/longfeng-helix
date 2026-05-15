@@ -171,7 +171,7 @@ function spawnAgent({ role, taskId }) {
   }
 
   try {
-    const child = cp.spawn('claude', ['-p', prompt], { cwd: workingDir, stdio: ['ignore', 'inherit', 'inherit'], detached: true });
+    const child = cp.spawn('claude', ['-p', prompt, '--permission-mode', 'bypassPermissions'], { cwd: workingDir, stdio: ['ignore', 'inherit', 'inherit'], detached: true });
     child.unref();
     log(`${GREEN}[claude spawn] ${role} ${taskId} pid=${child.pid}${RESET}`);
     return { mode: 'claude', pid: child.pid };
