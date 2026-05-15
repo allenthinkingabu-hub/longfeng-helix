@@ -62,4 +62,4 @@ spec-trace: T14 仅涉及 transition — mockup 09 CTA "结束本次" → 触发
 
 ## 5. 提交
 
-Commit hash: (见 git log after commit)
+Commit hash: 8acd64c
