@@ -70,13 +70,15 @@ describe('capture → analyzing transition (真 IDE)', () => {
     expect(page.path).toBe('pages/analyzing/index');
   });
 
-  it('analyzing 页接收到 query 参数 (subject + qid)', async () => {
+  it('analyzing 页接收到全部 query 参数 (imageUrl + subject + qid)', async () => {
     // 当前页应仍是 analyzing (上一个 test navigateTo 后停留)
     const page = await mp.currentPage();
     expect(page.path).toBe('pages/analyzing/index');
-    // 验证页面 query 包含预期的 transition 参数
+    // 验证页面 query 包含完整的 transition 参数 (三者缺一不可)
     // miniprogram-automator page.query 返回解析后的 query object
     const query = page.query || {};
+    expect(query).toHaveProperty('imageUrl');
+    expect(query.imageUrl).toBeTruthy(); // imageUrl 不能为空
     expect(query).toHaveProperty('subject', 'math');
     expect(query).toHaveProperty('qid', '42');
   });
