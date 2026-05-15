@@ -19,7 +19,7 @@ const SUBJECT_LABEL: Record<string, string> = {
 
 const DIFF_LABELS = ['', '简单', '偏易', '中等', '偏难', '困难'];
 
-const TIMELINE_LABELS = ['现在', '15:28', '明日', '4/24', '4/28', '5/6', '5/21'];
+const TIMELINE_LABELS = ['15:28', '明日', '4/24', '4/28', '5/6', '5/21'];
 
 interface PageData {
   pageState: 'LOADING' | 'DRAFT' | 'ERROR' | 'EMPTY';
@@ -65,7 +65,6 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
     diffLabel: '中等',
     analysisDuration: '4.2s',
     timelineNodes: [
-      { tLevel: 'T0', label: '现在' },
       { tLevel: 'T1', label: '15:28' },
       { tLevel: 'T2', label: '明日' },
       { tLevel: 'T3', label: '4/24' },
@@ -144,7 +143,7 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
   },
 
   _buildTimeline(nodes: PlannedNode[]) {
-    const levels = ['T0', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6'];
+    const levels = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'];
     return levels.map((lv, i) => ({
       tLevel: lv,
       label: TIMELINE_LABELS[i] || '',
