@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "SC01-T08",
+    "team_id": "team-1",
+    "title": "PHASE-B 延后 SC-01-T08 · P05→P-HOME 返回 · 今日复习大卡数字 +1 · 圆环进度动画",
+    "attempt": 1,
+    "phase": "tester",
+    "dev_done": true,
+    "passes": true,
+    "retries": 0,
+    "audit_retries": 1,
+    "git_commits": [
+      "94f922e"
+    ]
+  },
+  "work_log_dir": "audits/runs/SC01-T08/team-1/attempt-1",
+  "log_requirements": {
+    "must_write": [
+      "tester.md",
+      "adversarial.md",
+      "test-reports/"
+    ]
+  },
+  "audit_gate": "audit.js v1 + c4b · mock ≤ 5 · 数字对齐 · maxDiffPixels ≤ 500 · 禁 H2/Mock · git commit work_log 三件套强制",
+  "previous_audit_verdict": {
+    "task_id": "SC01-T08",
+    "attempt": 1,
+    "team_id": "team-1",
+    "audited_at": "2026-05-15T07:54:50.268Z",
+    "audited_by": "audit.js v1 (deterministic · 5 dims)",
+    "pass": false,
+    "checks": [
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_exists",
+        "pass": false,
+        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t08-home-to-wrongbook/audits/runs/SC01-T08/team-1/attempt-1/coder.md"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "bugs_found_md_exists",
+        "pass": false,
+        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t08-home-to-wrongbook/audits/runs/SC01-T08/team-1/attempt-1/bugs-found.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "tester_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t08-home-to-wrongbook/audits/runs/SC01-T08/team-1/attempt-1/tester.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t08-home-to-wrongbook/audits/runs/SC01-T08/team-1/attempt-1/adversarial.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "test_reports_nonempty",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t08-home-to-wrongbook/audits/runs/SC01-T08/team-1/attempt-1/test-reports"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_has_reject_round",
+        "pass": true,
+        "evidence": "REJECT/驳回 keyword found"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_has_fix_round",
+        "pass": true,
+        "evidence": "fix/修复 keyword found"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "mock_total_le_5",
+        "pass": true,
+        "evidence": "mock=4/5 (vi.mock,page.route,MockMvc,jest.mock)"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "maxDiffPixels_le_500",
+        "pass": true,
+        "evidence": "max=500/500"
+      },
+      {
+        "dimension": "bug_reality",
+        "name": "all_git_commits_verified",
+        "pass": true,
+        "evidence": "1/1 hash(es) git cat-file -e PASS"
+      },
+      {
+        "dimension": "test_validity",
+        "name": "tester_md_testcase_count_matches_xml",
+        "pass": false,
+        "evidence": "claimed=2 ≠ xml<testcase>=10"
+      },
+      {
+        "dimension": "test_validity",
+        "name": "adversarial_has_exploratory_keywords",
+        "pass": false,
+        "evidence": "1/2 minimum (expected: 连点/DOM/注入/超长/阻断/race/SQL etc.)"
+      },
+      {
+        "dimension": "spec_alignment",
+        "name": "dor_e2e_required",
+        "pass": true,
+        "evidence": "inflight.physical_verification.dor_c1_to_c6_required=false — DoR skipped (P0 audit task)"
+      }
+    ],
+    "redo_target": "coder",
+    "redo_reason": "[coder_compliance.coder_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t08-home-to-wrongbook/audits/runs/SC01-T08/team-1/attempt-1/coder.md · [coder_compliance.bugs_found_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t08-home-to-wrongbook/audits/runs/SC01-T08/team-1/attempt-1/bugs-found.md · [test_validity.tester_md_testcase_count_matches_xml] claimed=2 ≠ xml<testcase>=10 · [test_validity.adversarial_has_exploratory_keywords] 1/2 minimum (expected: 连点/DOM/注入/超长/阻断/race/SQL etc.)"
+  },
+  "context": {
+    "scenario": "PHASE-B 延后 TC-01.01 步 12-13 · P05→P-HOME 返回 · 今日复习大卡数字 +1 · 圆环进度动画",
+    "target_page": "P05→P-HOME",
+    "page_state_machine": "list.LIST → home.LOADING → home.READY",
+    "biz_step_range": "biz §2B.2 步 12-13",
+    "biz_refs": [
+      "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 12-13",
+      "biz §2A.3.3 P-HOME 今日聚合首页"
+    ],
+    "spec_refs": "design/system/pages/P-HOME.spec.md §5 GET /api/home/today",
+    "primary_services": [
+      "frontend/apps/h5",
+      "backend/review-plan-service (HomeAggregator)"
+    ],
+    "primary_apis": [
+      "GET /api/home/today?tz=Asia/Shanghai"
+    ],
+    "acceptance_criteria": [
+      {
+        "id": "AC1",
+        "text": "Tap Tab 1「首页」→ P-HOME 顶部大卡重新渲染 (loading skeleton 100ms 后真数据)"
+      },
+      {
+        "id": "AC2",
+        "text": "GET /api/home/today?tz=Asia/Shanghai → 200 {today:{total, done, circleProgress}, resume:null}"
+      },
+      {
+        "id": "AC3",
+        "text": "大卡数字从 N → N+1 (compare before/after · 必须经过 +1 动画 · 不可静默替换)"
+      },
+      {
+        "id": "AC4",
+        "text": "圆环进度从 done/total 旧值动画到新值 · 300ms easeInOut"
+      }
+    ],
+    "test_invariants": [
+      "TI1: tz 参数必须传 (跨时区学生 · 影响今日窗口 UTC 计算)",
+      "TI2: total=0 → 显示「今天已完成，拍一道新题试试？」hero 空态 (不显示数字 0)",
+      "TI3: 数字 +1 动画 ≥ 300ms 可见 (不允许静默 update)",
+      "TI4: home.READY 态 VRT screenshot"
+    ],
+    "key_invariants": [
+      "P-HOME 数据为 MVP 子集 (today.total/done/circleProgress + resume) · Phase 1 再剥独立 home-aggregator"
+    ],
+    "build_pages_required": "P-HOME (01_home_ios_refined.html · 首页 · home tab)",
+    "mockup_chain": "05_wrongbook_list.html (起点 T07 build) → 01_home_ios_refined.html (终点 build)",
+    "sandbox": {
+      "pg_port": 15433,
+      "redis_port": 16380,
+      "minio_api_port": 9002,
+      "pg_user": "longfeng",
+      "pg_password": "longfeng_dev",
+      "pg_db": "wrongbook"
+    },
+    "phase_b_prerequisites": "第一波 (T01/T03/T05/T11/T13) + 第二波 (T02/T04/T06/T12) 已合 main · 9 page+transition 可作 reference",
+    "e2e_protocol": "DoR C-1..C-6 + 真 sandbox + Playwright headed + toHaveScreenshot (audit c4b 新卡口)"
+  },
+  "isolation": {
+    "worktree_disabled": false,
+    "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t08-home-to-wrongbook",
+    "branch_name": "claude/sc01-t08-home-to-wrongbook"
+  },
+  "physical_verification": {
+    "dor_c1_to_c6_required": false
+  },
+  "permissions": {
+    "writable_fields": [
+      "task.passes"
+    ]
+  },
+  "written_at": "2026-05-15T07:54:50.274Z",
+  "written_by": "TL agent (PHASE-B B-wave spawn prep)",
+  "deliverables_definition_of_done": [
+    "1. Build 缺失 page (per build_pages_required · 1:1 mockup HTML)",
+    "2. transition 跳转实现 + 状态机",
+    "3. Playwright spec.ts 用 toHaveScreenshot (非 page.screenshot 盲存)",
+    "4. work_log: coder.md + bugs-found.md",
+    "5. **强制 git add audits/runs/SC01-T08/team-*/attempt-1/ + git commit**",
+    "6. inflight dev_done=true + git_commits[]",
+    "7. node .harness/harness.js --advance=SC01-T08"
+  ],
+  "rule_6_tool_budget_guidance": "PHASE-B 延后 · transition + 建新 page · 预计 ~60-80 tool use"
+}

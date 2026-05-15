@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { CapturePage } from './pages/Capture/index';
 import { AnalyzingPage } from './pages/Analyzing/index';
 import { ResultPage } from './pages/Result/index';
@@ -19,7 +19,8 @@ const ManualEntryStub: React.FC = () => (
 
 export const App: React.FC = () => (
   <Routes>
-    <Route path="/" element={<HomeStub />} />
+    <Route path="/" element={<HomePage />} />
+    <Route path="/wrongbook" element={<WrongbookStub />} />
     <Route path="/capture" element={<CapturePage />} />
     <Route path="/analyzing/:taskId" element={<AnalyzingPage />} />
     <Route path="/question/:qid/result" element={<ResultPage />} />
