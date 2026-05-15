@@ -57,5 +57,5 @@ Phase 1 scope: 写 spec 不跑 automator (Phase 2 TL 串行验)。
 
 ## 5. 提交
 
-- commit hash: (见下 git commit)
+- commit hash: `7287ba1`
 - 文件变更: `frontend/apps/mp/test/e2e/home.spec.ts` (+126 行 · 新文件)
