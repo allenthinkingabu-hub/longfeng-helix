@@ -9,7 +9,7 @@
     </view>
     <text class="nav-title">拍下错题</text>
     <view class="icon-btn" data-test-id="p02-topbar-flash-btn" bindtap="onToggleFlash">
-      <van-icon name="{{ flashOn ? 'bulb-o' : 'bulb-o' }}" color="{{ flashOn ? '#FFCC00' : '#fff' }}" size="18px" />
+      <van-icon name="bulb-o" color="{{ flashOn ? '#FFCC00' : '#fff' }}" size="18px" />
     </view>
   </view>
 
@@ -137,7 +137,7 @@
       <text>拍题</text>
     </view>
     <view class="tab">
-      <van-icon name="clock-o" size="24px" />
+      <van-icon name="bell" size="24px" />
       <text>复习</text>
     </view>
     <view class="tab">
