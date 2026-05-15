@@ -1,0 +1,16 @@
+{
+  "name": "@longfeng/root",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Repository root · husky pre-commit hooks for cross-stack lint",
+  "scripts": {
+    "prepare": "husky",
+    "lint:mp": "cd frontend/apps/mp && pnpm lint && pnpm test:unit",
+    "lint:h5": "cd frontend/apps/h5 && pnpm lint && pnpm typecheck",
+    "lint:backend": "cd backend && mvn -q checkstyle:check spotbugs:check -DskipTests || true",
+    "lint:all": "pnpm lint:mp && pnpm lint:h5"
+  },
+  "devDependencies": {
+    "husky": "^9.1.6"
+  }
+}

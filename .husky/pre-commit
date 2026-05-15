@@ -1,0 +1,35 @@
+#!/usr/bin/env sh
+# Pre-commit hook · cross-stack lint by changed paths
+# Skip if no staged files (e.g. `git commit --allow-empty`)
+
+CHANGED=$(git diff --cached --name-only)
+[ -z "$CHANGED" ] && exit 0
+
+# MP — node static lint + tsc + unit test
+if echo "$CHANGED" | grep -q "^frontend/apps/mp/"; then
+  echo "[pre-commit] MP files changed → pnpm -F mp lint + test:unit"
+  (cd frontend/apps/mp && pnpm -s lint && pnpm -s test:unit) || {
+    echo "[pre-commit] ✗ MP lint/test failed · commit blocked"
+    exit 1
+  }
+fi
+
+# H5 — eslint + tsc
+if echo "$CHANGED" | grep -q "^frontend/apps/h5/"; then
+  echo "[pre-commit] H5 files changed → pnpm -F h5 lint + typecheck"
+  (cd frontend/apps/h5 && pnpm -s lint && pnpm -s typecheck) || {
+    echo "[pre-commit] ✗ H5 lint/typecheck failed · commit blocked"
+    exit 1
+  }
+fi
+
+# Backend — checkstyle + spotbugs (if configured); skipTests for speed
+if echo "$CHANGED" | grep -q "^backend/.*\.java$"; then
+  echo "[pre-commit] Backend Java changed → mvn checkstyle:check spotbugs:check"
+  (cd backend && mvn -q checkstyle:check spotbugs:check -DskipTests) || {
+    echo "[pre-commit] ✗ Backend static-analysis failed · commit blocked"
+    exit 1
+  }
+fi
+
+echo "[pre-commit] ✓ all stack checks passed"
