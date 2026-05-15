@@ -49,4 +49,4 @@ pnpm -F mp typecheck → PASS (0 errors)
 
 ## 5. 提交
 
-Commit hash: (pending — will be filled after git commit)
+Commit hash: 29cfa90
