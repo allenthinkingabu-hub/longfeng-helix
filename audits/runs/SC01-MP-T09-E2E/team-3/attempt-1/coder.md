@@ -54,4 +54,4 @@ Phase 1 scope: 写 spec + lint + tsc + test:unit only. **不跑 automator** (Pha
 
 ## 5. 提交
 
-- commit hash: (pending — will be filled after git commit)
+- commit hash: `8c0143f` — pre-commit hook passed (lint 0 errors + 97/97 unit tests)
