@@ -5,7 +5,7 @@
     "team_id": "team-1",
     "title": "PHASE-B 延后 SC-01-T10 · P07 Tap 第 1 题「开始」→ POST /nodes/{nid}/open → P08 + 写 EVENT_OPENED",
     "attempt": 2,
-    "phase": "tester",
+    "phase": "done",
     "dev_done": true,
     "passes": true,
     "retries": 0,
@@ -188,7 +188,7 @@
       "task.passes"
     ]
   },
-  "written_at": "2026-05-15T07:55:25.668Z",
+  "written_at": "2026-05-15T07:56:08.685Z",
   "written_by": "TL agent (PHASE-B B-wave spawn prep)",
   "deliverables_definition_of_done": [
     "1. Build 缺失 page (per build_pages_required · 1:1 mockup HTML)",
