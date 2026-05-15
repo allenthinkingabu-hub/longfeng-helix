@@ -4,17 +4,17 @@
     "id": "SC01-MP-T13",
     "team_id": "team-5",
     "title": "PHASE-C MP wave-1 · SC01-MP-T13 · P09 review-done 1:1 mirror H5 mockup (人工视觉验收路线)",
-    "attempt": 1,
+    "attempt": 2,
     "phase": "tester",
     "dev_done": true,
     "passes": true,
     "retries": 0,
-    "audit_retries": 0,
+    "audit_retries": 1,
     "git_commits": [
       "acd3fe8"
     ]
   },
-  "work_log_dir": "audits/runs/SC01-MP-T13/team-5/attempt-1",
+  "work_log_dir": "audits/runs/SC01-MP-T13/team-5/attempt-2",
   "log_requirements": {
     "must_write": [
       "tester.md",
@@ -23,7 +23,126 @@
     ]
   },
   "audit_gate": "audit.js v1 relaxed (PHASE-C 人工视觉路线) · 验 tsc PASS + mockup baseline 4-state 截图落盘 + spec-trace.md · NO automator E2E · mock ≤ 5 · 强制 git commit work_log",
-  "previous_audit_verdict": null,
+  "previous_audit_verdict": {
+    "task_id": "SC01-MP-T13",
+    "attempt": 1,
+    "team_id": "team-5",
+    "audited_at": "2026-05-15T12:59:06.961Z",
+    "audited_by": "audit.js v1 (deterministic · 5 dims)",
+    "pass": false,
+    "checks": [
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t13-review-done/audits/runs/SC01-MP-T13/team-5/attempt-1/coder.md"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_地形侦察",
+        "pass": true,
+        "evidence": "1×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_编码",
+        "pass": true,
+        "evidence": "1×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_自检",
+        "pass": true,
+        "evidence": "1×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_提交",
+        "pass": true,
+        "evidence": "1×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "bugs_found_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t13-review-done/audits/runs/SC01-MP-T13/team-5/attempt-1/bugs-found.md"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "bugs_found_md_has_declaration",
+        "pass": true,
+        "evidence": "bug list found"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "tester_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t13-review-done/audits/runs/SC01-MP-T13/team-5/attempt-1/tester.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t13-review-done/audits/runs/SC01-MP-T13/team-5/attempt-1/adversarial.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "test_reports_nonempty",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t13-review-done/audits/runs/SC01-MP-T13/team-5/attempt-1/test-reports"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_has_reject_round",
+        "pass": true,
+        "evidence": "REJECT/驳回 keyword found"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_has_fix_round",
+        "pass": true,
+        "evidence": "fix/修复 keyword found"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "mock_total_le_5",
+        "pass": false,
+        "evidence": "mock=10/5 OVER · {\"vi.mock\":2,\"page.route\":2,\"MockMvc\":1,\"jest.mock\":1,\"wx.request.mock\":1,\"miniprogram-simulate\":1,\"wx.cloud.mock\":1,\"mockRequest\":1}"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "maxDiffPixels_le_500",
+        "pass": true,
+        "evidence": "max=500/500"
+      },
+      {
+        "dimension": "bug_reality",
+        "name": "all_git_commits_verified",
+        "pass": true,
+        "evidence": "1/1 hash(es) git cat-file -e PASS"
+      },
+      {
+        "dimension": "test_validity",
+        "name": "tester_md_testcase_count_matches_xml",
+        "pass": true,
+        "evidence": "no explicit testcase count in tester.md — skip (advisory)"
+      },
+      {
+        "dimension": "test_validity",
+        "name": "adversarial_has_exploratory_keywords",
+        "pass": true,
+        "evidence": "2 matched: [block,race]"
+      },
+      {
+        "dimension": "spec_alignment",
+        "name": "dor_e2e_required",
+        "pass": true,
+        "evidence": "inflight.physical_verification.dor_c1_to_c6_required=false — DoR skipped (P0 audit task)"
+      }
+    ],
+    "redo_target": "tester",
+    "redo_reason": "[tester_compliance.mock_total_le_5] mock=10/5 OVER · {\"vi.mock\":2,\"page.route\":2,\"MockMvc\":1,\"jest.mock\":1,\"wx.request.mock\":1,\"miniprogram-simulate\":1,\"wx.cloud.mock\":1,\"mockRequest\":1}"
+  },
   "context": {
     "scenario": "PHASE-C MP 14 mirror 第一波 · SC01-MP-T13 · P09 页 1:1 mirror H5 同名 mockup",
     "phase_c_route": "人工视觉验收 (automator E2E 在用户 Mac 上 IDE/CLI 接入摩擦大 · 已被 TL 决策跳过)",
@@ -77,6 +196,6 @@
     "9. node .harness/harness.js --advance=SC01-MP-T13"
   ],
   "rule_6_tool_budget_guidance": "PHASE-C wave-1 单 page 1:1 mirror + 4 screenshot + tsc · 预计 ~40-60 tool use · 软线 50 self-check · 70 surface · 85 forced compaction summary",
-  "written_at": "2026-05-15T12:54:16.477Z",
+  "written_at": "2026-05-15T12:59:06.968Z",
   "written_by": "TL agent (PHASE-C wave-1 spawn prep · 人工视觉路线)"
 }
