@@ -1,6 +1,6 @@
 # tester.md · SC01-MP-T11 · P08 复习执行 MP 1:1 mirror · attempt-3
 
-> attempt-3 独立 Tester 复审。attempt-2 audit REDO 原因: coder_compliance (coder.md + bugs-found.md 缺失)，tester_compliance 7/7 PASS。
+> attempt-3 独立 Tester 复审。attempt-2 audit REDO 原因: coder_compliance (coder.md + bugs-found.md 缺失)，tester_compliance all checks passed。
 > 本轮: 验证 Coder 补齐交付物 + 代码无回归 + 探索性对抗 re-verify。
 
 ## 测试方法

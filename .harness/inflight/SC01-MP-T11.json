@@ -27,7 +27,7 @@
     "task_id": "SC01-MP-T11",
     "attempt": 3,
     "team_id": "team-4",
-    "audited_at": "2026-05-15T13:04:19.173Z",
+    "audited_at": "2026-05-15T13:12:39.545Z",
     "audited_by": "audit.js v1 (deterministic · 5 dims)",
     "pass": false,
     "checks": [
@@ -196,6 +196,6 @@
     "9. node .harness/harness.js --advance=SC01-MP-T11"
   ],
   "rule_6_tool_budget_guidance": "PHASE-C wave-1 单 page 1:1 mirror + 4 screenshot + tsc · 预计 ~40-60 tool use · 软线 50 self-check · 70 surface · 85 forced compaction summary",
-  "written_at": "2026-05-15T13:09:50.032Z",
+  "written_at": "2026-05-15T13:12:39.550Z",
   "written_by": "TL agent (PHASE-C wave-1 spawn prep · 人工视觉路线)"
 }
