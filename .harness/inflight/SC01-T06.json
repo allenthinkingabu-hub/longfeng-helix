@@ -4,17 +4,17 @@
     "id": "SC01-T06",
     "team_id": "team-2",
     "title": "PHASE-B 第二波 SC-01-T06 · question.created MQ → review-plan 生成 plan+7 nodes → calendar-core 落 7 events",
-    "attempt": 1,
+    "attempt": 2,
     "phase": "tester",
     "dev_done": true,
     "passes": true,
     "retries": 0,
-    "audit_retries": 0,
+    "audit_retries": 1,
     "git_commits": [
       "8aff994"
     ]
   },
-  "work_log_dir": "audits/runs/SC01-T06/team-2/attempt-1",
+  "work_log_dir": "audits/runs/SC01-T06/team-2/attempt-2",
   "log_requirements": {
     "must_write": [
       "tester.md",
@@ -23,7 +23,126 @@
     ]
   },
   "audit_gate": "audit.js v1 (含新加 c4b 真 VRT 检查) 五维度严卡 · mock ≤ 5 · 数字对齐 · maxDiffPixels ≤ 500 · 禁 H2/Mock",
-  "previous_audit_verdict": null,
+  "previous_audit_verdict": {
+    "task_id": "SC01-T06",
+    "attempt": 1,
+    "team_id": "team-2",
+    "audited_at": "2026-05-15T06:38:44.335Z",
+    "audited_by": "audit.js v1 (deterministic · 5 dims)",
+    "pass": false,
+    "checks": [
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/audits/runs/SC01-T06/team-2/attempt-1/coder.md"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_地形侦察",
+        "pass": true,
+        "evidence": "1×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_编码",
+        "pass": true,
+        "evidence": "2×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_自检",
+        "pass": true,
+        "evidence": "1×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_提交",
+        "pass": true,
+        "evidence": "1×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "bugs_found_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/audits/runs/SC01-T06/team-2/attempt-1/bugs-found.md"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "bugs_found_md_has_declaration",
+        "pass": true,
+        "evidence": "\"0 bug\" declaration found"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "tester_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/audits/runs/SC01-T06/team-2/attempt-1/tester.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/audits/runs/SC01-T06/team-2/attempt-1/adversarial.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "test_reports_nonempty",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/audits/runs/SC01-T06/team-2/attempt-1/test-reports"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_has_reject_round",
+        "pass": true,
+        "evidence": "REJECT/驳回 keyword found"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_has_fix_round",
+        "pass": true,
+        "evidence": "fix/修复 keyword found"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "mock_total_le_5",
+        "pass": true,
+        "evidence": "mock=0/5 (none)"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "maxDiffPixels_le_500",
+        "pass": true,
+        "evidence": "max=500/500"
+      },
+      {
+        "dimension": "bug_reality",
+        "name": "all_git_commits_verified",
+        "pass": true,
+        "evidence": "1/1 hash(es) git cat-file -e PASS"
+      },
+      {
+        "dimension": "test_validity",
+        "name": "tester_md_testcase_count_matches_xml",
+        "pass": false,
+        "evidence": "claimed=5 ≠ xml<testcase>=10"
+      },
+      {
+        "dimension": "test_validity",
+        "name": "adversarial_has_exploratory_keywords",
+        "pass": false,
+        "evidence": "0/2 minimum (expected: 连点/DOM/注入/超长/阻断/race/SQL etc.)"
+      },
+      {
+        "dimension": "spec_alignment",
+        "name": "dor_e2e_required",
+        "pass": true,
+        "evidence": "inflight.physical_verification.dor_c1_to_c6_required=false — DoR skipped (P0 audit task)"
+      }
+    ],
+    "redo_target": "tester",
+    "redo_reason": "[test_validity.tester_md_testcase_count_matches_xml] claimed=5 ≠ xml<testcase>=10 · [test_validity.adversarial_has_exploratory_keywords] 0/2 minimum (expected: 连点/DOM/注入/超长/阻断/race/SQL etc.)"
+  },
   "context": {
     "scenario": "PHASE-B 第二波 · TC-01.01 步 10 (后端透明) + TC-01.05 (calendar 503 outbox 兜底) · question.created MQ → review-plan 生成 plan+7 nodes → calendar-core 落 7 events",
     "target_page": "(后端透明 · 用户无感知)",
@@ -107,7 +226,7 @@
       "task.passes"
     ]
   },
-  "written_at": "2026-05-15T06:05:40.586Z",
+  "written_at": "2026-05-15T06:38:44.339Z",
   "written_by": "TL agent (PHASE-B wave 2 spawn prep)",
   "deliverables_definition_of_done": [
     "1. 实现 task per inflight.context.acceptance_criteria + test_invariants",
