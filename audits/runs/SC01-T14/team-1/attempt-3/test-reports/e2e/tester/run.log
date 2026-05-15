@@ -1,0 +1,19 @@
+Running 6 tests using 1 worker
+
+  ✓  AC1+AC2 · tap 结束本次 → P09→P-HOME transition ≤500ms (1.3s)
+  ✓  AC3+AC4 · P-HOME renders with correct data after transition (401ms)
+  ✓  TI3 · wb_done_exit埋点 fires on tap 结束本次 (331ms)
+  ✓  AC5 · done==total → hero 切「今天已完成」+ 大卡显示 0 (437ms)
+  ✓  P-HOME renders READY state with data from API (257ms)
+  ✓  P-HOME VRT · toHaveScreenshot baseline (816ms)
+
+  6 passed (4.2s)
+
+--- Adversarial tests ---
+  ✓  ADV1 · 阻断 API 500 on home/today → P-HOME renders error state (647ms)
+  ✓  ADV2 · dblclick 结束本次 → no crash, navigates to P-HOME (363ms)
+  ✓  ADV3 · network timeout on home/today → P-HOME handles gracefully (343ms)
+
+  3 passed (2.2s)
+
+Total: 9 tests, 0 failures

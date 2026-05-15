@@ -1,0 +1,11 @@
+
+Running 6 tests using 1 worker
+
+  ✓  1 [chromium] › tests/e2e/sc-01/t14-done-to-home.spec.ts:148:5 › SC-01-T14 · P09→P-HOME Done-to-Home transition › Normal path (TC-01.01 步 20) › AC1+AC2 · tap 结束本次 → P09→P-HOME transition ≤500ms (1.0s)
+  ✓  2 [chromium] › tests/e2e/sc-01/t14-done-to-home.spec.ts:179:5 › SC-01-T14 · P09→P-HOME Done-to-Home transition › Normal path (TC-01.01 步 20) › AC3+AC4 · P-HOME renders with correct data after transition (772ms)
+  ✓  3 [chromium] › tests/e2e/sc-01/t14-done-to-home.spec.ts:214:5 › SC-01-T14 · P09→P-HOME Done-to-Home transition › Normal path (TC-01.01 步 20) › TI3 · wb_done_exit埋点 fires on tap 结束本次 (703ms)
+  ✓  4 [chromium] › tests/e2e/sc-01/t14-done-to-home.spec.ts:280:5 › SC-01-T14 · P09→P-HOME Done-to-Home transition › ALL_DONE path (AC5 · TC-02.01 步 12) › AC5 · done==total → hero 切「今天已完成」+ 大卡显示 0 (802ms)
+  ✓  5 [chromium] › tests/e2e/sc-01/t14-done-to-home.spec.ts:318:5 › SC-01-T14 · P09→P-HOME Done-to-Home transition › P-HOME standalone rendering › P-HOME renders READY state with data from API (664ms)
+  ✓  6 [chromium] › tests/e2e/sc-01/t14-done-to-home.spec.ts:346:5 › SC-01-T14 · P09→P-HOME Done-to-Home transition › P-HOME standalone rendering › P-HOME VRT · toHaveScreenshot baseline (1.2s)
+
+  6 passed (6.1s)
