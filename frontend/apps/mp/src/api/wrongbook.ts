@@ -72,3 +72,49 @@ export function createQuestion(req: CreateQuestionReq): Promise<CreateQuestionRe
     { method: 'POST', body: req },
   );
 }
+
+// ── list wrong questions (P05 wrongbook list page) ───────────
+
+export interface WrongQuestionListItem {
+  qid: string;
+  subject: string;
+  kp: string[];
+  stemSnippet: string;
+  thumb: string;
+  masteryPct: number;
+  masteryLabel: 'NOT_MASTERED' | 'PARTIAL' | 'MASTERED';
+  nextDueAt: string;
+  nodeStage: number;
+  createdAt: string;
+  errorType?: string;
+  difficulty: number;
+  questionNo: string;
+}
+
+export interface ListWrongQuestionsResp {
+  items: WrongQuestionListItem[];
+  total: number;
+  page: number;
+  size: number;
+}
+
+export interface ListWrongQuestionsParams {
+  page?: number;
+  size?: number;
+  subject?: string;
+  mastery?: string;
+}
+
+/** GET /api/wb/questions */
+export function listWrongQuestions(
+  params: ListWrongQuestionsParams = {},
+): Promise<ListWrongQuestionsResp> {
+  const parts: string[] = [];
+  if (params.page !== undefined) parts.push(`page=${params.page}`);
+  if (params.size !== undefined) parts.push(`size=${params.size}`);
+  if (params.subject) parts.push(`subject=${params.subject}`);
+  if (params.mastery) parts.push(`mastery=${params.mastery}`);
+  const query = parts.join('&');
+  const url = `${apiBase('wb')}/api/wb/questions${query ? `?${query}` : ''}`;
+  return httpJSON<ListWrongQuestionsResp>(url);
+}

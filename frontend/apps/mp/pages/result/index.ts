@@ -173,11 +173,13 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
     this.setData({ isSaving: true });
 
     try {
-      // POST save is out of scope for T05 result page mirror
-      // In production this would call questionsClient.save(qid)
+      // T07: save + transition to P05 wrongbook list
       wx.showToast({ title: '保存成功', icon: 'success' });
+      const qid = this._questionRaw?.id || this._qid;
       setTimeout(() => {
-        wx.navigateBack({ delta: 1 });
+        wx.navigateTo({
+          url: `/pages/wrongbook-list/index?highlight=${qid}`,
+        });
       }, 1500);
     } catch (err) {
       console.error('[P04] save error:', err);
