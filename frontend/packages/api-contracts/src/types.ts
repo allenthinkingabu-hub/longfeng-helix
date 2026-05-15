@@ -278,6 +278,39 @@ export interface GradeReq {
 /** Response 复用 NodeResultResp (backend CompleteResult maps 1:1) */
 export type GradeResp = NodeResultResp;
 
+// ==================== SC-01-T10 · GET /api/review/today · P07 TodayReview ====================
+// 对齐 backend ReviewPlanController.today() + spec P07-review-today.spec.md §5 #1
+export interface TodaySlotItem {
+  nid: string;
+  tLevel: 'T0' | 'T1' | 'T2' | 'T3' | 'T4' | 'T5' | 'T6';
+  hhmm: string;
+  nextDueAt: string;
+  subject: string;
+  kp: string;
+  stem: string;
+  tags: string[];
+  status: 'SCHEDULED' | 'PUSHED' | 'OPEN' | 'GRADED';
+}
+
+export interface TodaySlot {
+  slotKey: 'now' | 'morning' | 'afternoon' | 'evening';
+  slotTitle: string;
+  items: TodaySlotItem[];
+}
+
+export interface TodayResp {
+  date: string;
+  tzOffset: string;
+  totalCount: number;
+  estMinutes: number;
+  doneCount: number;
+  inProgressCount: number;
+  waitCount: number;
+  progressPct: number;
+  masteryPct: number;
+  slots: TodaySlot[];
+}
+
 // ==================== S5 review-plan（readonly）====================
 export interface ReviewPlanVO {
   id: string;

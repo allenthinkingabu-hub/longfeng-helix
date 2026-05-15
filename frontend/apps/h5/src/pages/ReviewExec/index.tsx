@@ -5,13 +5,17 @@
  * 状态机: READING → ANSWERING → REVEALED → GRADED
  * A11y: aria-live on reveal card, aria-disabled on mastered btn after reveal
  *
+ * T10 scope: LIST → READING (enter page) → ANSWERING (canvas touch)
+ *   AC1: Tap 列表第一题「开始」按钮 · 按钮 loading + 触觉 medium (P07 handles)
+ *   AC2: POST /api/review/nodes/{nid}/open → 200 (P07 calls before nav)
+ *   AC3: P07 → P08 跳转 ≤ 400ms · 顶部进度条 1/N + chips + 题干卡 渲染
+ *   AC4: 状态 READING (题干可见) → ANSWERING (canvas onTouchStart · 笔迹实时渲染)
+ *   AC5: P08 强制关闭 (×) → 弹二次确认 Sheet
+ *
  * T11 scope: ANSWERING → REVEALED (tap 揭示答案)
- *   AC1: Tap 揭示按钮 · loading + 触觉 light
- *   AC2: POST /api/review/nodes/{nid}/reveal → 200 · markRevealed(nid)
- *   AC3: 答案卡绿色展开 300ms easeOut + 3 步解法 + 6 节点时间线高亮当前 T (pulse)
- *   AC4: 状态 ANSWERING → REVEALED · 揭示后底部 3 按钮全部可点
- *   TI1: reveal 不改 plan · TI2: reveal 不发 MQ · TI3: mastered btn disabled after reveal
- *   TI4: 埋点 wb_exec_reveal{nid,waitMs}
+ *   AC1-AC4, TI1-TI4 (preserved from T11)
+ *
+ * T12 scope: REVEALED → GRADED (tap grade → SM-2 → P09)
  */
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -78,10 +82,14 @@ export const ReviewExecPage: React.FC = () => {
   const nid = rawNid;
 
   // ── State machine ──────────────────────────────────────────
-  const [execState, setExecState] = useState<ExecState>('ANSWERING');
+  // T10 AC4: 初始状态 READING (not ANSWERING)
+  const [execState, setExecState] = useState<ExecState>('READING');
   const [isRevealing, setIsRevealing] = useState(false);
   const [revealedAt, setRevealedAt] = useState<string | null>(null);
   const openedAtRef = useRef<number>(Date.now());
+
+  // T10 AC5: Exit confirm sheet state
+  const [showExitSheet, setShowExitSheet] = useState(false);
 
   // ── Data (mock for now · T10 will wire real data loading) ──
   const question: QuestionData = MOCK_QUESTION;
@@ -89,6 +97,14 @@ export const ReviewExecPage: React.FC = () => {
   const cursor = 2;
   const total = 8;
   const progressPct = Math.round((cursor / total) * 100);
+
+  // ── T10 AC4: canvas onTouchStart → READING → ANSWERING ────
+  const handleCanvasTouch = useCallback(() => {
+    if (execState === 'READING') {
+      setExecState('ANSWERING');
+      track('wb_exec_writing_start', { nid, mode: 'handwrite' });
+    }
+  }, [execState, nid]);
 
   // ── AC1+AC2: Tap reveal → POST /reveal → REVEALED ──────────
   const handleReveal = useCallback(async () => {
@@ -149,6 +165,22 @@ export const ReviewExecPage: React.FC = () => {
     setIsGrading(false);
   }, [nid, nav, isGrading]);
 
+  // ── T10 AC5: Close handler → exit confirm sheet ────────────
+  const handleClose = useCallback(() => {
+    setShowExitSheet(true);
+    track('wb_exec_exit_confirm', { nid, progress: cursor / total });
+  }, [nid, cursor, total]);
+
+  const handleExitCancel = useCallback(() => {
+    setShowExitSheet(false);
+  }, []);
+
+  const handleExitConfirm = useCallback(() => {
+    setShowExitSheet(false);
+    track('wb_exec_exit', { nid, sessionId: 'mock-sid-001' });
+    nav('/');
+  }, [nid, nav]);
+
   // ── Derived state ──────────────────────────────────────────
   const isRevealed = execState === 'REVEALED' || execState === 'GRADED';
   // TI3 (spec §6.4): 揭示后 mastered btn disabled
@@ -175,7 +207,7 @@ export const ReviewExecPage: React.FC = () => {
         <button
           className={s.close}
           data-testid={TEST_IDS.p08.closeBtn}
-          onClick={() => nav('/')}
+          onClick={handleClose}
           aria-label="关闭"
         >
           <svg width="14" height="14" viewBox="0 0 14 14">
@@ -213,10 +245,15 @@ export const ReviewExecPage: React.FC = () => {
         </div>
 
         {/* ── Work area (mockup .work L172) ────────────────── */}
-        <div className={s.blockTitle} data-testid={TEST_IDS.p08.answerArea}>
+        <div className={s.blockTitle}>
           <span className={s.blockTitleDot} />你的解答 · 手写
         </div>
-        <div className={s.work}>
+        <div
+          className={s.work}
+          data-testid={TEST_IDS.p08.answerArea}
+          onTouchStart={handleCanvasTouch}
+          onMouseDown={handleCanvasTouch}
+        >
           <div className={s.paper}>
             <div className={s.handwritten}>
               f(x) = x² − 4x + 3<br/>
@@ -373,6 +410,26 @@ export const ReviewExecPage: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* ── T10 AC5: Exit confirm sheet ──────────────────── */}
+      {showExitSheet && (
+        <div className={s.sheetOverlay} data-testid={TEST_IDS.p08.exitConfirmSheet}>
+          <div className={s.sheet}>
+            <div className={s.sheetTitle}>退出本次复习？</div>
+            <div className={s.sheetBody}>
+              本次复习尚未自评，退出将保留在原计划
+            </div>
+            <div className={s.sheetActions}>
+              <button className={s.sheetCancel} onClick={handleExitCancel}>
+                取消
+              </button>
+              <button className={s.sheetExit} onClick={handleExitConfirm}>
+                退出
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,0 +1,22 @@
+<testsuites id="" name="" tests="9" failures="0" skipped="0" errors="0" time="4.900900000000001">
+<testsuite name="sc-01/t10-target-to-exec.spec.ts" timestamp="2026-05-15T07:52:15.004Z" hostname="chromium" tests="9" failures="0" skipped="0" time="4.064" errors="0">
+<testcase name="SC-01-T10 · P07 Tap → POST /open → P08 渲染 + READING→ANSWERING › P07 · 页面结构渲染 › P07 · Hero card + stats + progress visible" classname="sc-01/t10-target-to-exec.spec.ts" time="0.518">
+</testcase>
+<testcase name="SC-01-T10 · P07 Tap → POST /open → P08 渲染 + READING→ANSWERING › P07 · 页面结构渲染 › P07 · slot headers + item cards visible" classname="sc-01/t10-target-to-exec.spec.ts" time="0.47">
+</testcase>
+<testcase name="SC-01-T10 · P07 Tap → POST /open → P08 渲染 + READING→ANSWERING › P07 → P08 transition › AC1+AC2+AC3 · tap item → POST /open 200 → P08 renders" classname="sc-01/t10-target-to-exec.spec.ts" time="0.484">
+</testcase>
+<testcase name="SC-01-T10 · P07 Tap → POST /open → P08 渲染 + READING→ANSWERING › P07 → P08 transition › AC3 · bottom CTA &quot;全部开始&quot; → POST /open → P08" classname="sc-01/t10-target-to-exec.spec.ts" time="0.469">
+</testcase>
+<testcase name="SC-01-T10 · P07 Tap → POST /open → P08 渲染 + READING→ANSWERING › P08 · READING → ANSWERING › AC4 · READING state: reveal button disabled → touch canvas → ANSWERING: reveal button enabled" classname="sc-01/t10-target-to-exec.spec.ts" time="0.387">
+</testcase>
+<testcase name="SC-01-T10 · P07 Tap → POST /open → P08 渲染 + READING→ANSWERING › P08 · Exit confirm sheet › AC5 · tap × → exit confirm sheet → cancel → back to P08" classname="sc-01/t10-target-to-exec.spec.ts" time="0.502">
+</testcase>
+<testcase name="SC-01-T10 · P07 Tap → POST /open → P08 渲染 + READING→ANSWERING › P08 · Exit confirm sheet › AC5 · tap × → exit → tap &quot;退出&quot; → navigate home" classname="sc-01/t10-target-to-exec.spec.ts" time="0.391">
+</testcase>
+<testcase name="SC-01-T10 · P07 Tap → POST /open → P08 渲染 + READING→ANSWERING › TI2 · reveal content hidden before reveal (aria-hidden + display:none)" classname="sc-01/t10-target-to-exec.spec.ts" time="0.375">
+</testcase>
+<testcase name="SC-01-T10 · P07 Tap → POST /open → P08 渲染 + READING→ANSWERING › P08 UI structure · topbar + progress + meta + question + answer + grade + memory curve" classname="sc-01/t10-target-to-exec.spec.ts" time="0.468">
+</testcase>
+</testsuite>
+</testsuites>
