@@ -1,0 +1,120 @@
+{
+  "task_id": "SC01-T11",
+  "attempt": 3,
+  "team_id": "team-5",
+  "audited_at": "2026-05-15T05:15:16.167Z",
+  "audited_by": "audit.js v1 (deterministic · 5 dims)",
+  "pass": true,
+  "checks": [
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_exists",
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t11-review-exec/audits/runs/SC01-T11/team-5/attempt-3/coder.md"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_keyword_地形侦察",
+      "pass": true,
+      "evidence": "1×"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_keyword_编码",
+      "pass": true,
+      "evidence": "1×"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_keyword_自检",
+      "pass": true,
+      "evidence": "1×"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_keyword_提交",
+      "pass": true,
+      "evidence": "1×"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "bugs_found_md_exists",
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t11-review-exec/audits/runs/SC01-T11/team-5/attempt-3/bugs-found.md"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "bugs_found_md_has_declaration",
+      "pass": true,
+      "evidence": "bug list found"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "tester_md_exists",
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t11-review-exec/audits/runs/SC01-T11/team-5/attempt-3/tester.md"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "adversarial_md_exists",
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t11-review-exec/audits/runs/SC01-T11/team-5/attempt-3/adversarial.md"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "test_reports_nonempty",
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t11-review-exec/audits/runs/SC01-T11/team-5/attempt-3/test-reports"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "adversarial_has_reject_round",
+      "pass": true,
+      "evidence": "REJECT/驳回 keyword found"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "adversarial_has_fix_round",
+      "pass": true,
+      "evidence": "fix/修复 keyword found"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "mock_total_le_5",
+      "pass": true,
+      "evidence": "mock=0/5 (none)"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "maxDiffPixels_le_500",
+      "pass": true,
+      "evidence": "max=0/500"
+    },
+    {
+      "dimension": "bug_reality",
+      "name": "all_git_commits_verified",
+      "pass": true,
+      "evidence": "4/4 hash(es) git cat-file -e PASS"
+    },
+    {
+      "dimension": "test_validity",
+      "name": "tester_md_testcase_count_matches_xml",
+      "pass": true,
+      "evidence": "claimed=16 == xml<testcase>=16"
+    },
+    {
+      "dimension": "test_validity",
+      "name": "adversarial_has_exploratory_keywords",
+      "pass": true,
+      "evidence": "2 matched: [连点,边界]"
+    },
+    {
+      "dimension": "spec_alignment",
+      "name": "dor_e2e_required",
+      "pass": true,
+      "evidence": "inflight.physical_verification.dor_c1_to_c6_required=false — DoR skipped (P0 audit task)"
+    }
+  ],
+  "redo_target": null,
+  "redo_reason": null
+}
