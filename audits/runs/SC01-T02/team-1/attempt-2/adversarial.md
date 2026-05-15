@@ -1,64 +1,68 @@
-# SC01-T02 Adversarial Log · team-1 · attempt-1
+# SC01-T02 Adversarial Log · team-1 · attempt-2
 
-## Round 1 · REJECT — AC6 fallback banner 断言缺失
+## Round 1 · REJECT — AC2 骨架屏断言不完整（4 步 step 未逐一验证）
 
 ### 发现
 
-**AC6 要求**: "SSE 连接失败 → 顶部 toast + 不阻塞 (允许 P03 已进)"
+**AC2 要求**: "P03 首屏骨架屏 (4 步流水线占位 wait 态) 必须在跳转后 ≤ 100ms 渲染"
 
-**Coder E2E 脚本 (t02-capture-to-analyzing.spec.ts L389-417)**:
-- 仅断言 `p03-root` 和 `step1` 可见
-- **未断言** fallback banner (`p03-fallback-banner`) 是否出现
-- **未断言** banner 文本内容
-- VRT 基线在 banner 出现之前截图，掩盖了 banner 是否真正渲染
+**Coder E2E 脚本 (t02-capture-to-analyzing.spec.ts L320-322)**:
+- 仅断言 `p03-root` 和 `analyzing-pipeline` 容器可见
+- **未逐一断言** 4 个 pipeline step (`step-1` 到 `step-4`) 是否都在 wait 态渲染
+- 如果某个 step 组件条件渲染逻辑出 bug（如 step3/step4 未渲染），此测试不会捕获
 
 **复现**:
 ```bash
-# 添加 banner 断言后运行
-npx playwright test -g "AC6" --reporter=list
-# → FAIL: locator('[data-testid="p03-fallback-banner"]') not found (5s timeout)
+# 查看现有断言 — 只有 root + pipeline，缺少 step1-step4
+grep -n "TID_P03\." tests/e2e/sc-01/t02-capture-to-analyzing.spec.ts | head -10
+# L321: await expect(...TID_P03.root...).toBeVisible
+# L322: await expect(...TID_P03.pipeline...).toBeVisible
+# → happy path 缺失 step1-step4 断言（AC6 有 step1 但 happy path 没有）
 ```
-
-**根因分析**:
-- `useEventSource` hook 使用 fetch + 重试逻辑（maxRetries=3, exponential backoff 1s+2s+4s ≈ 7s）
-- SSE 500 后 hook 静默重试 3 次，耗时 ~7s 才触发 `onFail('NETWORK_ERROR')`
-- `onFail` 调用后 `errorBanner` 才被设置 → banner 才渲染
-- 原测试 5s 内截图，banner 尚未出现
 
 ### 修复
 
 **文件**: `frontend/apps/h5/tests/e2e/sc-01/t02-capture-to-analyzing.spec.ts`
 
-**变更** (L412-416):
+**变更** (L323-327 新增):
 ```typescript
-// AC6: fallback banner must appear after SSE retries exhausted
-// useEventSource retries 3x with exponential backoff (1s+2s+4s ≈ 7s) before calling onFail
-const banner = page.locator('[data-testid="p03-fallback-banner"]');
-await expect(banner).toBeVisible({ timeout: 15_000 });
-const bannerText = await banner.textContent();
-expect(bannerText, 'AC6: fallback banner shows error text').toBeTruthy();
+// AC2 strengthened: verify ALL 4 pipeline steps are present before SSE starts
+await expect(page.locator(`[data-testid="${TID_P03.step1}"]`)).toBeVisible({ timeout: 2_000 });
+await expect(page.locator(`[data-testid="${TID_P03.step2}"]`)).toBeVisible({ timeout: 2_000 });
+await expect(page.locator(`[data-testid="${TID_P03.step3}"]`)).toBeVisible({ timeout: 2_000 });
+await expect(page.locator(`[data-testid="${TID_P03.step4}"]`)).toBeVisible({ timeout: 2_000 });
 ```
-
-**VRT 基线更新**: `p03-sse-error-chromium-darwin.png` 重新生成（含 banner 渲染后的截图）
 
 ### 验证
 
 ```bash
 npx playwright test tests/e2e/sc-01/t02-capture-to-analyzing.spec.ts --reporter=list
-# 6 passed (16.7s)
+# 6 passed (17.7s)
 ```
 
-AC6 test 现在 9.3s 完成（含 ~7s SSE 重试等待），banner 可见性 + 文本断言均 PASS。
+AC1-3 happy path 现在断言全部 4 步 pipeline step 可见，覆盖了骨架屏完整性。
 
 ### 我为什么相信这个测试能抓到回归
 
-1. 如果 `useEventSource` 的 `onFail` 回调不再触发 → banner 不渲染 → `toBeVisible` 超时失败
-2. 如果 banner testid 被改名或删除 → locator 找不到元素 → 失败
-3. 如果 banner 文本为空 → `toBeTruthy()` 失败
-4. VRT 基线包含 banner 渲染后的完整页面 → CSS 回归（banner 样式丢失/错位）会被像素 diff 捕获
+1. 如果 `AnalyzingPipeline` 组件移除或条件跳过某个 step → `toBeVisible` 超时失败
+2. 由于 SSE gate 机制（`sseGate` Promise），验证发生在 SSE 事件流开始之前 → 确保检查的是 wait 态，不是已完成态
+3. 如果 testid 命名变更 → locator 找不到元素 → 失败
+4. VRT 基线 `p03-queued` 已含 4 步 wait 态，但 VRT 可能因 `maxDiffPixels=500` 容忍小偏差；逐一 `toBeVisible` 断言是确定性的，不受像素阈值影响
 
 ---
 
 ## Round 1 · FIX 确认 — PASS
 
-修复后全量 6/6 PASS，AC6 断言覆盖完整。进入 PASS 宣判。
+修复后全量 6/6 PASS，AC2 断言覆盖完整。进入 PASS 宣判。
+
+---
+
+## 探索性测试审查（超纲对抗 · 不影响本轮 PASS 判定）
+
+源码深度审查发现以下潜在风险，记录供后续 task 参考：
+
+| # | 问题 | 文件 | 严重性 | 本轮影响 |
+|---|------|------|--------|---------|
+| 1 | handleFile 无防抖 — 快速重复选文件可能创建多个 question | Capture/index.tsx | HIGH | 超出 T02 scope |
+| 2 | useEventSource SSE fetch 无 timeout — stream 挂住不自动断开 | useEventSource.ts | HIGH | AC6 已覆盖 SSE 失败 |
+| 3 | Analyzing.onDone setTimeout 与 cancel 微小 race | Analyzing/index.tsx | MEDIUM | navigatedRef guard 已存在 |

@@ -320,6 +320,11 @@ test.describe('SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url +
     // AC2: P03 skeleton screen visible (4 steps in wait state)
     await expect(page.locator(`[data-testid="${TID_P03.root}"]`)).toBeVisible({ timeout: 2_000 });
     await expect(page.locator(`[data-testid="${TID_P03.pipeline}"]`)).toBeVisible({ timeout: 2_000 });
+    // AC2 strengthened: verify ALL 4 pipeline steps are present before SSE starts
+    await expect(page.locator(`[data-testid="${TID_P03.step1}"]`)).toBeVisible({ timeout: 2_000 });
+    await expect(page.locator(`[data-testid="${TID_P03.step2}"]`)).toBeVisible({ timeout: 2_000 });
+    await expect(page.locator(`[data-testid="${TID_P03.step3}"]`)).toBeVisible({ timeout: 2_000 });
+    await expect(page.locator(`[data-testid="${TID_P03.step4}"]`)).toBeVisible({ timeout: 2_000 });
 
     // ── P03 骨架屏截图 (SSE gated → 4步 wait 态) ──
     await expect(page).toHaveScreenshot('p03-queued-chromium-darwin.png', {

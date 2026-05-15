@@ -5,7 +5,7 @@
     "team_id": "team-1",
     "title": "PHASE-B 第二波 SC-01-T02 · 上传完成自动跳 P03 · 创建 PENDING question · 启 analyze 任务 · SSE 订阅",
     "attempt": 2,
-    "phase": "tester",
+    "phase": "done",
     "dev_done": true,
     "passes": true,
     "retries": 0,
@@ -227,7 +227,7 @@
       "task.passes"
     ]
   },
-  "written_at": "2026-05-15T06:12:23.078Z",
+  "written_at": "2026-05-15T06:13:49.031Z",
   "written_by": "TL agent (PHASE-B wave 2 spawn prep)",
   "deliverables_definition_of_done": [
     "1. 实现 task per inflight.context.acceptance_criteria + test_invariants",
