@@ -46,4 +46,4 @@ Phase 1 spec-only — automator not invoked. Phase 2 TL will run `pnpm -F mp tes
 
 ## 5. 提交
 
-Commit hash: (to be filled after git commit)
+Commit hash: 4cb1a12
