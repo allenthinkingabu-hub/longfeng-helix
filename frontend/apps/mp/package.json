@@ -1,0 +1,25 @@
+{
+  "name": "@longfeng/mp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "龙凤错题本 · 微信小程序 · Vant Weapp · 消费 @longfeng/api-contracts + testids + telemetry",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "vitest run --config test/vitest.config.ts",
+    "devtools:open": "bash scripts/devtools-cli.sh open",
+    "devtools:auto": "bash scripts/devtools-cli.sh auto",
+    "devtools:close": "bash scripts/devtools-cli.sh close"
+  },
+  "dependencies": {
+    "@longfeng/api-contracts": "workspace:*",
+    "@longfeng/telemetry": "workspace:*",
+    "@longfeng/testids": "workspace:*",
+    "@vant/weapp": "^1.11.7"
+  },
+  "devDependencies": {
+    "miniprogram-api-typings": "^5.2.1",
+    "miniprogram-automator": "^0.12.1",
+    "typescript": "^5.5.4",
+    "vitest": "^1.6.0"
+  }
+}

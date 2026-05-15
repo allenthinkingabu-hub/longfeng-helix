@@ -1,0 +1,29 @@
+/* P02 拍题页样式 · Hello World 骨架 */
+.capture-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 40rpx;
+  box-sizing: border-box;
+}
+
+.capture-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 80rpx;
+}
+
+.capture-title {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.capture-subtitle {
+  font-size: 28rpx;
+  color: #999;
+}
