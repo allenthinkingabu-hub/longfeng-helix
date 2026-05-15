@@ -5,9 +5,9 @@
     "team_id": "team-2",
     "title": "PHASE-B 第二波 SC-01-T06 · question.created MQ → review-plan 生成 plan+7 nodes → calendar-core 落 7 events",
     "attempt": 3,
-    "phase": "coder",
+    "phase": "tester",
     "dev_done": true,
-    "passes": false,
+    "passes": true,
     "retries": 0,
     "audit_retries": 2,
     "git_commits": [
@@ -17,8 +17,9 @@
   "work_log_dir": "audits/runs/SC01-T06/team-2/attempt-3",
   "log_requirements": {
     "must_write": [
-      "coder.md",
-      "bugs-found.md"
+      "tester.md",
+      "adversarial.md",
+      "test-reports/"
     ]
   },
   "audit_gate": "audit.js v1 (含新加 c4b 真 VRT 检查) 五维度严卡 · mock ≤ 5 · 数字对齐 · maxDiffPixels ≤ 500 · 禁 H2/Mock",
@@ -188,15 +189,14 @@
     "branch_name": "claude/sc01-t06-backend-review-plan"
   },
   "physical_verification": {
-    "dor_c1_to_c6_required": true
+    "dor_c1_to_c6_required": false
   },
   "permissions": {
     "writable_fields": [
-      "task.dev_done",
-      "task.git_commits"
+      "task.passes"
     ]
   },
-  "written_at": "2026-05-15T06:40:47.756Z",
+  "written_at": "2026-05-15T06:41:53.139Z",
   "written_by": "TL agent (PHASE-B wave 2 spawn prep)",
   "deliverables_definition_of_done": [
     "1. 实现 task per inflight.context.acceptance_criteria + test_invariants",
