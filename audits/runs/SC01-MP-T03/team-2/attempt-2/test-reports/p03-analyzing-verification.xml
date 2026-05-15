@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="SC01-MP-T03 P03 Analyzing Verification" tests="6" failures="0" errors="0" time="0.0">
+  <testcase classname="tsc" name="tsc --noEmit pass (0 errors)" time="0.0"/>
+  <testcase classname="file-completeness" name="index.json + index.wxml + index.wxss + index.ts all exist" time="0.0"/>
+  <testcase classname="app-json" name="app.json pages array contains pages/analyzing/index" time="0.0"/>
+  <testcase classname="baseline-screenshots" name="4 baseline screenshots (init/analyzing/error/success) in mp-baseline/" time="0.0"/>
+  <testcase classname="spec-trace" name="spec-trace.md exists with DOM mapping + state machine + Vant table" time="0.0"/>
+  <testcase classname="state-machine" name="statusText correct for all 4 states (init/analyzing/success/error)" time="0.0"/>
+</testsuite>
