@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "SC01-T06",
+    "team_id": "team-2",
+    "title": "PHASE-B 第二波 SC-01-T06 · question.created MQ → review-plan 生成 plan+7 nodes → calendar-core 落 7 events",
+    "attempt": 3,
+    "phase": "done",
+    "dev_done": true,
+    "passes": true,
+    "retries": 0,
+    "audit_retries": 2,
+    "git_commits": [
+      "8aff994"
+    ]
+  },
+  "work_log_dir": "audits/runs/SC01-T06/team-2/attempt-3",
+  "log_requirements": {
+    "must_write": [
+      "tester.md",
+      "adversarial.md",
+      "test-reports/"
+    ]
+  },
+  "audit_gate": "audit.js v1 (含新加 c4b 真 VRT 检查) 五维度严卡 · mock ≤ 5 · 数字对齐 · maxDiffPixels ≤ 500 · 禁 H2/Mock",
+  "previous_audit_verdict": {
+    "task_id": "SC01-T06",
+    "attempt": 2,
+    "team_id": "team-2",
+    "audited_at": "2026-05-15T06:40:47.752Z",
+    "audited_by": "audit.js v1 (deterministic · 5 dims)",
+    "pass": false,
+    "checks": [
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_exists",
+        "pass": false,
+        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/audits/runs/SC01-T06/team-2/attempt-2/coder.md"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "bugs_found_md_exists",
+        "pass": false,
+        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/audits/runs/SC01-T06/team-2/attempt-2/bugs-found.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "tester_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/audits/runs/SC01-T06/team-2/attempt-2/tester.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/audits/runs/SC01-T06/team-2/attempt-2/adversarial.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "test_reports_nonempty",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/audits/runs/SC01-T06/team-2/attempt-2/test-reports"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_has_reject_round",
+        "pass": true,
+        "evidence": "REJECT/驳回 keyword found"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_has_fix_round",
+        "pass": true,
+        "evidence": "fix/修复 keyword found"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "mock_total_le_5",
+        "pass": true,
+        "evidence": "mock=0/5 (none)"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "maxDiffPixels_le_500",
+        "pass": true,
+        "evidence": "max=500/500"
+      },
+      {
+        "dimension": "bug_reality",
+        "name": "all_git_commits_verified",
+        "pass": true,
+        "evidence": "1/1 hash(es) git cat-file -e PASS"
+      },
+      {
+        "dimension": "test_validity",
+        "name": "tester_md_testcase_count_matches_xml",
+        "pass": true,
+        "evidence": "claimed=5 == xml<testcase>=5"
+      },
+      {
+        "dimension": "test_validity",
+        "name": "adversarial_has_exploratory_keywords",
+        "pass": true,
+        "evidence": "9 matched: [连点,注入,超长,脏数据,边界]"
+      },
+      {
+        "dimension": "spec_alignment",
+        "name": "dor_e2e_required",
+        "pass": true,
+        "evidence": "inflight.physical_verification.dor_c1_to_c6_required=false — DoR skipped (P0 audit task)"
+      }
+    ],
+    "redo_target": "coder",
+    "redo_reason": "[coder_compliance.coder_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/audits/runs/SC01-T06/team-2/attempt-2/coder.md · [coder_compliance.bugs_found_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/audits/runs/SC01-T06/team-2/attempt-2/bugs-found.md"
+  },
+  "context": {
+    "scenario": "PHASE-B 第二波 · TC-01.01 步 10 (后端透明) + TC-01.05 (calendar 503 outbox 兜底) · question.created MQ → review-plan 生成 plan+7 nodes → calendar-core 落 7 events",
+    "target_page": "(后端透明 · 用户无感知)",
+    "page_state_machine": "review.plan.created · 7 nodes ACTIVE · 7 calendar_events SCHEDULED",
+    "biz_step_range": "biz §2B.2 步 10",
+    "biz_refs": [
+      "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 10",
+      "biz §SC-01.10",
+      "TC-01.05"
+    ],
+    "spec_refs": "A05-review-plan.md §5 + A04-ai-analysis.md §7 events",
+    "primary_services": [
+      "backend/wrongbook-service (publisher)",
+      "backend/review-plan-service (consumer)",
+      "backend/calendar-core (Feign target)"
+    ],
+    "primary_apis": [
+      "MQ Topic: question.created.topic",
+      "review-plan internal: createSevenNodes(itemId, userId, occurredAt)",
+      "Feign POST → calendar-core: batchCreate 7 events"
+    ],
+    "acceptance_criteria": [
+      {
+        "id": "AC1",
+        "text": "question.created.topic 投递 1 条 · payload {itemId, userId, subject, topic, action, occurredAt} (snake_case JsonAlias 容错)"
+      },
+      {
+        "id": "AC2",
+        "text": "review-plan-service QuestionCreatedConsumer 消费 → service.createSevenNodes → wb_review_plan 1 条 + wb_review_node 7 条 (node_index 0..6 · strategyCode=EBBINGHAUS_SM2 · ease_factor=2.5 · status=ACTIVE)"
+      },
+      {
+        "id": "AC3",
+        "text": "NODE_OFFSETS [2h, 1d, 2d, 4d, 7d, 14d, 30d] 写入 next_due_at = baseInstant + offset · 与 spec §SC-01.10 字符级一致"
+      },
+      {
+        "id": "AC4",
+        "text": "createSevenNodes 后 calendarBatchCreate.dispatch(persisted) → 7 条 calendar_event (relation_type=STUDY · 独立事务)"
+      },
+      {
+        "id": "AC5",
+        "text": "TC-01.05 · calendar-core 503 → outbox EVENT_CALENDAR_BATCH_CREATE 滞留 · 3 次重试 (1s/3s/9s 退避) → 最终 7 条 event 全部落地 · UI 顶部 toast「排期同步中，稍后自动重试」"
+      },
+      {
+        "id": "AC6",
+        "text": "幂等: 同 wrong_item_id 重放 createSevenNodes → existsByWrongItemId 闸门拦截 · success counter 不增 / duplicate counter 增 · 不重复落 7 行"
+      }
+    ],
+    "test_invariants": [
+      "TI1: 7 节点 node_index 严格 0..6 · 无重复无缺失 (unique index uk_review_plan_item_node)",
+      "TI2: NODE_OFFSETS 与 spec §SC-01.10 + design/arch/s5-review-plan.md §A1 100% 对齐 (任何 offset 改动需 ADR)",
+      "TI3: 重放 question.created (同 msgId) → success=0 / duplicate=1 (micrometer counter)",
+      "TI4: calendar 失败不回滚 plan (eventual consistency · SC-01-C07)",
+      "TI5: outbox 重试到上限 (3 次) 仍失败 → 告警 + 落 dead-letter (不静默丢消息)"
+    ],
+    "key_invariants": [
+      "7 nodes + 7 calendar events 最终一致 (不允许 'plan 已建但 events 0 条' 持续 > 5 min)",
+      "重放不产生重复 plan/nodes/events"
+    ],
+    "sandbox": {
+      "pg_port": 15433,
+      "redis_port": 16380,
+      "minio_api_port": 9002,
+      "pg_user": "longfeng",
+      "pg_password": "longfeng_dev",
+      "pg_db": "wrongbook"
+    },
+    "mockup_directive": "(后端透明 · 无前端 page · 不需要 mockup)",
+    "e2e_protocol": "DoR C-1..C-6 per dor_c1_to_c6_required · 真 sandbox · 禁 Mock",
+    "phase_b_wave_1_prerequisites": "PHASE-B 第一波 5 page 已 merge main: Capture/Analyzing/Result/ReviewExec/ReviewDone · 可作为 transition 起点"
+  },
+  "isolation": {
+    "worktree_disabled": false,
+    "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan",
+    "branch_name": "claude/sc01-t06-backend-review-plan"
+  },
+  "physical_verification": {
+    "dor_c1_to_c6_required": false
+  },
+  "permissions": {
+    "writable_fields": [
+      "task.passes"
+    ]
+  },
+  "written_at": "2026-05-15T06:42:05.195Z",
+  "written_by": "TL agent (PHASE-B wave 2 spawn prep)",
+  "deliverables_definition_of_done": [
+    "1. 实现 task per inflight.context.acceptance_criteria + test_invariants",
+    "2. 起 backend service + 前端 dev server 真联调 (per primary_services + sandbox endpoint)",
+    "3. work_log: coder.md (5 段落) + bugs-found.md (真 bug list)",
+    "4. git commit 分批 · hash 全部 git cat-file -e 验真",
+    "5. **强制 git add audits/runs/SC01-T06/team-*/attempt-1/ + git commit** (per 上波教训)",
+    "6. inflight dev_done=true + git_commits[]",
+    "7. node .harness/harness.js --advance=SC01-T06"
+  ],
+  "rule_6_tool_budget_guidance": "PHASE-B 第二波 · transition task 比 page task 简单 · 预计 ~50-70 tool use"
+}
