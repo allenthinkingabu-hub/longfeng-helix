@@ -1,0 +1,14 @@
+<testsuites id="" name="" tests="5" failures="0" skipped="0" errors="0" time="5.490298000000001">
+<testsuite name="sc-01/t12-exec-to-done.spec.ts" timestamp="2026-05-15T05:53:39.674Z" hostname="chromium" tests="5" failures="0" skipped="0" time="4.183" errors="0">
+<testcase name="SC-01-T12 · P08→P09 Grade transition › MASTERED path (TC-01.01 步 18) › AC1+AC2+AC3+AC4 · tap ✓ 已掌握 → POST /grade MASTERED → P09 transition" classname="sc-01/t12-exec-to-done.spec.ts" time="1.258">
+</testcase>
+<testcase name="SC-01-T12 · P08→P09 Grade transition › MASTERED path (TC-01.01 步 18) › AC3 · grade request carries X-Idempotency-Key header" classname="sc-01/t12-exec-to-done.spec.ts" time="0.78">
+</testcase>
+<testcase name="SC-01-T12 · P08→P09 Grade transition › FORGOT path (TC-01.06 · AC5) › AC5 · tap ✗ 未掌握 → POST /grade FORGOT → P09 FORGOT variant" classname="sc-01/t12-exec-to-done.spec.ts" time="0.844">
+</testcase>
+<testcase name="SC-01-T12 · P08→P09 Grade transition › Grade error handling (spec §9) › spec §9 · grade 5xx → buttons remain enabled · no crash" classname="sc-01/t12-exec-to-done.spec.ts" time="0.809">
+</testcase>
+<testcase name="SC-01-T12 · P08→P09 Grade transition › memory curve · 7 nodes visible on P08" classname="sc-01/t12-exec-to-done.spec.ts" time="0.492">
+</testcase>
+</testsuite>
+</testsuites>
