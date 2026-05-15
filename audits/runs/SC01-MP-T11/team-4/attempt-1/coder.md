@@ -83,6 +83,6 @@ test/api/review-exec.integration.spec.ts
 
 ## 5. 提交
 
-- commit hash: (pending — will be filled after git commit)
+- commit hash: e609eae
 - branch: claude/sc01-mp-t11-review-exec
 - files: 8 files changed (4 new + 3 modified + 1 bugfix)
