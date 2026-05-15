@@ -25,6 +25,32 @@ page {
   overflow: hidden;
 }
 
+.hero::before,
+.hero::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+.hero::before {
+  width: 440rpx;
+  height: 440rpx;
+  background: #6DFFA1;
+  top: -120rpx;
+  left: -120rpx;
+  filter: blur(72rpx);
+}
+
+.hero::after {
+  width: 520rpx;
+  height: 520rpx;
+  background: #0B6B30;
+  bottom: -200rpx;
+  right: -160rpx;
+  filter: blur(72rpx);
+}
+
 .hero--forgot {
   background: linear-gradient(175deg, #CC6600 0%, #FF9500 100%);
 }

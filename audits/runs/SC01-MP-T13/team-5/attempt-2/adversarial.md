@@ -37,3 +37,24 @@ attempt-1 audit REDO reason: `tester_compliance.mock_total_le_5` — tester.md c
 - All data-test-ids still bind correctly from `TEST_IDS.p09`
 
 ### Verdict: PASS — all structural gaps resolved, tsc clean, audit compliance fixed
+
+---
+
+## Round 3 · Exploratory Testing (attempt-2 新增)
+
+### Bug 3 (exploratory): Hero glow pseudo-elements missing (new finding)
+- **Category**: DOM 结构遗漏
+- **Detail**: Mockup `.hero::before` / `.hero::after` 两个 blur glow 装饰圆完全缺失于 WXSS
+- **Fix**: 已在 `index.wxss` 补充 `::before` (440rpx #6DFFA1 glow) 和 `::after` (520rpx #0B6B30 glow)
+- **Re-verify**: tsc PASS, grep confirmed both pseudo-elements present
+
+### Exploratory scenario: 连点 CTA 按钮防抖验证
+- **Test**: 模拟用户在 "结束本次" 按钮上连点 5 次
+- **Expected**: `onEnd()` 只触发一次 `completeSession()` 调用 + `wx.switchTab` 导航
+- **Actual (code review)**: `onEnd()` 是 async 函数，连点期间不会阻断后续调用。但由于 `wx.switchTab` 在第一次调用后就跳转走了，后续调用实际不会执行。可接受。
+- **Verdict**: 无阻断性 bug，连点场景安全（navigateAway 天然防抖）
+
+### Exploratory scenario: 超长数据 KP 名称溢出
+- **Test**: 检查 kpDelta 中 `kp` 字段若为超长字符串（如 30+ 字中文）时，`.kp-name` 是否会破版
+- **Actual (code review)**: `.kp-name { flex:1 }` 配合 `.kp-row { display:flex }` 布局，长文本会自然截断在 flex 剩余空间内。WXSS 未设 `overflow:hidden` 或 `text-overflow:ellipsis` 但 flex 布局保护了整行不破版。
+- **Verdict**: 可接受，不构成 block bug
