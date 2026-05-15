@@ -11,7 +11,7 @@
  * A11y: aria-live="polite" on toast, aria-label on CTA buttons
  */
 import React, { useEffect, useState, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { reviewClient, NodeResultResp, NextInSessionResp, CalendarSubscribeResp } from '@longfeng/api-contracts';
 import { TEST_IDS, p09Ids } from '@longfeng/testids';
@@ -105,6 +105,7 @@ function Skeleton() {
 // ─── Main Component ─────────────────────────────────────────
 export const ReviewDonePage: React.FC = () => {
   const [params] = useSearchParams();
+  const navigate = useNavigate();
   const nid = params.get('nodeId') || 'mock-nid-001';
   const sid = params.get('sid') || 'mock-sid-001';
 
@@ -192,9 +193,9 @@ export const ReviewDonePage: React.FC = () => {
 
   const handleEnd = useCallback(() => {
     track('wb_done_exit', { nid, returnTo: 'home', state: pageState });
-    // Navigate to P-HOME
-    window.location.href = '/';
-  }, [nid, pageState]);
+    // T14: Navigate to P-HOME (soft navigation via React Router)
+    navigate('/');
+  }, [nid, pageState, navigate]);
 
   // ── Derived values ───────────────────────────────────────
   // T12: FORGOT variant detection — from query param (P08 passes grade) or result state
