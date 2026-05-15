@@ -1,8 +1,27 @@
 {
   "schema_version": 1,
-  "task": {"id": "SC01-MP-T04-E2E", "team_id": "team-2", "title": "PHASE-C MP E2E + VRT · SC01-MP-T04-E2E · analyzing (transition)", "attempt": 1, "phase": "coder", "dev_done": true, "passes": false, "retries": 0, "audit_retries": 0, "git_commits": ["38312e7"]},
+  "task": {
+    "id": "SC01-MP-T04-E2E",
+    "team_id": "team-2",
+    "title": "PHASE-C MP E2E + VRT · SC01-MP-T04-E2E · analyzing (transition)",
+    "attempt": 1,
+    "phase": "tester",
+    "dev_done": true,
+    "passes": true,
+    "retries": 0,
+    "audit_retries": 0,
+    "git_commits": [
+      "38312e7"
+    ]
+  },
   "work_log_dir": "audits/runs/SC01-MP-T04-E2E/team-2/attempt-1",
-  "log_requirements": {"must_write": ["coder.md", "bugs-found.md"]},
+  "log_requirements": {
+    "must_write": [
+      "tester.md",
+      "adversarial.md",
+      "test-reports/"
+    ]
+  },
   "audit_gate": "Phase 1 · 写 spec 不跑 automator · lint + tsc + test:unit PASS · 强制 git commit",
   "previous_audit_verdict": null,
   "context": {
@@ -20,13 +39,32 @@
       "api-only kind (T06): 调 src/api/review.ts 函数 · 验证响应契约 (补 health-check soft-skip)",
       "Phase 1 不跑 automator (只写 spec + lint + tsc + test:unit · Phase 2 串行跑)"
     ],
-    "scope_out": ["修现有 page 代码 (除非 Phase 3 fix Coder)", "跑 automator (Phase 2 TL 负责)", "miniprogram-ci"],
-    "backend_ports": {"file": 8084, "wb": 8082, "ai": 8083, "review": 8085},
+    "scope_out": [
+      "修现有 page 代码 (除非 Phase 3 fix Coder)",
+      "跑 automator (Phase 2 TL 负责)",
+      "miniprogram-ci"
+    ],
+    "backend_ports": {
+      "file": 8084,
+      "wb": 8082,
+      "ai": 8083,
+      "review": 8085
+    },
     "shared_infra": "main 上已备: pixelmatch + pngjs + playwright-core + 23 mockup baseline + test/e2e/automator-smoke.spec.ts 可参考"
   },
-  "isolation": {"worktree_disabled": false, "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t04-e2e", "branch_name": "claude/sc01-mp-t04-e2e"},
-  "physical_verification": {"dor_c1_to_c6_required": false, "rationale": "Phase 1 写 spec 不跑 automator · TL Phase 2 串行验"},
-  "permissions": {"writable_fields": ["task.dev_done", "task.git_commits"]},
+  "isolation": {
+    "worktree_disabled": false,
+    "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t04-e2e",
+    "branch_name": "claude/sc01-mp-t04-e2e"
+  },
+  "physical_verification": {
+    "dor_c1_to_c6_required": false
+  },
+  "permissions": {
+    "writable_fields": [
+      "task.passes"
+    ]
+  },
   "deliverables_definition_of_done": [
     "1. test/e2e/<page-or-flow>.spec.ts (符合 scope_in)",
     "2. pnpm -F mp lint + typecheck PASS",
@@ -35,6 +73,6 @@
     "5. 强制 git commit + node .harness/harness.js --advance=SC01-MP-T04-E2E"
   ],
   "rule_6_tool_budget_guidance": "Phase 1 · 20-30 tool use",
-  "written_at": "2026-05-15T13:00:00.000Z",
+  "written_at": "2026-05-15T16:17:30.919Z",
   "written_by": "TL agent (Phase 1 E2E spec spawn)"
 }

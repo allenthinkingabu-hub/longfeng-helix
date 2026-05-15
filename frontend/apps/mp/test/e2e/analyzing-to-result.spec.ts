@@ -100,16 +100,23 @@ describe('P03→P04 transition: analyzing → result (真 IDE)', () => {
   }, 30_000);
 
   it('error state stays on analyzing page (no transition)', async () => {
-    // Navigate with invalid imageUrl to trigger error path
+    // Navigate with invalid imageUrl to trigger _startAnalysis catch (L114-122)
+    // → sets pageState='error', errorMsg='网络异常，请重试', showBanner=true
+    // NOTE: this tests the startAnalyze API failure path, NOT the FAILED poll status path (L167-176)
     await mp.reLaunch({
       url: '/pages/analyzing/index?imageUrl=invalid://no-such-image&subject=数学&qid=e2e-error-qid',
     });
 
-    // Wait a bit for error to surface
+    // Wait for error to surface (API call rejection)
     await new Promise((r) => setTimeout(r, 3000));
 
-    // Should remain on analyzing page (error state, no transition)
+    // Must remain on analyzing page
     const page = await mp.currentPage();
     expect(page.path).toBe('pages/analyzing/index');
+
+    // Verify actually in error state, not still analyzing (path alone is ambiguous)
+    const data = await page.data();
+    expect(data.pageState).toBe('error');
+    expect(data.showBanner).toBe(true);
   }, 10_000);
 });
