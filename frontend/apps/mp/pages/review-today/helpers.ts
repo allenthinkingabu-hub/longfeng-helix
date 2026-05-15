@@ -146,3 +146,23 @@ export const MOCK_SLOTS: SlotData[] = [
   { key: 'now', title: '现在 · 上午', iconClass: 'slotIconYellow', items: MOCK_ITEMS.slice(0, 2) },
   { key: 'afternoon', title: '下午', iconClass: 'slotIconBlue', items: MOCK_ITEMS.slice(2, 4) },
 ];
+
+// ─── T10 · tap → exec transition helpers (extracted for unit testability) ──
+
+/**
+ * Extract nid from a tap event's dataset.
+ * Returns the string nid or null if missing.
+ */
+export function extractNidFromTap(e: WechatMiniprogram.TouchEvent): string | null {
+  const nid = e?.currentTarget?.dataset?.nid;
+  if (nid === undefined || nid === null || nid === '') return null;
+  return String(nid);
+}
+
+/**
+ * Build the transition URL for review-exec.
+ * Mirrors H5 sibling: nav(`/review/exec/0?sid=${sid}`)
+ */
+export function buildExecUrl(sid: string, nid: string): string {
+  return `/pages/review-exec/index?sid=${encodeURIComponent(sid)}&nid=${encodeURIComponent(nid)}`;
+}

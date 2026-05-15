@@ -5,9 +5,9 @@
     "pages/analyzing/index",
     "pages/result/index",
     "pages/wrongbook-list/index",
+    "pages/review-today/index",
     "pages/review-exec/index",
-    "pages/review-done/index",
-    "pages/review-today/index"
+    "pages/review-done/index"
   ],
   "window": {
     "navigationBarBackgroundColor": "#ffffff",
