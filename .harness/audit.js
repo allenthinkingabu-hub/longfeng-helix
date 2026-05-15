@@ -278,6 +278,26 @@ function auditSpecAlignment() {
     record(DIM, 'c4_screenshots_ge_12', false, `screenshots dir missing: ${ssDir}`);
   }
 
+  // C-4b · Playwright spec.ts 必须用 toHaveScreenshot (真 pixel diff) 而非只 page.screenshot (盲存)
+  // 防 Tester 用 page.screenshot 假装做了 VRT · 实际 0 diff 断言 (PHASE-B T01 attempt-1 真出过这问题)
+  const e2eSrcDir = path.join(REPO_ROOT, 'frontend', 'apps', 'h5', 'tests', 'e2e');
+  if (exists(e2eSrcDir)) {
+    const taskId = inflight.task.id.toLowerCase().replace('sc01-','').replace('-','_');
+    const specFiles = walkFiles(e2eSrcDir).filter(f => f.endsWith('.spec.ts'));
+    const relevantSpecs = specFiles.filter(f => path.basename(f).toLowerCase().includes(inflight.task.id.toLowerCase().split('-').pop()));
+    if (relevantSpecs.length) {
+      let totalToHave = 0, totalPageShot = 0;
+      for (const f of relevantSpecs) {
+        const body = readText(f);
+        totalToHave += countSubstring(body, 'toHaveScreenshot');
+        totalPageShot += countSubstring(body, 'page.screenshot(');
+      }
+      record(DIM, 'c4b_real_vrt_diff_not_blind_screenshot', totalToHave >= 1 || totalPageShot === 0,
+        totalToHave >= 1 ? `toHaveScreenshot=${totalToHave} (真 VRT diff)`
+                         : `0 toHaveScreenshot 但 ${totalPageShot} page.screenshot — 盲存非真 diff`);
+    }
+  }
+
   // C-5 · spec-trace.md (≥ 4 行表格)
   const traceMd = path.join(e2eCoderDir, 'spec-trace.md');
   record(DIM, 'c5_spec_trace_md_exists', nonEmpty(traceMd), traceMd);

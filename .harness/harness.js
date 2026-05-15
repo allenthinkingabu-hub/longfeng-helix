@@ -148,13 +148,20 @@ function spawnAgent({ role, taskId }) {
   const workingDir  = (payload.isolation && payload.isolation.working_dir) || REPO_ROOT;
   const agentMd     = path.join('.harness', 'agents', role === 'coder' ? 'coder-agent.md' : 'test-agent.md');
   const inflightRel = path.relative(REPO_ROOT, inflightPath(taskId));
-  const prompt = [
+  const workLogRel = (payload.work_log_dir || '').replace(/\\/g, '/');
+  const promptBase = [
     `你是 ${role} agent。`,
     `第一件事: 完整读 ${agentMd} 全文 + 完整读 ${inflightRel} 全文。`,
     `按 agent.md 内化的铁律和步骤执行 task ${taskId}。`,
-    `完成后改对应 inflight 字段 (Coder: dev_done; Tester: passes)，`,
+  ];
+  const commitDirective = workLogRel
+    ? `**[强制 git commit 红线]** 完成后 git add ${workLogRel}/ + git commit (确保 work_log 三件套进 git history · 否则 merge main 后丢失) · `
+    : '';
+  const promptTail = [
+    `${commitDirective}改对应 inflight 字段 (Coder: dev_done; Tester: passes)，`,
     `然后调用 node .harness/harness.js --advance=${taskId} 通知 harness 推进。`,
-  ].join(' ');
+  ];
+  const prompt = promptBase.concat(promptTail).join(' ');
 
   if (SPAWN_MODE === 'stub') {
     log(`${YELLOW}[stub spawn] would spawn ${role} for ${taskId} cwd=${path.relative(REPO_ROOT, workingDir) || '.'}${RESET}`);
