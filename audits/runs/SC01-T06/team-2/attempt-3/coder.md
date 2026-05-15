@@ -1,4 +1,4 @@
-# SC-01-T06 Coder 工作日志 · attempt-1
+# SC-01-T06 Coder 工作日志 · attempt-3
 
 ## 1. 地形侦察
 
