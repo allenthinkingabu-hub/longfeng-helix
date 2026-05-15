@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "SC01-MP-T13",
+    "team_id": "team-5",
+    "title": "PHASE-C MP wave-1 · SC01-MP-T13 · P09 review-done 1:1 mirror H5 mockup (人工视觉验收路线)",
+    "attempt": 1,
+    "phase": "coder",
+    "dev_done": true,
+    "passes": false,
+    "retries": 0,
+    "audit_retries": 0,
+    "git_commits": ["acd3fe8"]
+  },
+  "work_log_dir": "audits/runs/SC01-MP-T13/team-5/attempt-1",
+  "log_requirements": {
+    "must_write": ["coder.md", "bugs-found.md"]
+  },
+  "audit_gate": "audit.js v1 relaxed (PHASE-C 人工视觉路线) · 验 tsc PASS + mockup baseline 4-state 截图落盘 + spec-trace.md · NO automator E2E · mock ≤ 5 · 强制 git commit work_log",
+  "previous_audit_verdict": null,
+  "context": {
+    "scenario": "PHASE-C MP 14 mirror 第一波 · SC01-MP-T13 · P09 页 1:1 mirror H5 同名 mockup",
+    "phase_c_route": "人工视觉验收 (automator E2E 在用户 Mac 上 IDE/CLI 接入摩擦大 · 已被 TL 决策跳过)",
+    "target_page": "P09",
+    "mp_page_dir": "frontend/apps/mp/pages/review-done/",
+    "mockup_path": "design/mockups/wrongbook/09_review_done.html",
+    "baseline_screenshot_dir": "design/system/screenshots/mp-baseline/",
+    "h5_sibling_task": "SC01-T13 (已 merge main · 可看 frontend/apps/h5/src/pages/<同名>/ 取 state machine + API contract 对齐)",
+    "scope_in": [
+      "frontend/apps/mp/pages/review-done/index.{json,wxml,wxss,ts} 全实现 · 1:1 mirror mockup HTML 视觉 + DOM 结构",
+      "更新 frontend/apps/mp/app.json pages 数组加入 pages/review-done/index",
+      "用 Vant Weapp 组件代替 H5 端 Konsta UI · 必要时跑 bash scripts/devtools-cli.sh build-npm-fs 构建 miniprogram_npm",
+      "tsc --noEmit pass (pnpm -F mp typecheck)",
+      "mockup baseline 截图: chromium 加载 design/mockups/wrongbook/09_review_done.html → 截 4 态 (idle/loading/error/success) → design/system/screenshots/mp-baseline/pT13-<state>.png (4 file)",
+      "spec-trace.md: 写明 mockup DOM → WXML 映射表 + state machine + 哪些 Vant 组件替换了 H5 Konsta"
+    ],
+    "scope_out": [
+      "miniprogram-automator E2E test (人工视觉验收路线 · 跳)",
+      "真起 微信工具 IDE (Coder 不做 · 由 TL 用户人工验收)",
+      "backend API 真接 (mock fixture 即可 · 不超 5 mock)"
+    ],
+    "sandbox": {"pg_port": 15436, "redis_port": 16383, "minio_api_port": 9008},
+    "mockup_chain": "design/mockups/wrongbook/09_review_done.html (设计真相 SoT · 1:1 mirror)"
+  },
+  "isolation": {
+    "worktree_disabled": false,
+    "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t13-review-done",
+    "branch_name": "claude/sc01-mp-t13-review-done"
+  },
+  "physical_verification": {
+    "dor_c1_to_c6_required": false,
+    "rationale": "PHASE-C 人工视觉路线 · DoR C-2/C-4/c4b automator E2E 不适用 · 改 tsc PASS + 4 截图 + spec-trace.md"
+  },
+  "permissions": {
+    "writable_fields": ["task.dev_done", "task.git_commits"]
+  },
+  "deliverables_definition_of_done": [
+    "1. frontend/apps/mp/pages/review-done/index.{json,wxml,wxss,ts} 全 1:1 mirror mockup",
+    "2. app.json pages 数组更新",
+    "3. tsc --noEmit pass · (build-npm-fs 若用 Vant)",
+    "4. 4 个 mockup baseline 截图落盘 design/system/screenshots/mp-baseline/",
+    "5. spec-trace.md (mockup DOM → WXML 映射表 + state machine)",
+    "6. work_log: coder.md (5 段) + bugs-found.md",
+    "7. **强制 git add frontend/apps/mp/pages/review-done/ + app.json + design/system/screenshots/mp-baseline/ + audits/runs/SC01-MP-T13/team-5/attempt-1/ + git commit**",
+    "8. inflight dev_done=true + git_commits[hash]",
+    "9. node .harness/harness.js --advance=SC01-MP-T13"
+  ],
+  "rule_6_tool_budget_guidance": "PHASE-C wave-1 单 page 1:1 mirror + 4 screenshot + tsc · 预计 ~40-60 tool use · 软线 50 self-check · 70 surface · 85 forced compaction summary",
+  "written_at": "2026-05-15T08:00:00.000Z",
+  "written_by": "TL agent (PHASE-C wave-1 spawn prep · 人工视觉路线)"
+}
