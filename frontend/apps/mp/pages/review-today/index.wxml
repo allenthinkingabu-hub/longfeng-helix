@@ -1,7 +1,7 @@
 <!-- P07 今日复习 · 1:1 mirror of design/mockups/wrongbook/07_review_today.html -->
 <!-- trace: design/mockups/wrongbook/07_review_today.html · @longfeng/testids p07 -->
 
-<view class="review-today-page" data-test-id="{{testIds.root}}">
+<view class="review-today-page" data-test-id="p07-root">
 
   <!-- ── Nav bar (mockup .nav) ───────────────────────── -->
   <view class="nav">
@@ -19,8 +19,8 @@
   <scroll-view class="content" scroll-y="true">
 
     <!-- ── Hero summary card ───────────────────────── -->
-    <view class="hero" data-test-id="{{testIds.todayReviewCard}}">
-      <view class="bubble b1" data-test-id="{{testIds.heroParticles}}"></view>
+    <view class="hero" data-test-id="today-review-card">
+      <view class="bubble b1" data-test-id="today-review-card-particles"></view>
       <view class="bubble b2"></view>
 
       <view class="hero-tag">
@@ -29,13 +29,13 @@
       </view>
 
       <view class="hero-h2">
-        <text class="hero-total" data-test-id="{{testIds.heroTotal}}">{{totalCount}} 题待复习</text>
-        <text class="hero-sz" data-test-id="{{testIds.heroEstMin}}">预计 {{estMinutes}} 分钟</text>
+        <text class="hero-total" data-test-id="today-review-card-total">{{totalCount}} 题待复习</text>
+        <text class="hero-sz" data-test-id="today-review-card-est-min">预计 {{estMinutes}} 分钟</text>
       </view>
 
       <view class="stats-row">
         <view class="st">
-          <text class="st-v" data-test-id="{{testIds.heroDone}}">{{doneCount}}</text>
+          <text class="st-v" data-test-id="today-review-card-done">{{doneCount}}</text>
           <text class="st-l">已完成</text>
         </view>
         <view class="st">
@@ -48,17 +48,17 @@
         </view>
       </view>
 
-      <view class="pg" data-test-id="{{testIds.heroProgressBar}}">
+      <view class="pg" data-test-id="today-review-card-progress-bar">
         <view class="pg-fill" style="width: {{progressPct}}%;"></view>
       </view>
       <view class="pg-txt">
-        <text data-test-id="{{testIds.heroProgressPct}}">进度 {{progressPct}}%</text>
-        <text data-test-id="{{testIds.heroMasteryPct}}">掌握度 {{masteryPct}}%</text>
+        <text data-test-id="p07-hero-progress-pct">进度 {{progressPct}}%</text>
+        <text data-test-id="today-review-card-mastery-pct">掌握度 {{masteryPct}}%</text>
       </view>
     </view>
 
     <!-- ── Empty state ─────────────────────────────── -->
-    <view wx:if="{{pageState === 'today.EMPTY'}}" class="empty" data-test-id="{{testIds.emptyState}}">
+    <view wx:if="{{pageState === 'today.EMPTY'}}" class="empty" data-test-id="p07-empty-state">
       <text class="empty-title">今日无题 · 拍一道试试</text>
       <text class="empty-sub">还没有待复习的题目</text>
     </view>
@@ -106,7 +106,7 @@
   </scroll-view>
 
   <!-- ── Floating CTA ────────────────────────────── -->
-  <view wx:if="{{pageState !== 'today.EMPTY' && pageState !== 'today.ALL_DONE'}}" class="cta" bind:tap="onStartAllTap" data-test-id="{{testIds.bottomCtaStartAllBtn}}">
+  <view wx:if="{{pageState !== 'today.EMPTY' && pageState !== 'today.ALL_DONE'}}" class="cta" bind:tap="onStartAllTap" data-test-id="p07-bottom-cta-start-all-btn">
     <van-icon name="play" color="#fff" size="20px" />
     <text>全部开始</text>
     <text class="cta-sz">{{totalCount}} 题 · {{estMinutes}} min</text>
