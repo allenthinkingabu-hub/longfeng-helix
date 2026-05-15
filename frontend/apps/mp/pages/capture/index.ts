@@ -146,10 +146,11 @@ Page({
       });
       this.setData({ uploadPct: 100, state: 'UPLOADED' });
 
-      // Step 4: navigate to analyzing page
+      // Step 4: navigate to analyzing page (pass imageUrl for AI analysis kickoff)
+      const imageUrl = encodeURIComponent(presignResp.image_url);
       setTimeout(() => {
         wx.navigateTo({
-          url: `/pages/analyzing/index?qid=${created.qid}&subject=${this.data.subject}`,
+          url: `/pages/analyzing/index?imageUrl=${imageUrl}&subject=${this.data.subject}&qid=${created.qid}`,
         });
       }, 300);
     } catch {
