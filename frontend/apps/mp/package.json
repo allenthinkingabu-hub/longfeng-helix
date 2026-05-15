@@ -9,7 +9,9 @@
     "test": "vitest run --config test/vitest.config.ts",
     "test:unit": "vitest run --config test/vitest.config.ts test/unit",
     "test:integration": "vitest run --config test/vitest.config.ts test/api test/transitions",
-    "test:e2e": "vitest run --config test/vitest.config.ts",
+    "test:e2e:automator": "vitest run --config test/vitest.config.ts test/e2e",
+    "vrt:baseline": "node scripts/capture-mockup-baselines.mjs",
+    "devtools:start": "bash scripts/devtools-cli.sh start",
     "devtools:open": "bash scripts/devtools-cli.sh open",
     "devtools:auto": "bash scripts/devtools-cli.sh auto",
     "devtools:close": "bash scripts/devtools-cli.sh close"
@@ -23,6 +25,9 @@
   "devDependencies": {
     "miniprogram-api-typings": "^5.2.1",
     "miniprogram-automator": "^0.12.1",
+    "pixelmatch": "^7.1.0",
+    "playwright-core": "^1.60.0",
+    "pngjs": "^7.0.0",
     "typescript": "^5.5.4",
     "vitest": "^1.6.0"
   }
