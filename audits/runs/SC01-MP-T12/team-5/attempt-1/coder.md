@@ -90,7 +90,7 @@ pnpm -F mp run test:e2e
 
 ## 5. 提交
 
-- Commit hash: (见下方 git commit)
+- Commit hash: 0dc277d (feat), 9f0c335 (advance)
 - 文件变更:
   - `frontend/apps/mp/src/api/review.ts` (+50 行: getNode, revealNode, gradeNode)
   - `frontend/apps/mp/pages/review-exec/index.ts` (+5 行: wx.navigateTo transition)
