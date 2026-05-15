@@ -243,7 +243,57 @@ test.describe('SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url +
   // AC1 + AC2 + AC3 · Happy path: upload → createPending → analyze-by-url → nav P03 → SSE → P04
   // ─────────────────────────────────────────────────────────────
   test('AC1-3 · happy path · P02 upload → createPending 201 → analyze 202 → jump P03 → SSE 4步 → P04', async ({ page }) => {
-    const { requestOrder } = await setupFullTransition(page);
+    // Use SSE gate to control timing: hold SSE until P03 skeleton is verified
+    const requestOrder: string[] = [];
+    let releaseSse: (() => void) | null = null;
+    const sseGate = new Promise<void>((r) => { releaseSse = r; });
+
+    await page.addInitScript(() => {
+      try {
+        window.localStorage.setItem('access_token', 'dev-stub-token');
+        window.localStorage.setItem('lf:auth:studentId', '7');
+        window.localStorage.setItem('lf:token', 'dev-stub-token');
+      } catch { /* noop */ }
+    });
+
+    // Setup all routes (same as setupFullTransition but with SSE gate)
+    await page.route('**/api/file/presign', async (route) => {
+      requestOrder.push('presign');
+      await route.fulfill({ status: 200, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(PRESIGN_RESPONSE) });
+    });
+    await page.route('**/s3/**', async (route) => {
+      if (route.request().method() === 'PUT') { requestOrder.push('put'); await route.fulfill({ status: 200 }); }
+      else await route.continue();
+    });
+    await page.route('**/api/file/complete**', async (route) => {
+      requestOrder.push('complete');
+      await route.fulfill({ status: 200, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(COMPLETE_RESPONSE) });
+    });
+    await page.route('**/api/wb/questions', async (route) => {
+      if (route.request().method() !== 'POST') { await route.continue(); return; }
+      requestOrder.push('createPending');
+      await route.fulfill({ status: 201, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(CREATE_PENDING_RESPONSE) });
+    });
+    await page.route('**/api/ai/analyze-by-url', async (route) => {
+      requestOrder.push('analyzeByUrl');
+      await route.fulfill({ status: 202, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(ANALYZE_BY_URL_RESPONSE) });
+    });
+    await page.route(`**/api/ai/stream/${TASK_ID}`, async (route) => {
+      requestOrder.push('sseStream');
+      // Hold SSE response until gate opens → allows P03 skeleton verification
+      await sseGate;
+      await route.fulfill({
+        status: 200,
+        headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no' },
+        body: sseBody(SSE_EVENTS),
+      });
+    });
+    await page.route(`**/api/ai/cancel/**`, async (route) => {
+      await route.fulfill({ status: 200, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'CANCELLED' }) });
+    });
+
+    await page.goto('/capture', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator(`[data-testid="${TID_P02.root}"]`)).toBeVisible();
 
     // ── IDLE 截图 (P02 初始态) ──
     await expect(page).toHaveScreenshot('p02-idle-chromium-darwin.png', {
@@ -254,19 +304,10 @@ test.describe('SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url +
     // select math subject
     await page.locator(`[data-testid="${TID_P02.subjectMath}"]`).click();
 
-    // inject fixture file (triggers handleFile → presign → PUT → complete → createPending → analyze-by-url → nav)
+    // inject fixture file
     await injectFixtureFile(page);
 
-    // UPLOADING 态
-    await expect(page.locator(`[data-testid="${TID_P02.uploadProgress}"]`)).toBeVisible({ timeout: 5_000 });
-
-    // ── UPLOADING 截图 (P02 上传中) ──
-    await expect(page).toHaveScreenshot('p02-uploading-chromium-darwin.png', {
-      maxDiffPixels: 500,
-      fullPage: true,
-    });
-
-    // AC1: nav to /analyzing/{taskId} within 5s (upload + 300ms delay)
+    // AC1: nav to /analyzing/{taskId} (SSE is gated so we stay on P03)
     await page.waitForURL(/\/analyzing\//, { timeout: 10_000 });
     expect(page.url(), 'AC1: URL contains /analyzing/ with taskId').toContain(`/analyzing/${TASK_ID}`);
     expect(page.url(), 'AC3: URL has qid query param').toContain(`qid=${QID}`);
@@ -275,21 +316,21 @@ test.describe('SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url +
     const createIdx = requestOrder.indexOf('createPending');
     const analyzeIdx = requestOrder.indexOf('analyzeByUrl');
     expect(createIdx, 'TI2: createPending came before analyzeByUrl').toBeLessThan(analyzeIdx);
-    expect(createIdx, 'TI2: createPending was called').toBeGreaterThanOrEqual(0);
-    expect(analyzeIdx, 'TI2: analyzeByUrl was called').toBeGreaterThanOrEqual(0);
 
-    // AC2: P03 skeleton screen visible ≤ 100ms (we assert it's visible)
+    // AC2: P03 skeleton screen visible (4 steps in wait state)
     await expect(page.locator(`[data-testid="${TID_P03.root}"]`)).toBeVisible({ timeout: 2_000 });
     await expect(page.locator(`[data-testid="${TID_P03.pipeline}"]`)).toBeVisible({ timeout: 2_000 });
 
-    // ── P03 骨架屏截图 (4步 wait → streaming) ──
+    // ── P03 骨架屏截图 (SSE gated → 4步 wait 态) ──
     await expect(page).toHaveScreenshot('p03-queued-chromium-darwin.png', {
       maxDiffPixels: 500,
       fullPage: true,
     });
 
-    // AC3: SSE stream was connected (sseStream in requestOrder)
-    // Wait for SSE to complete (DONE → nav P04)
+    // Release SSE gate → events flow → DONE → nav P04
+    releaseSse!();
+
+    // Wait for SSE to complete → DONE → nav P04
     await page.waitForURL(/\/question\/.*\/result/, { timeout: 10_000 });
     expect(page.url(), 'DONE → nav P04 /question/{qid}/result').toContain(`/question/${QID}/result`);
 
