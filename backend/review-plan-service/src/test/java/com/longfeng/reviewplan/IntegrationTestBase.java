@@ -7,21 +7,21 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
 /**
- * S5 IT backbone · 复用 S3 同款 pgvector/pg16 @ 127.0.0.1:15432（由 ops/scripts/it-stack-up.sh 预起）.
+ * S5 IT backbone · sandbox PG @ 127.0.0.1:15436/wrongbook（longfeng/longfeng_dev）.
  *
  * <p>为避免 Boot 拉 Nacos/Feign/Sentinel · IT 关掉 feign.sentinel.enabled + spring.cloud.*.enabled.
  *
- * <p>SC-01-C05: 因 IT 共享 DB 与多个模块的 flyway 历史脏态冲突，直接关闭 Flyway 自启；
- * 由本类 static block 应用必要的 schema patch（V1.0.065 outbox event_type CHECK 扩展）.
+ * <p>SC-01-C05: Flyway 已启用 (out-of-order + baseline-on-migrate) 处理共享 DB 脏态；
+ * static block 作为 Flyway 前置安全网确保 outbox event_type CHECK 包含 calendar_event_batch_create.
  */
 public abstract class IntegrationTestBase {
 
-  protected static final String DB_URL = "jdbc:postgresql://127.0.0.1:15432/wrongbook";
-  protected static final String DB_USER = "postgres";
-  protected static final String DB_PASSWORD = "wb";
+  protected static final String DB_URL = "jdbc:postgresql://127.0.0.1:15436/wrongbook";
+  protected static final String DB_USER = "longfeng";
+  protected static final String DB_PASSWORD = "longfeng_dev";
 
   static {
-    // SC-01-C05 · 因 flyway 已禁用，直接 ALTER review_plan_outbox.event_type CHECK 扩展（V1.0.065 等价）
+    // SC-01-C05 · Flyway 前置安全网：确保 outbox event_type CHECK 已含 calendar_event_batch_create（V1.0.066 等价）
     try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
         Statement st = conn.createStatement()) {
       st.execute("ALTER TABLE review_plan_outbox "
@@ -54,7 +54,7 @@ public abstract class IntegrationTestBase {
     r.add("spring.flyway.baseline-version", () -> "1");
     // SC-01-C05 · review-plan-service 本地 4 个迁移在共享 DB 中可能已被等价对象占位 → 跳过执行避免 'relation already exists'
     r.add("spring.flyway.ignore-migration-patterns", () -> "*:missing,*:future,*:ignored");
-    r.add("spring.flyway.enabled", () -> "false");
+    r.add("spring.flyway.enabled", () -> "true");
     r.add("review.mq.enabled", () -> "false");
     r.add("review.feign.enabled", () -> "false");
     r.add("feign.sentinel.enabled", () -> "false");
