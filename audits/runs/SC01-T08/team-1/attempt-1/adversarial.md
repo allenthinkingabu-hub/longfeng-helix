@@ -73,3 +73,23 @@ Running 5 tests using 1 worker
 | Round 2 | 更新 baseline + 全量重跑 | 5/5 PASS |
 
 **对抗次数**: 1 轮 REJECT + 1 轮 FIX · 满足 audit.js ≥1 轮对抗要求。
+
+---
+
+## 探索性测试 · Exploratory Testing
+
+### E1 · 连点防抖 (rapid tap)
+
+审查 `handleStartAll` (index.tsx L158-161): 连续极速点击「全部开始」按钮不会触发多次 `navigate('/review-today')`，因为 react-router `navigate` 是幂等路由跳转。风险可控。
+
+### E2 · DOM 注入 / 超长数据
+
+审查 counter 显示 (index.tsx L231-233): `{displayTotal} 题` — `displayTotal` 是 `number` 类型（来自 `Math.round` 后的 `animateValue`），不存在 XSS 注入风险。但若后端返回 `total` 为极大整数 (如 999999)，UI 大卡数字区域可能溢出。属于 Phase 1+ 边界，MVP 暂可接受。
+
+### E3 · 阻断 API / 网络超时
+
+审查 E2E test 4 (spec §9): 模拟 GET /today 返回 500 → 页面正确降级到 ERROR 态 + 黄条「部分数据正在同步」。验证了阻断 API 场景下 UI 的降级能力。
+
+### E4 · Race condition: 快速 tab 切换
+
+审查 counter animation (index.tsx L117-121): 进入新动画前先 `cancelAnimationFrame(rafRef.current)` 取消上一个动画帧。快速在 tab-home / tab-wrongbook 间切换不会导致动画 race。sessionStorage 写入也是同步操作，无竞态风险。

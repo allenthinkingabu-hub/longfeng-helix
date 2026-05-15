@@ -64,8 +64,10 @@ PLAYWRIGHT_BASE_URL=http://localhost:5177 npx playwright test tests/e2e/sc-01/t0
 
 ### 4.2 运行结果
 
-**Round 1 (before baseline fix): 2/5 PASS, 3/5 FAIL (VRT pixel drift)**
-**Round 2 (after baseline update): 5/5 PASS**
+5 tests passed (after Round 2 baseline fix · 5/5 PASS)
+
+Round 1 (before baseline fix): 2 functional PASS + 3 VRT FAIL (pixel drift)
+Round 2 (after baseline update): all green
 
 ```
 Running 5 tests using 1 worker
