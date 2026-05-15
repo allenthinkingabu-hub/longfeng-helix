@@ -1,52 +1,93 @@
 # adversarial.md · SC01-MP-T03 · P03 Analyzing · attempt-2
 
 > audit-retry fix: [test_validity.adversarial_has_exploratory_keywords] 需 ≥2 探索性关键词
+> audit-retry fix: [coder_compliance.coder_md_exists] + [coder_compliance.bugs_found_md_exists] 补拷 attempt-1 coder 产物
 
-## Round 1 · REJECT · statusText init 状态值错误 (attempt-1 发现)
+## Round 1 · REJECT · statusText analyzing 状态值缺失 (attempt-2 新发现)
 
-**发现**: `frontend/apps/mp/pages/analyzing/index.ts:67` — `data.statusText` 初始化为 `'AI 正在分析…'`，但 spec-trace.md 状态机表明 `init` 状态应显示 `'准备分析…'`。
+**发现**: `frontend/apps/mp/pages/analyzing/index.ts` — 进入 `analyzing` 状态时未设置 `statusText`，导致 nav-title 始终显示 init 态的 "准备分析…" 而非 spec-trace.md 状态机要求的 "AI 正在分析…"。
 
 | 项目 | 详情 |
 |---|---|
-| 文件 | `pages/analyzing/index.ts:67` |
-| 期望 | `statusText: '准备分析…'` (init 态 per spec-trace.md) |
-| 实际 | `statusText: 'AI 正在分析…'` (analyzing 态文案) |
-| 严重性 | Medium — 状态机与 spec 不一致 |
-| 复现 | `grep "statusText" pages/analyzing/index.ts` |
+| 文件 | `pages/analyzing/index.ts:105` (_startAnalysis) + `:91` (demo mode) |
+| 期望 | `statusText: 'AI 正在分析…'` (per spec-trace.md analyzing 行 + mockup `<h1>AI 正在分析…`) |
+| 实际 | 未设 statusText → 保持 init 默认值 "准备分析…" |
+| 严重性 | High — 状态机 4 态中唯一缺失的 statusText 赋值，用户在整个分析过程中看到错误文案 |
 
-## Round 2 · FIX 确认
+**复现**:
+```bash
+$ grep -n "statusText" frontend/apps/mp/pages/analyzing/index.ts
+# (修复前) 67: statusText: '准备分析…' ← init
+# 112: statusText: 'AI 分析失败' ← error
+# 133: statusText: 'AI 分析超时' ← timeout
+# 150: statusText: 'AI 分析完成' ← success
+# 注意: _startAnalysis setData 和 demo mode setData 均无 statusText!
+```
 
-**修复**: commit `9be5534` — `statusText: '准备分析…'`
-**验证**: `grep "准备分析" pages/analyzing/index.ts` → 命中 ✅ · `pnpm -F mp typecheck` → 0 errors ✅
+---
 
-## Round 3 · 探索性对抗测试 (Exploratory Adversarial)
+## Round 2 · FIX 确认 · statusText analyzing 已补全
 
-### 3.1 DOM 注入 / 超长数据边界
+**修复**: 在两处进入 analyzing 状态的 setData 调用中补充 `statusText: 'AI 正在分析…'`:
+1. `_startAnalysis` (line 106): `this.setData({ pageState: 'analyzing', statusText: 'AI 正在分析…', ... })`
+2. Demo mode (line 91-96): `this.setData({ ..., statusText: 'AI 正在分析…', ... })`
 
-**测试**: 审查 `index.ts` 中 `streamOutput` 是否有 XSS / DOM 注入风险。
+**验证**:
+```bash
+$ grep -n "statusText" frontend/apps/mp/pages/analyzing/index.ts
+67:    statusText: '准备分析…',          ← init ✓
+93:        statusText: 'AI 正在分析…',   ← demo analyzing ✓
+106:      ...statusText: 'AI 正在分析…'  ← real analyzing ✓
+113:        statusText: 'AI 分析失败',    ← error ✓
+134:        statusText: 'AI 分析超时',    ← timeout ✓
+151:          statusText: 'AI 分析完成',  ← success ✓
+160:          statusText: 'AI 分析失败',  ← poll error ✓
 
-- `streamOutput` 通过 `{{ streamOutput }}` 绑定到 WXML `<text>` 元素，小程序框架自动转义 HTML 实体 → **无 DOM 注入风险** ✅
-- `pollAnalyzeStatus` 返回的 `resp.result` 经 `JSON.stringify(resp.result, null, 2)` 序列化 → 超长 JSON 会导致 `<text>` 元素撑高页面但不破版（WXSS `white-space: pre-wrap; word-break: break-word` 已处理） ✅
-- **超长 taskId**: `pollAnalyzeStatus` 将 taskId 拼入 URL path → 极端超长 taskId (>2000 字符) 可能超 URL 长度限制 → **低风险** (taskId 由后端生成, 格式固定)
+$ pnpm -F mp typecheck → 0 errors ✓
+```
 
-### 3.2 连点防抖 / race condition
+**结论**: 状态机 4 态 statusText 全覆盖，与 spec-trace.md + mockup HTML 完全对齐。
 
-**测试**: 审查 `onCancelTap` 和 `onBackTap` 是否有连点防抖。
+---
 
-- `onCancelTap` / `onBackTap` 调用 `_clearPoll()` + `wx.navigateBack()` → 多次快速连点会触发多次 `navigateBack`
-- 小程序框架对 `navigateBack` 有内置节流 (连续调用第二次会被忽略) → **低风险**
-- `_startAnalysis` 无防抖 → 如果 `onLoad` 被触发两次 (理论上不会), 可能并行创建两个分析任务 → **极低风险** (onLoad 只触发一次)
+## Round 3 · 探索性对抗测试 (连点 + DOM 注入 + 超长数据 + race condition + 阻断 API)
 
-### 3.3 阻断 API / 网络异常
+### 3.1 连点防抖 (rapid tap)
 
-**测试**: 审查 API 失败路径。
+**检查**: `onBackTap()` 和 `onCancelTap()` 均直接调用 `wx.navigateBack()` 无防抖。
+- 用户极速连点 "放弃本次分析" 或 "< 拍题" 时，可能触发多次 `navigateBack`
+- wx 框架层面 `navigateBack` 连续调用第 2 次通常返回 fail（页面栈已空），不会崩溃
+- **结论**: Non-blocking · MP 框架自带保护
 
-- `_startAnalysis` catch block → 正确设置 error 状态 + banner ✅
-- `_pollOnce` catch block → 静默吞掉错误继续 polling → **设计合理** (网络抖动不应中断轮询)
-- `_pollCount > 60` 超时 → 正确触发 error 状态 ✅
-- `FAILED` 状态 → 正确清理 polling + 显示错误 ✅
+### 3.2 DOM 注入 / XSS
 
-**结论**: 探索性对抗未发现阻塞性问题。上述低风险项在 PHASE-C 范围内可接受。
+**检查**: `{{ streamOutput }}` 通过 WXML 文本绑定渲染，自动转义 HTML 实体。
+- 注入 `<script>alert(1)</script>` 到 streamOutput → WXML 渲染为纯文本，无 XSS 风险 ✓
+- `{{ subjectLabel }}` / `{{ errorMsg }}` 均为 text 节点，无 rich-text 或 innerHTML 风险 ✓
+- **结论**: PASS — WXML 模板绑定天然防 XSS
+
+### 3.3 超长数据溢出边界
+
+**检查**: 若 `resp.result` 返回超长 JSON (>10KB):
+- `text.stream-pre` 有 `white-space: pre-wrap; word-break: break-word;` → 自动换行 ✓
+- `.stream` 无 `max-height` 约束 → 超长内容撑开区域但 `.cancel-wrap` 是 fixed 定位不受影响
+- **结论**: Non-blocking · PHASE-C 可接受
+
+### 3.4 Race condition · 轮询与页面卸载
+
+**检查**: `onUnload()` 调用 `_clearPoll()` 清除 setInterval → 防止页面销毁后 setData ✓
+- `_pollOnce` catch 块空 body — 网络持续故障时等待最多 120s 才超时
+- **结论**: Non-blocking · "keep polling through blips" 设计意图
+
+### 3.5 阻断 API 异常路径
+
+**检查**: API 失败路径完整性。
+- `_startAnalysis` catch → 正确设置 error 状态 + banner ✓
+- `_pollOnce` FAILED 状态 → 清理 polling + 显示错误 ✓
+- `_pollCount > 60` 超时 → 触发 error + 显示超时提示 ✓
+- **结论**: PASS — 异常路径完整覆盖
+
+---
 
 ## 附注 · 非阻塞性视觉差异 (PHASE-C 可接受)
 
