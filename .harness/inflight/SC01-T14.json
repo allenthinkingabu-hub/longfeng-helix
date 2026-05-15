@@ -11,7 +11,8 @@
     "retries": 0,
     "audit_retries": 2,
     "git_commits": [
-      "5accb29"
+      "5accb29",
+      "ff0f3d8"
     ]
   },
   "work_log_dir": "audits/runs/SC01-T14/team-1/attempt-3",
