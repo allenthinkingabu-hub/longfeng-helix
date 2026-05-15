@@ -77,9 +77,12 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
 
   /** cached raw question for save mutation */
   _questionRaw: null as QuestionDetail | null,
+  /** persisted qid for retry after error */
+  _qid: '',
 
   onLoad(options: Record<string, string | undefined>) {
     const qid = options.qid || '';
+    this._qid = qid;
     if (!qid) {
       this.setData({ pageState: 'EMPTY' });
       return;
@@ -159,7 +162,7 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
   },
 
   onRetryTap() {
-    const qid = this._questionRaw?.id || '';
+    const qid = this._qid || this._questionRaw?.id || '';
     if (qid) {
       this._fetchQuestion(qid);
     }
