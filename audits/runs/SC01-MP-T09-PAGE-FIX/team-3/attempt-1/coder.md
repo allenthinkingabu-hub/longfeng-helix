@@ -44,4 +44,4 @@ spec 中的 selector `[data-test-id="today-review-card"]` 现在能匹配 wxml l
 
 ## 5. 提交
 
-- commit hash: (pending — will fill after git commit)
+- commit hash: 5bf6e9d

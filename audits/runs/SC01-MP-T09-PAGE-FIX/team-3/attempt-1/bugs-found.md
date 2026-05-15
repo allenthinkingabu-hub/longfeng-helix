@@ -4,4 +4,4 @@
 
 - **文件**: `frontend/apps/mp/pages/review-today/index.wxml`
 - **描述**: 11 处 `data-test-id` 使用 Mustache `{{testIds.X}}` 动态绑定，miniprogram-automator E2E 下 `page.$('[data-test-id="today-review-card"]')` 找不到元素。改为静态字符串后 selector 可匹配。
-- **修复 commit**: (pending)
+- **修复 commit**: 5bf6e9d
