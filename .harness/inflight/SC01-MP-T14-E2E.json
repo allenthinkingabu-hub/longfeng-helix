@@ -12,7 +12,9 @@
     "audit_retries": 0,
     "git_commits": [
       "d449394",
-      "7bbadb0"
+      "7bbadb0",
+      "2a25be8",
+      "687c420"
     ]
   },
   "work_log_dir": "audits/runs/SC01-MP-T14-E2E/team-5/attempt-1",
