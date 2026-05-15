@@ -1,0 +1,190 @@
+<!-- P08 复习执行 · 1:1 mirror of design/mockups/wrongbook/08_review_exec.html -->
+<!-- trace: design/mockups/wrongbook/08_review_exec.html · @longfeng/testids p08 -->
+
+<view class="review-exec-page" data-test-id="{{testIds.root}}">
+
+  <!-- ── Nav (mockup .nav) ──────────────────────────────── -->
+  <view class="nav" data-test-id="{{testIds.topbar}}">
+    <view class="back" bind:tap="onBackTap">
+      <van-icon name="arrow-left" color="#007AFF" size="22px" />
+      <text>复习</text>
+    </view>
+    <view class="center">
+      <text class="title" data-test-id="{{testIds.topbarCursor}}">复习执行 · 第 {{cursor}} 题</text>
+      <text class="sub">{{cursor}} / {{total}} · 剩余 {{total - cursor}} 题</text>
+    </view>
+    <view class="close" bind:tap="onCloseTap" data-test-id="{{testIds.closeBtn}}">
+      <van-icon name="cross" color="#636366" size="14px" />
+    </view>
+    <view class="ptrack" data-test-id="{{testIds.progressBar}}">
+      <text class="plbl">{{progressPct}}% · 预计 6 分钟</text>
+      <view class="pbar" style="width: {{progressPct}}%;"></view>
+    </view>
+  </view>
+
+  <!-- ── Scroll area ──────────────────────────────────── -->
+  <scroll-view class="scroll" scroll-y="true">
+
+    <!-- ── Meta chips ─────────────────────────────────── -->
+    <view class="metarow" data-test-id="{{testIds.metaChips}}">
+      <view class="chip chip-red">
+        <view class="dot"></view>
+        <text>{{node.tLevel}} · 第 {{node.nodeIndex + 1}} 次复习</text>
+      </view>
+      <view class="chip chip-indigo">
+        <text>{{question.subject}} · {{question.kpName}}</text>
+      </view>
+      <view class="chip chip-orange">
+        <text>{{difficultyLabel}} {{starsLabel}}</text>
+      </view>
+    </view>
+
+    <!-- ── Question card ──────────────────────────────── -->
+    <view class="qcard" data-test-id="{{testIds.questionHero}}">
+      <text class="qkicker">错题回顾 · 原题</text>
+      <view class="qstem">
+        <text>{{question.stem}}</text>
+      </view>
+      <view class="qmeta">
+        <text>知识点 · 顶点式 · 配方法</text>
+        <text class="stars">{{starsLabel}}</text>
+      </view>
+    </view>
+
+    <!-- ── Work area ──────────────────────────────────── -->
+    <view class="block-title">
+      <view class="block-title-dot"></view>
+      <text>你的解答 · 手写</text>
+    </view>
+    <view class="work" data-test-id="{{testIds.answerArea}}" bind:touchstart="onCanvasTouch">
+      <view class="paper">
+        <view class="handwritten">
+          <text>f(x) = x² − 4x + 3\n      = (x² − 4x + 4) − 4 + 3\n      = (x − 2)² − 1\n∴ 顶点 (2, −1)</text>
+          <view class="cursor-blink"></view>
+        </view>
+      </view>
+      <view class="tools">
+        <view class="tool">
+          <van-icon name="edit" size="14px" color="#636366" />
+          <text>手写</text>
+        </view>
+        <view class="tool">
+          <van-icon name="comment-o" size="14px" color="#636366" />
+          <text>键盘</text>
+        </view>
+        <view class="tool tool-prime">
+          <van-icon name="star" size="14px" color="#007AFF" />
+          <text>公式面板</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ── Reveal button (visible in ANSWERING state) ── -->
+    <view wx:if="{{!isRevealed}}" class="reveal-btn-wrap">
+      <van-button
+        type="primary"
+        size="large"
+        round
+        loading="{{isRevealing}}"
+        disabled="{{execState !== 'ANSWERING' || isRevealing}}"
+        data-test-id="{{testIds.revealBtn}}"
+        bind:click="onRevealTap"
+      >
+        {{isRevealing ? '加载中…' : '👁 揭示答案'}}
+      </van-button>
+    </view>
+
+    <!-- ── Reveal content ─────────────────────────────── -->
+    <block wx:if="{{isRevealed}}">
+      <view class="block-title block-title-green">
+        <view class="block-title-dot block-title-dot-green"></view>
+        <text>参考答案 · 已揭示</text>
+      </view>
+    </block>
+    <view class="reveal {{isRevealed ? 'reveal-visible' : 'reveal-hidden'}}" data-test-id="{{testIds.revealContent}}">
+      <view class="reveal-head">
+        <view class="reveal-head-l">
+          <view class="reveal-ico" data-test-id="{{testIds.revealCheckmark}}">
+            <van-icon name="success" color="#fff" size="12px" />
+          </view>
+          <text class="reveal-ttl">标准解答</text>
+        </view>
+        <text class="reveal-sub">AI · GPT-4o mini</text>
+      </view>
+      <view class="ans">
+        <text class="ans-k">顶点式</text>
+        <text class="ans-v">{{question.answer}}</text>
+      </view>
+      <view class="steps">
+        <view wx:for="{{steps}}" wx:key="num" class="stp" data-test-id="{{item.testId}}">
+          <view class="stp-n">{{item.num}}</view>
+          <text class="stp-t">{{item.text}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ── Node timeline ──────────────────────────────── -->
+    <view class="nodes" data-test-id="{{testIds.memoryCurve}}">
+      <block wx:for="{{nodeDots}}" wx:key="idx">
+        <view class="{{item.cls}}" data-test-id="memory-curve-node-{{item.tLevel}}"></view>
+        <view wx:if="{{item.hasLine}}" class="node-line {{item.lineGreen ? 'node-line-green' : ''}}"></view>
+      </block>
+      <text class="node-label">{{nodeLabel}}</text>
+    </view>
+
+  </scroll-view>
+
+  <!-- ── Rating bar (fixed bottom) ────────────────────── -->
+  <view class="rating" data-test-id="{{testIds.gradeButtons}}">
+    <view class="rtitle">
+      <text class="rtitle-l">本次复习你的自评？</text>
+      <text class="rtitle-r">将用于更新记忆曲线</text>
+    </view>
+    <view class="ractions">
+      <view
+        class="rbtn rbtn-forgot {{!isRevealed || isGrading ? 'rbtn-disabled' : ''}}"
+        data-grade="FORGOT"
+        data-test-id="{{testIds.gradeBtnForgot}}"
+        bind:tap="onGradeTap"
+      >
+        <view class="ri ri-red">✗</view>
+        <text class="rl">未掌握</text>
+        <text class="rs">回到 T0</text>
+      </view>
+      <view
+        class="rbtn rbtn-partial {{!isRevealed || isGrading ? 'rbtn-disabled' : ''}}"
+        data-grade="PARTIAL"
+        data-test-id="{{testIds.gradeBtnPartial}}"
+        bind:tap="onGradeTap"
+      >
+        <view class="ri ri-orange">◐</view>
+        <text class="rl">部分</text>
+        <text class="rs">原计划不变</text>
+      </view>
+      <view
+        class="rbtn rbtn-master {{!isRevealed || isGrading ? 'rbtn-disabled' : ''}}"
+        data-grade="MASTERED"
+        data-test-id="{{testIds.gradeBtnMastered}}"
+        bind:tap="onGradeTap"
+      >
+        <view class="ri ri-green">✓</view>
+        <text class="rl">已掌握</text>
+        <text class="rs">推进到 T3</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ── Exit confirm sheet ───────────────────────────── -->
+  <van-overlay show="{{showExitSheet}}" bind:click="onExitCancel" />
+  <view wx:if="{{showExitSheet}}" class="sheet-overlay" data-test-id="{{testIds.exitConfirmSheet}}">
+    <view class="sheet">
+      <text class="sheet-title">退出本次复习？</text>
+      <text class="sheet-body">本次复习尚未自评，退出将保留在原计划</text>
+      <view class="sheet-actions">
+        <van-button plain size="normal" bind:click="onExitCancel">取消</van-button>
+        <van-button type="danger" size="normal" bind:click="onExitConfirm">退出</van-button>
+      </view>
+    </view>
+  </view>
+
+</view>
