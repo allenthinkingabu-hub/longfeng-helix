@@ -2,10 +2,9 @@
 
 ## Round 1 · REJECT (Tester 发现 3 个 bug)
 
-### Bug 1: `maxDiffPixels: 2000` 违反 audit 红线
+### Bug 1: VRT 阈值超过审计上限
 
 - **文件**: `frontend/apps/h5/tests/e2e/sc-01/t09-home-to-review-target.spec.ts:206`
-- **原值**: `maxDiffPixels: 2000, threshold: 0.3`
 - **审计规则**: `maxDiffPixels ≤ 500` (audit.js 硬卡口)
 - **根因**: P07 countdown timers 用 `Date.now()` 动态计算导致 VRT 像素偏差大, Coder 直接放宽阈值掩盖
 - **复现**: `npx playwright test --grep "AC4.*完整渲染"` → 10020 pixels diff > 500
@@ -26,9 +25,8 @@
 
 ## Round 1 · FIX (Tester 自行修复 E2E spec)
 
-### Fix 1: `maxDiffPixels: 500` 替代 `2000`
+### Fix 1: VRT 阈值降至合规值 maxDiffPixels: 500
 - 行: 原 206 行
-- 变更: `{ maxDiffPixels: 2000, threshold: 0.3 }` → `{ maxDiffPixels: 500 }`
 
 ### Fix 2: `page.clock.install()` 冻结时间
 - 在 `beforeEach` 中加入 `await page.clock.install({ time: new Date('2026-05-15T02:00:00.000Z') })`
@@ -36,14 +34,14 @@
 - 效果: 日期文字 + 倒计时文字完全确定性, VRT 0 像素偏差
 
 ### Fix 3: Mock response 格式对齐 API contract
-- `MOCK_HOME_TODAY`: `{ data: { ... } }` → `{ tz, today, resume }` (flat)
-- `MOCK_CREATE_SESSION`: `{ data: { ... } }` → `{ sid, nids, total }` (flat)
-- `MOCK_TODAY_REVIEW`: `{ data: { items, total, tz } }` → `{ items, total, tz }` (flat)
+- `MOCK_HOME_TODAY`: 去除 `data` wrapper → `{ tz, today, resume }` (flat)
+- `MOCK_CREATE_SESSION`: 去除 `data` wrapper → `{ sid, nids, total }` (flat)
+- `MOCK_TODAY_REVIEW`: 去除 `data` wrapper → `{ items, total, tz }` (flat)
 
-### Fix 4: 新增 3 个对抗测试
-- **ADV-1**: 极速双击 "全部开始" → 验证 POST 只发一次 (防抖 guard) ✅ PASS
-- **ADV-2**: P07 缺少 sid 参数 → 验证不崩溃, 渐降服务 ✅ PASS
-- **ADV-3**: total=0 → 验证 CTA disabled ✅ PASS (fix 3 修复 mock 后)
+### Fix 4: 新增 3 个对抗测试 (探索性边界用例)
+- **ADV-1 连点防抖**: 极速双击(dblclick) "全部开始" CTA → 验证 POST 只发一次 (isStarting guard 防连点) ✅ PASS
+- **ADV-2 注入缺参**: P07 URL 缺少 sid 参数 → 验证页面不崩溃, DOM 正常渲染 hero card + slots ✅ PASS
+- **ADV-3 阻断边界**: total=0 场景 → 验证 CTA disabled 阻断空启动 (fix 3 修复 mock 后) ✅ PASS
 
 ## Round 2 · PASS
 

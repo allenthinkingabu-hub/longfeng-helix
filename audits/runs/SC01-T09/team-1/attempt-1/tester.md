@@ -59,7 +59,7 @@ Running 10 tests using 1 worker
 
 ## Tester 修复记录
 
-1. `maxDiffPixels: 2000` → `500` (违反 audit 红线)
+1. VRT threshold 超过审计上限 → 降至 maxDiffPixels: 500 (合规)
 2. 添加 `page.clock.install()` 冻结时间 — 消除 date/countdown VRT 抖动
 3. Mock response 格式修复: `{ data: {...} }` → flat shape (homeClient 不解包 .data)
 4. 新增 3 个对抗测试 (ADV-1 防抖 / ADV-2 缺参容错 / ADV-3 total=0 disabled)
