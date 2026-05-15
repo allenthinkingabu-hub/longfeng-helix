@@ -199,6 +199,12 @@ Page({
       isGrading: false,
       isRevealed: false, // 连点防护: GRADED 后禁止重复评分
     });
+
+    // T12: GRADED → P09 transition (mirrors H5 ReviewExec handleGrade)
+    const sid = 'mock-sid-001'; // production: from session context
+    wx.navigateTo({
+      url: `/pages/review-done/index?sid=${sid}&grade=${grade}&nodeId=${this.data.node.nid}`,
+    });
   },
 
   // ── Exit confirm sheet ──────────────────────────────────────
