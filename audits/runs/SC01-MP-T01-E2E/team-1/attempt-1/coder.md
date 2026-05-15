@@ -44,5 +44,6 @@ Phase 1 scope：**不跑 automator**（Phase 2 TL 串行跑）。仅验证：
 
 ## 5. 提交
 
-- commit hash: (见下方 git commit 输出)
+- commit hash: `0b6a273`
 - 文件：`frontend/apps/mp/test/e2e/capture.spec.ts`（新增 ~100 行）
+- pre-commit hook: lint 0 errors · test:unit 97/97 PASS
