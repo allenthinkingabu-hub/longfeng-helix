@@ -1,16 +1,16 @@
-<testsuites id="" name="" tests="6" failures="0" skipped="0" errors="0" time="10.864476999999999">
-<testsuite name="sc-01/t07-list-highlight-newest.spec.ts" timestamp="2026-05-15T08:09:00.405Z" hostname="chromium" tests="6" failures="0" skipped="0" time="9.961" errors="0">
-<testcase name="SC01-T07 · P04→P05 transition + highlight › AC1+AC2+AC3: P04 save → P05 with highlight → green border 3s fade" classname="sc-01/t07-list-highlight-newest.spec.ts" time="5.722">
+<testsuites id="" name="" tests="6" failures="0" skipped="0" errors="0" time="10.159038999999998">
+<testsuite name="sc-01/t07-list-highlight-newest.spec.ts" timestamp="2026-05-15T08:15:31.704Z" hostname="chromium" tests="6" failures="0" skipped="0" time="9.254" errors="0">
+<testcase name="SC01-T07 · P04→P05 transition + highlight › AC1+AC2+AC3: P04 save → P05 with highlight → green border 3s fade" classname="sc-01/t07-list-highlight-newest.spec.ts" time="5.43">
 </testcase>
-<testcase name="SC01-T07 · P04→P05 transition + highlight › AC4: highlighted card renders all required elements" classname="sc-01/t07-list-highlight-newest.spec.ts" time="0.45">
+<testcase name="SC01-T07 · P04→P05 transition + highlight › AC4: highlighted card renders all required elements" classname="sc-01/t07-list-highlight-newest.spec.ts" time="0.309">
 </testcase>
-<testcase name="SC01-T07 · P04→P05 transition + highlight › TI1: highlight={qid} not in list → fallback no highlight" classname="sc-01/t07-list-highlight-newest.spec.ts" time="0.287">
+<testcase name="SC01-T07 · P04→P05 transition + highlight › TI1: highlight={qid} not in list → fallback no highlight" classname="sc-01/t07-list-highlight-newest.spec.ts" time="0.252">
 </testcase>
-<testcase name="SC01-T07 · P04→P05 transition + highlight › 4-state VRT: loading state" classname="sc-01/t07-list-highlight-newest.spec.ts" time="0.83">
+<testcase name="SC01-T07 · P04→P05 transition + highlight › 4-state VRT: loading state" classname="sc-01/t07-list-highlight-newest.spec.ts" time="0.758">
 </testcase>
-<testcase name="SC01-T07 · P04→P05 transition + highlight › 4-state VRT: empty state" classname="sc-01/t07-list-highlight-newest.spec.ts" time="0.379">
+<testcase name="SC01-T07 · P04→P05 transition + highlight › 4-state VRT: empty state" classname="sc-01/t07-list-highlight-newest.spec.ts" time="0.278">
 </testcase>
-<testcase name="SC01-T07 · P04→P05 transition + highlight › 4-state VRT: error state" classname="sc-01/t07-list-highlight-newest.spec.ts" time="2.293">
+<testcase name="SC01-T07 · P04→P05 transition + highlight › 4-state VRT: error state" classname="sc-01/t07-list-highlight-newest.spec.ts" time="2.227">
 </testcase>
 </testsuite>
 </testsuites>

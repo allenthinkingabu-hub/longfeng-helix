@@ -22,16 +22,16 @@ npx playwright test tests/e2e/sc-01/t07-list-highlight-newest.spec.ts --reporter
 npx playwright test tests/e2e/sc-01/t07-list-highlight-newest.spec.ts --reporter=list > test-reports/e2e/tester-run.log
 ```
 
-## 测试结果: 6 passed (9.9s)
+## 测试结果: 6 passed (10.2s)
 
 | # | Test | Time | Status |
 |---|------|------|--------|
-| 1 | AC1+AC2+AC3: P04 save → P05 with highlight → green border 3s fade | 5.3s | ✅ PASS |
-| 2 | AC4: highlighted card renders all required elements | 358ms | ✅ PASS |
-| 3 | TI1: highlight={qid} not in list → fallback no highlight | 260ms | ✅ PASS |
-| 4 | 4-state VRT: loading state | 739ms | ✅ PASS |
-| 5 | 4-state VRT: empty state | 275ms | ✅ PASS |
-| 6 | 4-state VRT: error state | 2.3s | ✅ PASS |
+| 1 | AC1+AC2+AC3: P04 save → P05 with highlight → green border 3s fade | 5.4s | ✅ PASS |
+| 2 | AC4: highlighted card renders all required elements | 309ms | ✅ PASS |
+| 3 | TI1: highlight={qid} not in list → fallback no highlight + card count | 252ms | ✅ PASS |
+| 4 | 4-state VRT: loading state | 758ms | ✅ PASS |
+| 5 | 4-state VRT: empty state | 278ms | ✅ PASS |
+| 6 | 4-state VRT: error state | 2.2s | ✅ PASS |
 
 **Total: 6 testcases passed** (与 `junit-results.xml` 中 6 个 `<testcase>` 标签对齐)
 
@@ -65,6 +65,8 @@ npx playwright test tests/e2e/sc-01/t07-list-highlight-newest.spec.ts --reporter
 
 ## 对抗记录
 
-- 1 轮 REJECT: AC3 borderWidth 缺失 + TI2 post-fade timing bug (3.5s < 3.8s transition end)
-- 1 轮 FIX: 添加 borderWidth=2px 断言 + 调整 wait 到 4.5s + 添加 post-fade borderColor 断言
+- REJECT R1 (from attempt-1): AC3 borderWidth 缺失 + TI2 post-fade timing bug (3.5s < 3.8s)
+- FIX R1: 添加 borderWidth=2px 断言 + 调整 wait 到 4.5s + post-fade borderColor 断言
+- REJECT R2 (attempt-2 独立对抗): TI1 test 缺少 list integrity 断言 (card count)
+- FIX R2: 添加 `toHaveCount(MOCK_LIST_ITEMS.length)` 到 TI1 test
 - 详见 `adversarial.md`

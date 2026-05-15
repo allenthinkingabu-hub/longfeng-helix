@@ -64,7 +64,7 @@ expect(postFadeBorder).not.toContain('52, 199, 89');
 ```
 结果: ✅ PASS
 
-### 修复后全量回归 (attempt-2 物理验证)
+### 修复后回归 (pre-adversarial-2)
 
 ```
 Running 6 tests using 1 worker
@@ -77,10 +77,60 @@ Running 6 tests using 1 worker
   6 passed (9.9s)
 ```
 
+---
+
+## REJECT Round 2 · attempt-2 Tester 独立对抗
+
+### Finding 3: TI1 test 缺少 list integrity 断言
+
+- **严重度**: Medium
+- **TI1 原文**: "highlight={qid} 不在 list 中 → fallback 不高亮 (不抛错 · 列表正常渲染)"
+- **问题**: 测试只验证了 `[data-highlighted="true"]` count=0 (无高亮)，但**未验证列表正常渲染** — 即所有卡片(4 张)都完整显示。若 highlight 不匹配导致 list 部分渲染或只渲染 1 项，测试仍会绿灯。
+- **位置**: `t07-list-highlight-newest.spec.ts:344-346` — 缺 `toHaveCount(4)` 断言
+- **复现**: 审查代码确认缺失；如果 component 在 highlight 不匹配时 `.filter()` 返回空或部分，测试无法发现
+
+---
+
+## FIX Round 2 · 修复验证
+
+### Fix 3: 添加 list item count 断言
+
+```diff
++    // TESTER adversarial (attempt-2): verify ALL list items still render (no silent drop)
++    const allCards = page.locator(`[data-testid="${TID.itemCard}"]`);
++    await expect(allCards).toHaveCount(MOCK_LIST_ITEMS.length);
+```
+
+文件: `frontend/apps/h5/tests/e2e/sc-01/t07-list-highlight-newest.spec.ts:348-350`
+
+结果: ✅ PASS — 4 cards rendered as expected
+
+### 修复后全量回归 (attempt-2 最终物理验证)
+
+```
+Running 6 tests using 1 worker
+  ✓ AC1+AC2+AC3: P04 save → P05 with highlight → green border 3s fade (5.4s)
+  ✓ AC4: highlighted card renders all required elements (309ms)
+  ✓ TI1: highlight={qid} not in list → fallback no highlight (252ms)
+  ✓ 4-state VRT: loading state (758ms)
+  ✓ 4-state VRT: empty state (278ms)
+  ✓ 4-state VRT: error state (2.2s)
+  6 passed (10.2s)
+```
+
 JUnit XML: `test-reports/e2e/junit-results.xml` — 6 `<testcase>` 标签 · 0 failures · 0 errors
+
+## 探索性验证 (超纲手工测试)
+
+| 场景 | 结果 |
+|------|------|
+| Save API 500 → P04 不跳转 | ✅ graceful (stays on P04) |
+| Double-click save → API call count | ✅ 1 call only (debounce) |
+| API request 含 `highlight={qid}` param | ✅ verified via request interception |
+| Error state (API 500) → error banner visible | ✅ `[role="alert"]` 可见 |
 
 ---
 
 ## 最终裁决: PASS
 
-6/6 E2E 全绿 · AC1-AC4 + TI1-TI2-TI4 已验证 · 5 态 VRT baseline · mock=3 ≤ 5 · maxDiffPixels=500 ≤ 500 · JUnit XML 6 testcase 与 tester.md claimed=6 对齐 · 对抗 1 轮 REJECT + 1 轮 FIX 完成
+6/6 E2E 全绿 · AC1-AC4 + TI1-TI2-TI4 已验证 · 5 态 VRT baseline · mock=3 ≤ 5 · maxDiffPixels=500 ≤ 500 · JUnit XML 6 testcase 与 tester.md claimed=6 对齐 · 对抗 2 轮 REJECT + 2 轮 FIX 完成(attempt-1: borderWidth+timing; attempt-2: list integrity)

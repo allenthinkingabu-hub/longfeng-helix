@@ -344,6 +344,10 @@ test.describe('SC01-T07 · P04→P05 transition + highlight', () => {
     // No card should be highlighted (nonexistent-qid doesn't match any item)
     const highlightedCards = page.locator('[data-highlighted="true"]');
     await expect(highlightedCards).toHaveCount(0);
+
+    // TESTER adversarial (attempt-2): verify ALL list items still render (no silent drop)
+    const allCards = page.locator(`[data-testid="${TID.itemCard}"]`);
+    await expect(allCards).toHaveCount(MOCK_LIST_ITEMS.length);
   });
 
   test('4-state VRT: loading state', async ({ page }) => {
