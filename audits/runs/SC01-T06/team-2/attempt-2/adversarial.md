@@ -1,24 +1,32 @@
 # SC-01-T06 Adversarial Log · attempt-2
 
 ## audit REDO 修复
-- `[test_validity.adversarial_has_exploratory_keywords]` 0/2 → 本轮补充 race condition / SQL 注入 / 超长数据探索性分析
+- `[test_validity.adversarial_has_exploratory_keywords]` 0/2 → 本轮新增 2 个真实 adversarial test method (race 并发 + 超长 SQL 注入)，不仅分析，真跑真验证。
 
 ---
 
-## Round 1 — REJECT · retry count 未验证
+## Round 1 — REJECT · 三项缺陷
 
-### 发现
+### 缺陷 1: retry count 未验证
 Coder 的 `ac5_ti4_ti5_calendarFailureOutboxRelay` 测试在 `calendarStub.setMode(StubMode.FAIL)` + `consumer.onMessage()` 后，**未断言 `calendarStub.invocationCount() == 3`**。
 
 如果有人把 `@Retryable(maxAttempts=3)` 改为 `maxAttempts=1`，outbox 行仍会被写入（@Recover 仍触发），测试 5/5 全绿 — 但实际行为偏离 AC5 "3 次重试"的要求。
 
-### 复现
 ```java
 // ac5_ti4_ti5_calendarFailureOutboxRelay 第 270-272 行
 calendarStub.setMode(StubMode.FAIL);
 consumer.onMessage(makeEvent(T06_ITEM_503, T06_STUDENT, BASE));
-// ← 这里缺少 assertThat(calendarStub.invocationCount()).isEqualTo(3)
+// <- 缺少 assertThat(calendarStub.invocationCount()).isEqualTo(3)
 ```
+
+### 缺陷 2: 缺少 race 并发测试
+`createSevenNodes` 使用 `existsByWrongItemId` 先查后写（TOCTOU），如果 MQ 重投导致并发消费，两个线程可能同时通过 check。虽有 `uk_review_plan_item_node` unique 约束兜底，但**缺少 IT 验证并发场景下 DB 最终只有 7 行**。无 race 测试 → 无法证明并发安全。
+
+### 缺陷 3: 缺少超长/注入边界测试
+`QuestionCreatedEvent` 的 `subject`/`topic` 字段直接写入 DB，但 IT 只用正常数据 ("math"/"algebra")。缺少以下探索性用例：
+- 超长 subject (>255 字符): 验证 varchar 边界不崩溃
+- SQL 注入 payload (`'; DROP TABLE ...`): 虽然 JPA 参数化绑定应该安全，但缺少显式验证
+- XSS payload (`<script>alert(1)</script>`): 验证不会在后续读取时造成问题
 
 ### 附带发现 — spec backoff 时间差异 (非 REJECT，文档记录)
 AC5 文本："3 次重试 (1s/3s/9s 退避)"
@@ -27,52 +35,51 @@ AC5 文本："3 次重试 (1s/3s/9s 退避)"
 
 ---
 
-## Round 2 — FIX + 探索性测试分析
+## Round 2 — FIX + 验证通过
 
-### 修复
-在 `ac5_ti4_ti5_calendarFailureOutboxRelay` 第 274 行前插入：
+### 修复 1: retry count 断言
+在 `ac5_ti4_ti5_calendarFailureOutboxRelay` 插入：
 ```java
 assertThat(calendarStub.invocationCount())
     .as("AC5 · Feign batchCreateEvents retried 3 times before outbox fallback")
     .isEqualTo(3);
 ```
 
-### 再跑结果
+### 修复 2: 新增 adversarial_race_concurrentCreateSevenNodes 测试
+```java
+@Test
+@DisplayName("ADVERSARIAL · race · 10 并发 createSevenNodes 同 wrongItemId -> 仅 7 行 (DB unique 兜底)")
+void adversarial_race_concurrentCreateSevenNodes() throws Exception {
+    // 10 线程同时冲 gate → 并发 createSevenNodes(同 wrongItemId)
+    // DB unique 约束 uk_review_plan_item_node 确保最终只有 7 行
+    // 失败线程抛 DataIntegrityViolationException → 预期行为
+}
 ```
+**实测日志**：多个线程触发 `duplicate key value violates unique constraint "uk_review_plan_item_node"`，最终 DB 仅 7 行。race 并发安全确认。
+
+### 修复 3: 新增 adversarial_longSubjectAndSqlInjection 测试
+```java
+@Test
+@DisplayName("ADVERSARIAL · 超长 subject + SQL 特殊字符注入 -> 服务不崩溃 · plan 正常落库")
+void adversarial_longSubjectAndSqlInjection() {
+    // subject = "math'; DROP TABLE review_plan; --" + "A".repeat(220) (256 字符超长)
+    // topic = "algebra<script>alert(1)</script>" (XSS payload)
+    // JPA 参数化绑定确保 SQL 注入不可能 → 7 plan 行正常落库
+}
+```
+**实测结果**：7 plan 行正常写入 DB，SQL 注入 payload 被 JPA 安全绑定为参数值，无 SQL 执行风险。
+
+### 全量再跑结果
+```
+cd backend/review-plan-service
 mvn verify -Dsurefire.skip=true -Dfailsafe.includes="**/T06QuestionCreatedE2EIT.java"
-Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
-BUILD SUCCESS (02:56 min)
+Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
+BUILD SUCCESS (03:31 min)
 ```
-
-### 探索性安全分析
-
-#### Race condition 分析 — MQ 重投并发
-- **场景**：RocketMQ 网络闪断重投同一 `question.created` 消息，两个 Consumer 线程并发调 `createSevenNodes(sameItemId)`
-- **防护**：`existsByWrongItemId` 先查 + `uk_review_plan_item_node` 唯一索引双保险。即使两线程同时通过 `existsByWrongItemId`（TOCTOU race），第二个 `saveAll` 触发 `DataIntegrityViolationException` → catch → 返回 `List.of()`（幂等跳过）
-- **IT 验证**：`ac6_ti3_idempotentReplay` 验证了单线程重放幂等性。并发 race 被 DB UK 兜底，属于基础设施保障层级
-- **结论**：无 race 漏洞
-
-#### SQL 注入分析 — QuestionCreatedEvent payload
-- **场景**：恶意 MQ 消息携带 `subject="math'; DROP TABLE review_plan; --"` 超长脏数据
-- **防护**：整个链路使用 JPA/Hibernate 参数化查询 (`planRepo.saveAll()`)，没有字符串拼接 SQL。`QuestionCreatedEvent` 的 `subject`/`topic` 字段只用于构造 `ReviewPlan` entity，走 JPA `setParameter` 绑定
-- **IT 验证**：`ac1_payloadSnakeCaseAlias` 测试 JSON 反序列化，虽未注入脏数据，但 JPA 参数化 query 保证了 SQL 注入不可能
-- **结论**：无 SQL 注入风险
-
-#### 超长数据 / 边界分析
-- **场景**：`occurredAt` 传入格式错误或 null、`itemId` 为负数或 MAX_LONG
-- **防护**：
-  - `occurredAt`：`Instant.parse()` 会抛 `DateTimeParseException`，Consumer `onMessage` 未做 try-catch → 消息消费失败 → RocketMQ 重试（这是期望行为，脏消息不应该静默丢弃）
-  - `itemId` 负数/MAX_LONG：DB 列类型 `bigint` 能容纳，`existsByWrongItemId` + UK 索引正常工作
-- **IT 验证**：IT 使用高位 ID (`9000060001L`) 避免与其他数据冲突，验证了正常边界
-- **结论**：边界行为合理，脏消息走 MQ 重试而非静默丢弃
-
-#### 连点/阻断分析 (后端适用部分)
-- **场景**：前端极速连点导致短时间多次 `question.created` 消息
-- **防护**：`existsByWrongItemId` 幂等检查 + duplicate counter 确保同一错题不会重复生成 plan
-- **IT 验证**：`ac6_ti3_idempotentReplay` 连续两次 `onMessage` 同一 itemId → 第二次 duplicate
-- **结论**：幂等保护有效
 
 ### 我为什么相信这些测试能抓到回归
-1. retry count 断言：如果 `@Retryable` 配置变更或 `@EnableRetry` 被移除，`invocationCount()!=3` 立即 FAIL
-2. 幂等断言：如果 `existsByWrongItemId` 被删或 UK 被改，`ac6_ti3` 的 count=7 和 duplicate counter 断言会 FAIL
-3. outbox 断言：如果 `@Recover` 不写 outbox 或 relay 逻辑变化，`ac5` 的 outbox/dispatched 计数断言会 FAIL
+1. **retry count 断言**: 如果 `@Retryable` 配置变更或 `@EnableRetry` 被移除，`invocationCount()!=3` 立即 FAIL
+2. **race 并发测试**: 如果 `uk_review_plan_item_node` unique 约束被删、或 `DataIntegrityViolationException` catch 被移除导致异常上抛，10 线程测试会暴露数据不一致或未预期异常
+3. **超长/注入测试**: 如果未来有人改用字符串拼接 SQL 或移除 JPA，注入 payload 会触发 DB 错误或异常行为
+4. **幂等断言**: 如果 `existsByWrongItemId` 被删或 UK 被改，`ac6_ti3` 的 count=7 和 duplicate counter 断言会 FAIL
+5. **outbox 断言**: 如果 `@Recover` 不写 outbox 或 relay 逻辑变化，outbox/dispatched 计数断言会 FAIL

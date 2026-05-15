@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-failsafe-plugin/xsd/failsafe-test-report-3.0.xsd" version="3.0" name="com.longfeng.reviewplan.T06QuestionCreatedE2EIT" time="17.996" tests="5" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-failsafe-plugin/xsd/failsafe-test-report-3.0.xsd" version="3.0" name="com.longfeng.reviewplan.T06QuestionCreatedE2EIT" time="48.876" tests="7" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -16,7 +16,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="AU"/>
     <property name="sun.boot.library.path" value="/Library/Java/JavaVirtualMachines/jdk-17.0.13.jdk/Contents/Home/lib"/>
-    <property name="sun.java.command" value="/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/backend/review-plan-service/target/surefire/surefirebooter-20260515103740111_3.jar /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/backend/review-plan-service/target/surefire 2026-05-15T10-37-40_022-jvmRun1 surefire-20260515103740111_1tmp surefire_0-20260515103740111_2tmp"/>
+    <property name="sun.java.command" value="/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/backend/review-plan-service/target/surefire/surefirebooter-20260515104819951_3.jar /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/backend/review-plan-service/target/surefire 2026-05-15T10-48-19_831-jvmRun1 surefire-20260515104819951_1tmp surefire_0-20260515104819951_2tmp"/>
     <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="jdk.debug" value="release"/>
     <property name="csp.sentinel.flow.cold.factor" value="3"/>
@@ -36,7 +36,7 @@
     <property name="FILE_LOG_CHARSET" value="UTF-8"/>
     <property name="java.awt.headless" value="true"/>
     <property name="csp.sentinel.api.port" value="8719"/>
-    <property name="surefire.real.class.path" value="/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/backend/review-plan-service/target/surefire/surefirebooter-20260515103740111_3.jar"/>
+    <property name="surefire.real.class.path" value="/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/backend/review-plan-service/target/surefire/surefirebooter-20260515104819951_3.jar"/>
     <property name="polyglot.engine.WarnInterpreterOnly" value="false"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
@@ -53,16 +53,16 @@
     <property name="localRepository" value="/Users/allen/.m2/repository"/>
     <property name="java.vendor.url.bug" value="https://techsupport.roguewave.com/"/>
     <property name="java.io.tmpdir" value="/var/folders/yp/wsftyjj12tz305gg23l68ch00000gn/T/"/>
-    <property name="catalina.home" value="/private/var/folders/yp/wsftyjj12tz305gg23l68ch00000gn/T/tomcat.0.7451372696695887706"/>
+    <property name="catalina.home" value="/private/var/folders/yp/wsftyjj12tz305gg23l68ch00000gn/T/tomcat.0.13255644790312098652"/>
     <property name="com.zaxxer.hikari.pool_number" value="1"/>
     <property name="java.version" value="17.0.13"/>
     <property name="user.dir" value="/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/backend/review-plan-service"/>
     <property name="os.arch" value="x86_64"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="PID" value="89619"/>
+    <property name="PID" value="91802"/>
     <property name="csp.sentinel.app.name" value="review-plan-service"/>
     <property name="CONSOLE_LOG_CHARSET" value="UTF-8"/>
-    <property name="catalina.base" value="/private/var/folders/yp/wsftyjj12tz305gg23l68ch00000gn/T/tomcat.0.7451372696695887706"/>
+    <property name="catalina.base" value="/private/var/folders/yp/wsftyjj12tz305gg23l68ch00000gn/T/tomcat.0.13255644790312098652"/>
     <property name="native.encoding" value="UTF-8"/>
     <property name="java.library.path" value="/Users/allen/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:."/>
     <property name="java.vm.info" value="mixed mode, sharing"/>
@@ -74,9 +74,9 @@
     <property name="java.class.version" value="61.0"/>
     <property name="LOGGED_APPLICATION_NAME" value="[review-plan-service] "/>
   </properties>
-  <testcase name="ac5_ti4_ti5_calendarFailureOutboxRelay" classname="com.longfeng.reviewplan.T06QuestionCreatedE2EIT" time="2.441">
+  <testcase name="adversarial_race_concurrentCreateSevenNodes" classname="com.longfeng.reviewplan.T06QuestionCreatedE2EIT" time="32.231">
     <system-out><![CDATA[Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
-10:37:41.994 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.longfeng.reviewplan.Application for test class com.longfeng.reviewplan.T06QuestionCreatedE2EIT
+10:48:21.841 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.longfeng.reviewplan.Application for test class com.longfeng.reviewplan.T06QuestionCreatedE2EIT
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -86,68 +86,134 @@
  =========|_|==============|___/=/_/_/_/
  :: Spring Boot ::                (v3.2.5)
 
-2026-05-15T10:37:43.318+04:00  INFO 89619 --- [review-plan-service] [           main] c.l.reviewplan.T06QuestionCreatedE2EIT   : Starting T06QuestionCreatedE2EIT using Java 17.0.13 with PID 89619 (started by allen in /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/backend/review-plan-service)
-2026-05-15T10:37:43.320+04:00  INFO 89619 --- [review-plan-service] [           main] c.l.reviewplan.T06QuestionCreatedE2EIT   : No active profile set, falling back to 1 default profile: "default"
-2026-05-15T10:37:45.388+04:00  INFO 89619 --- [review-plan-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-05-15T10:37:45.466+04:00  INFO 89619 --- [review-plan-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 60 ms. Found 3 JPA repository interfaces.
-2026-05-15T10:37:46.859+04:00  INFO 89619 --- [review-plan-service] [           main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=aa9e2ff3-1acf-3639-b37d-7dab7ddfe477
-2026-05-15T10:37:47.647+04:00  WARN 89619 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.apache.rocketmq.spring.autoconfigure.ListenerContainerConfiguration' of type [org.apache.rocketmq.spring.autoconfigure.ListenerContainerConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
-2026-05-15T10:37:47.656+04:00  WARN 89619 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.apache.rocketmq.spring.autoconfigure.MessageConverterConfiguration' of type [org.apache.rocketmq.spring.autoconfigure.MessageConverterConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
-2026-05-15T10:37:47.721+04:00  WARN 89619 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'createRocketMQMessageConverter' of type [org.apache.rocketmq.spring.support.RocketMQMessageConverter] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
-2026-05-15T10:37:47.735+04:00  WARN 89619 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration' of type [org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
-2026-05-15T10:37:47.765+04:00  WARN 89619 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
-2026-05-15T10:37:47.771+04:00  WARN 89619 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'loadBalancerClientsDefaultsMappingsProvider' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration$$Lambda$1098/0x00000001365e2150] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
-2026-05-15T10:37:47.780+04:00  WARN 89619 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'defaultsBindHandlerAdvisor' of type [org.springframework.cloud.commons.config.DefaultsBindHandlerAdvisor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
-2026-05-15T10:37:47.789+04:00  WARN 89619 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration' of type [org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
-2026-05-15T10:37:47.795+04:00  WARN 89619 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'stringOrNumberMigrationVersionConverter' of type [org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration$StringOrNumberToMigrationVersionConverter] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
-2026-05-15T10:37:47.824+04:00  WARN 89619 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'rocketmq-org.apache.rocketmq.spring.autoconfigure.RocketMQProperties' of type [org.apache.rocketmq.spring.autoconfigure.RocketMQProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
-2026-05-15T10:37:47.835+04:00  WARN 89619 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'rocketMQMessageListenerContainerRegistrar' of type [org.apache.rocketmq.spring.support.RocketMQMessageListenerContainerRegistrar] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
-2026-05-15T10:37:48.403+04:00  INFO 89619 --- [review-plan-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
-2026-05-15T10:37:48.419+04:00  INFO 89619 --- [review-plan-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-05-15T10:37:48.420+04:00  INFO 89619 --- [review-plan-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.20]
-2026-05-15T10:37:48.576+04:00  INFO 89619 --- [review-plan-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2026-05-15T10:37:48.579+04:00  INFO 89619 --- [review-plan-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 4884 ms
+2026-05-15T10:48:23.119+04:00  INFO 91802 --- [review-plan-service] [           main] c.l.reviewplan.T06QuestionCreatedE2EIT   : Starting T06QuestionCreatedE2EIT using Java 17.0.13 with PID 91802 (started by allen in /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/backend/review-plan-service)
+2026-05-15T10:48:23.121+04:00  INFO 91802 --- [review-plan-service] [           main] c.l.reviewplan.T06QuestionCreatedE2EIT   : No active profile set, falling back to 1 default profile: "default"
+2026-05-15T10:48:25.200+04:00  INFO 91802 --- [review-plan-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-15T10:48:25.277+04:00  INFO 91802 --- [review-plan-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 68 ms. Found 3 JPA repository interfaces.
+2026-05-15T10:48:26.609+04:00  INFO 91802 --- [review-plan-service] [           main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=aa9e2ff3-1acf-3639-b37d-7dab7ddfe477
+2026-05-15T10:48:27.303+04:00  WARN 91802 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.apache.rocketmq.spring.autoconfigure.ListenerContainerConfiguration' of type [org.apache.rocketmq.spring.autoconfigure.ListenerContainerConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:48:27.312+04:00  WARN 91802 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.apache.rocketmq.spring.autoconfigure.MessageConverterConfiguration' of type [org.apache.rocketmq.spring.autoconfigure.MessageConverterConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:48:27.372+04:00  WARN 91802 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'createRocketMQMessageConverter' of type [org.apache.rocketmq.spring.support.RocketMQMessageConverter] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:48:27.396+04:00  WARN 91802 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration' of type [org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:48:27.408+04:00  WARN 91802 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:48:27.417+04:00  WARN 91802 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'loadBalancerClientsDefaultsMappingsProvider' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration$$Lambda$1098/0x000000013a5e2150] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:48:27.425+04:00  WARN 91802 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'defaultsBindHandlerAdvisor' of type [org.springframework.cloud.commons.config.DefaultsBindHandlerAdvisor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:48:27.433+04:00  WARN 91802 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration' of type [org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:48:27.441+04:00  WARN 91802 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'stringOrNumberMigrationVersionConverter' of type [org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration$StringOrNumberToMigrationVersionConverter] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:48:27.469+04:00  WARN 91802 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'rocketmq-org.apache.rocketmq.spring.autoconfigure.RocketMQProperties' of type [org.apache.rocketmq.spring.autoconfigure.RocketMQProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:48:27.477+04:00  WARN 91802 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'rocketMQMessageListenerContainerRegistrar' of type [org.apache.rocketmq.spring.support.RocketMQMessageListenerContainerRegistrar] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:48:27.983+04:00  INFO 91802 --- [review-plan-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+2026-05-15T10:48:27.996+04:00  INFO 91802 --- [review-plan-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-15T10:48:27.997+04:00  INFO 91802 --- [review-plan-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-05-15T10:48:28.104+04:00  INFO 91802 --- [review-plan-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-15T10:48:28.107+04:00  INFO 91802 --- [review-plan-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 4593 ms
 Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
-2026-05-15T10:37:49.456+04:00  INFO 89619 --- [review-plan-service] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://127.0.0.1:15433/wrongbook (PostgreSQL 15.17)
-2026-05-15T10:37:49.586+04:00  INFO 89619 --- [review-plan-service] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 1.0.081
-2026-05-15T10:37:49.587+04:00  WARN 89619 --- [review-plan-service] [           main] o.f.core.internal.command.DbMigrate      : outOfOrder mode is active. Migration of schema "public" may not be reproducible.
-2026-05-15T10:37:49.593+04:00  INFO 89619 --- [review-plan-service] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
-2026-05-15T10:37:49.837+04:00  INFO 89619 --- [review-plan-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-05-15T10:37:49.905+04:00  INFO 89619 --- [review-plan-service] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
-2026-05-15T10:37:49.942+04:00  INFO 89619 --- [review-plan-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
-2026-05-15T10:37:50.160+04:00  INFO 89619 --- [review-plan-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-05-15T10:37:50.185+04:00  INFO 89619 --- [review-plan-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-05-15T10:37:50.253+04:00  INFO 89619 --- [review-plan-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1b83fac3
-2026-05-15T10:37:50.256+04:00  INFO 89619 --- [review-plan-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-05-15T10:37:51.584+04:00  INFO 89619 --- [review-plan-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-05-15T10:37:51.664+04:00  INFO 89619 --- [review-plan-service] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-05-15T10:37:52.318+04:00  INFO 89619 --- [review-plan-service] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-05-15T10:37:54.518+04:00  INFO 89619 --- [review-plan-service] [           main] c.a.c.sentinel.SentinelWebMvcConfigurer  : [Sentinel Starter] register SentinelWebInterceptor with urlPatterns: [/**].
-2026-05-15T10:37:55.112+04:00  WARN 89619 --- [review-plan-service] [           main] o.a.r.s.a.RocketMQAutoConfiguration      : The necessary spring property 'rocketmq.name-server' is not defined, all rockertmq beans creation are skipped!
-2026-05-15T10:37:56.043+04:00  INFO 89619 --- [review-plan-service] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
-2026-05-15T10:37:56.424+04:00  INFO 89619 --- [review-plan-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 59358 (http) with context path ''
-2026-05-15T10:37:56.467+04:00  INFO 89619 --- [review-plan-service] [           main] c.l.reviewplan.T06QuestionCreatedE2EIT   : Started T06QuestionCreatedE2EIT in 13.85 seconds (process running for 16.157)
-2026-05-15T10:37:58.613+04:00 ERROR 89619 --- [review-plan-service] [           main] c.l.r.s.CalendarBatchCreateService       : calendar batchCreate retries exhausted · outbox row written · wrongItemId=9000060002 · size=7
-2026-05-15T10:37:58.668+04:00  INFO 89619 --- [review-plan-service] [           main] c.l.r.consumer.QuestionCreatedConsumer   : question.created success · itemId=9000060002 · 7 nodes created
-2026-05-15T10:37:58.903+04:00  INFO 89619 --- [review-plan-service] [           main] c.l.r.job.CalendarOutboxRelayJob         : calendar-outbox-relay dispatched · id=313565657666965504 · planId=313565654198276096
-2026-05-15T10:37:58.936+04:00  INFO 89619 --- [review-plan-service] [           main] c.l.r.job.CalendarOutboxRelayJob         : calendar-outbox-relay · scanned=1 · dispatched=1
+2026-05-15T10:48:29.077+04:00  INFO 91802 --- [review-plan-service] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://127.0.0.1:15433/wrongbook (PostgreSQL 15.17)
+2026-05-15T10:48:29.199+04:00  INFO 91802 --- [review-plan-service] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 1.0.081
+2026-05-15T10:48:29.201+04:00  WARN 91802 --- [review-plan-service] [           main] o.f.core.internal.command.DbMigrate      : outOfOrder mode is active. Migration of schema "public" may not be reproducible.
+2026-05-15T10:48:29.207+04:00  INFO 91802 --- [review-plan-service] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-05-15T10:48:29.438+04:00  INFO 91802 --- [review-plan-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-15T10:48:29.500+04:00  INFO 91802 --- [review-plan-service] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-05-15T10:48:29.536+04:00  INFO 91802 --- [review-plan-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-15T10:48:29.761+04:00  INFO 91802 --- [review-plan-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-15T10:48:29.789+04:00  INFO 91802 --- [review-plan-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-15T10:48:29.838+04:00  INFO 91802 --- [review-plan-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@20a2930f
+2026-05-15T10:48:29.840+04:00  INFO 91802 --- [review-plan-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-15T10:48:31.217+04:00  INFO 91802 --- [review-plan-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-15T10:48:31.327+04:00  INFO 91802 --- [review-plan-service] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-15T10:48:31.916+04:00  INFO 91802 --- [review-plan-service] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-05-15T10:48:33.959+04:00  INFO 91802 --- [review-plan-service] [           main] c.a.c.sentinel.SentinelWebMvcConfigurer  : [Sentinel Starter] register SentinelWebInterceptor with urlPatterns: [/**].
+2026-05-15T10:48:34.577+04:00  WARN 91802 --- [review-plan-service] [           main] o.a.r.s.a.RocketMQAutoConfiguration      : The necessary spring property 'rocketmq.name-server' is not defined, all rockertmq beans creation are skipped!
+2026-05-15T10:48:35.541+04:00  INFO 91802 --- [review-plan-service] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-05-15T10:48:36.048+04:00  INFO 91802 --- [review-plan-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 62630 (http) with context path ''
+2026-05-15T10:48:36.092+04:00  INFO 91802 --- [review-plan-service] [           main] c.l.reviewplan.T06QuestionCreatedE2EIT   : Started T06QuestionCreatedE2EIT in 13.678 seconds (process running for 15.928)
+2026-05-15T10:49:07.942+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-5] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: null
+2026-05-15T10:49:07.942+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: null
+2026-05-15T10:49:07.942+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-3] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: null
+2026-05-15T10:49:07.942+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-7] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: null
+2026-05-15T10:49:07.942+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-8] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: null
+2026-05-15T10:49:07.942+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-4] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: null
+2026-05-15T10:49:07.942+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-9] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: null
+2026-05-15T10:49:07.942+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-6] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: null
+2026-05-15T10:49:07.942+04:00  WARN 91802 --- [review-plan-service] [ool-3-thread-10] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: null
+2026-05-15T10:49:07.942+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-2] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: null
+2026-05-15T10:49:07.953+04:00 ERROR 91802 --- [review-plan-service] [pool-3-thread-4] o.h.engine.jdbc.spi.SqlExceptionHelper   : HikariPool-1 - Connection is not available, request timed out after 30023ms.
+2026-05-15T10:49:07.956+04:00 ERROR 91802 --- [review-plan-service] [ool-3-thread-10] o.h.engine.jdbc.spi.SqlExceptionHelper   : HikariPool-1 - Connection is not available, request timed out after 30021ms.
+2026-05-15T10:49:07.955+04:00 ERROR 91802 --- [review-plan-service] [pool-3-thread-6] o.h.engine.jdbc.spi.SqlExceptionHelper   : HikariPool-1 - Connection is not available, request timed out after 30021ms.
+2026-05-15T10:49:07.953+04:00 ERROR 91802 --- [review-plan-service] [pool-3-thread-3] o.h.engine.jdbc.spi.SqlExceptionHelper   : HikariPool-1 - Connection is not available, request timed out after 30021ms.
+2026-05-15T10:49:07.955+04:00 ERROR 91802 --- [review-plan-service] [pool-3-thread-9] o.h.engine.jdbc.spi.SqlExceptionHelper   : HikariPool-1 - Connection is not available, request timed out after 30021ms.
+2026-05-15T10:49:07.954+04:00 ERROR 91802 --- [review-plan-service] [pool-3-thread-7] o.h.engine.jdbc.spi.SqlExceptionHelper   : HikariPool-1 - Connection is not available, request timed out after 30021ms.
+2026-05-15T10:49:07.954+04:00 ERROR 91802 --- [review-plan-service] [pool-3-thread-5] o.h.engine.jdbc.spi.SqlExceptionHelper   : HikariPool-1 - Connection is not available, request timed out after 30020ms.
+2026-05-15T10:49:07.953+04:00 ERROR 91802 --- [review-plan-service] [pool-3-thread-8] o.h.engine.jdbc.spi.SqlExceptionHelper   : HikariPool-1 - Connection is not available, request timed out after 30021ms.
+2026-05-15T10:49:07.955+04:00 ERROR 91802 --- [review-plan-service] [pool-3-thread-2] o.h.engine.jdbc.spi.SqlExceptionHelper   : HikariPool-1 - Connection is not available, request timed out after 30021ms.
+2026-05-15T10:49:07.957+04:00 ERROR 91802 --- [review-plan-service] [pool-3-thread-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : HikariPool-1 - Connection is not available, request timed out after 30021ms.
+2026-05-15T10:49:07.988+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-8] c.l.r.service.ReviewPlanService          : calendar batchCreate dispatch terminated with runtime exception (outbox should cover) · wrongItemId=9000060004 · err=Cannot locate recovery method
+2026-05-15T10:49:07.987+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-4] c.l.r.service.ReviewPlanService          : calendar batchCreate dispatch terminated with runtime exception (outbox should cover) · wrongItemId=9000060004 · err=Cannot locate recovery method
+2026-05-15T10:49:07.987+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-9] c.l.r.service.ReviewPlanService          : calendar batchCreate dispatch terminated with runtime exception (outbox should cover) · wrongItemId=9000060004 · err=Cannot locate recovery method
+2026-05-15T10:49:07.989+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-2] c.l.r.service.ReviewPlanService          : calendar batchCreate dispatch terminated with runtime exception (outbox should cover) · wrongItemId=9000060004 · err=Cannot locate recovery method
+2026-05-15T10:49:07.987+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-3] c.l.r.service.ReviewPlanService          : calendar batchCreate dispatch terminated with runtime exception (outbox should cover) · wrongItemId=9000060004 · err=Cannot locate recovery method
+2026-05-15T10:49:07.987+04:00  WARN 91802 --- [review-plan-service] [ool-3-thread-10] c.l.r.service.ReviewPlanService          : calendar batchCreate dispatch terminated with runtime exception (outbox should cover) · wrongItemId=9000060004 · err=Cannot locate recovery method
+2026-05-15T10:49:07.986+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-5] c.l.r.service.ReviewPlanService          : calendar batchCreate dispatch terminated with runtime exception (outbox should cover) · wrongItemId=9000060004 · err=Cannot locate recovery method
+2026-05-15T10:49:07.992+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-7] c.l.r.service.ReviewPlanService          : calendar batchCreate dispatch terminated with runtime exception (outbox should cover) · wrongItemId=9000060004 · err=Cannot locate recovery method
+2026-05-15T10:49:07.987+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-1] c.l.r.service.ReviewPlanService          : calendar batchCreate dispatch terminated with runtime exception (outbox should cover) · wrongItemId=9000060004 · err=Cannot locate recovery method
+2026-05-15T10:49:07.991+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-6] c.l.r.service.ReviewPlanService          : calendar batchCreate dispatch terminated with runtime exception (outbox should cover) · wrongItemId=9000060004 · err=Cannot locate recovery method
+2026-05-15T10:49:08.128+04:00  INFO 91802 --- [review-plan-service] [pool-3-thread-3] c.l.r.consumer.QuestionCreatedConsumer   : question.created success · itemId=9000060004 · 7 nodes created
+2026-05-15T10:49:08.139+04:00  WARN 91802 --- [review-plan-service] [ool-3-thread-10] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 23505
+2026-05-15T10:49:08.139+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-6] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 23505
+2026-05-15T10:49:08.139+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-9] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 23505
+2026-05-15T10:49:08.139+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-4] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 23505
+2026-05-15T10:49:08.139+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 23505
+2026-05-15T10:49:08.139+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-5] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 23505
+2026-05-15T10:49:08.139+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-8] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 23505
+2026-05-15T10:49:08.139+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-2] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 23505
+2026-05-15T10:49:08.140+04:00 ERROR 91802 --- [review-plan-service] [pool-3-thread-5] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: duplicate key value violates unique constraint "uk_review_plan_item_node"
+  Detail: Key (wrong_item_id, node_index)=(9000060004, 0) already exists.
+2026-05-15T10:49:08.139+04:00  WARN 91802 --- [review-plan-service] [pool-3-thread-7] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 23505
+2026-05-15T10:49:08.139+04:00 ERROR 91802 --- [review-plan-service] [ool-3-thread-10] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: duplicate key value violates unique constraint "uk_review_plan_item_node"
+  Detail: Key (wrong_item_id, node_index)=(9000060004, 0) already exists.
+2026-05-15T10:49:08.140+04:00 ERROR 91802 --- [review-plan-service] [pool-3-thread-7] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: duplicate key value violates unique constraint "uk_review_plan_item_node"
+  Detail: Key (wrong_item_id, node_index)=(9000060004, 0) already exists.
+2026-05-15T10:49:08.139+04:00 ERROR 91802 --- [review-plan-service] [pool-3-thread-6] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: duplicate key value violates unique constraint "uk_review_plan_item_node"
+  Detail: Key (wrong_item_id, node_index)=(9000060004, 0) already exists.
+2026-05-15T10:49:08.139+04:00 ERROR 91802 --- [review-plan-service] [pool-3-thread-9] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: duplicate key value violates unique constraint "uk_review_plan_item_node"
+  Detail: Key (wrong_item_id, node_index)=(9000060004, 0) already exists.
+2026-05-15T10:49:08.140+04:00 ERROR 91802 --- [review-plan-service] [pool-3-thread-4] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: duplicate key value violates unique constraint "uk_review_plan_item_node"
+  Detail: Key (wrong_item_id, node_index)=(9000060004, 0) already exists.
+2026-05-15T10:49:08.140+04:00 ERROR 91802 --- [review-plan-service] [pool-3-thread-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: duplicate key value violates unique constraint "uk_review_plan_item_node"
+  Detail: Key (wrong_item_id, node_index)=(9000060004, 0) already exists.
+2026-05-15T10:49:08.140+04:00 ERROR 91802 --- [review-plan-service] [pool-3-thread-2] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: duplicate key value violates unique constraint "uk_review_plan_item_node"
+  Detail: Key (wrong_item_id, node_index)=(9000060004, 0) already exists.
+2026-05-15T10:49:08.140+04:00 ERROR 91802 --- [review-plan-service] [pool-3-thread-8] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: duplicate key value violates unique constraint "uk_review_plan_item_node"
+  Detail: Key (wrong_item_id, node_index)=(9000060004, 0) already exists.
 ]]></system-out>
   </testcase>
-  <testcase name="ac4_calendarDispatch" classname="com.longfeng.reviewplan.T06QuestionCreatedE2EIT" time="0.109">
-    <system-out><![CDATA[2026-05-15T10:37:59.056+04:00  INFO 89619 --- [review-plan-service] [           main] c.l.r.s.CalendarBatchCreateService       : calendar batchCreate ok · wrongItemId=9000060001 · size=7
-2026-05-15T10:37:59.080+04:00  INFO 89619 --- [review-plan-service] [           main] c.l.r.consumer.QuestionCreatedConsumer   : question.created success · itemId=9000060001 · 7 nodes created
+  <testcase name="ac5_ti4_ti5_calendarFailureOutboxRelay" classname="com.longfeng.reviewplan.T06QuestionCreatedE2EIT" time="1.088">
+    <system-out><![CDATA[2026-05-15T10:49:09.283+04:00 ERROR 91802 --- [review-plan-service] [           main] c.l.r.s.CalendarBatchCreateService       : calendar batchCreate retries exhausted · outbox row written · wrongItemId=9000060002 · size=7
+2026-05-15T10:49:09.338+04:00  INFO 91802 --- [review-plan-service] [           main] c.l.r.consumer.QuestionCreatedConsumer   : question.created success · itemId=9000060002 · 7 nodes created
+2026-05-15T10:49:09.487+04:00  INFO 91802 --- [review-plan-service] [           main] c.l.r.job.CalendarOutboxRelayJob         : calendar-outbox-relay dispatched · id=313568470522417152 · planId=313568467724816384
+2026-05-15T10:49:09.509+04:00  INFO 91802 --- [review-plan-service] [           main] c.l.r.job.CalendarOutboxRelayJob         : calendar-outbox-relay · scanned=1 · dispatched=1
 ]]></system-out>
   </testcase>
-  <testcase name="ac2_ac3_ti1_ti2_sevenNodesCreated" classname="com.longfeng.reviewplan.T06QuestionCreatedE2EIT" time="0.104">
-    <system-out><![CDATA[2026-05-15T10:37:59.165+04:00  INFO 89619 --- [review-plan-service] [           main] c.l.r.s.CalendarBatchCreateService       : calendar batchCreate ok · wrongItemId=9000060001 · size=7
-2026-05-15T10:37:59.188+04:00  INFO 89619 --- [review-plan-service] [           main] c.l.r.consumer.QuestionCreatedConsumer   : question.created success · itemId=9000060001 · 7 nodes created
+  <testcase name="ac4_calendarDispatch" classname="com.longfeng.reviewplan.T06QuestionCreatedE2EIT" time="0.115">
+    <system-out><![CDATA[2026-05-15T10:49:09.594+04:00  INFO 91802 --- [review-plan-service] [           main] c.l.r.s.CalendarBatchCreateService       : calendar batchCreate ok · wrongItemId=9000060001 · size=7
+2026-05-15T10:49:09.624+04:00  INFO 91802 --- [review-plan-service] [           main] c.l.r.consumer.QuestionCreatedConsumer   : question.created success · itemId=9000060001 · 7 nodes created
 ]]></system-out>
   </testcase>
-  <testcase name="ac6_ti3_idempotentReplay" classname="com.longfeng.reviewplan.T06QuestionCreatedE2EIT" time="0.079">
-    <system-out><![CDATA[2026-05-15T10:37:59.253+04:00  INFO 89619 --- [review-plan-service] [           main] c.l.r.s.CalendarBatchCreateService       : calendar batchCreate ok · wrongItemId=9000060003 · size=7
-2026-05-15T10:37:59.278+04:00  INFO 89619 --- [review-plan-service] [           main] c.l.r.consumer.QuestionCreatedConsumer   : question.created success · itemId=9000060003 · 7 nodes created
-2026-05-15T10:37:59.288+04:00  INFO 89619 --- [review-plan-service] [           main] c.l.r.consumer.QuestionCreatedConsumer   : question.created duplicate · itemId=9000060003
+  <testcase name="ac2_ac3_ti1_ti2_sevenNodesCreated" classname="com.longfeng.reviewplan.T06QuestionCreatedE2EIT" time="0.116">
+    <system-out><![CDATA[2026-05-15T10:49:09.706+04:00  INFO 91802 --- [review-plan-service] [           main] c.l.r.s.CalendarBatchCreateService       : calendar batchCreate ok · wrongItemId=9000060001 · size=7
+2026-05-15T10:49:09.733+04:00  INFO 91802 --- [review-plan-service] [           main] c.l.r.consumer.QuestionCreatedConsumer   : question.created success · itemId=9000060001 · 7 nodes created
 ]]></system-out>
   </testcase>
-  <testcase name="ac1_payloadSnakeCaseAlias" classname="com.longfeng.reviewplan.T06QuestionCreatedE2EIT" time="0.064"/>
+  <testcase name="ac6_ti3_idempotentReplay" classname="com.longfeng.reviewplan.T06QuestionCreatedE2EIT" time="0.1">
+    <system-out><![CDATA[2026-05-15T10:49:09.827+04:00  INFO 91802 --- [review-plan-service] [           main] c.l.r.s.CalendarBatchCreateService       : calendar batchCreate ok · wrongItemId=9000060003 · size=7
+2026-05-15T10:49:09.855+04:00  INFO 91802 --- [review-plan-service] [           main] c.l.r.consumer.QuestionCreatedConsumer   : question.created success · itemId=9000060003 · 7 nodes created
+2026-05-15T10:49:09.866+04:00  INFO 91802 --- [review-plan-service] [           main] c.l.r.consumer.QuestionCreatedConsumer   : question.created duplicate · itemId=9000060003
+]]></system-out>
+  </testcase>
+  <testcase name="adversarial_longSubjectAndSqlInjection" classname="com.longfeng.reviewplan.T06QuestionCreatedE2EIT" time="0.085">
+    <system-out><![CDATA[2026-05-15T10:49:09.931+04:00  INFO 91802 --- [review-plan-service] [           main] c.l.r.s.CalendarBatchCreateService       : calendar batchCreate ok · wrongItemId=9000060005 · size=7
+2026-05-15T10:49:09.951+04:00  INFO 91802 --- [review-plan-service] [           main] c.l.r.consumer.QuestionCreatedConsumer   : question.created success · itemId=9000060005 · 7 nodes created
+]]></system-out>
+  </testcase>
+  <testcase name="ac1_payloadSnakeCaseAlias" classname="com.longfeng.reviewplan.T06QuestionCreatedE2EIT" time="0.08"/>
 </testsuite>

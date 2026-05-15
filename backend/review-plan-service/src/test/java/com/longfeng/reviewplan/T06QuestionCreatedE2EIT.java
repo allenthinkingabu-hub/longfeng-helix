@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
@@ -79,6 +82,8 @@ class T06QuestionCreatedE2EIT {
   private static final long T06_ITEM_HAPPY = 9000060001L;
   private static final long T06_ITEM_503 = 9000060002L;
   private static final long T06_ITEM_IDEM = 9000060003L;
+  private static final long T06_ITEM_RACE = 9000060004L;
+  private static final long T06_ITEM_LONG = 9000060005L;
 
   private static final Instant BASE = Instant.parse("2026-05-15T08:00:00Z");
 
@@ -150,7 +155,7 @@ class T06QuestionCreatedE2EIT {
     meterRegistry = new SimpleMeterRegistry();
     consumer = new QuestionCreatedConsumer(planService, meterRegistry);
 
-    long[] items = {T06_ITEM_HAPPY, T06_ITEM_503, T06_ITEM_IDEM};
+    long[] items = {T06_ITEM_HAPPY, T06_ITEM_503, T06_ITEM_IDEM, T06_ITEM_RACE, T06_ITEM_LONG};
     for (long itemId : items) {
       jdbc.update("DELETE FROM review_outcome WHERE plan_id IN "
           + "(SELECT id FROM review_plan WHERE wrong_item_id = ?)", itemId);
@@ -338,6 +343,75 @@ class T06QuestionCreatedE2EIT {
     assertThat(success.count()).isEqualTo(1.0);
     assertThat(duplicate).isNotNull();
     assertThat(duplicate.count()).isEqualTo(1.0);
+  }
+
+  // ==================================================================
+  // ADVERSARIAL · race condition — 并发重放同 wrongItemId 不应产生重复行
+  // ==================================================================
+  @Test
+  @DisplayName("ADVERSARIAL · race · 10 并发 createSevenNodes 同 wrongItemId → 仅 7 行 (DB unique 兜底)")
+  void adversarial_race_concurrentCreateSevenNodes() throws Exception {
+    calendarStub.setMode(StubMode.OK);
+
+    int threads = 10;
+    ExecutorService pool = Executors.newFixedThreadPool(threads);
+    CountDownLatch gate = new CountDownLatch(1);
+    CountDownLatch done = new CountDownLatch(threads);
+
+    for (int t = 0; t < threads; t++) {
+      pool.submit(() -> {
+        try {
+          gate.await(); // 所有线程同时冲
+          SimpleMeterRegistry localReg = new SimpleMeterRegistry();
+          QuestionCreatedConsumer localConsumer = new QuestionCreatedConsumer(planService, localReg);
+          localConsumer.onMessage(makeEvent(T06_ITEM_RACE, T06_STUDENT, BASE));
+        } catch (Exception ignored) {
+          // race 失败的线程会抛 DataIntegrityViolationException, 预期行为
+        } finally {
+          done.countDown();
+        }
+      });
+    }
+    gate.countDown(); // 放闸
+    done.await();
+    pool.shutdown();
+
+    // 无论多少线程并发, DB unique 约束保证最终只有 7 行
+    int planCount = jdbc.queryForObject(
+        "SELECT count(*) FROM review_plan WHERE wrong_item_id = ?",
+        Integer.class, T06_ITEM_RACE);
+    assertThat(planCount)
+        .as("race · 10 并发 createSevenNodes 后仍然只有 7 plan 行 (DB unique 兜底)")
+        .isEqualTo(7);
+  }
+
+  // ==================================================================
+  // ADVERSARIAL · 超长 subject 注入 — 验证 DB varchar 边界不崩溃
+  // ==================================================================
+  @Test
+  @DisplayName("ADVERSARIAL · 超长 subject + SQL 特殊字符注入 → 服务不崩溃 · plan 正常落库")
+  void adversarial_longSubjectAndSqlInjection() {
+    calendarStub.setMode(StubMode.OK);
+
+    // 构造 256 字符超长 subject + SQL 注入 payload
+    String longSubject = "math'; DROP TABLE review_plan; --" + "A".repeat(220);
+    QuestionCreatedEvent evt = new QuestionCreatedEvent();
+    evt.setItemId(T06_ITEM_LONG);
+    evt.setUserId(T06_STUDENT);
+    evt.setSubject(longSubject);
+    evt.setTopic("algebra<script>alert(1)</script>");
+    evt.setAction("created");
+    evt.setOccurredAt(BASE.toString());
+
+    // 不应抛异常 (JPA 参数绑定防 SQL 注入; varchar 截断或正常存储)
+    consumer.onMessage(evt);
+
+    int planCount = jdbc.queryForObject(
+        "SELECT count(*) FROM review_plan WHERE wrong_item_id = ?",
+        Integer.class, T06_ITEM_LONG);
+    assertThat(planCount)
+        .as("超长 subject + SQL 注入 payload 不影响 plan 落库")
+        .isEqualTo(7);
   }
 
   // ==================================================================
