@@ -188,6 +188,7 @@ Page({
     try {
       // AC2: POST /api/review/nodes/{nid}/grade (真 API)
       await gradeNode(this.data.node.nid, { grade, timeSpentMs });
+      wx.showToast({ title: `已评: ${grade}`, icon: 'none' });
     } catch {
       // spec §9: 失败 toast 提示
       wx.showToast({ title: '评分提交失败', icon: 'none' });
@@ -196,9 +197,8 @@ Page({
     this.setData({
       execState: 'GRADED' as ExecState,
       isGrading: false,
+      isRevealed: false, // 连点防护: GRADED 后禁止重复评分
     });
-
-    wx.showToast({ title: `已评: ${grade}`, icon: 'none' });
   },
 
   // ── Exit confirm sheet ──────────────────────────────────────

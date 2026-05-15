@@ -1,0 +1,19 @@
+4:<view class="review-exec-page" data-test-id="{{testIds.root}}">
+7:  <view class="nav" data-test-id="{{testIds.topbar}}">
+13:      <text class="title" data-test-id="{{testIds.topbarCursor}}">复习执行 · 第 {{cursor}} 题</text>
+16:    <view class="close" bind:tap="onCloseTap" data-test-id="{{testIds.closeBtn}}">
+19:    <view class="ptrack" data-test-id="{{testIds.progressBar}}">
+29:    <view class="metarow" data-test-id="{{testIds.metaChips}}">
+43:    <view class="qcard" data-test-id="{{testIds.questionHero}}">
+59:    <view class="work" data-test-id="{{testIds.answerArea}}" bind:touchstart="onCanvasTouch">
+90:        data-test-id="{{testIds.revealBtn}}"
+104:    <view class="reveal {{isRevealed ? 'reveal-visible' : 'reveal-hidden'}}" data-test-id="{{testIds.revealContent}}">
+107:          <view class="reveal-ico" data-test-id="{{testIds.revealCheckmark}}">
+119:        <view wx:for="{{steps}}" wx:key="num" class="stp" data-test-id="{{item.testId}}">
+127:    <view class="nodes" data-test-id="{{testIds.memoryCurve}}">
+129:        <view class="{{item.cls}}" data-test-id="memory-curve-node-{{item.tLevel}}"></view>
+138:  <view class="rating" data-test-id="{{testIds.gradeButtons}}">
+147:        data-test-id="{{testIds.gradeBtnForgot}}"
+157:        data-test-id="{{testIds.gradeBtnPartial}}"
+167:        data-test-id="{{testIds.gradeBtnMastered}}"
+179:  <view wx:if="{{showExitSheet}}" class="sheet-overlay" data-test-id="{{testIds.exitConfirmSheet}}">

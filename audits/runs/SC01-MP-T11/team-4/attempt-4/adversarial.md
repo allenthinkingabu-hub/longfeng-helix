@@ -10,7 +10,12 @@
 
 ---
 
-## Round 2 · 探索性对抗测试
+## Round 2 · attempt-4 Tester 代码审查 + 探索性对抗
+
+### unused component: van-progress (advisory)
+- `index.json` 注册了 `van-progress` 但 `index.wxml` 未引用 (grep 0 hit)
+- 影响: 增加 MP 包体积 (dead code) · 不影响功能
+- **判定**: advisory (不阻断)
 
 ### 连点防抖 (rapid tap / debounce)
 - onRevealTap: `if (isRevealing) return` + setData isRevealing=true → 连点被挡
