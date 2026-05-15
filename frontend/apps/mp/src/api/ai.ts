@@ -18,3 +18,38 @@ export function getAnswerByQid(qid: string): Promise<AiAnswer> {
     `${apiBase('ai')}/api/ai/${qid}/answer`,
   );
 }
+
+// ── analyze lifecycle (used by P03 analyzing page) ──────────────
+
+export interface StartAnalyzeReq {
+  imageUrl: string;
+  subject: string;
+}
+
+export interface StartAnalyzeResp {
+  taskId: string;
+  status: string;
+}
+
+/** POST /api/ai/analyze */
+export function startAnalyze(req: StartAnalyzeReq): Promise<StartAnalyzeResp> {
+  return httpJSON<StartAnalyzeResp>(
+    `${apiBase('ai')}/api/ai/analyze`,
+    { method: 'POST', body: req },
+  );
+}
+
+export interface PollAnalyzeStatusResponse {
+  taskId: string;
+  status: 'PENDING' | 'RUNNING' | 'SUCCEEDED' | 'FAILED';
+  currentStep?: number;
+  result?: Record<string, unknown>;
+  error?: string;
+}
+
+/** GET /api/ai/tasks/:taskId/status */
+export function pollAnalyzeStatus(taskId: string): Promise<PollAnalyzeStatusResponse> {
+  return httpJSON<PollAnalyzeStatusResponse>(
+    `${apiBase('ai')}/api/ai/tasks/${taskId}/status`,
+  );
+}
