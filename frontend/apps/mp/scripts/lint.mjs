@@ -13,11 +13,25 @@
  * Exit 0 = clean · Exit 1 = errors found
  */
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
+import { execSync } from 'node:child_process';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = resolve(__dirname, '..');
+
+// Self-heal: 如果 miniprogram_npm/ 不存在 (gitignored · fresh worktree) · 自动跑 build-npm-fs
+// 这样 fresh clone / 新 worktree 跑 lint 不会因 22 vant usingComponents 错失败
+const MP_NPM = join(PROJECT_ROOT, 'miniprogram_npm');
+if (!existsSync(MP_NPM)) {
+  console.log('[lint-mp] miniprogram_npm/ missing, auto-building via devtools-cli.sh build-npm-fs...');
+  try {
+    execSync('bash scripts/devtools-cli.sh build-npm-fs', { cwd: PROJECT_ROOT, stdio: 'inherit' });
+  } catch (e) {
+    console.error(`[lint-mp] build-npm-fs failed: ${e.message}`);
+    process.exit(1);
+  }
+}
 
 const errors = [];
 
