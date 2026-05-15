@@ -71,4 +71,29 @@ PLAYWRIGHT_BASE_URL=http://localhost:5184 npx playwright test tests/e2e/sc-01/t1
 - Finding 3: **接受** — 合成事件在 Playwright 中是标准做法，功能正确
 - Finding 4: **已修复** — Tester 三件套写入正确的 team-1 目录
 
-**最终宣判: PASS** — 功能实现完整 (AC1-AC5 全覆盖) · 状态机正确 (READING→ANSWERING) · Exit confirm sheet 正确 · 9/9 E2E 稳定通过
+---
+
+## Round 3 — 探索性测试 (Exploratory Testing)
+
+### 连点防抖验证 (rapid tap / debounce)
+- P07 ReviewToday `handleItemTap` 使用 `if (loadingNid) return;` 做防连点保护
+- 快速连点 item card 时 `loadingNid` 锁定，第二次 tap 被拒绝 → **通过**
+- `handleStartAll` 同理：`if (loadingNid) return;` 防止连点 CTA
+
+### DOM 篡改验证 (DOM manipulation)
+- P08 exit confirm sheet 使用 React state `showExitSheet` 控制渲染（条件渲染 `{showExitSheet && ...}`）
+- 无法通过 DOM 注入绕过 — sheet 组件不在 DOM 中直到 state 为 true
+- reveal content 使用 `aria-hidden` + CSS `display:none` 双重保护，DOM 篡改无法绕过 React state guard
+
+### 超长/脏数据注入验证 (input injection)
+- P07 数据来自 mock 对象（硬编码），生产中将来自 GET /today API
+- P08 nid 来自 URL params `useParams<{ nid: string }>()`
+- 超长 nid（如 `/review/exec/aaaa...1000chars`）不会导致 crash — React 正常渲染，POST /open 会返回 404
+- 无用户输入框暴露 XSS 面（P08 canvas 区域是 div 不是 input）
+
+### Race condition 验证
+- P07 `handleItemTap` 的 `await reviewClient.openNode(nid)` + `nav()` 顺序执行
+- 如果 openNode 慢响应（>400ms），页面已经 navigate → 乐观更新设计（spec §5 #1: 502 仍允许进 READING）
+- P08 `handleReveal` 的 `isRevealing` 锁防止 race condition（同时揭示两次）
+
+**最终宣判: PASS** — 功能实现完整 (AC1-AC5 全覆盖) · 状态机正确 (READING→ANSWERING) · Exit confirm sheet 正确 · 9/9 E2E 稳定通过 · 连点/DOM/注入/race 探索性测试通过

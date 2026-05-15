@@ -4,12 +4,12 @@
     "id": "SC01-T10",
     "team_id": "team-1",
     "title": "PHASE-B 延后 SC-01-T10 · P07 Tap 第 1 题「开始」→ POST /nodes/{nid}/open → P08 + 写 EVENT_OPENED",
-    "attempt": 1,
-    "phase": "tester",
+    "attempt": 2,
+    "phase": "coder",
     "dev_done": true,
-    "passes": true,
+    "passes": false,
     "retries": 0,
-    "audit_retries": 0,
+    "audit_retries": 1,
     "git_commits": [
       "e588313"
     ]
@@ -23,7 +23,96 @@
     ]
   },
   "audit_gate": "audit.js v1 + c4b · mock ≤ 5 · 数字对齐 · maxDiffPixels ≤ 500 · 禁 H2/Mock · git commit work_log 三件套强制",
-  "previous_audit_verdict": null,
+  "previous_audit_verdict": {
+    "task_id": "SC01-T10",
+    "attempt": 1,
+    "team_id": "team-1",
+    "audited_at": "2026-05-15T07:52:55.137Z",
+    "audited_by": "audit.js v1 (deterministic · 5 dims)",
+    "pass": false,
+    "checks": [
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_exists",
+        "pass": false,
+        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t10-target-to-exec/audits/runs/SC01-T10/team-1/attempt-1/coder.md"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "bugs_found_md_exists",
+        "pass": false,
+        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t10-target-to-exec/audits/runs/SC01-T10/team-1/attempt-1/bugs-found.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "tester_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t10-target-to-exec/audits/runs/SC01-T10/team-1/attempt-1/tester.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t10-target-to-exec/audits/runs/SC01-T10/team-1/attempt-1/adversarial.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "test_reports_nonempty",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t10-target-to-exec/audits/runs/SC01-T10/team-1/attempt-1/test-reports"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_has_reject_round",
+        "pass": true,
+        "evidence": "REJECT/驳回 keyword found"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_has_fix_round",
+        "pass": true,
+        "evidence": "fix/修复 keyword found"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "mock_total_le_5",
+        "pass": true,
+        "evidence": "mock=5/5 (page.route)"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "maxDiffPixels_le_500",
+        "pass": true,
+        "evidence": "max=500/500"
+      },
+      {
+        "dimension": "bug_reality",
+        "name": "all_git_commits_verified",
+        "pass": true,
+        "evidence": "1/1 hash(es) git cat-file -e PASS"
+      },
+      {
+        "dimension": "test_validity",
+        "name": "tester_md_testcase_count_matches_xml",
+        "pass": false,
+        "evidence": "claimed=9 but no <testcase> in XML — tester.md may inflate"
+      },
+      {
+        "dimension": "test_validity",
+        "name": "adversarial_has_exploratory_keywords",
+        "pass": false,
+        "evidence": "1/2 minimum (expected: 连点/DOM/注入/超长/阻断/race/SQL etc.)"
+      },
+      {
+        "dimension": "spec_alignment",
+        "name": "dor_e2e_required",
+        "pass": true,
+        "evidence": "inflight.physical_verification.dor_c1_to_c6_required=false — DoR skipped (P0 audit task)"
+      }
+    ],
+    "redo_target": "coder",
+    "redo_reason": "[coder_compliance.coder_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t10-target-to-exec/audits/runs/SC01-T10/team-1/attempt-1/coder.md · [coder_compliance.bugs_found_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t10-target-to-exec/audits/runs/SC01-T10/team-1/attempt-1/bugs-found.md · [test_validity.tester_md_testcase_count_matches_xml] claimed=9 but no <testcase> in XML — tester.md may inflate · [test_validity.adversarial_has_exploratory_keywords] 1/2 minimum (expected: 连点/DOM/注入/超长/阻断/race/SQL etc.)"
+  },
   "context": {
     "scenario": "PHASE-B 延后 TC-01.01 步 15-16 · P07 Tap 第 1 题「开始」→ POST /nodes/{nid}/open → P08 + 写 EVENT_OPENED",
     "target_page": "P07→P08",
@@ -95,10 +184,11 @@
   },
   "permissions": {
     "writable_fields": [
-      "task.passes"
+      "task.dev_done",
+      "task.git_commits"
     ]
   },
-  "written_at": "2026-05-15T07:43:17.316Z",
+  "written_at": "2026-05-15T07:52:55.143Z",
   "written_by": "TL agent (PHASE-B B-wave spawn prep)",
   "deliverables_definition_of_done": [
     "1. Build 缺失 page (per build_pages_required · 1:1 mockup HTML)",
