@@ -51,5 +51,5 @@ Phase 1 不跑 automator（inflight `physical_verification.dor_c1_to_c6_required
 
 ## 5. 提交
 
-- commit hash: (见下方 git commit 输出)
+- commit hash: 6c7be30
 - 分支: `claude/sc01-mp-t02-e2e`
