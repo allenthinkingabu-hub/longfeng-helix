@@ -64,7 +64,7 @@ function buildSteps(currentStep: number, pageState: PageState): StepData[] {
 Page({
   data: {
     pageState: 'init' as PageState,
-    statusText: 'AI 正在分析…',
+    statusText: '准备分析…',
     doneCount: 0,
     currentModel: 'qwen-vl-max',
     backupModel: 'gpt-4o-mini',
