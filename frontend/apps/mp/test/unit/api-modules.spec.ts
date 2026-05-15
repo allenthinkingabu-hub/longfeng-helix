@@ -46,7 +46,7 @@ describe('api/review.ts exports', () => {
   it('exports createSession function (SC-01-C05 #1)', () => {
     expect(typeof reviewApi.createSession).toBe('function');
   });
-  it('exports getToday function (SC-01-C05 #2)', () => {
+  it('exports getToday function (SC-01-C05 #2 · T09 P07)', () => {
     expect(typeof reviewApi.getToday).toBe('function');
   });
   it('exports getNode function (SC-01-C05 #3)', () => {
