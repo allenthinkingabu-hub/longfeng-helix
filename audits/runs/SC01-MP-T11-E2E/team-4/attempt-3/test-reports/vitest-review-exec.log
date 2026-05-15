@@ -1,0 +1,4 @@
+
+> @longfeng/mp@0.1.0 test:unit /Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t11-e2e/frontend/apps/mp
+> vitest run --config test/vitest.config.ts test/unit
+
