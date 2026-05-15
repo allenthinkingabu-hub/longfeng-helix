@@ -1,0 +1,14 @@
+
+Running 10 tests using 1 worker
+
+[1A[2K[1/10] [chromium] › tests/e2e/sc-01/t13-review-done.spec.ts:113:3 › SC-01-T13 · P09 ReviewDone › AC1 · renders green celebration Hero with confetti + checkmark
+[1A[2K[2/10] [chromium] › tests/e2e/sc-01/t13-review-done.spec.ts:148:3 › SC-01-T13 · P09 ReviewDone › AC2 · fetches node result via GET /nodes/{nid}/result
+[1A[2K[3/10] [chromium] › tests/e2e/sc-01/t13-review-done.spec.ts:172:3 › SC-01-T13 · P09 ReviewDone › AC3 · renders memory curve with 6 nodes (done/now/future states)
+[1A[2K[4/10] [chromium] › tests/e2e/sc-01/t13-review-done.spec.ts:192:3 › SC-01-T13 · P09 ReviewDone › AC4 · +日历 button → POST /subscribe → 200 + Toast
+[1A[2K[5/10] [chromium] › tests/e2e/sc-01/t13-review-done.spec.ts:229:3 › SC-01-T13 · P09 ReviewDone › AC5 · renders 3 stat cards + KP mastery bars
+[1A[2K[6/10] [chromium] › tests/e2e/sc-01/t13-review-done.spec.ts:261:3 › SC-01-T13 · P09 ReviewDone › TI2 · ALL_DONE state hides continue CTA, only shows end
+[1A[2K[7/10] [chromium] › tests/e2e/sc-01/t13-review-done.spec.ts:286:3 › SC-01-T13 · P09 ReviewDone › TI3 · subscribe is idempotent (double-tap does not error)
+[1A[2K[8/10] [chromium] › tests/e2e/sc-01/t13-review-done.spec.ts:314:3 › SC-01-T13 · P09 ReviewDone › CTA · RESULT state shows both continue + end buttons
+[1A[2K[9/10] [chromium] › tests/e2e/sc-01/t13-review-done.spec.ts:328:3 › SC-01-T13 · P09 ReviewDone › §9 degradation · GET /result 5xx → Hero neutral + Toast
+[1A[2K[10/10] [chromium] › tests/e2e/sc-01/t13-review-done.spec.ts:353:3 › SC-01-T13 · P09 ReviewDone › VRT · captures idle/loading state screenshot
+[1A[2K  10 passed (6.7s)
