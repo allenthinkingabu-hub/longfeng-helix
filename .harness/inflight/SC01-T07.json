@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "SC01-T07",
+    "team_id": "team-1",
+    "title": "PHASE-B 延后 SC-01-T07 · P04→P05 自动跳转 · 第 1 卡 (qid) 绿色高亮 3s",
+    "attempt": 1,
+    "phase": "coder",
+    "dev_done": true,
+    "passes": false,
+    "retries": 0,
+    "audit_retries": 0,
+    "git_commits": ["e306dc8"]
+  },
+  "work_log_dir": "audits/runs/SC01-T07/team-1/attempt-1",
+  "log_requirements": {
+    "must_write": [
+      "coder.md",
+      "bugs-found.md"
+    ]
+  },
+  "audit_gate": "audit.js v1 + c4b · mock ≤ 5 · 数字对齐 · maxDiffPixels ≤ 500 · 禁 H2/Mock · git commit work_log 三件套强制",
+  "previous_audit_verdict": null,
+  "context": {
+    "scenario": "PHASE-B 延后 TC-01.01 步 11 · P04→P05 自动跳转 · 第 1 卡 (qid) 绿色高亮 3s",
+    "target_page": "P04→P05",
+    "page_state_machine": "result.SAVED → list.HIGHLIGHTED → list.LIST",
+    "biz_step_range": "biz §2B.2 步 11",
+    "biz_refs": [
+      "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 11",
+      "biz §2A.4 P05 规格卡"
+    ],
+    "spec_refs": "design/system/pages/P05-wrongbook-list.spec.md §5 GET /api/wb/questions",
+    "primary_services": [
+      "frontend/apps/h5",
+      "backend/wrongbook-service"
+    ],
+    "primary_apis": [
+      "GET /api/wb/questions?sort=created_desc&highlight={qid}&page=1&size=20"
+    ],
+    "acceptance_criteria": [
+      {
+        "id": "AC1",
+        "text": "save 200 后 P04 淡出 + P05 淡入 ≤ 500ms · 列表滚动已置顶 (scrollY=0)"
+      },
+      {
+        "id": "AC2",
+        "text": "GET /api/wb/questions?sort=created_desc&highlight={qid} → 200 QuestionListResp · 第 1 项 qid 与传入 highlight 匹配"
+      },
+      {
+        "id": "AC3",
+        "text": "第 1 卡绿色高亮 (border 2px solid green-500) 持续 3s 后 fade-out 至正常态"
+      },
+      {
+        "id": "AC4",
+        "text": "高亮卡左色条 + 学科 chip + KP chips + 难度 ★ + 6 段阶段进度 (T0 done · T1-T6 future) + 下次到期 全部渲染"
+      }
+    ],
+    "test_invariants": [
+      "TI1: highlight={qid} 不在 list 中 → fallback 不高亮 (不抛错 · 列表正常渲染)",
+      "TI2: 高亮 fade-out 后卡片回归正常颜色 (不残留 border)",
+      "TI3: 埋点 wb_list_view{highlightedQid} 1 条",
+      "TI4: 4 态 (loading/empty/list/error) 中 list 态 + highlighted 态 VRT screenshot"
+    ],
+    "key_invariants": [
+      "高亮是 UI 反馈不是业务状态 · BE 不需要存 highlight 字段"
+    ],
+    "build_pages_required": "P05 (05_wrongbook_list.html · 错题本列表)",
+    "mockup_chain": "04_result.html (起点 ✅ T05 已合) → 05_wrongbook_list.html (终点 build)",
+    "sandbox": {
+      "pg_port": 15432,
+      "redis_port": 16379,
+      "minio_api_port": 9000,
+      "pg_user": "longfeng",
+      "pg_password": "longfeng_dev",
+      "pg_db": "wrongbook"
+    },
+    "phase_b_prerequisites": "第一波 (T01/T03/T05/T11/T13) + 第二波 (T02/T04/T06/T12) 已合 main · 9 page+transition 可作 reference",
+    "e2e_protocol": "DoR C-1..C-6 + 真 sandbox + Playwright headed + toHaveScreenshot (audit c4b 新卡口)"
+  },
+  "isolation": {
+    "worktree_disabled": false,
+    "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t07-result-to-home",
+    "branch_name": "claude/sc01-t07-result-to-home"
+  },
+  "physical_verification": {
+    "dor_c1_to_c6_required": true,
+    "rationale": "PHASE-B 前端 transition + build page · 真 Playwright headed E2E"
+  },
+  "permissions": {
+    "writable_fields": [
+      "task.dev_done",
+      "task.git_commits"
+    ]
+  },
+  "written_at": "2026-05-15T07:05:34.081Z",
+  "written_by": "TL agent (PHASE-B B-wave spawn prep)",
+  "deliverables_definition_of_done": [
+    "1. Build 缺失 page (per build_pages_required · 1:1 mockup HTML)",
+    "2. transition 跳转实现 + 状态机",
+    "3. Playwright spec.ts 用 toHaveScreenshot (非 page.screenshot 盲存)",
+    "4. work_log: coder.md + bugs-found.md",
+    "5. **强制 git add audits/runs/SC01-T07/team-*/attempt-1/ + git commit**",
+    "6. inflight dev_done=true + git_commits[]",
+    "7. node .harness/harness.js --advance=SC01-T07"
+  ],
+  "rule_6_tool_budget_guidance": "PHASE-B 延后 · transition + 建新 page · 预计 ~60-80 tool use"
+}

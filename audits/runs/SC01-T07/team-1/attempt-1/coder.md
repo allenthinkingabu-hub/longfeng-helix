@@ -85,5 +85,5 @@
 
 ## 5. 提交
 
-- commit hash: (pending git commit)
+- commit hash: e306dc8
 - 分支: `claude/sc01-t07-result-to-home`
