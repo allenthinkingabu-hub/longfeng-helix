@@ -87,9 +87,15 @@ describe('Home page E2E + VRT (SC01-MP-T08-E2E)', () => {
     expect(data.streak).toBe(12);
     expect(data.mastered).toBe(142);
 
+    // estMin (预计复习时间 · 用户可见 "预计 25 分钟")
+    expect(data.estMin).toBe(25);
+
     // subjects array should have 3 items (数学/物理/英语)
     expect(data.subjects).toHaveLength(3);
     expect(data.subjects[0].name).toBe('数学');
+
+    // weekStats (周统计卡片 MVP 数据)
+    expect(data.weekStats).toEqual({ mastered: 23, newItems: 8, forgotten: 2, masteryRate: 68 });
 
     // weekDays should have 7 items
     expect(data.weekDays).toHaveLength(7);
@@ -103,9 +109,7 @@ describe('Home page E2E + VRT (SC01-MP-T08-E2E)', () => {
 
   // ── Test 4: VRT — pixelmatch vs baseline < 5000 diff pixels ──
   it('home screenshot vs baseline diff < 5000 pixels', async () => {
-    const page = await mp.currentPage();
-
-    // Take actual screenshot (returns Buffer)
+    // Take actual screenshot (returns Buffer) — uses mp-level API, not page
     const actualBuf: Buffer = await mp.screenshot();
 
     // Parse actual PNG

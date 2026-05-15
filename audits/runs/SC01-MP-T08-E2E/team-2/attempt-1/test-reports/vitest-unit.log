@@ -1,0 +1,20 @@
+
+> @longfeng/mp@0.1.0 test:unit /Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t08-e2e/frontend/apps/mp
+> vitest run --config test/vitest.config.ts test/unit
+
+
+ RUN  v1.6.1 /Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t08-e2e/frontend/apps/mp
+
+ ✓ test/unit/wrongbook-list.spec.ts  (19 tests) 11ms
+ ✓ test/unit/review-today.spec.ts  (24 tests) 2ms
+ ✓ test/unit/review-done-end.spec.ts  (5 tests) 1ms
+ ✓ test/unit/home.spec.ts  (16 tests) 1ms
+ ✓ test/unit/review-today-tap.spec.ts  (11 tests) 1ms
+ ✓ test/unit/api-modules.spec.ts  (17 tests) 1ms
+ ✓ test/unit/_http.spec.ts  (5 tests)
+
+ Test Files  7 passed (7)
+      Tests  97 passed (97)
+   Start at  20:19:08
+   Duration  306ms (transform 78ms, setup 0ms, collect 89ms, tests 17ms, environment 0ms, prepare 61ms)
+
