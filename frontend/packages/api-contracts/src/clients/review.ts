@@ -1,10 +1,34 @@
 // SC-01-C05 · review-plan client
 // Endpoints: open / reveal / grade / result / sessions / subscribe
-import type { NodeResultResp, GradeReq, GradeResp, NextInSessionResp, CalendarSubscribeResp } from '../types';
+import type { NodeResultResp, GradeReq, GradeResp, NextInSessionResp, CalendarSubscribeResp, CreateReviewSessionReq, CreateReviewSessionResp, TodayReviewResp } from '../types';
 
 const BASE_PATH = '/api/review';
 
 export const reviewClient = {
+  /** POST /api/review/sessions · spec P-HOME §5 #2 + P07 §5 #2 */
+  async createSession(body?: CreateReviewSessionReq): Promise<CreateReviewSessionResp> {
+    const res = await fetch(`${BASE_PATH}/sessions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Idempotency-Key': crypto.randomUUID(),
+      },
+      body: JSON.stringify(body ?? {}),
+    });
+    if (!res.ok) throw new Error(`createSession failed: ${res.status}`);
+    const json = await res.json();
+    return json.data ?? json;
+  },
+
+  /** GET /api/review/today?tz= · spec P07 §5 #1 */
+  async getTodayReview(tz?: string): Promise<TodayReviewResp> {
+    const params = tz ? `?tz=${encodeURIComponent(tz)}` : '';
+    const res = await fetch(`${BASE_PATH}/today${params}`);
+    if (!res.ok) throw new Error(`today failed: ${res.status}`);
+    const json = await res.json();
+    return json.data ?? json;
+  },
+
   /** POST /api/review/nodes/{nid}/open */
   async openNode(nid: string): Promise<{ nid: string; openedAt: string }> {
     const res = await fetch(`${BASE_PATH}/nodes/${nid}/open`, { method: 'POST' });

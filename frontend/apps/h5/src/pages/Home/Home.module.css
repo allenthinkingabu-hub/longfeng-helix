@@ -1,0 +1,254 @@
+/* P-HOME · 1:1 mirror of design/mockups/wrongbook/01_home_v2.html (MVP subset for T09) */
+/* Colors from mockup CSS :root variables */
+
+.root {
+  --bg: #F2F2F7;
+  --card: #FFFFFF;
+  --sep: rgba(60,60,67,0.14);
+  --text: #1C1C1E;
+  --sec: #636366;
+  --ter: #8E8E93;
+  --blue: #007AFF;
+  --red: #FF3B30;
+  --orange: #FF9500;
+  --green: #34C759;
+  --indigo: #5856D6;
+  --yellow: #FFCC00;
+
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", sans-serif;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Topbar ─────────────────────────── */
+.topbar {
+  padding: 54px 18px 10px;
+  background: rgba(242,242,247,0.78);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+}
+
+.greet {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  color: var(--text);
+}
+
+.greetSub {
+  font-size: 13px;
+  color: var(--sec);
+  margin-top: 2px;
+}
+
+/* ── Scroll content ─────────────────────────── */
+.scroll {
+  flex: 1;
+  overflow: auto;
+  padding: 12px 16px 100px;
+}
+
+/* ── HERO dark card (mockup .hero) ─────────────── */
+.hero {
+  position: relative;
+  background: #0E0E10;
+  border-radius: 20px;
+  padding: 20px;
+  color: #fff;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.18);
+}
+
+.heroKicker {
+  font-size: 12px;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  font-weight: 600;
+  opacity: .7;
+}
+
+.heroRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.heroLeft {
+  flex: 1;
+}
+
+.heroBig {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.heroBigUnit {
+  font-size: 18px;
+  font-weight: 600;
+  opacity: .85;
+  margin-left: 4px;
+}
+
+.heroEst {
+  font-size: 13px;
+  opacity: .7;
+  margin-top: 4px;
+}
+
+/* Ring progress (SVG circle) */
+.ring {
+  width: 78px;
+  height: 78px;
+  flex-shrink: 0;
+}
+
+.ringBg {
+  fill: none;
+  stroke: rgba(255,255,255,0.12);
+  stroke-width: 6;
+}
+
+.ringFg {
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s ease-in-out;
+}
+
+.ringText {
+  font-size: 14px;
+  font-weight: 700;
+  fill: #fff;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* CTA button inside hero */
+.heroCta {
+  margin-top: 16px;
+  width: 100%;
+  height: 48px;
+  border-radius: 14px;
+  background: #fff;
+  color: #0E0E10;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255,255,255,0.12);
+  transition: opacity 0.15s;
+}
+
+.heroCta:active:not(:disabled) {
+  opacity: 0.8;
+}
+
+.heroCta:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Placeholder sections ─────────────────────────── */
+.section {
+  margin-top: 16px;
+  background: var(--card);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ter);
+  letter-spacing: .4px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.placeholder {
+  height: 60px;
+  border-radius: 10px;
+  background: rgba(120,120,128,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--ter);
+}
+
+/* ── TabBar ─────────────────────────── */
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 84px;
+  padding: 8px 0 24px;
+  background: rgba(255,255,255,0.78);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border-top: .5px solid var(--sep);
+  display: flex;
+  z-index: 15;
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: var(--ter);
+  font-size: 10px;
+}
+
+.tabActive {
+  composes: tab;
+  color: var(--blue);
+}
+
+/* ── Spinner ─────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(14,14,16,0.3);
+  border-top-color: #0E0E10;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* ── Toast ─────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: rgba(28,28,30,0.88);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+}
