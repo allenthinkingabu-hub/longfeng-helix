@@ -159,10 +159,10 @@ Page({
   },
 
   onTabHome() {
-    wx.switchTab({ url: '/pages/index/index' });
+    wx.reLaunch({ url: '/pages/home/index' });
   },
 
   onTabWrongbook() {
-    wx.navigateTo({ url: '/pages/wrongbook/index' });
+    wx.navigateTo({ url: '/pages/wrongbook-list/index' });
   },
 });

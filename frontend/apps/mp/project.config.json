@@ -2,7 +2,7 @@
   "miniprogramRoot": "./",
   "projectname": "longfeng-mp",
   "description": "龙凤错题本微信小程序",
-  "appid": "touristappid",
+  "appid": "wxf1ebf7730c8df0fa",
   "setting": {
     "es6": true,
     "enhance": true,
@@ -12,10 +12,33 @@
     "autoAudits": false,
     "urlCheck": false,
     "compileHotReLoad": true,
-    "useCompilerPlugins": ["typescript"],
+    "useCompilerPlugins": [
+      "typescript"
+    ],
     "packNpmManually": false,
-    "packNpmRelationList": []
+    "packNpmRelationList": [],
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "uploadWithSourceMap": true,
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "condition": false,
+    "swc": false,
+    "disableSWC": true,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
   },
   "compileType": "miniprogram",
-  "condition": {}
+  "condition": {},
+  "simulatorPluginLibVersion": {},
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "editorSetting": {}
 }

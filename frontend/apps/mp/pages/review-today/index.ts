@@ -79,7 +79,7 @@ Page({
   },
 
   onTabHome() {
-    wx.switchTab({ url: '/pages/home/index' });
+    wx.reLaunch({ url: '/pages/home/index' });
   },
 
   onItemTap(e: WechatMiniprogram.TouchEvent) {
