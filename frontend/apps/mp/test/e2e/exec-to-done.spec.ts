@@ -54,19 +54,9 @@ describe('SC01-MP-T12-E2E · P08→P09 transition (exec → done)', () => {
     await execPage.waitFor('view');
 
     // Step 4: Trigger the grade tap — tap the "已掌握" (MASTERED) button
-    // The rating buttons are the self-assessment CTA at the bottom of review-exec
-    // In mockup 08: .rbtn.master is the rightmost green button
-    // We use callMethod to invoke the page's onGradeTap handler directly
-    // since automator tap requires exact selector matching
-    try {
-      await execPage.callMethod('onGradeTap', { detail: { grade: 'MASTERED' } });
-    } catch {
-      // Fallback: if callMethod is not available, use navigateTo directly
-      // to simulate the transition that onGradeTap would trigger
-      await mp.navigateTo(
-        `/pages/review-done/index?sid=${sid}&grade=MASTERED&nodeId=${nid}`,
-      );
-    }
+    // Mockup 08: .rbtn.master is the rightmost green button
+    // Must use real tap (铁律 1: 模拟真人操作, no callMethod/evaluate bypass)
+    await execPage.tap('.rbtn.master');
 
     // Step 5: Wait for navigation to complete
     // Poll currentPage until path changes to review-done (max 5s)
