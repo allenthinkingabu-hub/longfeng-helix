@@ -17,7 +17,7 @@ import { PNG } from 'pngjs';
 import pixelmatch from 'pixelmatch';
 
 const WS_ENDPOINT = process.env.MP_AUTOMATOR_WS || 'ws://127.0.0.1:9420';
-const BASELINE_PATH = resolve(__dirname, '../../../../design/system/screenshots/mp-vrt-baseline/04_result.png');
+const BASELINE_PATH = resolve(__dirname, '../../../../../design/system/screenshots/mp-vrt-baseline/04_result.png');
 const DIFF_THRESHOLD = 5000; // max diff pixels for VRT pass
 
 describe('P04 result page-vrt (真 IDE)', () => {
