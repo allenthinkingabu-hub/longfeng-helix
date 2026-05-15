@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "task": {"id": "SC01-MP-T14", "team_id": "team-5", "title": "PHASE-C MP wave-3 · SC01-MP-T14 · P09→P-HOME (review-done→home) · transition only (P-HOME by T08)", "attempt": 1, "phase": "coder", "dev_done": true, "passes": false, "retries": 0, "audit_retries": 0, "git_commits": ["8acd64c"]},
+  "work_log_dir": "audits/runs/SC01-MP-T14/team-5/attempt-1",
+  "log_requirements": {"must_write": ["coder.md", "bugs-found.md"]},
+  "audit_gate": "audit.js v1 relaxed · 真 API integration test 0 mock backend · UNIT TEST 100% pass red line · tsc PASS · 强制 git commit",
+  "previous_audit_verdict": null,
+  "context": {
+    "scenario": "PHASE-C MP wave-3 · P09→P-HOME",
+    "action": "transition only (P-HOME by T08)",
+    "h5_sibling": "SC01-T14 (frontend/apps/h5 已 merge · 看 sibling 实现对齐)",
+    "scope_in": [
+      "如果是 build page: 实现 frontend/apps/mp/pages/<dir>/index.{json,wxml,wxss,ts} 1:1 mirror mockup",
+      "如果是 transition only: 改 pages/<src>/index.ts 加 wx.navigateTo",
+      "更新 app.json pages 数组 (如新建 page)",
+      "Vant Weapp 组件 + 必跑 bash frontend/apps/mp/scripts/devtools-cli.sh build-npm-fs (如用 Vant)",
+      "src/api/<service>.ts 新增函数 (如调新 API · 用 httpJSON adapter)",
+      "**RED LINE 1: test/unit/<feature>.spec.ts (≥ 1 unit test · 纯逻辑 · 100% pass · 不依赖 backend)**",
+      "test/api/<service>.integration.spec.ts (真接 backend · 0 mock · soft-skip backend down 模式 · 不准用 expect(backendUp).toBe(true))",
+      "test/transitions/<flow>.spec.ts (mock wx runtime only · 测 navigateTo)",
+      "pnpm -F mp typecheck PASS",
+      "pnpm -F mp test:unit PASS (100% · red line)",
+      "spec-trace.md + coder.md (5段) + bugs-found.md"
+    ],
+    "scope_out": ["automator E2E", "真起 微信工具 IDE", "Mock backend (vi.mock/msw/nock 禁用 in integration test)"],
+    "backend_ports": {"file": 8084, "wb": 8082, "ai": 8083, "review": 8085},
+    "mockup_refs": "design/mockups/wrongbook/ · 涉及的 from/to page mockup HTML"
+  },
+  "isolation": {"worktree_disabled": false, "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t14-done-to-home", "branch_name": "claude/sc01-mp-t14-done-to-home"},
+  "physical_verification": {"dor_c1_to_c6_required": false, "rationale": "wave-3 · 人工视觉路线 + unit test red line"},
+  "permissions": {"writable_fields": ["task.dev_done", "task.git_commits"]},
+  "deliverables_definition_of_done": [
+    "1. page/transition 落码",
+    "2. **test/unit/<feature>.spec.ts ≥ 1 个 · 100% pass · 纯逻辑 · 不接 backend**",
+    "3. test/api/ 用 soft-skip backend down 模式 · 0 mock",
+    "4. pnpm typecheck PASS + pnpm test:unit 100% PASS",
+    "5. spec-trace.md + coder.md (5段) + bugs-found.md → audits/runs/SC01-MP-T14/team-5/attempt-1/",
+    "6. **强制 git commit + advance**"
+  ],
+  "rule_6_tool_budget_guidance": "wave-3 build+transition · 预计 40-60 tool use",
+  "written_at": "2026-05-15T10:15:00.000Z",
+  "written_by": "TL agent (PHASE-C wave-3 spawn prep · unit test red line)"
+}
