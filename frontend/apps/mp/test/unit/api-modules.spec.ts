@@ -11,6 +11,7 @@ import * as fileApi from '../../src/api/file';
 import * as wrongbookApi from '../../src/api/wrongbook';
 import * as aiApi from '../../src/api/ai';
 import * as reviewApi from '../../src/api/review';
+import * as homeApi from '../../src/api/home';
 
 describe('api/file.ts exports', () => {
   it('exports presign function', () => {
@@ -36,6 +37,12 @@ describe('api/ai.ts exports', () => {
   });
   it('exports pollAnalyzeStatus function', () => {
     expect(typeof aiApi.pollAnalyzeStatus).toBe('function');
+  });
+});
+
+describe('api/home.ts exports', () => {
+  it('exports getHomeTodayCount function', () => {
+    expect(typeof homeApi.getHomeTodayCount).toBe('function');
   });
 });
 

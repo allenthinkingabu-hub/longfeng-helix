@@ -1,0 +1,221 @@
+<!-- P-HOME 首页 · 1:1 mirror of design/mockups/wrongbook/01_home_ios_refined.html -->
+<!-- trace: design/mockups/wrongbook/01_home_ios_refined.html · @longfeng/testids pHome -->
+<!-- 状态机: LOADING → READY | EMPTY | ERROR -->
+
+<view class="home-page" data-test-id="{{testIds.root}}">
+
+  <!-- ── Hero aurora gradient ──────────────────────────── -->
+  <view class="hero"></view>
+
+  <!-- ── Greeting ──────────────────────────────────────── -->
+  <view class="greeting" data-test-id="{{testIds.greetingHero}}">
+    <view class="hello-row">
+      <view>
+        <view class="hello">{{greeting}}</view>
+        <view class="name-text">{{studentName}}，<text class="name-em">今天继续</text></view>
+      </view>
+      <view class="avatar">A</view>
+    </view>
+    <view class="streak-bar">
+      <view class="flame" data-test-id="{{testIds.streakFireIcon}}">
+        <text class="flame-icon">🔥</text>
+        <text data-test-id="{{testIds.streakDaysNumber}}">连续 {{streak}} 天</text>
+      </view>
+      <view class="dot"></view>
+      <text>掌握 <text class="mastered-num">{{mastered}}</text> 题</text>
+    </view>
+  </view>
+
+  <!-- ── Scroll area ──────────────────────────────────── -->
+  <scroll-view class="scroll" scroll-y="true">
+
+    <!-- ── LOADING skeleton ──────────────────────────── -->
+    <view wx:if="{{pageState === 'LOADING'}}" class="skeleton">
+      <view class="skeleton-card"></view>
+      <view class="skeleton-bar" style="width: 60%;"></view>
+      <view class="skeleton-bar" style="width: 85%;"></view>
+      <view class="skeleton-card skeleton-card-sm"></view>
+    </view>
+
+    <!-- ── ERROR banner ──────────────────────────────── -->
+    <view wx:if="{{pageState === 'ERROR'}}" class="error-banner">
+      <text>部分数据正在同步</text>
+    </view>
+
+    <!-- ── EMPTY hero ────────────────────────────────── -->
+    <view wx:if="{{pageState === 'EMPTY'}}" class="review-card empty-hero">
+      <view class="empty-hero-title">今天没有复习安排</view>
+      <text>拍一道新题试试？</text>
+    </view>
+
+    <!-- ── READY: Review hero card ───────────────────── -->
+    <block wx:if="{{pageState === 'READY'}}">
+
+      <view class="review-card" data-test-id="{{testIds.todayReviewCard}}">
+        <view class="rh-top">
+          <view>
+            <view class="rh-kicker">TODAY'S REVIEW</view>
+            <view class="rh-title">
+              <text class="rh-title-em" data-test-id="{{testIds.totalLabel}}">{{todayTotal}} 题</text>
+              <text> 待复习</text>
+            </view>
+            <view class="rh-sub">预计 {{estMin}} 分钟 · 下一节点 10:15</view>
+          </view>
+          <view class="rh-circle" data-test-id="{{testIds.circleProgress}}">
+            <view class="rh-circle-bg"></view>
+            <view class="rh-circle-track" style="--progress: {{circleProgress}};"></view>
+            <view class="rh-pct">
+              <text class="rh-pct-n">{{circlePctText}}</text>
+              <text class="rh-pct-l">DONE</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- Subject chips -->
+        <view class="rh-split">
+          <view wx:for="{{subjects}}" wx:key="name" class="rh-sub-chip">
+            <view class="rh-sq" style="background: {{item.color}};"></view>
+            <text class="rh-ct"><text class="rh-ct-em">{{item.count}}</text>{{item.name}}</text>
+          </view>
+        </view>
+
+        <!-- CTA -->
+        <view class="rh-cta">
+          <view class="rh-btn" bind:tap="onStartAll" data-test-id="{{testIds.startAllBtn}}">
+            <text class="rh-btn-play">▶</text>
+            <text>全部开始</text>
+          </view>
+          <view class="rh-btn2">
+            <van-icon name="plus" color="#fff" size="16px" />
+          </view>
+        </view>
+      </view>
+
+      <!-- ── Weekly summary ──────────────────────────── -->
+      <view class="sec">
+        <text class="sec-t">本周回顾</text>
+        <text class="sec-m">查看全部 ›</text>
+      </view>
+      <view class="weekly" data-test-id="{{testIds.weeklySparkline}}">
+        <view class="weekly-row">
+          <view class="stat">
+            <text class="stat-n stat-green">{{weekStats.mastered}}</text>
+            <text class="stat-l">掌握</text>
+          </view>
+          <view class="stat-sep"></view>
+          <view class="stat">
+            <text class="stat-n stat-blue">{{weekStats.newItems}}</text>
+            <text class="stat-l">新增</text>
+          </view>
+          <view class="stat-sep"></view>
+          <view class="stat">
+            <text class="stat-n stat-orange">{{weekStats.forgotten}}</text>
+            <text class="stat-l">遗忘</text>
+          </view>
+          <view class="stat-sep"></view>
+          <view class="stat">
+            <text class="stat-n stat-indigo">{{weekStats.masteryRate}}%</text>
+            <text class="stat-l">掌握率</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- ── Week schedule ───────────────────────────── -->
+      <view class="sec">
+        <text class="sec-t">本周日程</text>
+        <text class="sec-m">月视图 ›</text>
+      </view>
+      <view class="weekcard" data-test-id="{{testIds.weekStrip}}">
+        <view class="wc-head">
+          <view class="wc-head-l">
+            <van-icon name="calendar-o" size="14px" color="#1C1C1E" />
+            <text>{{weekLabel}}</text>
+          </view>
+          <view class="wc-expand">
+            <text>展开</text>
+            <van-icon name="arrow" size="10px" color="#007AFF" />
+          </view>
+        </view>
+        <view class="wc-row">
+          <view wx:for="{{weekDays}}" wx:key="d" class="wd {{item.today ? 'wd-today' : ''}}">
+            <text class="wd-w">{{item.w}}</text>
+            <text class="wd-d">{{item.d}}</text>
+            <view class="wd-dots">
+              <view wx:for="{{item.dots}}" wx:for-item="dot" wx:key="*this" class="wd-dot" style="background: {{dot}};"></view>
+            </view>
+            <text wx:if="{{item.num}}" class="wd-num">{{item.num}}</text>
+          </view>
+        </view>
+        <view class="wc-foot">
+          <view class="wc-legend">
+            <view class="wc-lg-item"><view class="wc-lg-dot" style="background: #C41E3A;"></view><text>数学</text></view>
+            <view class="wc-lg-item"><view class="wc-lg-dot" style="background: #0057B7;"></view><text>物理</text></view>
+            <view class="wc-lg-item"><view class="wc-lg-dot" style="background: #1A6B3A;"></view><text>化学</text></view>
+            <view class="wc-lg-item"><view class="wc-lg-dot" style="background: #9C4F00;"></view><text>英语</text></view>
+            <view class="wc-lg-item"><view class="wc-lg-dot" style="background: #FF2D55;"></view><text>考试</text></view>
+          </view>
+        </view>
+      </view>
+
+      <!-- ── Messages ────────────────────────────────── -->
+      <view class="sec">
+        <text class="sec-t">最近消息</text>
+        <text class="sec-m" data-test-id="{{testIds.messagesMoreLink}}">全部 2 ›</text>
+      </view>
+      <view class="msgs" data-test-id="{{testIds.messages}}">
+        <view wx:for="{{messages}}" wx:key="title" class="msg">
+          <view class="msg-ic msg-ic-{{item.theme}}">
+            <van-icon name="{{item.icon}}" color="{{item.iconColor}}" size="16px" />
+          </view>
+          <view class="msg-tx">
+            <text class="msg-t">{{item.title}}</text>
+            <text class="msg-s">{{item.subtitle}}</text>
+          </view>
+          <text class="msg-tm">{{item.time}}</text>
+        </view>
+      </view>
+
+      <!-- ── AI Weak KP ──────────────────────────────── -->
+      <view class="sec">
+        <text class="sec-t">AI 发现的薄弱点</text>
+        <text class="sec-m sec-m-orange">1 条待练</text>
+      </view>
+      <view class="kpcard" data-test-id="{{testIds.weakKp}}">
+        <view class="kp-head">
+          <view class="kp-head-ic">
+            <van-icon name="warning-o" color="#fff" size="14px" />
+          </view>
+          <text class="kp-head-ttl">「<text class="kp-head-em">韦达定理</text>」最近 4 次都错了</text>
+        </view>
+        <view class="kp-body">
+          <text>AI 检测到你在同一知识点上的错误在<text class="kp-strong">加速积累</text>。建议开启一次针对性专练（约 5 分钟），系统会同步写入你的记忆曲线。</text>
+        </view>
+        <view class="kp-actions">
+          <view class="kpbtn kpbtn-pr">
+            <text>▶ 立即专练</text>
+          </view>
+          <view class="kpbtn kpbtn-sc">
+            <text>稍后再说</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- ── Quick entries ───────────────────────────── -->
+      <view class="quick" data-test-id="{{testIds.quickEntries}}">
+        <view wx:for="{{quickEntries}}" wx:key="title" class="qcard" bind:tap="onQuickTap" data-url="{{item.url}}">
+          <view class="qcard-ic qcard-ic-{{item.theme}}">
+            <van-icon name="{{item.icon}}" color="#fff" size="18px" />
+          </view>
+          <view class="qcard-tx">
+            <text class="qcard-t">{{item.title}}</text>
+            <text class="qcard-s">{{item.subtitle}}</text>
+          </view>
+          <van-icon name="arrow" color="#8E8E93" size="10px" />
+        </view>
+      </view>
+
+    </block>
+
+  </scroll-view>
+
+</view>
