@@ -21,7 +21,7 @@ import pixelmatch from 'pixelmatch';
 const WS_ENDPOINT = process.env.MP_AUTOMATOR_WS || 'ws://127.0.0.1:9420';
 const BASELINE_PATH = resolve(
   __dirname,
-  '../../../../design/system/screenshots/mp-vrt-baseline/01_home_ios_refined.png',
+  '../../../../../design/system/screenshots/mp-vrt-baseline/01_home_ios_refined.png',
 );
 const VRT_THRESHOLD = 5000; // max diff pixels allowed
 

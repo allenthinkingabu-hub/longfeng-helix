@@ -24,7 +24,7 @@ const VRT_MAX_DIFF_PIXELS = 5000;
 
 const BASELINE_PATH = resolve(
   __dirname,
-  '../../../../design/system/screenshots/mp-vrt-baseline/05_wrongbook_list.png',
+  '../../../../../design/system/screenshots/mp-vrt-baseline/05_wrongbook_list.png',
 );
 
 /** Output dir for VRT artifacts (actual / diff screenshots) */
