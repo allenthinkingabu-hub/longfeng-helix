@@ -2,7 +2,7 @@
 <!-- State machine: LOADING → RESULT | ALL_DONE | ERROR -->
 
 <!-- Hero celebration -->
-<view class="hero {{isForgot ? 'hero--forgot' : ''}}" data-test-id="{{testIds.celebrateHero}}">
+<view class="hero {{isForgot ? 'hero--forgot' : ''}}" data-test-id="celebrate-hero">
   <!-- Confetti particles -->
   <view class="confetti" data-test-id="{{testIds.confettiBurst}}">
     <view
@@ -61,7 +61,7 @@
     <text class="block-title-right">题目 #{{result.wrongItemId}} · {{questionSubject}} · {{questionTopic}}</text>
   </view>
 
-  <view class="card" data-test-id="{{testIds.memoryCurve}}">
+  <view class="card" data-test-id="memory-curve">
     <view class="mc-head">
       <view>
         <view class="mc-title">{{questionTitle}}</view>
@@ -122,7 +122,7 @@
     <text>今日复习战绩</text>
     <text class="block-title-right">已完成 {{sessionStats.done}} / {{sessionStats.total}} · 剩余 {{sessionStats.total - sessionStats.done}} 题</text>
   </view>
-  <view class="stats" data-test-id="{{testIds.statsRow}}">
+  <view class="stats" data-test-id="p09-stats-row">
     <view class="stat" data-test-id="{{testIds.statsMastered}}">
       <view class="stat-big stat-green">{{sessionStats.mastered}}</view>
       <view class="stat-label">Mastered</view>
@@ -156,7 +156,7 @@
 </scroll-view>
 
 <!-- CTA dock -->
-<view wx:if="{{pageState !== 'LOADING'}}" class="cta" data-test-id="{{testIds.ctaRow}}">
+<view wx:if="{{pageState !== 'LOADING'}}" class="cta" data-test-id="p09-cta-row">
   <van-button
     custom-class="btn-sec"
     data-test-id="{{testIds.ctaEndBtn}}"
