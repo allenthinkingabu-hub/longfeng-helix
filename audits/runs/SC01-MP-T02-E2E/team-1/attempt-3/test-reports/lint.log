@@ -1,0 +1,5 @@
+
+> @longfeng/mp@0.1.0 lint /Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t02-e2e/frontend/apps/mp
+> node scripts/lint.mjs && tsc --noEmit
+
+✓ lint-mp: 0 errors
