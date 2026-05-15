@@ -64,4 +64,4 @@ Phase 1 审计门控：`audit_gate = "Phase 1 · 写 spec 不跑 automator · li
 ## 5. 提交
 
 - 历史 commits: `0b6a273` (spec 创建), `5319c9e` (tester fix), `7cea13d` (tester audit fix)
-- 本轮 commit: 补全 attempt-3 coder.md + bugs-found.md 工作日志
+- 本轮 commit: `5a10e6e` — 补全 attempt-3 coder.md + bugs-found.md 工作日志
