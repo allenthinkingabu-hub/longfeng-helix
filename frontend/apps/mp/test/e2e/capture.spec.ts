@@ -64,10 +64,14 @@ describe('P02 capture page-vrt (真 IDE)', () => {
     expect(page.path).toBe('pages/capture/index');
   });
 
-  it('capture 页 DOM 已渲染 (至少 1 个 view)', async () => {
+  it('capture 页核心 DOM 已渲染 (p02-root + shutter + subjects)', async () => {
     const page = await mp.currentPage();
-    const anyView = await page.$('view');
-    expect(anyView).toBeTruthy();
+    const root = await page.$('[data-test-id="p02-root"]');
+    expect(root).toBeTruthy();
+    const shutter = await page.$('[data-test-id="capture-shutter"]');
+    expect(shutter).toBeTruthy();
+    const subjects = await page.$('[data-test-id="p02-subjects"]');
+    expect(subjects).toBeTruthy();
   });
 
   it('mp.screenshot 截图落 test-results/e2e/capture-actual.png', async () => {
@@ -83,11 +87,16 @@ describe('P02 capture page-vrt (真 IDE)', () => {
     const actualPath = path.join(RESULTS_DIR, 'capture-actual.png');
     const diffPath = path.join(RESULTS_DIR, 'capture-diff.png');
 
+    // Self-contained: take screenshot if previous test didn't produce one
+    if (!fs.existsSync(actualPath)) {
+      await mp.screenshot({ path: actualPath });
+    }
+
     // Read baseline
     expect(fs.existsSync(BASELINE_PNG)).toBe(true);
     const baselineData = PNG.sync.read(fs.readFileSync(BASELINE_PNG));
 
-    // Read actual (captured by previous test)
+    // Read actual
     expect(fs.existsSync(actualPath)).toBe(true);
     const actualData = PNG.sync.read(fs.readFileSync(actualPath));
 
