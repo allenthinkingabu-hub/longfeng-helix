@@ -9,6 +9,8 @@ import type {
   QuestionDetailResp,
   SaveQuestionReq,
   SaveQuestionResp,
+  QuestionListParams,
+  QuestionListResp,
 } from '../types';
 
 const BASE_PATH = '/api/wb/questions';
@@ -82,6 +84,55 @@ export const questionsClient = {
       return (json as { data: CreateQuestionResp }).data;
     }
     return json as CreateQuestionResp;
+  },
+
+  /**
+   * GET /api/wb/questions · 列表接口 (P05 WrongbookList)
+   * SC-01-T07: 支持 highlight={qid} 参数，返回分页列表
+   * spec: design/system/pages/P05-wrongbook-list.spec.md §5 行 1
+   */
+  async list(params?: QuestionListParams): Promise<QuestionListResp> {
+    let token: string | null = null;
+    try {
+      if (typeof localStorage !== 'undefined' && typeof localStorage.getItem === 'function') {
+        token = localStorage.getItem('access_token');
+      }
+    } catch {
+      token = null;
+    }
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const query = new URLSearchParams();
+    if (params?.subject) query.set('subject', params.subject);
+    if (params?.mastery) query.set('mastery', params.mastery);
+    if (params?.q) query.set('q', params.q);
+    if (params?.qMode) query.set('qMode', params.qMode);
+    if (params?.page) query.set('page', String(params.page));
+    if (params?.size) query.set('size', String(params.size));
+    if (params?.sort) query.set('sort', params.sort);
+    if (params?.highlight) query.set('highlight', params.highlight);
+    if (params?.kp) params.kp.forEach(k => query.append('kp', k));
+
+    const qs = query.toString();
+    const url = `${BASE_PATH}${qs ? `?${qs}` : ''}`;
+
+    const res = await fetch(url, { method: 'GET', headers });
+    if (!res.ok) {
+      const err: unknown = await res.json().catch(() => ({
+        code: 'NETWORK',
+        message: res.statusText,
+      }));
+      throw err;
+    }
+    const raw = await res.json();
+    const payload =
+      raw && typeof raw === 'object' && 'data' in raw && 'code' in raw
+        ? (raw as { data: unknown }).data
+        : raw;
+    return camelize<QuestionListResp>(payload);
   },
 
   /**
