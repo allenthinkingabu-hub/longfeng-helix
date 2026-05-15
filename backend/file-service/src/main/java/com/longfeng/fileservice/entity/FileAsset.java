@@ -6,7 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * Placeholder entity for file asset (used by FileUploadIT / BackendChainIT).
+ * Entity for file asset (used by UploadController presign/complete/download chain).
  */
 @Entity
 @Table(name = "file_asset")
@@ -17,11 +17,20 @@ public class FileAsset {
     @Id
     private Long id;
 
-    @Column(name = "object_key")
+    @Column(name = "object_key", unique = true)
     private String objectKey;
 
     @Column(name = "status")
     private String status;
+
+    @Column(name = "owner_id")
+    private Long ownerId;
+
+    @Column(name = "mime_type")
+    private String mimeType;
+
+    @Column(name = "file_size")
+    private Long fileSize;
 
     @Column(name = "variant_thumb_key")
     private String variantThumbKey;
@@ -35,6 +44,12 @@ public class FileAsset {
     public void setObjectKey(String objectKey) { this.objectKey = objectKey; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    public Long getOwnerId() { return ownerId; }
+    public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
+    public String getMimeType() { return mimeType; }
+    public void setMimeType(String mimeType) { this.mimeType = mimeType; }
+    public Long getFileSize() { return fileSize; }
+    public void setFileSize(Long fileSize) { this.fileSize = fileSize; }
     public String getVariantThumbKey() { return variantThumbKey; }
     public void setVariantThumbKey(String variantThumbKey) { this.variantThumbKey = variantThumbKey; }
     public String getVariantMediumKey() { return variantMediumKey; }

@@ -1,0 +1,194 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< com.longfeng:file-service >----------------------
+[INFO] Building file-service 1.0.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:resources (default-resources) @ file-service ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:compile (default-compile) @ file-service ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:testResources (default-testResources) @ file-service ---
+[INFO] skip non existing resourceDirectory /Users/allen/workspace/longfeng/.claude/worktrees/team-1-file/backend/file-service/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:testCompile (default-testCompile) @ file-service ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.1.2:test (default-test) @ file-service ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.longfeng.fileservice.controller.PresignControllerTest
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+23:47:46.389 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=test-idem-key-a6a0224b-8868-401b-82d1-86abfd3a0b2a bucket=wrongbook-dev key=wrongbook/0/202605/7/313402028611100672_a.jpg provider=minio ttlMin=15 sha256=bbbbbbbb
+23:47:46.554 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=test-idem-key-f0a945d6-be08-4fd6-9586-4b52f27ba1a0 bucket=wrongbook-dev key=wrongbook/1/202605/42/313402029466738688_note.png provider=minio ttlMin=15 sha256=-
+23:47:46.583 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=test-idem-key-90983392-85ca-40e0-a900-99fe8fb6538d bucket=wrongbook-dev key=wrongbook/0/202605/7/313402029584179200_a.jpg provider=minio ttlMin=15 sha256=-
+23:47:46.642 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=test-idem-key-6e4f26fe-6216-4ad6-b24b-f2e5579b4bfa bucket=wrongbook-dev key=wrongbook/0/202605/0/313402029835837440_photo.png provider=minio ttlMin=15 sha256=-
+23:47:47.252 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=test-key-miss bucket=wrongbook-dev key=wrongbook/0/202605/7/313402032394362880_q.jpg provider=minio ttlMin=15 sha256=-
+23:47:47.286 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=test-idem-key-f411d359-5f65-42ce-a087-4a4d5c0e6d70 bucket=wrongbook-dev key=wrongbook/0/202605/0/313402032532774912_math.jpg provider=minio ttlMin=15 sha256=-
+23:47:47.298 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=test-idem-key-03a9684a-390a-4c93-a1ce-6b169d88739a bucket=wrongbook-dev key=wrongbook/0/202605/99/313402032583106560_a.jpg provider=minio ttlMin=15 sha256=-
+23:47:47.324 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign idempotent HIT · key=test-key-hit bucket=wrongbook-dev objectKey=wrongbook/0/202601/7/100_q.jpg
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.773 s -- in com.longfeng.fileservice.controller.PresignControllerTest
+[INFO] Running com.longfeng.fileservice.controller.PresignControllerWebMvcTest
+23:47:47.635 [main] INFO org.hibernate.validator.internal.util.Version -- HV000001: Hibernate Validator 8.0.1.Final
+23:47:48.446 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+23:47:48.447 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+23:47:48.454 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 1 ms
+23:47:48.946 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+23:47:48.947 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+23:47:48.947 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+23:47:49.062 [main] WARN org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver -- Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.longfeng.common.dto.ApiResult<com.longfeng.fileservice.controller.PresignController$PresignRespBody>> com.longfeng.fileservice.controller.PresignController.presign(com.longfeng.fileservice.controller.PresignController$PresignReqBody,java.lang.String,long,long): [Field error in object 'presignReqBody' on field 'sha256': rejected value [not-hex]; codes [Pattern.presignReqBody.sha256,Pattern.sha256,Pattern.java.lang.String,Pattern]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [presignReqBody.sha256,sha256]; arguments []; default message [sha256],[Ljakarta.validation.constraints.Pattern$Flag;@68b7bdcb,^[a-fA-F0-9]{64}$]; default message [msgkey:file.error.sha256_hex_required]] ]
+23:47:49.097 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+23:47:49.097 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+23:47:49.097 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+23:47:49.140 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=382c1cea-c538-4661-88aa-8a5fc0cedc42 bucket=wrongbook-dev key=wrongbook/0/202605/0/313402040296439808_note.png provider=minio ttlMin=15 sha256=-
+23:47:49.292 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+23:47:49.294 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+23:47:49.294 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+23:47:49.372 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=abe4a36f-53ce-4825-b1d5-f7f8ac293fd6 bucket=wrongbook-dev key=wrongbook/0/202605/0/313402041273712640_math.jpg provider=minio ttlMin=15 sha256=-
+23:47:49.487 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+23:47:49.488 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+23:47:49.489 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 1 ms
+23:47:49.505 [main] WARN org.springframework.web.servlet.PageNotFound -- No mapping for POST /api/files/presign
+23:47:49.512 [main] WARN org.springframework.web.servlet.PageNotFound -- No endpoint POST /api/files/presign.
+23:47:49.560 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+23:47:49.560 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+23:47:49.560 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+23:47:49.627 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+23:47:49.628 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+23:47:49.628 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+23:47:49.682 [main] INFO com.longfeng.fileservice.controller.PresignController -- presign MISS · idemKey=e53102c0-a5c5-43ee-b1d4-e9fd23eab4a9 bucket=wrongbook-dev key=wrongbook/0/202605/0/313402042582335488_math.jpg provider=minio ttlMin=15 sha256=aaaaaaaa
+23:47:49.714 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+23:47:49.714 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+23:47:49.714 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.409 s -- in com.longfeng.fileservice.controller.PresignControllerWebMvcTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 21, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- maven-jar-plugin:3.3.0:jar (default-jar) @ file-service ---
+[INFO] 
+[INFO] --- spring-boot-maven-plugin:3.2.5:repackage (repackage) @ file-service ---
+[INFO] Replacing main artifact /Users/allen/workspace/longfeng/.claude/worktrees/team-1-file/backend/file-service/target/file-service-1.0.0-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /Users/allen/workspace/longfeng/.claude/worktrees/team-1-file/backend/file-service/target/file-service-1.0.0-SNAPSHOT.jar.original
+[INFO] 
+[INFO] --- maven-failsafe-plugin:3.1.2:integration-test (default) @ file-service ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.longfeng.fileservice.FileUploadIT
+23:47:53.170 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.longfeng.fileservice.FileUploadIT]: FileUploadIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+23:47:53.387 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.longfeng.fileservice.Application for test class com.longfeng.fileservice.FileUploadIT
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-05-14T23:47:54.197+04:00  INFO 11622 --- [file-service] [           main] com.longfeng.fileservice.FileUploadIT    : Starting FileUploadIT using Java 17.0.13 with PID 11622 (started by allen in /Users/allen/workspace/longfeng/.claude/worktrees/team-1-file/backend/file-service)
+2026-05-14T23:47:54.203+04:00  INFO 11622 --- [file-service] [           main] com.longfeng.fileservice.FileUploadIT    : No active profile set, falling back to 1 default profile: "default"
+2026-05-14T23:47:56.754+04:00  INFO 11622 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-05-14T23:47:56.756+04:00  INFO 11622 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-14T23:47:56.948+04:00  INFO 11622 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 185 ms. Found 3 JPA repository interfaces.
+2026-05-14T23:47:57.016+04:00  INFO 11622 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-05-14T23:47:57.017+04:00  INFO 11622 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-05-14T23:47:57.048+04:00  INFO 11622 --- [file-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.fileservice.repo.FileAssetRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-14T23:47:57.048+04:00  INFO 11622 --- [file-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.fileservice.repo.WbFileLifecycleRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-14T23:47:57.054+04:00  INFO 11622 --- [file-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.fileservice.repo.WbFileRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-14T23:47:57.054+04:00  INFO 11622 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 26 ms. Found 0 Redis repository interfaces.
+2026-05-14T23:47:58.601+04:00  INFO 11622 --- [file-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+2026-05-14T23:47:58.614+04:00  INFO 11622 --- [file-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-14T23:47:58.615+04:00  INFO 11622 --- [file-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-05-14T23:47:58.723+04:00  INFO 11622 --- [file-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-14T23:47:58.726+04:00  INFO 11622 --- [file-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 4481 ms
+2026-05-14T23:47:59.774+04:00  INFO 11622 --- [file-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-14T23:47:59.827+04:00  INFO 11622 --- [file-service] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-05-14T23:47:59.860+04:00  INFO 11622 --- [file-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-14T23:48:00.097+04:00  INFO 11622 --- [file-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-14T23:48:00.121+04:00  INFO 11622 --- [file-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-14T23:48:00.417+04:00  INFO 11622 --- [file-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@29eaf100
+2026-05-14T23:48:00.420+04:00  INFO 11622 --- [file-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-14T23:48:01.743+04:00  INFO 11622 --- [file-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-14T23:48:01.860+04:00  INFO 11622 --- [file-service] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-14T23:48:06.232+04:00  INFO 11622 --- [file-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring TestDispatcherServlet ''
+2026-05-14T23:48:06.235+04:00  INFO 11622 --- [file-service] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-05-14T23:48:06.261+04:00  INFO 11622 --- [file-service] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-05-14T23:48:06.315+04:00  INFO 11622 --- [file-service] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 79 ms
+2026-05-14T23:48:06.511+04:00  INFO 11622 --- [file-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 63350 (http) with context path ''
+2026-05-14T23:48:06.544+04:00  INFO 11622 --- [file-service] [           main] com.longfeng.fileservice.FileUploadIT    : Started FileUploadIT in 12.973 seconds (process running for 14.835)
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-05-14T23:48:10.485+04:00  WARN 11622 --- [file-service] [           main] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.longfeng.common.dto.ApiResult<com.longfeng.fileservice.dto.PresignResp>> com.longfeng.fileservice.controller.UploadController.presign(com.longfeng.fileservice.dto.PresignReq,long): [Field error in object 'presignReq' on field 'size': rejected value [20000000]; codes [Max.presignReq.size,Max.size,Max.java.lang.Long,Max]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [presignReq.size,size]; arguments []; default message [size],10485760]; default message [must be less than or equal to 10485760]] ]
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 17.76 s -- in com.longfeng.fileservice.FileUploadIT
+[INFO] Running com.longfeng.fileservice.controller.PresignRealPgIT
+2026-05-14T23:48:10.611+04:00  INFO 11622 --- [file-service] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.longfeng.fileservice.controller.PresignRealPgIT]: PresignRealPgIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-05-14T23:48:10.696+04:00  INFO 11622 --- [file-service] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.longfeng.fileservice.Application for test class com.longfeng.fileservice.controller.PresignRealPgIT
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-05-14T23:48:10.816+04:00  INFO 11622 --- [file-service] [           main] c.l.f.controller.PresignRealPgIT         : Starting PresignRealPgIT using Java 17.0.13 with PID 11622 (started by allen in /Users/allen/workspace/longfeng/.claude/worktrees/team-1-file/backend/file-service)
+2026-05-14T23:48:10.817+04:00  INFO 11622 --- [file-service] [           main] c.l.f.controller.PresignRealPgIT         : No active profile set, falling back to 1 default profile: "default"
+2026-05-14T23:48:11.720+04:00  INFO 11622 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-05-14T23:48:11.721+04:00  INFO 11622 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-14T23:48:11.759+04:00  INFO 11622 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 36 ms. Found 3 JPA repository interfaces.
+2026-05-14T23:48:11.772+04:00  INFO 11622 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-05-14T23:48:11.773+04:00  INFO 11622 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-05-14T23:48:11.783+04:00  INFO 11622 --- [file-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.fileservice.repo.FileAssetRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-14T23:48:11.784+04:00  INFO 11622 --- [file-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.fileservice.repo.WbFileLifecycleRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-14T23:48:11.784+04:00  INFO 11622 --- [file-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.fileservice.repo.WbFileRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-14T23:48:11.784+04:00  INFO 11622 --- [file-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 10 ms. Found 0 Redis repository interfaces.
+2026-05-14T23:48:12.173+04:00  INFO 11622 --- [file-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+2026-05-14T23:48:12.176+04:00  INFO 11622 --- [file-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-14T23:48:12.177+04:00  INFO 11622 --- [file-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-05-14T23:48:12.246+04:00  INFO 11622 --- [file-service] [           main] o.a.c.c.C.[Tomcat-1].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2026-05-14T23:48:12.249+04:00  INFO 11622 --- [file-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1421 ms
+2026-05-14T23:48:12.639+04:00  INFO 11622 --- [file-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-14T23:48:12.649+04:00  INFO 11622 --- [file-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-14T23:48:12.661+04:00  INFO 11622 --- [file-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-14T23:48:12.662+04:00  INFO 11622 --- [file-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-05-14T23:48:12.735+04:00  INFO 11622 --- [file-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection org.postgresql.jdbc.PgConnection@2bd01716
+2026-05-14T23:48:12.735+04:00  INFO 11622 --- [file-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-05-14T23:48:13.198+04:00  INFO 11622 --- [file-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-14T23:48:13.302+04:00  INFO 11622 --- [file-service] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-14T23:48:14.681+04:00  INFO 11622 --- [file-service] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-05-14T23:48:14.785+04:00  INFO 11622 --- [file-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 63384 (http) with context path ''
+2026-05-14T23:48:14.800+04:00  INFO 11622 --- [file-service] [           main] c.l.f.controller.PresignRealPgIT         : Started PresignRealPgIT in 4.078 seconds (process running for 23.091)
+2026-05-14T23:48:15.034+04:00  INFO 11622 --- [file-service] [o-auto-2-exec-1] o.a.c.c.C.[Tomcat-1].[localhost].[/]     : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-14T23:48:15.035+04:00  INFO 11622 --- [file-service] [o-auto-2-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-05-14T23:48:15.037+04:00  INFO 11622 --- [file-service] [o-auto-2-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-05-14T23:48:15.869+04:00  INFO 11622 --- [file-service] [o-auto-2-exec-1] c.l.f.controller.PresignController       : presign MISS · idemKey=027114f7-6f51-4386-bd25-3e78b6d9d5cd bucket=s6-it-bucket key=wrongbook/0/202605/0/313402151999135744_wt7-real-pg.jpg provider=minio ttlMin=15 sha256=-
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.368 s -- in com.longfeng.fileservice.controller.PresignRealPgIT
+[INFO] Running com.longfeng.fileservice.BackendChainIT
+2026-05-14T23:48:15.969+04:00  INFO 11622 --- [file-service] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.longfeng.fileservice.BackendChainIT]: BackendChainIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-05-14T23:48:15.997+04:00  INFO 11622 --- [file-service] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.longfeng.fileservice.Application for test class com.longfeng.fileservice.BackendChainIT
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.861 s -- in com.longfeng.fileservice.BackendChainIT
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- maven-failsafe-plugin:3.1.2:verify (default) @ file-service ---
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  49.868 s
+[INFO] Finished at: 2026-05-14T23:48:28+04:00
+[INFO] ------------------------------------------------------------------------

@@ -75,10 +75,19 @@ class BackendChainIT extends IntegrationTestBase {
   @BeforeEach
   void seed() {
     jdbc = new JdbcTemplate(dataSource);
-    // SC-01-T01 attempt-2 (retries=1) cascade fix · FK fk_rp_item from review_plan
-    // 残留行指向 wrong_item id 区间 [CHAIN_ITEM_BASE..CHAIN_ITEM_END]; 旧 seed 没清,
-    // 后续 DELETE FROM wrong_item 触发 PSQLException FK violation。
-    // 修法: 先清 review_plan 上的反向引用 (CASCADE 等同手动), 再清 wrong_item。
+    // Ensure cross-service tables exist (they belong to wrongbook-service but
+    // are needed for BackendChainIT cross-service binding test)
+    jdbc.execute("CREATE TABLE IF NOT EXISTS user_account ("
+        + "id BIGINT PRIMARY KEY, username VARCHAR(255), role VARCHAR(50), "
+        + "status INT, timezone VARCHAR(50))");
+    jdbc.execute("CREATE TABLE IF NOT EXISTS wrong_item ("
+        + "id BIGINT PRIMARY KEY, student_id BIGINT, subject VARCHAR(50), "
+        + "source_type INT, status INT, mastery INT, version INT, "
+        + "origin_image_key VARCHAR(500))");
+    jdbc.execute("CREATE TABLE IF NOT EXISTS review_plan ("
+        + "id BIGSERIAL PRIMARY KEY, wrong_item_id BIGINT, "
+        + "CONSTRAINT fk_rp_item FOREIGN KEY (wrong_item_id) REFERENCES wrong_item(id))");
+
     jdbc.update(
         "DELETE FROM review_plan WHERE wrong_item_id BETWEEN ? AND ?",
         CHAIN_ITEM_BASE,

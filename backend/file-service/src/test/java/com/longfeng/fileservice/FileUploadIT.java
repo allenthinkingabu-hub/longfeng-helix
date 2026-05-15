@@ -208,6 +208,50 @@ class FileUploadIT extends IntegrationTestBase {
         .andExpect(jsonPath("$.data.ttl_seconds").value(900));
   }
 
+  // ========== SC-11.AC-2 · PDF complete (non-image MIME) ==========
+
+  @Test
+  @DisplayName("SC-11.AC-2 edge.0 · PDF presign → PUT → complete · READY without variants")
+  @CoversAC("SC-11.AC-2#edge.0")
+  void scenario_sc11_ac2_edge_0_pdf_complete_no_variants() throws Exception {
+    // Step 1: presign PDF
+    var body = Map.of("filename", "doc.pdf", "mime", "application/pdf", "size", 4096);
+    var presignRes =
+        mvc.perform(
+                post("/files/presign")
+                    .header("X-User-Id", 9000600)
+                    .contentType("application/json")
+                    .content(jsonMapper.writeValueAsString(body)))
+            .andExpect(status().isOk())
+            .andReturn();
+    PresignResp pr = parse(presignRes.getResponse().getContentAsString(), PresignResp.class);
+
+    // Step 2: PUT a fake PDF to MinIO
+    byte[] pdfBytes = "%PDF-1.4 fake pdf content for testing".getBytes();
+    HttpClient http = HttpClient.newHttpClient();
+    var putReq =
+        HttpRequest.newBuilder(URI.create(pr.uploadUrl()))
+            .PUT(BodyPublishers.ofByteArray(pdfBytes))
+            .header("Content-Type", "application/pdf")
+            .build();
+    var putResp = http.send(putReq, BodyHandlers.discarding());
+    assertThat(putResp.statusCode()).as("PUT PDF to MinIO").isBetween(200, 299);
+
+    // Step 3: complete should NOT crash (was RuntimeException before fix)
+    mvc.perform(post("/files/complete/" + pr.fileKey()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.status").value("READY"))
+        // PDF should have null variants (no image processing)
+        .andExpect(jsonPath("$.data.variant_thumb_key").doesNotExist())
+        .andExpect(jsonPath("$.data.variant_medium_key").doesNotExist());
+
+    // Verify DB status is READY
+    FileAsset asset = repo.findByObjectKey(pr.fileKey()).orElseThrow();
+    assertThat(asset.getStatus()).isEqualTo(FileAsset.STATUS_READY);
+    assertThat(asset.getVariantThumbKey()).isNull();
+    assertThat(asset.getVariantMediumKey()).isNull();
+  }
+
   // ========== helpers ==========
 
   /** 真实 JPEG 字节数组（无 EXIF · 用于 PUT MinIO）. */
