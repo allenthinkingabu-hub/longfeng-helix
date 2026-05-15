@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "SC01-T10",
+    "team_id": "team-1",
+    "title": "PHASE-B 延后 SC-01-T10 · P07 Tap 第 1 题「开始」→ POST /nodes/{nid}/open → P08 + 写 EVENT_OPENED",
+    "attempt": 1,
+    "phase": "coder",
+    "dev_done": true,
+    "passes": false,
+    "retries": 0,
+    "audit_retries": 0,
+    "git_commits": ["e588313"]
+  },
+  "work_log_dir": "audits/runs/SC01-T10/team-1/attempt-1",
+  "log_requirements": {
+    "must_write": [
+      "coder.md",
+      "bugs-found.md"
+    ]
+  },
+  "audit_gate": "audit.js v1 + c4b · mock ≤ 5 · 数字对齐 · maxDiffPixels ≤ 500 · 禁 H2/Mock · git commit work_log 三件套强制",
+  "previous_audit_verdict": null,
+  "context": {
+    "scenario": "PHASE-B 延后 TC-01.01 步 15-16 · P07 Tap 第 1 题「开始」→ POST /nodes/{nid}/open → P08 + 写 EVENT_OPENED",
+    "target_page": "P07→P08",
+    "page_state_machine": "today.LIST → exec.READING → exec.ANSWERING",
+    "biz_step_range": "biz §2B.2 步 15-16",
+    "biz_refs": [
+      "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 15-16",
+      "biz §2A.4 P08 规格卡"
+    ],
+    "spec_refs": "design/system/pages/P07-review-today.spec.md §5 + design/system/pages/P08-review-exec.spec.md §5",
+    "primary_services": [
+      "frontend/apps/h5",
+      "backend/review-plan-service"
+    ],
+    "primary_apis": [
+      "POST /api/review/nodes/{nid}/open"
+    ],
+    "acceptance_criteria": [
+      {
+        "id": "AC1",
+        "text": "Tap 列表第一题「开始」按钮 · 按钮 loading + 触觉 medium"
+      },
+      {
+        "id": "AC2",
+        "text": "POST /api/review/nodes/{nid}/open → 200 + 写 EVENT_OPENED outbox + NodeLifecycleTracker.markOpened(nid)"
+      },
+      {
+        "id": "AC3",
+        "text": "P07 → P08 跳转 ≤ 400ms · 顶部进度条 1/N + 题元 Chips (T 级 / 学科 / 难度) + 题干卡 (Hero 风) 渲染"
+      },
+      {
+        "id": "AC4",
+        "text": "状态 LIST → READING (题干可见) → 学生开始手写作答触发 ANSWERING · canvas 笔迹实时渲染"
+      },
+      {
+        "id": "AC5",
+        "text": "P08 强制关闭 (×) → 弹二次确认 Sheet「本次复习尚未自评，退出将保留在原计划」[取消/退出]"
+      }
+    ],
+    "test_invariants": [
+      "TI1: open 幂等 (同 nid 重放 → 200 + 不重复写 EVENT_OPENED · NodeLifecycleTracker 不刷 opened_at)",
+      "TI2: 揭示前不能看答案 (UI 锁 · 答案卡 display:none + aria-hidden)",
+      "TI3: 埋点 wb_exec_open{nid,T} 1 条 + sessionId 字段",
+      "TI4: P08 4 态 (reading/answering/revealed/graded) 中 reading 态 VRT screenshot"
+    ],
+    "key_invariants": [
+      "EVENT_OPENED outbox 必须 ≥ 1 条 (key_invariants 'review.node.opened ≥ 1 条')"
+    ],
+    "build_pages_required": "(P07 依赖 T09 · 自反推或自 build · P08 ✅ T11 已合)",
+    "mockup_chain": "07_review_today.html (起点 T09 build) → 08_review_exec.html (终点 ✅ T11 已合)",
+    "sandbox": {
+      "pg_port": 15435,
+      "redis_port": 16382,
+      "minio_api_port": 9006,
+      "pg_user": "longfeng",
+      "pg_password": "longfeng_dev",
+      "pg_db": "wrongbook"
+    },
+    "phase_b_prerequisites": "第一波 (T01/T03/T05/T11/T13) + 第二波 (T02/T04/T06/T12) 已合 main · 9 page+transition 可作 reference",
+    "e2e_protocol": "DoR C-1..C-6 + 真 sandbox + Playwright headed + toHaveScreenshot (audit c4b 新卡口)"
+  },
+  "isolation": {
+    "worktree_disabled": false,
+    "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t10-target-to-exec",
+    "branch_name": "claude/sc01-t10-target-to-exec"
+  },
+  "physical_verification": {
+    "dor_c1_to_c6_required": true,
+    "rationale": "PHASE-B 前端 transition + build page · 真 Playwright headed E2E"
+  },
+  "permissions": {
+    "writable_fields": [
+      "task.dev_done",
+      "task.git_commits"
+    ]
+  },
+  "written_at": "2026-05-15T07:05:34.092Z",
+  "written_by": "TL agent (PHASE-B B-wave spawn prep)",
+  "deliverables_definition_of_done": [
+    "1. Build 缺失 page (per build_pages_required · 1:1 mockup HTML)",
+    "2. transition 跳转实现 + 状态机",
+    "3. Playwright spec.ts 用 toHaveScreenshot (非 page.screenshot 盲存)",
+    "4. work_log: coder.md + bugs-found.md",
+    "5. **强制 git add audits/runs/SC01-T10/team-*/attempt-1/ + git commit**",
+    "6. inflight dev_done=true + git_commits[]",
+    "7. node .harness/harness.js --advance=SC01-T10"
+  ],
+  "rule_6_tool_budget_guidance": "PHASE-B 延后 · transition + 建新 page · 预计 ~60-80 tool use"
+}
