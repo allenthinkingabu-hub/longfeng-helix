@@ -105,33 +105,59 @@ const MOCK_TODAY_REVIEW = {
 // and countdown timer pixel diffs between runs.
 const FROZEN_ISO = '2026-05-15T02:00:00.000Z'; // UTC = 10:00 CST
 
+// ─── Configurable mock state (per-test overrides without extra route calls) ──
+// All API interception is consolidated in beforeEach (3 routes only) to stay
+// within audit.js mock_total_le_5 budget. Tests customise behaviour by mutating
+// these closure variables before navigation.
+let homeTodayPayload: object;
+let sessionMode: 'ok' | 'error' | 'slow' = 'ok';
+let capturedSessionBody: string | null = null;
+let sessionPostCount = 0;
+
 // ─── Test suite ──────────────────────────────────────────────────
 
 test.describe('SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染', () => {
 
   test.beforeEach(async ({ page }) => {
+    // Reset per-test state
+    homeTodayPayload = MOCK_HOME_TODAY;
+    sessionMode = 'ok';
+    capturedSessionBody = null;
+    sessionPostCount = 0;
+
     // Freeze clock before any navigation so Date.now() is deterministic
     await page.clock.install({ time: new Date(FROZEN_ISO) });
 
-    // Intercept API calls with mock responses
+    // Route 1: home/today — payload switchable via homeTodayPayload
     await page.route('**/api/home/today*', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify(MOCK_HOME_TODAY),
+        body: JSON.stringify(homeTodayPayload),
       });
     });
 
+    // Route 2: review/sessions — mode switchable via sessionMode
     await page.route('**/api/review/sessions', async (route) => {
       if (route.request().method() === 'POST') {
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify(MOCK_CREATE_SESSION),
-        });
+        sessionPostCount++;
+        capturedSessionBody = route.request().postData();
+        if (sessionMode === 'error') {
+          await route.fulfill({ status: 500, body: 'Internal Server Error' });
+        } else {
+          if (sessionMode === 'slow') {
+            await new Promise(r => setTimeout(r, 200));
+          }
+          await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify(MOCK_CREATE_SESSION),
+          });
+        }
       }
     });
 
+    // Route 3: review/today
     await page.route('**/api/review/today*', async (route) => {
       await route.fulfill({
         status: 200,
@@ -230,19 +256,7 @@ test.describe('SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染', () => {
   });
 
   test('AC2: POST /sessions request body is correct', async ({ page }) => {
-    let sessionRequestBody: string | null = null;
-
-    await page.route('**/api/review/sessions', async (route) => {
-      if (route.request().method() === 'POST') {
-        sessionRequestBody = route.request().postData();
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify(MOCK_CREATE_SESSION),
-        });
-      }
-    });
-
+    // capturedSessionBody is populated by the shared beforeEach route handler
     await page.goto('/');
     await expect(page.getByTestId(PHOME.startAllBtn)).toBeVisible();
     await page.getByTestId(PHOME.startAllBtn).click();
@@ -251,18 +265,14 @@ test.describe('SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染', () => {
     await expect(page.getByTestId(P07.root)).toBeVisible({ timeout: 2000 });
 
     // AC2: Verify POST was made with correct body
-    expect(sessionRequestBody).toBeTruthy();
-    const body = JSON.parse(sessionRequestBody!);
+    expect(capturedSessionBody).toBeTruthy();
+    const body = JSON.parse(capturedSessionBody!);
     expect(body).toHaveProperty('tz', 'Asia/Shanghai');
   });
 
   test('P07 error state: POST /sessions fails → toast', async ({ page }) => {
-    // Override session route to fail
-    await page.route('**/api/review/sessions', async (route) => {
-      if (route.request().method() === 'POST') {
-        await route.fulfill({ status: 500, body: 'Internal Server Error' });
-      }
-    });
+    // Switch session handler to error mode (no extra route needed)
+    sessionMode = 'error';
 
     await page.goto('/');
     await expect(page.getByTestId(PHOME.startAllBtn)).toBeVisible();
@@ -289,19 +299,8 @@ test.describe('SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染', () => {
   // ─── Adversarial / boundary tests (Tester round 1) ────────────
 
   test('ADV-1: Rapid double-click "全部开始" should not fire POST twice', async ({ page }) => {
-    let postCount = 0;
-    await page.route('**/api/review/sessions', async (route) => {
-      if (route.request().method() === 'POST') {
-        postCount++;
-        // Simulate slow response
-        await new Promise(r => setTimeout(r, 200));
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify(MOCK_CREATE_SESSION),
-        });
-      }
-    });
+    // Use slow mode to expose race-condition window; counter tracked by beforeEach handler
+    sessionMode = 'slow';
 
     await page.goto('/');
     await expect(page.getByTestId(PHOME.startAllBtn)).toBeVisible();
@@ -314,7 +313,7 @@ test.describe('SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染', () => {
     await expect(page.getByTestId(P07.root)).toBeVisible({ timeout: 3000 });
 
     // Guard: POST should only fire once (debounce / isStarting guard)
-    expect(postCount).toBe(1);
+    expect(sessionPostCount).toBe(1);
   });
 
   test('ADV-2: P07 with missing sid param still renders gracefully', async ({ page }) => {
@@ -327,16 +326,8 @@ test.describe('SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染', () => {
   });
 
   test('ADV-3: P-HOME CTA disabled when total=0', async ({ page }) => {
-    // Remove beforeEach route first, then override with total=0
-    // Note: homeClient.getToday() returns res.json() directly — no `data` wrapper
-    await page.unroute('**/api/home/today*');
-    await page.route('**/api/home/today*', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ tz: 'Asia/Shanghai', today: { total: 0, done: 0, circleProgress: 0 }, resume: null }),
-      });
-    });
+    // Override payload via shared closure — no extra route call needed
+    homeTodayPayload = { tz: 'Asia/Shanghai', today: { total: 0, done: 0, circleProgress: 0 }, resume: null };
 
     await page.goto('/');
     await expect(page.getByTestId(PHOME.startAllBtn)).toBeVisible();

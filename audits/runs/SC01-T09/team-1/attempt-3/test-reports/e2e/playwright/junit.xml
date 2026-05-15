@@ -1,0 +1,24 @@
+<testsuites id="" name="" tests="10" failures="0" skipped="0" errors="0" time="4.808143">
+<testsuite name="sc-01/t09-home-to-review-target.spec.ts" timestamp="2026-05-15T08:02:08.748Z" hostname="chromium" tests="10" failures="0" skipped="0" time="4.035" errors="0">
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › P-HOME renders with hero card and start button" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.684">
+</testcase>
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC1+AC2+AC3: Tap 全部开始 → POST /sessions → navigate P07" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.401">
+</testcase>
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC4: P07 完整渲染 - Hero + 3 stat + progress + slots + CTA" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.322">
+</testcase>
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC4: P07 slot groups render correctly" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.252">
+</testcase>
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC2: POST /sessions request body is correct" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.388">
+</testcase>
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › P07 error state: POST /sessions fails → toast" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.38">
+</testcase>
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › P07 back navigation returns to P-HOME" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.35">
+</testcase>
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › ADV-1: Rapid double-click &quot;全部开始&quot; should not fire POST twice" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.704">
+</testcase>
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › ADV-2: P07 with missing sid param still renders gracefully" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.255">
+</testcase>
+<testcase name="SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › ADV-3: P-HOME CTA disabled when total=0" classname="sc-01/t09-home-to-review-target.spec.ts" time="0.299">
+</testcase>
+</testsuite>
+</testsuites>
