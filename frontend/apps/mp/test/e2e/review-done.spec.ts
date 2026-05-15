@@ -59,24 +59,24 @@ describe('SC01-MP-T13 · P09 review-done page-vrt (真 IDE)', () => {
     expect(page.path).toBe('pages/review-done/index');
   });
 
-  // ── Test 2: key DOM selectors exist (page.$) ─────────────────
+  // ── Test 2: key DOM selectors exist (page.$ via data-test-id) ─
   it('hero / memory-curve / stats / cta DOM 元素已渲染', async () => {
     const page = await mp.currentPage();
 
-    // hero celebration area
-    const hero = await page.$('.hero');
+    // hero celebration area (testids.celebrateHero = 'celebrate-hero')
+    const hero = await page.$('[data-test-id="celebrate-hero"]');
     expect(hero).toBeTruthy();
 
-    // memory curve card
-    const memoryCurve = await page.$('.card');
+    // memory curve card (testids.memoryCurve = 'memory-curve')
+    const memoryCurve = await page.$('[data-test-id="memory-curve"]');
     expect(memoryCurve).toBeTruthy();
 
-    // stats row (3 stat blocks)
-    const stats = await page.$('.stats');
+    // stats row (testids.statsRow = 'p09-stats-row')
+    const stats = await page.$('[data-test-id="p09-stats-row"]');
     expect(stats).toBeTruthy();
 
-    // CTA dock
-    const cta = await page.$('.cta');
+    // CTA dock (testids.ctaRow = 'p09-cta-row')
+    const cta = await page.$('[data-test-id="p09-cta-row"]');
     expect(cta).toBeTruthy();
   });
 

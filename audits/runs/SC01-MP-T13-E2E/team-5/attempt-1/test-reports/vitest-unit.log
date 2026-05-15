@@ -1,0 +1,21 @@
+
+> @longfeng/mp@0.1.0 test:unit /Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t13-e2e/frontend/apps/mp
+> vitest run --config test/vitest.config.ts test/unit
+
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v1.6.1 /Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t13-e2e/frontend/apps/mp
+
+ ✓ test/unit/wrongbook-list.spec.ts  (19 tests) 513ms
+ ✓ test/unit/review-today.spec.ts  (24 tests) 80ms
+ ✓ test/unit/review-done-end.spec.ts  (5 tests) 20ms
+ ✓ test/unit/home.spec.ts  (16 tests) 17ms
+ ✓ test/unit/review-today-tap.spec.ts  (11 tests) 3ms
+ ✓ test/unit/api-modules.spec.ts  (17 tests) 5ms
+ ✓ test/unit/_http.spec.ts  (5 tests) 1ms
+
+ Test Files  7 passed (7)
+      Tests  97 passed (97)
+   Start at  20:21:44
+   Duration  4.61s (transform 1.55s, setup 0ms, collect 2.59s, tests 639ms, environment 0ms, prepare 288ms)
+
