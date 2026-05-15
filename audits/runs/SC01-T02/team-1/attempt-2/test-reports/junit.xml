@@ -1,0 +1,16 @@
+<testsuites id="" name="" tests="6" failures="0" skipped="0" errors="0" time="17.278473">
+<testsuite name="sc-01/t02-capture-to-analyzing.spec.ts" timestamp="2026-05-15T06:36:45.095Z" hostname="chromium" tests="6" failures="0" skipped="0" time="16.575" errors="0">
+<testcase name="SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url + SSE 订阅 › AC1-3 · happy path · P02 upload → createPending 201 → analyze 202 → jump P03 → SSE 4步 → P04" classname="sc-01/t02-capture-to-analyzing.spec.ts" time="2.144">
+</testcase>
+<testcase name="SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url + SSE 订阅 › AC4 · createPending 5xx → ERROR banner + stays P02 + no P03" classname="sc-01/t02-capture-to-analyzing.spec.ts" time="1.284">
+</testcase>
+<testcase name="SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url + SSE 订阅 › AC5 · analyze-by-url 5xx → ERROR banner + stays P02 + no P03" classname="sc-01/t02-capture-to-analyzing.spec.ts" time="1.268">
+</testcase>
+<testcase name="SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url + SSE 订阅 › AC6 · SSE connection failure → P03 entered + fallback banner" classname="sc-01/t02-capture-to-analyzing.spec.ts" time="9.277">
+</testcase>
+<testcase name="SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url + SSE 订阅 › TI1 · createPending carries X-Idempotency-Key header (reuse semantics)" classname="sc-01/t02-capture-to-analyzing.spec.ts" time="1.294">
+</testcase>
+<testcase name="SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url + SSE 订阅 › TI2 · analyze-by-url request body contains task_id + subject + image_url" classname="sc-01/t02-capture-to-analyzing.spec.ts" time="1.308">
+</testcase>
+</testsuite>
+</testsuites>

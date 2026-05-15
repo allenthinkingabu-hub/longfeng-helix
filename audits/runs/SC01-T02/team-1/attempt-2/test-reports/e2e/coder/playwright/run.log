@@ -1,0 +1,27 @@
+
+Running 6 tests using 1 worker
+
+  ✓  1 [chromium] › tests/e2e/sc-01/t02-capture-to-analyzing.spec.ts:245:3 › SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url + SSE 订阅 › AC1-3 · happy path · P02 upload → createPending 201 → analyze 202 → jump P03 → SSE 4步 → P04 (2.0s)
+  ✓  2 [chromium] › tests/e2e/sc-01/t02-capture-to-analyzing.spec.ts:347:3 › SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url + SSE 订阅 › AC4 · createPending 5xx → ERROR banner + stays P02 + no P03 (1.3s)
+  ✓  3 [chromium] › tests/e2e/sc-01/t02-capture-to-analyzing.spec.ts:368:3 › SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url + SSE 订阅 › AC5 · analyze-by-url 5xx → ERROR banner + stays P02 + no P03 (1.3s)
+  ✓  4 [chromium] › tests/e2e/sc-01/t02-capture-to-analyzing.spec.ts:389:3 › SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url + SSE 订阅 › AC6 · SSE connection failure → P03 entered + fallback banner (1.4s)
+  ✓  5 [chromium] › tests/e2e/sc-01/t02-capture-to-analyzing.spec.ts:422:3 › SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url + SSE 订阅 › TI1 · createPending carries X-Idempotency-Key header (reuse semantics) (1.4s)
+  ✓  6 [chromium] › tests/e2e/sc-01/t02-capture-to-analyzing.spec.ts:492:3 › SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url + SSE 订阅 › TI2 · analyze-by-url request body contains task_id + subject + image_url (1.3s)
+
+  6 passed (9.5s)
+<testsuites id="" name="" tests="6" failures="0" skipped="0" errors="0" time="9.47035">
+<testsuite name="sc-01/t02-capture-to-analyzing.spec.ts" timestamp="2026-05-15T05:59:02.667Z" hostname="chromium" tests="6" failures="0" skipped="0" time="8.68" errors="0">
+<testcase name="SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url + SSE 订阅 › AC1-3 · happy path · P02 upload → createPending 201 → analyze 202 → jump P03 → SSE 4步 → P04" classname="sc-01/t02-capture-to-analyzing.spec.ts" time="2.029">
+</testcase>
+<testcase name="SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url + SSE 订阅 › AC4 · createPending 5xx → ERROR banner + stays P02 + no P03" classname="sc-01/t02-capture-to-analyzing.spec.ts" time="1.325">
+</testcase>
+<testcase name="SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url + SSE 订阅 › AC5 · analyze-by-url 5xx → ERROR banner + stays P02 + no P03" classname="sc-01/t02-capture-to-analyzing.spec.ts" time="1.269">
+</testcase>
+<testcase name="SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url + SSE 订阅 › AC6 · SSE connection failure → P03 entered + fallback banner" classname="sc-01/t02-capture-to-analyzing.spec.ts" time="1.378">
+</testcase>
+<testcase name="SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url + SSE 订阅 › TI1 · createPending carries X-Idempotency-Key header (reuse semantics)" classname="sc-01/t02-capture-to-analyzing.spec.ts" time="1.38">
+</testcase>
+<testcase name="SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url + SSE 订阅 › TI2 · analyze-by-url request body contains task_id + subject + image_url" classname="sc-01/t02-capture-to-analyzing.spec.ts" time="1.299">
+</testcase>
+</testsuite>
+</testsuites>

@@ -14,10 +14,12 @@ import { useMutation } from '@tanstack/react-query';
 import {
   filesClient,
   questionsClient,
+  analyzeClient,
   type PresignResponse,
   type FileCompleteResponse,
   type CreateQuestionReq,
   type CreateQuestionResp,
+  type AnalyzeByUrlResp,
 } from '@longfeng/api-contracts';
 import { TEST_IDS } from '@longfeng/testids';
 import { track } from '@longfeng/telemetry';
@@ -166,6 +168,9 @@ export const CapturePage: React.FC = () => {
   >({
     mutationFn: ({ req, idempotencyKey }) => questionsClient.createPending(req, idempotencyKey),
   });
+  const analyzeMut = useMutation<AnalyzeByUrlResp, unknown, { task_id: string; subject: string; image_url: string }>({
+    mutationFn: (vars) => analyzeClient.analyzeByUrl(vars),
+  });
 
   const handleFile = useCallback(async (file: File) => {
     if (file.size > MAX_BYTES) {
@@ -202,18 +207,26 @@ export const CapturePage: React.FC = () => {
         },
         idempotencyKey: idemKey,
       });
+      setUploadPct(90);
+
+      // SC-01-T02 AC1: call analyze-by-url BEFORE navigating to P03
+      const analyzeResp = await analyzeMut.mutateAsync({
+        task_id: created.qid,
+        subject: subject.toUpperCase(),
+        image_url: presign.image_url,
+      });
       setUploadPct(100);
       setState('UPLOADED');
       clearIdempotencyKey();
       track('wb_capture_upload_success', { ms: 0, bytes: file.size, subject, qid: created.qid });
 
-      // E02c will replace `taskId=qid` with the real /api/ai/analyze taskId.
-      setTimeout(() => nav(`/analyzing/${created.qid}?qid=${created.qid}`), 300);
+      const taskId = analyzeResp.task_id;
+      setTimeout(() => nav(`/analyzing/${taskId}?qid=${created.qid}&subject=${encodeURIComponent(subject)}`), 300);
     } catch {
       setState('ERROR');
       setErrorMsg('上传失败，请重试');
     }
-  }, [nav, subject, presignMut, directUploadMut, completeMut, createPendingMut]);
+  }, [nav, subject, presignMut, directUploadMut, completeMut, createPendingMut, analyzeMut]);
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
