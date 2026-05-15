@@ -1,0 +1,651 @@
+/**
+ * P09 · ReviewDone · Mood B · pure-warm
+ * 1:1 对齐 design/mockups/wrongbook/09_review_done.html
+ * Token-first: --tkn-* CSS variables where available
+ */
+
+/* ── CSS Variables (Mood B · pure-warm · iOS Light) ─────────────── */
+.root {
+  --bg: #F2F2F7;
+  --card: #FFFFFF;
+  --sep: rgba(60, 60, 67, 0.14);
+  --text: #1C1C1E;
+  --sec: #636366;
+  --ter: #8E8E93;
+  --blue: #007AFF;
+  --red: #FF3B30;
+  --orange: #FF9500;
+  --green: #34C759;
+  --indigo: #5856D6;
+
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", sans-serif;
+  color: var(--text);
+  overflow: hidden;
+}
+
+/* ── Hero celebration header ──────────────────────────────────── */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 330px;
+  background: linear-gradient(175deg, #0F7F3E 0%, #1FAE5C 40%, #34C759 100%);
+  overflow: hidden;
+  z-index: 10;
+}
+
+.hero::before,
+.hero::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(36px);
+  opacity: .6;
+}
+
+.hero::before {
+  width: 220px;
+  height: 220px;
+  background: #6DFFA1;
+  top: -60px;
+  left: -60px;
+}
+
+.hero::after {
+  width: 260px;
+  height: 260px;
+  background: #0B6B30;
+  bottom: -100px;
+  right: -80px;
+}
+
+.heroForgot {
+  background: linear-gradient(175deg, #CC4400 0%, #E06800 40%, #FF9500 100%) !important;
+}
+
+.heroForgot::before {
+  background: #FFBB66 !important;
+}
+
+.heroForgot::after {
+  background: #993300 !important;
+}
+
+/* Confetti */
+.confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .9;
+  animation: confettiFade 1s ease-out forwards;
+}
+
+@keyframes confettiFade {
+  0% { opacity: .9; }
+  70% { opacity: .9; }
+  100% { opacity: 0; }
+}
+
+.confettiParticle {
+  position: absolute;
+  width: 6px;
+  height: 10px;
+  border-radius: 2px;
+  opacity: .85;
+}
+
+/* Hero icon */
+.heroIcon {
+  position: absolute;
+  top: 98px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .18);
+  border: 2px solid rgba(255, 255, 255, .35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .22), inset 0 2px 0 rgba(255, 255, 255, .35);
+}
+
+.heroIconCore {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #FFFFFF, #E4FFEC);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heroKicker {
+  position: absolute;
+  top: 210px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: rgba(255, 255, 255, .85);
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  position: absolute;
+  top: 230px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: .3px;
+}
+
+.heroSub {
+  position: absolute;
+  top: 272px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, .86);
+  letter-spacing: .3px;
+}
+
+.heroChips {
+  position: absolute;
+  top: 298px;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.heroChip {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .18);
+  border: 1px solid rgba(255, 255, 255, .28);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  backdrop-filter: blur(8px);
+}
+
+/* ── Scroll content ──────────────────────────────────────────── */
+.scroll {
+  position: absolute;
+  top: 310px;
+  left: 0;
+  right: 0;
+  bottom: 84px;
+  overflow: auto;
+  padding: 32px 16px 24px;
+  z-index: 20;
+}
+
+.scroll::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 16px;
+  height: 40px;
+  background: var(--bg);
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  box-shadow: 0 -18px 24px rgba(0, 0, 0, .04);
+}
+
+/* Block title */
+.blockTitle {
+  margin: 0 2px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ter);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.blockTitleDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--green);
+}
+
+.blockTitleRight {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--sec);
+  font-weight: 600;
+  letter-spacing: .3px;
+}
+
+/* ── Memory curve card ──────────────────────────────────────── */
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+}
+
+.mcHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 2px 2px 8px;
+}
+
+.mcTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.mcSub {
+  font-size: 11px;
+  color: var(--ter);
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.mcMastery {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--green);
+  letter-spacing: .3px;
+  line-height: 1;
+}
+
+.mcMasteryLabel {
+  font-size: 10px;
+  color: var(--ter);
+  font-weight: 600;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  text-align: right;
+}
+
+/* Nodes row */
+.nodesContainer {
+  margin-top: 12px;
+  position: relative;
+  padding: 14px 2px 22px;
+  height: 84px;
+}
+
+.nodesRow {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.node {
+  width: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.nodeDot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(120, 120, 128, 0.22);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(120, 120, 128, .18);
+}
+
+.nodeDotDone {
+  background: var(--green);
+  box-shadow: 0 0 0 2px rgba(52, 199, 89, .22);
+}
+
+.nodeDotNow {
+  background: linear-gradient(135deg, #5AA3FF, #0062E1);
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, .18);
+  position: relative;
+}
+
+.nodeDotNow::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 122, 255, .3);
+  animation: pulse 1.6s ease-out infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(.8); opacity: .7; }
+  100% { transform: scale(1.2); opacity: 0; }
+}
+
+.nodeLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--sec);
+  letter-spacing: .4px;
+}
+
+.nodeLabelDone {
+  color: var(--green);
+}
+
+.nodeLabelNow {
+  color: var(--blue);
+}
+
+.nodeDate {
+  font-size: 9px;
+  color: var(--ter);
+  font-weight: 600;
+}
+
+/* ── Advance banner ────────────────────────────────────────── */
+.advance {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(52, 199, 89, .10), rgba(0, 122, 255, .08));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.advanceIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #34C759, #007AFF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.advanceText {
+  flex: 1;
+  font-size: 12px;
+  color: var(--text);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.advanceTextEm {
+  color: var(--blue);
+  font-weight: 800;
+}
+
+/* ── Next due card ──────────────────────────────────────────── */
+.nextCard {
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+}
+
+.nextLeft {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.nextIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #E9FAF0, #C7F0D6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nextKicker {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ter);
+  letter-spacing: .4px;
+  text-transform: uppercase;
+}
+
+.nextDate {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 2px;
+}
+
+.nextMemo {
+  font-size: 11px;
+  color: var(--sec);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.addCalendarBtn {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 15px;
+  background: rgba(0, 122, 255, .12);
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.addCalendarBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Stats row ──────────────────────────────────────────────── */
+.stats {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.stat {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+}
+
+.statBig {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -.3px;
+}
+
+.statLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ter);
+  letter-spacing: .4px;
+  text-transform: uppercase;
+}
+
+.statGreen { color: var(--green); }
+.statBlue { color: var(--blue); }
+.statOrange { color: var(--orange); }
+
+/* ── KP chart ──────────────────────────────────────────────── */
+.kpList {
+  margin-top: 14px;
+  background: var(--card);
+  border-radius: 16px;
+  padding: 6px 14px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+}
+
+.kpRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: .5px solid var(--sep);
+}
+
+.kpRow:last-child {
+  border-bottom: none;
+}
+
+.kpSquare {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.kpName {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.kpBar {
+  width: 80px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(120, 120, 128, 0.14);
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.kpBarFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 3px;
+  transition: width 0.6s ease-out;
+}
+
+.kpPct {
+  width: 34px;
+  text-align: right;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--sec);
+  flex-shrink: 0;
+}
+
+/* ── CTA dock ──────────────────────────────────────────────── */
+.cta {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 10px 16px 14px;
+  background: rgba(242, 242, 247, 0.88);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border-top: .5px solid var(--sep);
+  display: flex;
+  gap: 10px;
+  z-index: 35;
+}
+
+.btn {
+  flex: 1;
+  height: 50px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  border: none;
+  cursor: pointer;
+}
+
+.btnSec {
+  background: rgba(120, 120, 128, 0.14);
+  color: var(--text);
+}
+
+.btnPri {
+  background: linear-gradient(180deg, #1B9BFF, #0062E1);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(0, 122, 255, .28);
+}
+
+/* ── Toast ──────────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 96px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 1100;
+  white-space: nowrap;
+}
+
+/* ── Skeleton ──────────────────────────────────────────────── */
+.skeleton {
+  padding: 340px 16px 24px;
+}
+
+.skeletonCard {
+  height: 120px;
+  background: rgba(120, 120, 128, 0.12);
+  border-radius: 16px;
+  margin-bottom: 14px;
+  animation: skeletonShimmer 1.5s infinite ease-in-out;
+}
+
+.skeletonBar {
+  height: 16px;
+  background: rgba(120, 120, 128, 0.12);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  animation: skeletonShimmer 1.5s infinite ease-in-out;
+}
+
+@keyframes skeletonShimmer {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}

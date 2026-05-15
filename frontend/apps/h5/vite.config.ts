@@ -54,6 +54,16 @@ export default defineConfig({
         target: process.env.VITE_AI_PROXY_TARGET || 'http://localhost:8083',
         changeOrigin: true,
       },
+      // SC-01-T13: review-plan-service (P09 ReviewDone)
+      '/api/review': {
+        target: process.env.VITE_REVIEW_PROXY_TARGET || 'http://localhost:8082',
+        changeOrigin: true,
+      },
+      // SC-01-T13: calendar-core (P09 +日历)
+      '/api/calendar': {
+        target: process.env.VITE_CALENDAR_PROXY_TARGET || 'http://localhost:8085',
+        changeOrigin: true,
+      },
     },
   },
   build: {

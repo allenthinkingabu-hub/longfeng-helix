@@ -192,6 +192,38 @@ export interface AnalyzeByUrlResp {
   status: 'ANALYZING';
 }
 
+// ==================== SC-01-T13 · P09 ReviewDone DTOs ====================
+// 对齐 backend review-plan-service NodeResultResp.java + spec P09 §5
+
+export interface NodeResultResp {
+  planId: number;
+  wrongItemId: number;
+  nodeIndex: number;
+  nodeState: string;            // "MASTERED" | "COMPLETED" | "ACTIVE"
+  quality: number;
+  easeBefore: number;
+  easeAfter: number;
+  intervalBefore: number;
+  intervalAfter: number;
+  nextDueAt: string;            // ISO 8601
+  durationMs: number;
+  mastered: boolean;
+}
+
+export interface NextInSessionResp {
+  nextNid: string | null;
+  completed: number;
+  total: number;
+  done: boolean;
+}
+
+export interface CalendarSubscribeResp {
+  eventId: number;
+  subscribed: boolean;
+  subscribedAt: string;
+  warningCode?: string;
+}
+
 // ==================== S5 review-plan（readonly）====================
 export interface ReviewPlanVO {
   id: string;
