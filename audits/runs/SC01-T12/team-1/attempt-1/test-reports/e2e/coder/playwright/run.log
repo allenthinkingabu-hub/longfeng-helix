@@ -1,0 +1,10 @@
+
+Running 5 tests using 1 worker
+
+  ✓  1 [chromium] › tests/e2e/sc-01/t12-exec-to-done.spec.ts:165:5 › SC-01-T12 · P08→P09 Grade transition › MASTERED path (TC-01.01 步 18) › AC1+AC2+AC3+AC4 · tap ✓ 已掌握 → POST /grade MASTERED → P09 transition (1.3s)
+  ✓  2 [chromium] › tests/e2e/sc-01/t12-exec-to-done.spec.ts:249:5 › SC-01-T12 · P08→P09 Grade transition › MASTERED path (TC-01.01 步 18) › AC3 · grade request carries X-Idempotency-Key header (780ms)
+  ✓  3 [chromium] › tests/e2e/sc-01/t12-exec-to-done.spec.ts:343:5 › SC-01-T12 · P08→P09 Grade transition › FORGOT path (TC-01.06 · AC5) › AC5 · tap ✗ 未掌握 → POST /grade FORGOT → P09 FORGOT variant (844ms)
+  ✓  4 [chromium] › tests/e2e/sc-01/t12-exec-to-done.spec.ts:386:5 › SC-01-T12 · P08→P09 Grade transition › Grade error handling (spec §9) › spec §9 · grade 5xx → buttons remain enabled · no crash (809ms)
+  ✓  5 [chromium] › tests/e2e/sc-01/t12-exec-to-done.spec.ts:433:3 › SC-01-T12 · P08→P09 Grade transition › memory curve · 7 nodes visible on P08 (492ms)
+
+  5 passed (5.5s)

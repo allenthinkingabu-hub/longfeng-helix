@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "SC01-T12",
+    "team_id": "team-1",
+    "title": "PHASE-B 第二波 SC-01-T12 · P08 Tap「✓ 已掌握」· POST /nodes/{nid}/grade {grade:MASTERED} · SM-2 重算 · 推进 T+1",
+    "attempt": 1,
+    "phase": "tester",
+    "dev_done": true,
+    "passes": true,
+    "retries": 0,
+    "audit_retries": 0,
+    "git_commits": [
+      "3484dfe",
+      "c6759a4"
+    ]
+  },
+  "work_log_dir": "audits/runs/SC01-T12/team-1/attempt-1",
+  "log_requirements": {
+    "must_write": [
+      "tester.md",
+      "adversarial.md",
+      "test-reports/"
+    ]
+  },
+  "audit_gate": "audit.js v1 (含新加 c4b 真 VRT 检查) 五维度严卡 · mock ≤ 5 · 数字对齐 · maxDiffPixels ≤ 500 · 禁 H2/Mock",
+  "previous_audit_verdict": null,
+  "context": {
+    "scenario": "PHASE-B 第二波 · TC-01.01 步 18 + TC-01.06 FORGOT 变体 (SC-04 入口) · P08 Tap「✓ 已掌握」· POST /nodes/{nid}/grade {grade:MASTERED} · SM-2 重算 · 推进 T+1",
+    "target_page": "P08→P09",
+    "page_state_machine": "exec.REVEALED → exec.GRADED → done.RESULT",
+    "biz_step_range": "biz §2B.2 步 18",
+    "biz_refs": [
+      "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 18",
+      "biz §2A.4 P08 规格卡 自评语义",
+      "TC-01.06"
+    ],
+    "spec_refs": "P08-review-exec.spec.md §6 + P09-review-done.spec.md §5",
+    "primary_services": [
+      "frontend/apps/h5",
+      "backend/review-plan-service",
+      "backend/calendar-core (FORGOT 级联)"
+    ],
+    "primary_apis": [
+      "POST /api/review/nodes/{nid}/grade body {grade, timeSpentMs, answerText?}"
+    ],
+    "acceptance_criteria": [
+      {
+        "id": "AC1",
+        "text": "Tap 绿色「✓ 已掌握」按钮 · loading + 触觉 success"
+      },
+      {
+        "id": "AC2",
+        "text": "POST /api/review/nodes/{nid}/grade body {grade:MASTERED, timeSpentMs} → 200 + 写 EVENT_GRADED outbox + 推进 T+1 (next_due_at = NODE_OFFSETS[currentIndex+1])"
+      },
+      {
+        "id": "AC3",
+        "text": "SM-2 重算: quality=5, ease_factor → min(easeMax=3.0, prev + 0.1) · 写入 wb_review_node 行"
+      },
+      {
+        "id": "AC4",
+        "text": "P08 → P09 跳转 ≤ 500ms · 同时刷 today 大卡 -1"
+      },
+      {
+        "id": "AC5",
+        "text": "TC-01.06 · Tap 红色「✗ 未掌握」grade=FORGOT → SC-04 入口: 当前 + 后续 6 nodes 全部 CANCELLED + forceCreateSevenNodes(跳幂等闸门) 重建 7 nodes + calendar 批删 6 + 批建 7 · 最终一致"
+      }
+    ],
+    "test_invariants": [
+      "TI1: MASTERED 连续 3 次且 ease ≥ 2.8 → markAllMasteredByWrongItemId 软删全 7 行 (Q-G 聚合根原子性)",
+      "TI2: PARTIAL → quality=3 · plan 维持不变 (next_due_at 不改)",
+      "TI3: FORGOT → 走 forceCreateSevenNodes 跳 existsByWrongItemId 闸门 · 调用方先 soft-delete 旧 7 行",
+      "TI4: EVENT_GRADED outbox payload 含 plan/wrongItem/quality/grade 字段",
+      "TI5: P08 graded 态 + P09 result 态 VRT screenshot × 2"
+    ],
+    "key_invariants": [
+      "EVENT_GRADED outbox 必须 ≥ 1 条 (key_invariants 'review.node.graded ≥ 1 条')",
+      "FORGOT 重排原子性: 旧 6 events 删除 + 新 7 events 创建必须同时完成或都不完成 (不允许中间态持续 > 5 min)"
+    ],
+    "sandbox": {
+      "pg_port": 15436,
+      "redis_port": 16383,
+      "minio_api_port": 9008,
+      "pg_user": "longfeng",
+      "pg_password": "longfeng_dev",
+      "pg_db": "wrongbook"
+    },
+    "mockup_directive": "08_review_exec.html→09_review_done.html (transition · MASTERED grade → P09)",
+    "e2e_protocol": "DoR C-1..C-6 per dor_c1_to_c6_required · 真 sandbox · 禁 Mock",
+    "phase_b_wave_1_prerequisites": "PHASE-B 第一波 5 page 已 merge main: Capture/Analyzing/Result/ReviewExec/ReviewDone · 可作为 transition 起点"
+  },
+  "isolation": {
+    "worktree_disabled": false,
+    "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t12-exec-to-done",
+    "branch_name": "claude/sc01-t12-exec-to-done"
+  },
+  "physical_verification": {
+    "dor_c1_to_c6_required": false
+  },
+  "permissions": {
+    "writable_fields": [
+      "task.passes"
+    ]
+  },
+  "written_at": "2026-05-15T05:57:08.014Z",
+  "written_by": "TL agent (PHASE-B wave 2 spawn prep)",
+  "deliverables_definition_of_done": [
+    "1. 实现 task per inflight.context.acceptance_criteria + test_invariants",
+    "2. 起 backend service + 前端 dev server 真联调 (per primary_services + sandbox endpoint)",
+    "3. work_log: coder.md (5 段落) + bugs-found.md (真 bug list)",
+    "4. git commit 分批 · hash 全部 git cat-file -e 验真",
+    "5. **强制 git add audits/runs/SC01-T12/team-*/attempt-1/ + git commit** (per 上波教训)",
+    "6. inflight dev_done=true + git_commits[]",
+    "7. node .harness/harness.js --advance=SC01-T12"
+  ],
+  "rule_6_tool_budget_guidance": "PHASE-B 第二波 · transition task 比 page task 简单 · 预计 ~50-70 tool use"
+}

@@ -225,6 +225,20 @@ export interface CalendarSubscribeResp {
   warningCode?: string;
 }
 
+// ==================== SC-01-T12 · POST /api/review/nodes/{nid}/grade ====================
+// 对齐 backend GradeReq.java + spec P08 §5 #3
+
+export type GradeValue = 'MASTERED' | 'PARTIAL' | 'FORGOT';
+
+export interface GradeReq {
+  grade: GradeValue;
+  timeSpentMs: number;
+  answerText?: string;
+}
+
+/** Response 复用 NodeResultResp (backend CompleteResult maps 1:1) */
+export type GradeResp = NodeResultResp;
+
 // ==================== S5 review-plan（readonly）====================
 export interface ReviewPlanVO {
   id: string;

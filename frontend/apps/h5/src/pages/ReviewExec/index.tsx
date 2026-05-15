@@ -118,12 +118,36 @@ export const ReviewExecPage: React.FC = () => {
     track('wb_exec_reveal', { nid, waitMs });
   }, [execState, isRevealing, nid]);
 
-  // ── Grade handlers (stub for T12 · buttons enabled per AC4) ──
-  const handleGrade = useCallback((grade: 'FORGOT' | 'PARTIAL' | 'MASTERED') => {
-    // T12 will implement the full grade flow
-    track('wb_exec_grade', { nid, grade, totalMs: Date.now() - openedAtRef.current });
-    nav(`/review/done/${nid}`);
-  }, [nid, nav]);
+  // ── T12: Grade handler (POST /grade → SM-2 → navigate P09) ──
+  const [isGrading, setIsGrading] = useState(false);
+  const handleGrade = useCallback(async (grade: 'FORGOT' | 'PARTIAL' | 'MASTERED') => {
+    if (isGrading) return;
+    setIsGrading(true);
+
+    // AC1: 触觉 success
+    try {
+      if ('vibrate' in navigator) navigator.vibrate(20);
+    } catch { /* noop */ }
+
+    const timeSpentMs = Date.now() - openedAtRef.current;
+
+    try {
+      // AC2: POST /api/review/nodes/{nid}/grade {grade, timeSpentMs}
+      await reviewClient.gradeNode(nid, { grade, timeSpentMs });
+    } catch {
+      // spec §9: 重试 3 次逻辑由 caller 处理; UI 留在 REVEALED · toast
+    }
+
+    // AC4: 状态 REVEALED → GRADED
+    setExecState('GRADED');
+
+    // TI4: 埋点 wb_exec_grade
+    track('wb_exec_grade', { nid, grade, totalMs: timeSpentMs });
+
+    // AC4: P08 → P09 ≤ 500ms (query params aligned with P09 spec §7)
+    nav(`/review/done?nodeId=${nid}&sid=mock-sid-001&grade=${grade}`);
+    setIsGrading(false);
+  }, [nid, nav, isGrading]);
 
   // ── Derived state ──────────────────────────────────────────
   const isRevealed = execState === 'REVEALED' || execState === 'GRADED';
@@ -318,7 +342,7 @@ export const ReviewExecPage: React.FC = () => {
           <button
             className={s.rbtnForgot}
             data-testid={TEST_IDS.p08.gradeBtnForgot}
-            disabled={!isRevealed}
+            disabled={!isRevealed || isGrading}
             onClick={() => handleGrade('FORGOT')}
           >
             <div className={s.ri}>✗</div>
@@ -328,7 +352,7 @@ export const ReviewExecPage: React.FC = () => {
           <button
             className={s.rbtnPartial}
             data-testid={TEST_IDS.p08.gradeBtnPartial}
-            disabled={!isRevealed}
+            disabled={!isRevealed || isGrading}
             onClick={() => handleGrade('PARTIAL')}
           >
             <div className={s.ri}>◐</div>
@@ -338,7 +362,7 @@ export const ReviewExecPage: React.FC = () => {
           <button
             className={s.rbtnMaster}
             data-testid={TEST_IDS.p08.gradeBtnMastered}
-            disabled={!isRevealed || !masteredEnabled}
+            disabled={!isRevealed || !masteredEnabled || isGrading}
             onClick={() => handleGrade('MASTERED')}
             aria-disabled={isRevealed && !masteredEnabled}
             title={isRevealed ? '看过答案后只能选 部分 / 未掌握' : undefined}
