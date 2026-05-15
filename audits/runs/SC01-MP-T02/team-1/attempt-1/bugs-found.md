@@ -3,17 +3,17 @@
 ## Bug 1: capture navigateTo passed wrong params to analyzing page
 - **File**: `frontend/apps/mp/pages/capture/index.ts:149-154`
 - **Description**: navigateTo URL had `qid` + `subject` but analyzing `onLoad` expects `imageUrl` + `subject`. Without `imageUrl`, analyzing falls into demo mode instead of starting real AI analysis.
-- **Fix commit**: (see main commit)
+- **Fix commit**: ffa0acc
 
 ## Bug 2: `startAnalyze` / `pollAnalyzeStatus` / `PollAnalyzeStatusResponse` missing from ai.ts
 - **File**: `frontend/apps/mp/src/api/ai.ts`
 - **Description**: `pages/analyzing/index.ts` imports these but they didn't exist → tsc error
-- **Fix commit**: (see main commit)
+- **Fix commit**: ffa0acc
 
 ## Bug 3: `createQuestion` missing from wrongbook.ts
 - **File**: `frontend/apps/mp/src/api/wrongbook.ts`
 - **Description**: `pages/capture/index.ts` imports `createQuestion` but it wasn't exported → tsc error
-- **Fix commit**: (see main commit)
+- **Fix commit**: ffa0acc
 
 ## Pre-existing (NOT fixed — scope_out per Rule 3 Surgical):
 
