@@ -1,0 +1,15 @@
+
+Running 10 tests using 1 worker
+
+  ✓   1 [chromium] › tests/e2e/sc-01/t09-home-to-review-target.spec.ts:144:3 › SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › P-HOME renders with hero card and start button (472ms)
+  ✓   2 [chromium] › tests/e2e/sc-01/t09-home-to-review-target.spec.ts:160:3 › SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC1+AC2+AC3: Tap 全部开始 → POST /sessions → navigate P07 (401ms)
+  ✓   3 [chromium] › tests/e2e/sc-01/t09-home-to-review-target.spec.ts:179:3 › SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC4: P07 完整渲染 - Hero + 3 stat + progress + slots + CTA (330ms)
+  ✓   4 [chromium] › tests/e2e/sc-01/t09-home-to-review-target.spec.ts:217:3 › SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC4: P07 slot groups render correctly (296ms)
+  ✓   5 [chromium] › tests/e2e/sc-01/t09-home-to-review-target.spec.ts:232:3 › SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › AC2: POST /sessions request body is correct (384ms)
+  ✓   6 [chromium] › tests/e2e/sc-01/t09-home-to-review-target.spec.ts:259:3 › SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › P07 error state: POST /sessions fails → toast (383ms)
+  ✓   7 [chromium] › tests/e2e/sc-01/t09-home-to-review-target.spec.ts:278:3 › SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › P07 back navigation returns to P-HOME (382ms)
+  ✓   8 [chromium] › tests/e2e/sc-01/t09-home-to-review-target.spec.ts:291:3 › SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › ADV-1: Rapid double-click "全部开始" should not fire POST twice (700ms)
+  ✓   9 [chromium] › tests/e2e/sc-01/t09-home-to-review-target.spec.ts:320:3 › SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › ADV-2: P07 with missing sid param still renders gracefully (261ms)
+  ✓  10 [chromium] › tests/e2e/sc-01/t09-home-to-review-target.spec.ts:329:3 › SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染 › ADV-3: P-HOME CTA disabled when total=0 (265ms)
+
+  10 passed (4.6s)

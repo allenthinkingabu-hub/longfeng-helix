@@ -70,40 +70,49 @@ const p07SlotItemTLevel = (key: string, idx: number) => `p07-slot-${key}-item-${
 const p07SlotItemCountdown = (key: string, idx: number) => `p07-slot-${key}-item-${idx}-countdown`;
 
 // ─── Mock API responses ──────────────────────────────────────────
+// Note: homeClient/reviewClient use res.json() directly — no `data` wrapper.
+// The Coder's original mocks wrapped in { data: ... } which caused the client
+// to receive undefined fields, silently falling back to FALLBACK_TODAY.
+// Tester fix: align mock shape to actual API contract (HomeTodayResp / CreateSessionResp).
 const MOCK_HOME_TODAY = {
-  data: {
-    tz: 'Asia/Shanghai',
-    today: { total: 8, done: 3, circleProgress: 0.375 },
-    resume: null,
-  },
+  tz: 'Asia/Shanghai',
+  today: { total: 8, done: 3, circleProgress: 0.375 },
+  resume: null,
 };
 
 const MOCK_CREATE_SESSION = {
-  data: {
-    sid: 'sess-t09-001',
-    nids: [1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008],
-    total: 8,
-  },
+  sid: 'sess-t09-001',
+  nids: [1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008],
+  total: 8,
 };
 
+// Fixed timestamps relative to FROZEN_ISO (2026-05-15T02:00:00Z = 10:00 CST)
+// reviewClient.getTodayReview() does `json.data ?? json` so either format works,
+// but we use flat shape for consistency with the actual TodayReviewResp type.
 const MOCK_TODAY_REVIEW = {
-  data: {
-    items: [
-      { id: 1001, wrongItemId: 2001, studentId: 1, nodeIndex: 1, strategyCode: '数学', startAt: '2026-04-01T00:00:00Z', easeFactor: 2.5, status: 'ACTIVE', nextDueAt: new Date(Date.now() + 5 * 60000).toISOString(), completedAt: null, totalReview: 3, totalForget: 0 },
-      { id: 1002, wrongItemId: 2002, studentId: 1, nodeIndex: 3, strategyCode: '物理', startAt: '2026-04-01T00:00:00Z', easeFactor: 2.3, status: 'ACTIVE', nextDueAt: new Date(Date.now() + 60 * 60000).toISOString(), completedAt: null, totalReview: 2, totalForget: 1 },
-      { id: 1003, wrongItemId: 2003, studentId: 1, nodeIndex: 4, strategyCode: '化学', startAt: '2026-04-01T00:00:00Z', easeFactor: 2.1, status: 'ACTIVE', nextDueAt: new Date(Date.now() + 300 * 60000).toISOString(), completedAt: null, totalReview: 1, totalForget: 0 },
-      { id: 1004, wrongItemId: 2004, studentId: 1, nodeIndex: 2, strategyCode: '英语', startAt: '2026-04-01T00:00:00Z', easeFactor: 2.6, status: 'ACTIVE', nextDueAt: new Date(Date.now() + 400 * 60000).toISOString(), completedAt: null, totalReview: 4, totalForget: 0 },
-    ],
-    total: 4,
-    tz: 'Asia/Shanghai',
-  },
+  items: [
+    { id: 1001, wrongItemId: 2001, studentId: 1, nodeIndex: 1, strategyCode: '数学', startAt: '2026-04-01T00:00:00Z', easeFactor: 2.5, status: 'ACTIVE', nextDueAt: '2026-05-15T02:05:00.000Z', completedAt: null, totalReview: 3, totalForget: 0 },
+    { id: 1002, wrongItemId: 2002, studentId: 1, nodeIndex: 3, strategyCode: '物理', startAt: '2026-04-01T00:00:00Z', easeFactor: 2.3, status: 'ACTIVE', nextDueAt: '2026-05-15T03:00:00.000Z', completedAt: null, totalReview: 2, totalForget: 1 },
+    { id: 1003, wrongItemId: 2003, studentId: 1, nodeIndex: 4, strategyCode: '化学', startAt: '2026-04-01T00:00:00Z', easeFactor: 2.1, status: 'ACTIVE', nextDueAt: '2026-05-15T07:00:00.000Z', completedAt: null, totalReview: 1, totalForget: 0 },
+    { id: 1004, wrongItemId: 2004, studentId: 1, nodeIndex: 2, strategyCode: '英语', startAt: '2026-04-01T00:00:00Z', easeFactor: 2.6, status: 'ACTIVE', nextDueAt: '2026-05-15T08:40:00.000Z', completedAt: null, totalReview: 4, totalForget: 0 },
+  ],
+  total: 4,
+  tz: 'Asia/Shanghai',
 };
+
+// ─── Frozen clock instant (2026-05-15T10:00:00+08:00) ──────────
+// Freeze time so VRT baselines are deterministic — eliminates date text
+// and countdown timer pixel diffs between runs.
+const FROZEN_ISO = '2026-05-15T02:00:00.000Z'; // UTC = 10:00 CST
 
 // ─── Test suite ──────────────────────────────────────────────────
 
 test.describe('SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染', () => {
 
   test.beforeEach(async ({ page }) => {
+    // Freeze clock before any navigation so Date.now() is deterministic
+    await page.clock.install({ time: new Date(FROZEN_ISO) });
+
     // Intercept API calls with mock responses
     await page.route('**/api/home/today*', async (route) => {
       await route.fulfill({
@@ -201,9 +210,8 @@ test.describe('SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染', () => {
     await expect(page.getByTestId(P07.bottomCtaStartAllBtn)).toContainText('全部开始');
 
     // TI4: VRT screenshot - P07 list state
-    // Note: countdown timers are time-sensitive (changing text "N 分钟" / "N h")
-    // so we use a higher pixel tolerance while still validating layout structure
-    await expect(page).toHaveScreenshot('p07-list-baseline.png', { maxDiffPixels: 2000, threshold: 0.3 });
+    // Clock is frozen via page.clock.install() so countdown text is deterministic
+    await expect(page).toHaveScreenshot('p07-list-baseline.png', { maxDiffPixels: 500 });
   });
 
   test('AC4: P07 slot groups render correctly', async ({ page }) => {
@@ -276,5 +284,63 @@ test.describe('SC-01-T09 · P-HOME → P07 跳转 + P07 完整渲染', () => {
 
     // Should be back on P-HOME
     await expect(page.getByTestId(PHOME.root)).toBeVisible();
+  });
+
+  // ─── Adversarial / boundary tests (Tester round 1) ────────────
+
+  test('ADV-1: Rapid double-click "全部开始" should not fire POST twice', async ({ page }) => {
+    let postCount = 0;
+    await page.route('**/api/review/sessions', async (route) => {
+      if (route.request().method() === 'POST') {
+        postCount++;
+        // Simulate slow response
+        await new Promise(r => setTimeout(r, 200));
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(MOCK_CREATE_SESSION),
+        });
+      }
+    });
+
+    await page.goto('/');
+    await expect(page.getByTestId(PHOME.startAllBtn)).toBeVisible();
+
+    const btn = page.getByTestId(PHOME.startAllBtn);
+    // Rapid double-click
+    await btn.dblclick();
+
+    // Wait for navigation
+    await expect(page.getByTestId(P07.root)).toBeVisible({ timeout: 3000 });
+
+    // Guard: POST should only fire once (debounce / isStarting guard)
+    expect(postCount).toBe(1);
+  });
+
+  test('ADV-2: P07 with missing sid param still renders gracefully', async ({ page }) => {
+    // Navigate to P07 without sid — should not crash
+    await page.goto('/review/today');
+    await expect(page.getByTestId(P07.root)).toBeVisible();
+
+    // Should still show hero card and slots (from API data)
+    await expect(page.getByTestId(P07.todayReviewCard)).toBeVisible();
+  });
+
+  test('ADV-3: P-HOME CTA disabled when total=0', async ({ page }) => {
+    // Remove beforeEach route first, then override with total=0
+    // Note: homeClient.getToday() returns res.json() directly — no `data` wrapper
+    await page.unroute('**/api/home/today*');
+    await page.route('**/api/home/today*', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ tz: 'Asia/Shanghai', today: { total: 0, done: 0, circleProgress: 0 }, resume: null }),
+      });
+    });
+
+    await page.goto('/');
+    await expect(page.getByTestId(PHOME.startAllBtn)).toBeVisible();
+    // Button should be disabled when total=0
+    await expect(page.getByTestId(PHOME.startAllBtn)).toBeDisabled();
   });
 });
