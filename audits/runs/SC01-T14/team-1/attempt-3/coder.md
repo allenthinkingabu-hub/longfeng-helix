@@ -1,4 +1,4 @@
-# SC01-T14 · Coder 工作日志 · attempt-1
+# SC01-T14 · Coder 工作日志 · attempt-3
 
 ## 1. 地形侦察
 
@@ -113,5 +113,6 @@ Running 6 tests using 1 worker
 
 ## 5. 提交
 
-- 落盘工作日志: `coder.md` + `bugs-found.md` in `audits/runs/SC01-T14/team-1/attempt-1/`
+- **主功能 commit**: `5accb29` (feat: P09→P-HOME transition · build P-HOME page 1:1 mockup · 6/6 E2E PASS)
+- 落盘工作日志: `coder.md` + `bugs-found.md` in `audits/runs/SC01-T14/team-1/attempt-3/`
 - E2E 产物: `test-reports/e2e/coder/{playwright,screenshots,spec-trace.md,env-snapshot.md}`
