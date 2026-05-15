@@ -5,6 +5,9 @@
   "description": "龙凤错题本 · 微信小程序 · Vant Weapp · 消费 @longfeng/api-contracts + testids + telemetry",
   "scripts": {
     "typecheck": "tsc --noEmit",
+    "test": "vitest run --config test/vitest.config.ts",
+    "test:unit": "vitest run --config test/vitest.config.ts test/unit",
+    "test:integration": "vitest run --config test/vitest.config.ts test/api test/transitions",
     "test:e2e": "vitest run --config test/vitest.config.ts",
     "devtools:open": "bash scripts/devtools-cli.sh open",
     "devtools:auto": "bash scripts/devtools-cli.sh auto",
