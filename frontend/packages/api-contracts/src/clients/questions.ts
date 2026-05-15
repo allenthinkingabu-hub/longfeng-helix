@@ -52,10 +52,21 @@ export const questionsClient = {
     };
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
+    // Map FE camelCase → backend snake_case per QuestionDetailController.CreateQuestionReq
+    const body: Record<string, unknown> = {
+      student_id: req.studentId,
+      subject: req.subject,
+    };
+    if (req.image_key) body.origin_image_key = req.image_key;
+    if (req.mime) body.mime = req.mime;
+    if (req.source_type != null) body.source_type = req.source_type;
+    if (req.grade_code) body.grade_code = req.grade_code;
+    if (req.idempotency_key) body.idempotency_key = req.idempotency_key;
+
     const res = await fetch(BASE_PATH, {
       method: 'POST',
       headers,
-      body: JSON.stringify(req),
+      body: JSON.stringify(body),
     });
     if (!res.ok) {
       const err: unknown = await res.json().catch(() => ({

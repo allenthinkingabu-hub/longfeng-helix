@@ -5,22 +5,18 @@ spring:
   application:
     name: wrongbook-service
   datasource:
-    url: jdbc:postgresql://localhost:15433/wrongbook?stringtype=unspecified
+    url: jdbc:postgresql://localhost:15432/wrongbook?stringtype=unspecified
     username: longfeng
     password: longfeng_dev
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     open-in-view: false
     properties:
       hibernate:
         default_schema: public
   flyway:
-    enabled: true
-    locations: classpath:db/wrongbook
-    url: ${spring.datasource.url}
-    user: ${spring.datasource.username}
-    password: ${spring.datasource.password}
+    enabled: false
 
 app:
   snowflake:
