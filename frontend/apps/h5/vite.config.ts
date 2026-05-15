@@ -54,6 +54,10 @@ export default defineConfig({
         target: process.env.VITE_AI_PROXY_TARGET || 'http://localhost:8083',
         changeOrigin: true,
       },
+      '/api/review': {
+        target: process.env.VITE_REVIEW_PROXY_TARGET || 'http://localhost:8085',
+        changeOrigin: true,
+      },
     },
   },
   build: {

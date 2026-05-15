@@ -1,0 +1,409 @@
+/* P08 · ReviewExec · Mood B · review-exec layout */
+
+.root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--tkn-color-bg-primary, #f8f9fa);
+  font-family: var(--tkn-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Topbar ─────────────────────────────────── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  height: 44px;
+  background: var(--tkn-color-bg-primary, #fff);
+  border-bottom: 1px solid var(--tkn-color-border, #e5e7eb);
+}
+
+.topbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--tkn-color-primary-DEFAULT, #007AFF);
+  font-size: 14px;
+}
+
+.topbarTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--tkn-color-text-primary, #1c1c1e);
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--tkn-color-text-secondary, #8e8e93);
+}
+
+/* ── Progress bar ─────────────────────────────── */
+.progressBar {
+  height: 4px;
+  background: var(--tkn-color-bg-tertiary, #e5e7eb);
+  position: relative;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: var(--tkn-color-primary-DEFAULT, #007AFF);
+  transition: width 0.3s ease-out;
+}
+
+/* ── Meta chips ─────────────────────────────── */
+.metaChips {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.chipRed {
+  composes: chip;
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.chipIndigo {
+  composes: chip;
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.chipOrange {
+  composes: chip;
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+/* ── Question hero ─────────────────────────────── */
+.questionHero {
+  margin: 0 16px 12px;
+  background: var(--tkn-color-bg-primary, #fff);
+  border-radius: var(--tkn-radius-lg, 16px);
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.questionKicker {
+  font-size: 12px;
+  color: var(--tkn-color-text-tertiary, #8e8e93);
+  margin-bottom: 8px;
+}
+
+.questionStem {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--tkn-color-text-primary, #1c1c1e);
+}
+
+/* ── Answer area ─────────────────────────────── */
+.answerArea {
+  margin: 0 16px 12px;
+  background: var(--tkn-color-bg-primary, #fff);
+  border-radius: var(--tkn-radius-lg, 16px);
+  padding: 16px;
+  min-height: 120px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.answerLabel {
+  font-size: 13px;
+  color: var(--tkn-color-text-secondary, #636366);
+  margin-bottom: 8px;
+}
+
+.answerCanvas {
+  width: 100%;
+  min-height: 80px;
+  border: 1px dashed var(--tkn-color-border, #d1d5db);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tkn-color-text-tertiary, #9ca3af);
+  font-size: 14px;
+}
+
+/* ── Reveal button ─────────────────────────────── */
+.revealBtnWrap {
+  padding: 0 16px 12px;
+}
+
+.revealBtn {
+  width: 100%;
+  padding: 14px 0;
+  border: none;
+  border-radius: var(--tkn-radius-md, 12px);
+  background: var(--tkn-color-primary-DEFAULT, #007AFF);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.15s;
+}
+
+.revealBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.revealBtn:active:not(:disabled) {
+  opacity: 0.8;
+}
+
+/* ── Reveal card ─────────────────────────────── */
+.revealCard {
+  margin: 0 16px 12px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: var(--tkn-radius-lg, 16px);
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.revealCardHidden {
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.revealCardVisible {
+  max-height: 600px;
+  opacity: 1;
+}
+
+.revealCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px 10px;
+}
+
+.revealCheckmark {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.revealTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #065f46;
+}
+
+.revealAnswer {
+  padding: 0 16px 12px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #064e3b;
+}
+
+.revealSteps {
+  padding: 0 16px 16px;
+}
+
+.revealStep {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.revealStepNum {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #d1fae5;
+  color: #065f46;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.revealStepText {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #064e3b;
+}
+
+/* ── Memory curve ─────────────────────────────── */
+.memoryCurve {
+  margin: 0 16px 12px;
+  padding: 12px 16px;
+  background: var(--tkn-color-bg-primary, #fff);
+  border-radius: var(--tkn-radius-lg, 16px);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.memoryCurveNodes {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+}
+
+.memoryCurveNode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 40px;
+  position: relative;
+}
+
+.memoryCurveNode::after {
+  content: '';
+  position: absolute;
+  top: 11px;
+  right: -50%;
+  width: 100%;
+  height: 2px;
+  background: var(--tkn-color-border, #d1d5db);
+}
+
+.memoryCurveNode:last-child::after {
+  display: none;
+}
+
+.memoryCurveDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--tkn-color-border, #d1d5db);
+  z-index: 1;
+  transition: all 0.3s;
+}
+
+.memoryCurveDotActive {
+  background: var(--tkn-color-primary-DEFAULT, #007AFF);
+}
+
+.memoryCurveDotPast {
+  background: #10b981;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,122,255,0.4); }
+  50% { transform: scale(1.3); box-shadow: 0 0 0 6px rgba(0,122,255,0); }
+}
+
+.memoryCurveDotPulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.memoryCurveLabel {
+  font-size: 10px;
+  color: var(--tkn-color-text-tertiary, #8e8e93);
+  margin-top: 4px;
+}
+
+/* ── Grade buttons ─────────────────────────────── */
+.gradeButtons {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  background: var(--tkn-color-bg-primary, #fff);
+  border-top: 1px solid var(--tkn-color-border, #e5e7eb);
+}
+
+.gradeBtn {
+  flex: 1;
+  padding: 12px 0;
+  border: none;
+  border-radius: var(--tkn-radius-md, 12px);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.gradeBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.gradeBtn:active:not(:disabled) {
+  opacity: 0.8;
+}
+
+.gradeForgot {
+  composes: gradeBtn;
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.gradePartial {
+  composes: gradeBtn;
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.gradeMastered {
+  composes: gradeBtn;
+  background: #ecfdf5;
+  color: #10b981;
+}
+
+/* ── Bottom padding for fixed grade buttons ─── */
+.bottomSpacer {
+  height: 80px;
+}
+
+/* ── Spinner ─────────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}

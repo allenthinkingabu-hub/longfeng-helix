@@ -218,14 +218,17 @@ public class ReviewPlanController {
         return ApiResult.ok(null);
     }
 
-    /** SC-01-C05 #5 · POST /api/review/nodes/{nid}/reveal · 记 revealed_at. */
+    /** SC-01-C05 #5 · POST /api/review/nodes/{nid}/reveal · 记 revealed_at · spec §5 #2. */
     @Operation(summary = "SC-01-C05 reveal node")
     @PostMapping("/api/review/nodes/{nid}/reveal")
-    public ApiResult<Void> revealNode(@PathVariable Long nid) {
-        // 确认 plan 存在
+    public ApiResult<Map<String, Object>> revealNode(@PathVariable Long nid) {
+        // 确认 plan 存在 (404 if missing)
         planService.getById(nid);
         lifecycleTracker.markRevealed(nid);
-        return ApiResult.ok(null);
+        Instant revealedAt = lifecycleTracker.getRevealedAt(nid);
+        return ApiResult.ok(Map.of(
+            "nid", nid,
+            "revealedAt", revealedAt != null ? revealedAt.toString() : Instant.now().toString()));
     }
 
     /**
