@@ -1,0 +1,10 @@
+
+Running 5 tests using 1 worker
+
+  ✓  1 [chromium] › tests/e2e/sc-01/t01-capture-to-pending.spec.ts:89:3 › SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › happy path · presign 200 + PUT + complete + wb/questions 201 + 跳 /analyzing/ (2.9s)
+  ✓  2 [chromium] › tests/e2e/sc-01/t01-capture-to-pending.spec.ts:163:3 › SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › AC2 · same X-Idempotency-Key 24h reuses object_key (no double wb_file row) (703ms)
+  ✓  3 [chromium] › tests/e2e/sc-01/t01-capture-to-pending.spec.ts:206:3 › SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › AC6 · missing X-Idempotency-Key Header returns 400 (not 500) (645ms)
+  ✓  4 [chromium] › tests/e2e/sc-01/t01-capture-to-pending.spec.ts:227:3 › SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › TI4 · shutter disabled during UPLOADING + 10 clicks fire only 1 presign (2.0s)
+  ✓  5 [chromium] › tests/e2e/sc-01/t01-capture-to-pending.spec.ts:257:3 › SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › TI3 · presign 5xx shows ERROR banner + stays on /capture (1.2s)
+
+  5 passed (9.3s)

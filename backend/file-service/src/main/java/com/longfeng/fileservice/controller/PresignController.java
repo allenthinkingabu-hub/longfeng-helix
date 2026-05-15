@@ -31,10 +31,12 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -256,6 +258,43 @@ public class PresignController {
 
         return ResponseEntity.ok(ApiResult.ok(body));
     }
+
+    /**
+     * POST /api/file/complete/{objectKey}
+     *
+     * <p>Marks the {@link WbFile} record as UPLOADED (status=1) after the client
+     * finishes the direct PUT to the presigned URL. Idempotent: calling complete
+     * on an already-UPLOADED file is a no-op.
+     *
+     * <p>SC-01-T01 upload chain step 3 (presign → PUT → complete → createPending).
+     */
+    @PostMapping(value = {"/complete/{objectKey}", "/complete"})
+    @Transactional
+    public ResponseEntity<ApiResult<CompleteRespBody>> complete(
+            @PathVariable(required = false) String objectKey,
+            @RequestParam(value = "key", required = false) String queryKey) {
+        if ((objectKey == null || objectKey.isBlank()) && queryKey != null) {
+            objectKey = queryKey;
+        }
+        if (objectKey == null || objectKey.isBlank()) {
+            throw new BusinessException(ErrCode.VALIDATION_FAILED,
+                    "msgkey:file.error.object_key_required");
+        }
+        WbFile file = fileRepo.findByObjectKey(objectKey)
+                .orElseThrow(() -> new BusinessException(ErrCode.RESOURCE_NOT_FOUND,
+                        "msgkey:file.error.not_found"));
+        if (file.getStatus() != WbFile.STATUS_UPLOADED) {
+            file.setStatus(WbFile.STATUS_UPLOADED);
+            fileRepo.save(file);
+        }
+        LOG.info("file complete · objectKey={} status=UPLOADED", objectKey);
+        return ResponseEntity.ok(ApiResult.ok(
+                new CompleteRespBody(objectKey, "READY")));
+    }
+
+    public record CompleteRespBody(
+            @JsonProperty("file_key") String fileKey,
+            String status) {}
 
     // ── SC-01-T01 AC2 · Redis idempotency cache helpers ───────────────────────
 

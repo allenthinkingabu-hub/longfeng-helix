@@ -150,7 +150,7 @@ export const CapturePage: React.FC = () => {
   // ── Upload chain · per FRONTEND_GUIDANCE rule 2 (useMutation only, no raw fetch) ──
   // SC-01-E02b · presign → PUT OSS → complete → POST /api/wb/questions (拿 qid)
   // P03 navigation uses real qid; taskId placeholder reused until E02c wires /api/ai/analyze.
-  const presignMut = useMutation<PresignResponse, unknown, { mime: string; size: number }>({
+  const presignMut = useMutation<PresignResponse, unknown, { mime: string; size: number; filename: string; idempotencyKey: string }>({
     mutationFn: (vars) => filesClient.presign(vars),
   });
   const directUploadMut = useMutation<void, unknown, { uploadUrl: string; file: File }>({
@@ -178,7 +178,12 @@ export const CapturePage: React.FC = () => {
     const idemKey = getOrCreateIdempotencyKey();
     try {
       track('wb_capture_upload_start', { bytes: file.size, subject });
-      const presign = await presignMut.mutateAsync({ mime: file.type, size: file.size });
+      const presign = await presignMut.mutateAsync({
+        mime: file.type,
+        size: file.size,
+        filename: file.name || 'capture.jpg',
+        idempotencyKey: idemKey,
+      });
       setUploadPct(15);
 
       await directUploadMut.mutateAsync({ uploadUrl: presign.upload_url, file });
@@ -264,7 +269,7 @@ export const CapturePage: React.FC = () => {
           onClick={() => setFlashOn((v) => !v)}
         >
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" stroke="#fff" strokeWidth="1.8" strokeLinejoin="round"/>
+            <path d="M12 5v3M12 16v3M5 12h3M16 12h3M7 7l2 2M15 15l2 2M7 17l2-2M15 9l2-2" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
           </svg>
         </button>
       </header>
@@ -302,10 +307,10 @@ export const CapturePage: React.FC = () => {
           <p className={s.paperFormula}>
             f(x) = (x − <em>1</em>)² − <em>2</em>
           </p>
-          <ul className={s.paperOpts}>
-            <li>A. (1, −2)</li><li>B. (2, −1)</li>
-            <li>C. (−1, 2)</li><li>D. (2, 1)</li>
-          </ul>
+          <div className={s.paperOpts}>
+            <span>A. (1, −2)</span><span>B. (2, −1)</span>
+            <span>C. (−1, 2)</span><span>D. (2, 1)</span>
+          </div>
           <p className={s.paperAns}>学生作答：</p>
           <div className={s.paperStrike} />
           <div className={s.paperPen}>B ✗</div>

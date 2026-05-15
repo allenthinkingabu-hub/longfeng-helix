@@ -1,0 +1,14 @@
+<testsuites id="" name="" tests="5" failures="0" skipped="0" errors="0" time="9.29767">
+<testsuite name="sc-01/t01-capture-to-pending.spec.ts" timestamp="2026-05-15T04:54:46.595Z" hostname="chromium" tests="5" failures="0" skipped="0" time="7.556" errors="0">
+<testcase name="SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › happy path · presign 200 + PUT + complete + wb/questions 201 + 跳 /analyzing/" classname="sc-01/t01-capture-to-pending.spec.ts" time="2.94">
+</testcase>
+<testcase name="SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › AC2 · same X-Idempotency-Key 24h reuses object_key (no double wb_file row)" classname="sc-01/t01-capture-to-pending.spec.ts" time="0.703">
+</testcase>
+<testcase name="SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › AC6 · missing X-Idempotency-Key Header returns 400 (not 500)" classname="sc-01/t01-capture-to-pending.spec.ts" time="0.645">
+</testcase>
+<testcase name="SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › TI4 · shutter disabled during UPLOADING + 10 clicks fire only 1 presign" classname="sc-01/t01-capture-to-pending.spec.ts" time="2.02">
+</testcase>
+<testcase name="SC-01-T01 · P02 拍题 → presign → PUT MinIO → wb/questions → 跳 P03 › TI3 · presign 5xx shows ERROR banner + stays on /capture" classname="sc-01/t01-capture-to-pending.spec.ts" time="1.248">
+</testcase>
+</testsuite>
+</testsuites>

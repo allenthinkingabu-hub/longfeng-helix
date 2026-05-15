@@ -1,0 +1,447 @@
+/* P02 · Capture · Mood C dark-camera
+ * 1:1 aligned with design/mockups/wrongbook/02_capture.html
+ * Colors, spacing, effects taken directly from mockup CSS.
+ */
+
+/* ── Root (replaces .screen in mockup) ────────────────────────── */
+.root {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #0B0F1A;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "PingFang SC", "Helvetica Neue", sans-serif;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Nav (mockup .nav) ────────────────────────────────────────── */
+.nav {
+  position: relative;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 54px 18px 0;
+  height: calc(54px + 50px);
+}
+.navTitle {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+.iconBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  padding: 0;
+}
+.iconBtn svg { width: 18px; height: 18px; }
+
+/* ── Auto-detect badge (mockup .detect) ──────────────────────── */
+.detect {
+  position: relative;
+  z-index: 24;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 8px auto 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  color: #fff;
+  font-size: 12px;
+  padding: 7px 12px;
+  border-radius: 999px;
+}
+.detectPulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #FFCC00;
+  box-shadow: 0 0 0 6px rgba(255,204,0,0.18);
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ── Tip card (mockup .tip · glass morphism) ─────────────────── */
+.tip {
+  position: relative;
+  z-index: 24;
+  margin: 12px 18px 0;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 0.5px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  padding: 11px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-size: 13px;
+  letter-spacing: 0.1px;
+}
+.tip svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  color: #FFCC00;
+}
+.tip span { opacity: 0.92; }
+
+/* ── Viewfinder (mockup .view) ───────────────────────────────── */
+.view {
+  position: relative;
+  flex: 1;
+  margin: 8px 0 0;
+  background: radial-gradient(800px 400px at 50% 30%, #1d2433 0%, #0B0F1A 65%);
+  overflow: hidden;
+}
+
+/* ── Paper preview (mockup .paper) ───────────────────────────── */
+.paper {
+  position: absolute;
+  left: 50%;
+  top: 54%;
+  transform: translate(-50%, -50%) rotate(-3deg);
+  width: 255px;
+  height: 330px;
+  background: linear-gradient(180deg, #fbf8f0, #f1ece0);
+  border-radius: 6px;
+  box-shadow: 0 30px 70px rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.4);
+  padding: 22px 20px;
+  color: #1a1a1a;
+  font-family: Georgia, serif;
+}
+.paperLbl {
+  font-size: 9px;
+  color: #a78a3c;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif;
+  font-weight: 700;
+}
+.paperQno {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #7a3b3b;
+  background: #fde9e9;
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif;
+}
+.paperHeading {
+  font-size: 13px;
+  line-height: 1.55;
+  margin-top: 8px;
+  font-weight: 600;
+  color: #222;
+}
+.paperFormula {
+  margin-top: 10px;
+  text-align: center;
+  font-style: italic;
+  font-size: 14px;
+  color: #222;
+}
+.paperFormula em {
+  color: #a02828;
+  font-style: italic;
+  font-weight: 700;
+}
+.paperOpts {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 10px;
+  font-size: 11px;
+  color: #333;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif;
+}
+.paperOpts span {
+  display: flex;
+  gap: 5px;
+}
+.paperAns {
+  margin-top: 10px;
+  font-size: 11px;
+  color: #666;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif;
+}
+.paperStrike {
+  position: absolute;
+  top: 172px;
+  left: 24px;
+  width: 184px;
+  height: 18px;
+  background: rgba(255,80,80,0.55);
+  transform: rotate(-2deg);
+  border-radius: 3px;
+}
+.paperPen {
+  position: absolute;
+  top: 198px;
+  left: 36px;
+  font-family: "Caveat", "Comic Sans MS", cursive;
+  font-size: 18px;
+  color: #c9302c;
+  transform: rotate(-3deg);
+}
+
+/* ── Corner brackets (mockup .bracket) ───────────────────────── */
+.bracket {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  border: 3px solid #FFCC00;
+  box-shadow: 0 0 18px rgba(255,204,0,0.45);
+}
+.bracketTL { top: 14%; left: 14%; border-right: 0; border-bottom: 0; border-top-left-radius: 10px; }
+.bracketTR { top: 14%; right: 14%; border-left: 0; border-bottom: 0; border-top-right-radius: 10px; }
+.bracketBL { bottom: 14%; left: 14%; border-right: 0; border-top: 0; border-bottom-left-radius: 10px; }
+.bracketBR { bottom: 14%; right: 14%; border-left: 0; border-top: 0; border-bottom-right-radius: 10px; }
+
+/* ── Scan line (mockup .scan · yellow gradient) ──────────────── */
+.scan {
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  top: 48%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255,204,0,0.95), transparent);
+  box-shadow: 0 0 18px rgba(255,204,0,0.7);
+  animation: scanMove 3s linear infinite;
+}
+@keyframes scanMove {
+  0% { top: 20%; }
+  100% { top: 75%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scan { animation: none; top: 48%; }
+  .detectPulse { animation: none; }
+}
+
+/* ── Upload progress overlay ─────────────────────────────────── */
+.uploadOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  z-index: 10;
+}
+.uploadRing { width: 72px; height: 72px; }
+
+/* ── Error banner ────────────────────────────────────────────── */
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  margin: 0 18px;
+  background: rgba(255,59,48,0.15);
+  border: 0.5px solid rgba(255,59,48,0.3);
+  border-radius: 12px;
+  color: #FF3B30;
+  font-size: 13px;
+}
+
+/* ── Subject chips (mockup .subjects / .subj) ────────────────── */
+.subjects {
+  display: flex;
+  gap: 8px;
+  padding: 8px 18px;
+  overflow-x: auto;
+  z-index: 24;
+}
+.subj {
+  flex: 1;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.10);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 0.5px solid rgba(255,255,255,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 0;
+}
+.subjOn {
+  background: rgba(255,255,255,0.95);
+  color: #007AFF;
+  border-color: transparent;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+}
+
+/* ── Mode tabs (mockup .modes · yellow active) ───────────────── */
+.modes {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  padding: 6px 18px;
+  z-index: 24;
+}
+.modeBtn {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.55);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.modeOn {
+  color: #FFCC00;
+}
+.modeOn::after {
+  content: "";
+  display: block;
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: #FFCC00;
+  margin: 4px auto 0;
+}
+
+/* ── Dock gradient (mockup .dock) ────────────────────────────── */
+.dock {
+  height: 24px;
+  background: linear-gradient(180deg, rgba(11,15,26,0) 0%, rgba(11,15,26,0.85) 35%, #0B0F1A 100%);
+  z-index: 23;
+}
+
+/* ── Controls (mockup .controls) ─────────────────────────────── */
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 4px 32px 12px;
+  z-index: 24;
+}
+.controlBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.85);
+  font-size: 11px;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  padding: 0;
+}
+.controlIc {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.10);
+  border: 0.5px solid rgba(255,255,255,0.18);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+.controlIc svg { width: 22px; height: 22px; }
+
+/* ── Shutter 78px (mockup .shutter + .core) ──────────────────── */
+.shutter {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: #fff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.18), 0 0 0 8px rgba(255,255,255,0.10), 0 14px 28px rgba(0,0,0,0.35);
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.2s;
+}
+.shutter:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.shutterCore {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #5FA8FF, #007AFF);
+  border: 3px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+.shutterCore svg { width: 24px; height: 24px; }
+
+/* ── Hidden file input ───────────────────────────────────────── */
+.hiddenInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  opacity: 0;
+}
+
+/* ── Tab bar (mockup .tabbar · yellow active) ────────────────── */
+.tabbar {
+  display: flex;
+  padding: 8px 0 24px;
+  background: rgba(11,15,26,0.78);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border-top: 0.5px solid rgba(255,255,255,0.08);
+  z-index: 25;
+}
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  font-size: 10px;
+  cursor: pointer;
+  padding: 0;
+}
+.tab svg { width: 24px; height: 24px; }
+.tabActive { color: #FFCC00; }
