@@ -51,5 +51,5 @@ Phase 1 不跑 automator（inflight `physical_verification.dor_c1_to_c6_required
 
 ## 5. 提交
 
-- Commit: (pending — will be filled after git commit)
+- Commit: 056fc0e
 - 文件变更: `frontend/apps/mp/test/e2e/today-to-exec.spec.ts` (+75 lines, new file)
