@@ -86,4 +86,4 @@ Total time: 02:55 min
 
 ## 5. 提交
 
-- commit hash: (待 git commit 后填写)
+- commit hash: 8aff994 (git cat-file -e 验真 VALID)
