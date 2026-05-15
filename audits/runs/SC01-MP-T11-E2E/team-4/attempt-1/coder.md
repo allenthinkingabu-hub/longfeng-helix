@@ -50,4 +50,4 @@ Phase 1 scope：**只写 spec + lint + tsc + test:unit**。Phase 2 TL 串行跑 
 
 ## 5. 提交
 
-commit hash: (见下方 git commit)
+commit hash: 03569dd
