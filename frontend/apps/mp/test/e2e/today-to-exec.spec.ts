@@ -56,9 +56,14 @@ describe('SC01-MP-T10-E2E · today→exec transition (真 IDE)', () => {
     // wait for navigation
     await new Promise(r => setTimeout(r, 1500));
 
-    // Step 4: verify currentPage switched to review-exec
+    // Step 4: verify currentPage switched to review-exec with nid param
     const execPage = await mp.currentPage();
-    expect(execPage.path).toContain('pages/review-exec');
+    expect(execPage.path).toBe('pages/review-exec/index');
+
+    // Step 5: verify nid query parameter was forwarded (core transition contract)
+    const query = (execPage as unknown as { query: Record<string, string> }).query;
+    expect(query).toBeDefined();
+    expect(query.nid).toBeTruthy();
   }, 20_000);
 
   it('review-today page renders hero card and at least one slot item', async () => {
