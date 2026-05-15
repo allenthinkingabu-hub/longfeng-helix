@@ -20,6 +20,7 @@ import { PNG } from 'pngjs';
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { TEST_IDS } from '@longfeng/testids';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -76,7 +77,7 @@ describe('P07 review-today · page-vrt (真 IDE automator)', () => {
   it('hero card (data-test-id=today-review-card) is rendered', async () => {
     const page = await mp.currentPage();
     // page.$ uses CSS selector on the WXML shadow DOM
-    const hero = await page.$('[data-test-id="today-review-card"]');
+    const hero = await page.$(`[data-test-id="${TEST_IDS.p07.todayReviewCard}"]`);
     expect(hero).toBeTruthy();
 
     // Verify nav title text
