@@ -5,7 +5,7 @@
     "team_id": "team-1",
     "title": "PHASE-B 第二波 SC-01-T04 · SSE DONE 后 P03→P04 跳转 · 渲染 Hero + 错因 + 3 步解法 + 6 节点预告",
     "attempt": 3,
-    "phase": "tester",
+    "phase": "done",
     "dev_done": true,
     "passes": true,
     "retries": 0,
@@ -190,7 +190,7 @@
       "task.passes"
     ]
   },
-  "written_at": "2026-05-15T06:08:54.408Z",
+  "written_at": "2026-05-15T06:09:55.206Z",
   "written_by": "TL agent (PHASE-B wave 2 spawn prep)",
   "deliverables_definition_of_done": [
     "1. 实现 task per inflight.context.acceptance_criteria + test_invariants",

@@ -256,8 +256,13 @@ test.describe('SC01-T04 · SSE DONE → P03→P04 transition + P04 渲染', () =
     const memoryCurve = page.locator(`[data-testid="${P04_TID.memoryCurve}"]`);
     await expect(memoryCurve).toBeVisible();
 
-    // TI1: T0=now visible as timeline node
+    // TI1: T0=now, T1-T6=future (完整不变量验证)
     await expect(page.locator('[data-testid="result-timeline-node-T0"]')).toBeVisible();
+    await expect(page.locator('[data-testid="result-timeline-node-T0"]')).toHaveAttribute('data-status', 'now');
+    for (const t of ['T1', 'T2', 'T3', 'T4', 'T5', 'T6']) {
+      await expect(page.locator(`[data-testid="result-timeline-node-${t}"]`)).toBeVisible();
+      await expect(page.locator(`[data-testid="result-timeline-node-${t}"]`)).toHaveAttribute('data-status', 'future');
+    }
 
     // AC4: CTA 保存按钮
     await expect(page.locator(`[data-testid="${P04_TID.saveCta}"]`)).toBeVisible();
