@@ -63,4 +63,4 @@ spec-trace 对照表（transition kind）:
 
 ## 5. 提交
 
-- commit hash: (pending — 将在 git commit 后回填)
+- commit hash: 38312e7
