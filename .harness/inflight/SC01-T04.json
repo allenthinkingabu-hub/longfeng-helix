@@ -4,93 +4,62 @@
     "id": "SC01-T04",
     "team_id": "team-1",
     "title": "PHASE-B 第二波 SC-01-T04 · SSE DONE 后 P03→P04 跳转 · 渲染 Hero + 错因 + 3 步解法 + 6 节点预告",
-    "attempt": 2,
-    "phase": "tester",
+    "attempt": 3,
+    "phase": "coder",
     "dev_done": true,
-    "passes": true,
+    "passes": false,
     "retries": 0,
-    "audit_retries": 1,
+    "audit_retries": 2,
     "git_commits": [
       "cb9190c",
       "71eb1a5"
     ]
   },
-  "work_log_dir": "audits/runs/SC01-T04/team-1/attempt-2",
+  "work_log_dir": "audits/runs/SC01-T04/team-1/attempt-3",
   "log_requirements": {
     "must_write": [
-      "tester.md",
-      "adversarial.md",
-      "test-reports/"
+      "coder.md",
+      "bugs-found.md"
     ]
   },
   "audit_gate": "audit.js v1 (含新加 c4b 真 VRT 检查) 五维度严卡 · mock ≤ 5 · 数字对齐 · maxDiffPixels ≤ 500 · 禁 H2/Mock",
   "previous_audit_verdict": {
     "task_id": "SC01-T04",
-    "attempt": 1,
+    "attempt": 2,
     "team_id": "team-1",
-    "audited_at": "2026-05-15T06:06:16.913Z",
+    "audited_at": "2026-05-15T06:08:00.181Z",
     "audited_by": "audit.js v1 (deterministic · 5 dims)",
     "pass": false,
     "checks": [
       {
         "dimension": "coder_compliance",
         "name": "coder_md_exists",
-        "pass": true,
-        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result/audits/runs/SC01-T04/team-1/attempt-1/coder.md"
-      },
-      {
-        "dimension": "coder_compliance",
-        "name": "coder_md_keyword_地形侦察",
-        "pass": true,
-        "evidence": "1×"
-      },
-      {
-        "dimension": "coder_compliance",
-        "name": "coder_md_keyword_编码",
-        "pass": true,
-        "evidence": "2×"
-      },
-      {
-        "dimension": "coder_compliance",
-        "name": "coder_md_keyword_自检",
-        "pass": true,
-        "evidence": "2×"
-      },
-      {
-        "dimension": "coder_compliance",
-        "name": "coder_md_keyword_提交",
-        "pass": true,
-        "evidence": "2×"
+        "pass": false,
+        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result/audits/runs/SC01-T04/team-1/attempt-2/coder.md"
       },
       {
         "dimension": "coder_compliance",
         "name": "bugs_found_md_exists",
-        "pass": true,
-        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result/audits/runs/SC01-T04/team-1/attempt-1/bugs-found.md"
-      },
-      {
-        "dimension": "coder_compliance",
-        "name": "bugs_found_md_has_declaration",
-        "pass": true,
-        "evidence": "bug list found"
+        "pass": false,
+        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result/audits/runs/SC01-T04/team-1/attempt-2/bugs-found.md"
       },
       {
         "dimension": "tester_compliance",
         "name": "tester_md_exists",
         "pass": true,
-        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result/audits/runs/SC01-T04/team-1/attempt-1/tester.md"
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result/audits/runs/SC01-T04/team-1/attempt-2/tester.md"
       },
       {
         "dimension": "tester_compliance",
         "name": "adversarial_md_exists",
         "pass": true,
-        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result/audits/runs/SC01-T04/team-1/attempt-1/adversarial.md"
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result/audits/runs/SC01-T04/team-1/attempt-2/adversarial.md"
       },
       {
         "dimension": "tester_compliance",
         "name": "test_reports_nonempty",
         "pass": true,
-        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result/audits/runs/SC01-T04/team-1/attempt-1/test-reports"
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result/audits/runs/SC01-T04/team-1/attempt-2/test-reports"
       },
       {
         "dimension": "tester_compliance",
@@ -108,7 +77,7 @@
         "dimension": "tester_compliance",
         "name": "mock_total_le_5",
         "pass": true,
-        "evidence": "mock=1/5 (page.route)"
+        "evidence": "mock=4/5 (vi.mock,page.route,MockMvc,jest.mock)"
       },
       {
         "dimension": "tester_compliance",
@@ -125,14 +94,14 @@
       {
         "dimension": "test_validity",
         "name": "tester_md_testcase_count_matches_xml",
-        "pass": false,
-        "evidence": "claimed=4 ≠ xml<testcase>=8"
+        "pass": true,
+        "evidence": "claimed=4 == xml<testcase>=4"
       },
       {
         "dimension": "test_validity",
         "name": "adversarial_has_exploratory_keywords",
         "pass": true,
-        "evidence": "2 matched: [DOM,500]"
+        "evidence": "3 matched: [DOM,注入,500]"
       },
       {
         "dimension": "spec_alignment",
@@ -141,8 +110,8 @@
         "evidence": "inflight.physical_verification.dor_c1_to_c6_required=false — DoR skipped (P0 audit task)"
       }
     ],
-    "redo_target": "tester",
-    "redo_reason": "[test_validity.tester_md_testcase_count_matches_xml] claimed=4 ≠ xml<testcase>=8"
+    "redo_target": "coder",
+    "redo_reason": "[coder_compliance.coder_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result/audits/runs/SC01-T04/team-1/attempt-2/coder.md · [coder_compliance.bugs_found_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result/audits/runs/SC01-T04/team-1/attempt-2/bugs-found.md"
   },
   "context": {
     "scenario": "PHASE-B 第二波 · TC-01.01 步 7-8 + TC-01.04 (低置信黄条) · SSE DONE 后 P03→P04 跳转 · 渲染 Hero + 错因 + 3 步解法 + 6 节点预告",
@@ -213,14 +182,15 @@
     "branch_name": "claude/sc01-t04-analyzing-to-result"
   },
   "physical_verification": {
-    "dor_c1_to_c6_required": false
+    "dor_c1_to_c6_required": true
   },
   "permissions": {
     "writable_fields": [
-      "task.passes"
+      "task.dev_done",
+      "task.git_commits"
     ]
   },
-  "written_at": "2026-05-15T06:06:16.918Z",
+  "written_at": "2026-05-15T06:08:00.186Z",
   "written_by": "TL agent (PHASE-B wave 2 spawn prep)",
   "deliverables_definition_of_done": [
     "1. 实现 task per inflight.context.acceptance_criteria + test_invariants",
