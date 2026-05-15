@@ -3,7 +3,7 @@
  *
  * Direct fetch to real backend at localhost:8085.
  * Soft-skip: if health probe fails, all tests skip gracefully.
- * 0 mock. 8 endpoints. Validates envelope shape + required fields.
+ * 0 mock. 9 endpoints (8 Coder + 1 Tester adversarial). Validates envelope shape + required fields.
  *
  * Endpoints under test (trace: src/api/review.ts → backend ReviewPlanController):
  *   1. POST /api/review/sessions           → createSession
@@ -14,6 +14,7 @@
  *   6. POST /api/review/sessions/:sid/complete → completeSession
  *   7. POST /api/review/sessions/:sid/next → nextInSession
  *   8. GET  /api/review/nodes/:nid/result  → nodeResult
+ *   9. POST /api/review/nodes/:nid/open   → openNode (Tester addition)
  */
 import { describe, it, expect, beforeAll } from 'vitest';
 
@@ -63,7 +64,7 @@ function assertEnvelope(json: unknown): asserts json is { code: number; message:
 
 // ── suite ────────────────────────────────────────────────────
 
-describe('Review API contract (8 endpoints · real backend :8085)', () => {
+describe('Review API contract (9 endpoints · real backend :8085)', () => {
   let alive = false;
 
   beforeAll(async () => {
@@ -233,7 +234,7 @@ describe('Review API contract (8 endpoints · real backend :8085)', () => {
   });
 
   // ── #8 nodeResult ───────────────────────────────────────────
-  it('GET /api/review/nodes/:nid/result → envelope { NodeResultResp fields }', async () => {
+  it('GET /api/review/nodes/:nid/result → envelope { NodeResultResp 12 fields }', async () => {
     if (!alive) return;
 
     const { status, json } = await api('/api/review/nodes/1/result');
@@ -242,11 +243,35 @@ describe('Review API contract (8 endpoints · real backend :8085)', () => {
     if (status >= 200 && status < 300) {
       assertEnvelope(json);
       const data = (json as { data: unknown }).data as Record<string, unknown>;
+      // 5 required fields
       expect(data).toHaveProperty('nid');
       expect(data).toHaveProperty('wrongItemId');
       expect(data).toHaveProperty('nodeIndex');
       expect(data).toHaveProperty('nodeState');
       expect(data).toHaveProperty('mastered');
+      // 7 nullable fields — must be present as keys even if null
+      expect('quality' in data).toBe(true);
+      expect('easeFactorBefore' in data).toBe(true);
+      expect('easeFactorAfter' in data).toBe(true);
+      expect('intervalDaysBefore' in data).toBe(true);
+      expect('intervalDaysAfter' in data).toBe(true);
+      expect('nextDueAt' in data).toBe(true);
+      expect('durationMs' in data).toBe(true);
+    }
+  });
+
+  // ── #9 openNode (Tester adversarial addition — was missing from Coder spec) ──
+  it('POST /api/review/nodes/:nid/open → envelope { null data }', async () => {
+    if (!alive) return;
+
+    const { status, json } = await api('/api/review/nodes/1/open', { method: 'POST' });
+    expect(status).toBeLessThan(500);
+
+    if (status >= 200 && status < 300) {
+      assertEnvelope(json);
+      // openNode returns ApiEnvelope<null> — data should be null
+      const obj = json as { data: unknown };
+      expect(obj.data).toBeNull();
     }
   });
 });
