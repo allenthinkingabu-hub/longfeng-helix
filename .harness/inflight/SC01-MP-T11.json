@@ -196,6 +196,6 @@
     "9. node .harness/harness.js --advance=SC01-MP-T11"
   ],
   "rule_6_tool_budget_guidance": "PHASE-C wave-1 单 page 1:1 mirror + 4 screenshot + tsc · 预计 ~40-60 tool use · 软线 50 self-check · 70 surface · 85 forced compaction summary",
-  "written_at": "2026-05-15T13:05:57.851Z",
+  "written_at": "2026-05-15T13:09:03.299Z",
   "written_by": "TL agent (PHASE-C wave-1 spawn prep · 人工视觉路线)"
 }
