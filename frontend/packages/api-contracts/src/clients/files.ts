@@ -74,6 +74,7 @@ export const filesClient = {
     return {
       upload_url: data.url as string,
       file_key: data.object_key as string,
+      image_url: (data.image_url as string) ?? '',
       ttl_seconds: data.expires_in_sec as number,
       bucket: 'wrongbook-dev',
     };

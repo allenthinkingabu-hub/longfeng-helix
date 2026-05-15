@@ -82,6 +82,7 @@ export interface PresignRequest {
 export interface PresignResponse {
   upload_url: string;
   file_key: string;
+  image_url: string;
   ttl_seconds: number;
   bucket: string;
 }
