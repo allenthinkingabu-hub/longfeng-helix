@@ -409,6 +409,13 @@ test.describe('SC-01-T02 · P02→P03 跳转 · createPending + analyze-by-url +
     // P03 should show pipeline in wait state (SSE failed)
     await expect(page.locator(`[data-testid="${TID_P03.step1}"]`)).toBeVisible();
 
+    // AC6: fallback banner must appear after SSE retries exhausted
+    // useEventSource retries 3x with exponential backoff (1s+2s+4s ≈ 7s) before calling onFail
+    const banner = page.locator('[data-testid="p03-fallback-banner"]');
+    await expect(banner).toBeVisible({ timeout: 15_000 });
+    const bannerText = await banner.textContent();
+    expect(bannerText, 'AC6: fallback banner shows error text').toBeTruthy();
+
     // ── SSE 失败截图 ──
     await expect(page).toHaveScreenshot('p03-sse-error-chromium-darwin.png', {
       maxDiffPixels: 500,

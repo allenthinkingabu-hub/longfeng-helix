@@ -5,18 +5,24 @@
     "team_id": "team-1",
     "title": "PHASE-B 第二波 SC-01-T02 · 上传完成自动跳 P03 · 创建 PENDING question · 启 analyze 任务 · SSE 订阅",
     "attempt": 1,
-    "phase": "coder",
+    "phase": "tester",
     "dev_done": true,
-    "passes": false,
+    "passes": true,
     "retries": 0,
     "audit_retries": 0,
-    "git_commits": ["053420e", "a54044b", "a221ec1", "2b55af2"]
+    "git_commits": [
+      "053420e",
+      "a54044b",
+      "a221ec1",
+      "2b55af2"
+    ]
   },
   "work_log_dir": "audits/runs/SC01-T02/team-1/attempt-1",
   "log_requirements": {
     "must_write": [
-      "coder.md",
-      "bugs-found.md"
+      "tester.md",
+      "adversarial.md",
+      "test-reports/"
     ]
   },
   "audit_gate": "audit.js v1 (含新加 c4b 真 VRT 检查) 五维度严卡 · mock ≤ 5 · 数字对齐 · maxDiffPixels ≤ 500 · 禁 H2/Mock",
@@ -95,16 +101,14 @@
     "branch_name": "claude/sc01-t02-capture-to-analyzing"
   },
   "physical_verification": {
-    "dor_c1_to_c6_required": true,
-    "rationale": "PHASE-B 前端 transition task · Playwright headed + 跨页跳转 E2E"
+    "dor_c1_to_c6_required": false
   },
   "permissions": {
     "writable_fields": [
-      "task.dev_done",
-      "task.git_commits"
+      "task.passes"
     ]
   },
-  "written_at": "2026-05-15T05:41:56.535Z",
+  "written_at": "2026-05-15T06:02:31.914Z",
   "written_by": "TL agent (PHASE-B wave 2 spawn prep)",
   "deliverables_definition_of_done": [
     "1. 实现 task per inflight.context.acceptance_criteria + test_invariants",
