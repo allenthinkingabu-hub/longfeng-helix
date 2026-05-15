@@ -24,7 +24,7 @@ describe('SC01-MP-T13 · P09 review-done page-load + testid (真 IDE)', () => {
       ),
     ]);
 
-    await mp.reLaunch({ url: '/pages/review-done/index' });
+    await mp.reLaunch('/pages/review-done/index');
     await new Promise((r) => setTimeout(r, 1000));
   }, 45_000);
 

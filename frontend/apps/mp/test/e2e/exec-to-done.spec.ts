@@ -34,7 +34,7 @@ describe('SC01-MP-T12-E2E · P08→P09 transition (exec → done)', () => {
   it('navigates from review-exec to review-done after grade tap', async () => {
     const sid = 'e2e-sid-001';
     const nid = '1001';
-    await mp.reLaunch({ url: `/pages/review-exec/index?sid=${sid}&nid=${nid}` });
+    await mp.reLaunch(`/pages/review-exec/index?sid=${sid}&nid=${nid}`);
     await new Promise((r) => setTimeout(r, 1000));
 
     const execPage = await mp.currentPage();

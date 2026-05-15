@@ -21,7 +21,7 @@ describe('P04 result page-load + testid (真 IDE)', () => {
       ),
     ]);
 
-    await mp.reLaunch({ url: '/pages/result/index?qid=test-vrt-001' });
+    await mp.reLaunch('/pages/result/index?qid=test-vrt-001');
     await new Promise((r) => setTimeout(r, 1000));
   }, 45_000);
 

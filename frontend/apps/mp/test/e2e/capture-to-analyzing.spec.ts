@@ -30,7 +30,7 @@ describe('capture → analyzing transition (真 IDE)', () => {
   });
 
   it('reLaunch 到 capture 页 · currentPage.path === pages/capture/index', async () => {
-    await mp.reLaunch({ url: '/pages/capture/index' });
+    await mp.reLaunch('/pages/capture/index');
     await new Promise((r) => setTimeout(r, 500));
     const page = await mp.currentPage();
     expect(page.path).toBe('pages/capture/index');
@@ -40,9 +40,7 @@ describe('capture → analyzing transition (真 IDE)', () => {
     const mockImageUrl = encodeURIComponent('https://example.com/test.jpg');
     const mockSubject = 'math';
     const mockQid = '42';
-    await mp.reLaunch({
-      url: `/pages/analyzing/index?imageUrl=${mockImageUrl}&subject=${mockSubject}&qid=${mockQid}`,
-    });
+    await mp.reLaunch(`/pages/analyzing/index?imageUrl=${mockImageUrl}&subject=${mockSubject}&qid=${mockQid}`);
     await new Promise((r) => setTimeout(r, 500));
     const page = await mp.currentPage();
     expect(page.path).toBe('pages/analyzing/index');

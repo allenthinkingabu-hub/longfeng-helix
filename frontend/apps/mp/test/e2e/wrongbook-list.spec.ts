@@ -25,7 +25,7 @@ describe('P05 wrongbook-list page-load + DOM (真 IDE)', () => {
       ),
     ]);
 
-    await mp.reLaunch({ url: '/pages/wrongbook-list/index' });
+    await mp.reLaunch('/pages/wrongbook-list/index');
     await new Promise((r) => setTimeout(r, 1500));
   }, 45_000);
 

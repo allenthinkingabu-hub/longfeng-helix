@@ -30,7 +30,7 @@ describe('SC01-MP-T10-E2E · today→exec transition (真 IDE)', () => {
   });
 
   it('reLaunch review-today → tap item card → currentPage.path = pages/review-exec/index', async () => {
-    await mp.reLaunch({ url: '/pages/review-today/index' });
+    await mp.reLaunch('/pages/review-today/index');
     await new Promise((r) => setTimeout(r, 2000));
 
     const todayPage = await mp.currentPage();
@@ -51,7 +51,7 @@ describe('SC01-MP-T10-E2E · today→exec transition (真 IDE)', () => {
   }, 60_000);
 
   it('review-today page renders hero card and at least one slot item', async () => {
-    await mp.reLaunch({ url: '/pages/review-today/index' });
+    await mp.reLaunch('/pages/review-today/index');
     await new Promise((r) => setTimeout(r, 2000));
 
     const page = await mp.currentPage();

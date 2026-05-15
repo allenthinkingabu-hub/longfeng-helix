@@ -21,7 +21,7 @@ describe('P02 capture page-load + testid (真 IDE)', () => {
       ),
     ]);
 
-    await mp.reLaunch({ url: '/pages/capture/index' });
+    await mp.reLaunch('/pages/capture/index');
     await new Promise((r) => setTimeout(r, 1000));
   }, 45_000);
 

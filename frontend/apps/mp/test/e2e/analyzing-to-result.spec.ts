@@ -30,7 +30,7 @@ describe('P03→P04 transition: analyzing → result (真 IDE)', () => {
   });
 
   it('reLaunch to analyzing page with demo taskId', async () => {
-    await mp.reLaunch({ url: '/pages/analyzing/index?qid=test-qid-e2e' });
+    await mp.reLaunch('/pages/analyzing/index?qid=test-qid-e2e');
     await new Promise((r) => setTimeout(r, 800));
     const page = await mp.currentPage();
     expect(page.path).toBe('pages/analyzing/index');
@@ -43,7 +43,7 @@ describe('P03→P04 transition: analyzing → result (真 IDE)', () => {
   });
 
   it('reLaunch to result page (模拟转场 · Phase 3 不依赖后端轮询)', async () => {
-    await mp.reLaunch({ url: '/pages/result/index?qid=test-qid-e2e' });
+    await mp.reLaunch('/pages/result/index?qid=test-qid-e2e');
     await new Promise((r) => setTimeout(r, 800));
     const page = await mp.currentPage();
     expect(page.path).toBe('pages/result/index');

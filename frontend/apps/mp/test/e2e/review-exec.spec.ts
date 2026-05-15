@@ -25,7 +25,7 @@ describe('P08 review-exec page-load + testid (真 IDE)', () => {
       ),
     ]);
 
-    await mp.reLaunch({ url: '/pages/review-exec/index' });
+    await mp.reLaunch('/pages/review-exec/index');
     await new Promise((r) => setTimeout(r, 1000));
     page = await mp.currentPage();
   }, 45_000);

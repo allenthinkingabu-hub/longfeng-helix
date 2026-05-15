@@ -27,7 +27,7 @@ describe('P03 Analyzing page · page-load + testid', () => {
   });
 
   it('reLaunch → pages/analyzing/index · currentPage.path correct', async () => {
-    await mp.reLaunch({ url: '/pages/analyzing/index?taskId=demo' });
+    await mp.reLaunch('/pages/analyzing/index?taskId=demo');
     await new Promise((r) => setTimeout(r, 800));
     const page = await mp.currentPage();
     expect(page.path).toBe('pages/analyzing/index');

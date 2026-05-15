@@ -29,7 +29,7 @@ describe('SC01-MP-T14-E2E · done→home transition (真 IDE)', () => {
   });
 
   it('navigate to review-done page via reLaunch', async () => {
-    await mp.reLaunch({ url: '/pages/review-done/index' });
+    await mp.reLaunch('/pages/review-done/index');
     await new Promise((r) => setTimeout(r, 1000));
     const page = await mp.currentPage();
     expect(page.path).toBe('pages/review-done/index');
