@@ -86,5 +86,5 @@
 
 ## 5. 提交
 
-- Commit 1 (功能): reviewClient + P08 handleGrade + App.tsx 路由 + P09 FORGOT variant + E2E spec
-- Commit hash: (见 git log)
+- Commit 1 (功能): `3484dfe` — reviewClient + P08 handleGrade + App.tsx 路由 + P09 FORGOT variant + E2E spec
+- Commit 2 (审计工件): `c6759a4` — playwright report + 12 screenshots + run.log
