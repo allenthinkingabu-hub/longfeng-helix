@@ -1,0 +1,119 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< com.longfeng:review-plan-service >------------------
+[INFO] Building review-plan-service 1.0.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+Downloading from apache.snapshots: https://repository.apache.org/snapshots/io/grpc/grpc-core/maven-metadata.xml
+[WARNING] Could not transfer metadata io.grpc:grpc-core/maven-metadata.xml from/to apache.snapshots (https://repository.apache.org/snapshots): transfer failed for https://repository.apache.org/snapshots/io/grpc/grpc-core/maven-metadata.xml
+Downloading from apache.snapshots: https://repository.apache.org/snapshots/io/grpc/grpc-api/maven-metadata.xml
+[WARNING] Could not transfer metadata io.grpc:grpc-api/maven-metadata.xml from/to apache.snapshots (https://repository.apache.org/snapshots): transfer failed for https://repository.apache.org/snapshots/io/grpc/grpc-api/maven-metadata.xml
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:resources (default-resources) @ review-plan-service ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:compile (default-compile) @ review-plan-service ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:testResources (default-testResources) @ review-plan-service ---
+[INFO] skip non existing resourceDirectory /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/backend/review-plan-service/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:testCompile (default-testCompile) @ review-plan-service ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.1.2:test (default-test) @ review-plan-service ---
+[INFO] 
+[INFO] --- maven-jar-plugin:3.3.0:jar (default-jar) @ review-plan-service ---
+[INFO] 
+[INFO] --- spring-boot-maven-plugin:3.2.5:repackage (repackage) @ review-plan-service ---
+[INFO] Replacing main artifact /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/backend/review-plan-service/target/review-plan-service-1.0.0-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/backend/review-plan-service/target/review-plan-service-1.0.0-SNAPSHOT.jar.original
+[INFO] 
+[INFO] --- maven-failsafe-plugin:3.1.2:integration-test (default) @ review-plan-service ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.longfeng.reviewplan.T06QuestionCreatedE2EIT
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+10:02:36.983 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.longfeng.reviewplan.Application for test class com.longfeng.reviewplan.T06QuestionCreatedE2EIT
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-05-15T10:02:38.239+04:00  INFO 84197 --- [review-plan-service] [           main] c.l.reviewplan.T06QuestionCreatedE2EIT   : Starting T06QuestionCreatedE2EIT using Java 17.0.13 with PID 84197 (started by allen in /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t06-backend-review-plan/backend/review-plan-service)
+2026-05-15T10:02:38.243+04:00  INFO 84197 --- [review-plan-service] [           main] c.l.reviewplan.T06QuestionCreatedE2EIT   : No active profile set, falling back to 1 default profile: "default"
+2026-05-15T10:02:40.418+04:00  INFO 84197 --- [review-plan-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-15T10:02:40.493+04:00  INFO 84197 --- [review-plan-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 66 ms. Found 3 JPA repository interfaces.
+2026-05-15T10:02:41.804+04:00  INFO 84197 --- [review-plan-service] [           main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=aa9e2ff3-1acf-3639-b37d-7dab7ddfe477
+2026-05-15T10:02:42.427+04:00  WARN 84197 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.apache.rocketmq.spring.autoconfigure.ListenerContainerConfiguration' of type [org.apache.rocketmq.spring.autoconfigure.ListenerContainerConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:02:42.435+04:00  WARN 84197 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.apache.rocketmq.spring.autoconfigure.MessageConverterConfiguration' of type [org.apache.rocketmq.spring.autoconfigure.MessageConverterConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:02:42.493+04:00  WARN 84197 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'createRocketMQMessageConverter' of type [org.apache.rocketmq.spring.support.RocketMQMessageConverter] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:02:42.511+04:00  WARN 84197 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration' of type [org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:02:42.523+04:00  WARN 84197 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:02:42.527+04:00  WARN 84197 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'loadBalancerClientsDefaultsMappingsProvider' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration$$Lambda$1098/0x00000001365e1a80] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:02:42.534+04:00  WARN 84197 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'defaultsBindHandlerAdvisor' of type [org.springframework.cloud.commons.config.DefaultsBindHandlerAdvisor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:02:42.547+04:00  WARN 84197 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration' of type [org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:02:42.552+04:00  WARN 84197 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'stringOrNumberMigrationVersionConverter' of type [org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration$StringOrNumberToMigrationVersionConverter] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:02:42.578+04:00  WARN 84197 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'rocketmq-org.apache.rocketmq.spring.autoconfigure.RocketMQProperties' of type [org.apache.rocketmq.spring.autoconfigure.RocketMQProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:02:42.588+04:00  WARN 84197 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'rocketMQMessageListenerContainerRegistrar' of type [org.apache.rocketmq.spring.support.RocketMQMessageListenerContainerRegistrar] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-15T10:02:43.077+04:00  INFO 84197 --- [review-plan-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+2026-05-15T10:02:43.092+04:00  INFO 84197 --- [review-plan-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-15T10:02:43.092+04:00  INFO 84197 --- [review-plan-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-05-15T10:02:43.205+04:00  INFO 84197 --- [review-plan-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-15T10:02:43.208+04:00  INFO 84197 --- [review-plan-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 4557 ms
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+2026-05-15T10:02:44.100+04:00  INFO 84197 --- [review-plan-service] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://127.0.0.1:15433/wrongbook (PostgreSQL 15.17)
+2026-05-15T10:02:44.222+04:00  INFO 84197 --- [review-plan-service] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 1.0.081
+2026-05-15T10:02:44.224+04:00  WARN 84197 --- [review-plan-service] [           main] o.f.core.internal.command.DbMigrate      : outOfOrder mode is active. Migration of schema "public" may not be reproducible.
+2026-05-15T10:02:44.229+04:00  INFO 84197 --- [review-plan-service] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-05-15T10:02:44.454+04:00  INFO 84197 --- [review-plan-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-15T10:02:44.539+04:00  INFO 84197 --- [review-plan-service] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-05-15T10:02:44.582+04:00  INFO 84197 --- [review-plan-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-15T10:02:44.801+04:00  INFO 84197 --- [review-plan-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-15T10:02:44.828+04:00  INFO 84197 --- [review-plan-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-15T10:02:44.890+04:00  INFO 84197 --- [review-plan-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@3f7bf0f6
+2026-05-15T10:02:44.892+04:00  INFO 84197 --- [review-plan-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-15T10:02:46.253+04:00  INFO 84197 --- [review-plan-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-15T10:02:46.331+04:00  INFO 84197 --- [review-plan-service] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-15T10:02:46.929+04:00  INFO 84197 --- [review-plan-service] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-05-15T10:02:48.946+04:00  INFO 84197 --- [review-plan-service] [           main] c.a.c.sentinel.SentinelWebMvcConfigurer  : [Sentinel Starter] register SentinelWebInterceptor with urlPatterns: [/**].
+2026-05-15T10:02:49.553+04:00  WARN 84197 --- [review-plan-service] [           main] o.a.r.s.a.RocketMQAutoConfiguration      : The necessary spring property 'rocketmq.name-server' is not defined, all rockertmq beans creation are skipped!
+2026-05-15T10:02:50.498+04:00  INFO 84197 --- [review-plan-service] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-05-15T10:02:51.114+04:00  INFO 84197 --- [review-plan-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 52659 (http) with context path ''
+2026-05-15T10:02:51.160+04:00  INFO 84197 --- [review-plan-service] [           main] c.l.reviewplan.T06QuestionCreatedE2EIT   : Started T06QuestionCreatedE2EIT in 13.594 seconds (process running for 15.852)
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-05-15T10:02:53.179+04:00 ERROR 84197 --- [review-plan-service] [           main] c.l.r.s.CalendarBatchCreateService       : calendar batchCreate retries exhausted · outbox row written · wrongItemId=9000060002 · size=7
+2026-05-15T10:02:53.242+04:00  INFO 84197 --- [review-plan-service] [           main] c.l.r.consumer.QuestionCreatedConsumer   : question.created success · itemId=9000060002 · 7 nodes created
+2026-05-15T10:02:53.404+04:00  INFO 84197 --- [review-plan-service] [           main] c.l.r.job.CalendarOutboxRelayJob         : calendar-outbox-relay dispatched · id=313556826723471360 · planId=313556823032483840
+2026-05-15T10:02:53.432+04:00  INFO 84197 --- [review-plan-service] [           main] c.l.r.job.CalendarOutboxRelayJob         : calendar-outbox-relay · scanned=1 · dispatched=1
+2026-05-15T10:02:53.627+04:00  INFO 84197 --- [review-plan-service] [           main] c.l.r.s.CalendarBatchCreateService       : calendar batchCreate ok · wrongItemId=9000060001 · size=7
+2026-05-15T10:02:53.657+04:00  INFO 84197 --- [review-plan-service] [           main] c.l.r.consumer.QuestionCreatedConsumer   : question.created success · itemId=9000060001 · 7 nodes created
+2026-05-15T10:02:53.758+04:00  INFO 84197 --- [review-plan-service] [           main] c.l.r.s.CalendarBatchCreateService       : calendar batchCreate ok · wrongItemId=9000060001 · size=7
+2026-05-15T10:02:53.777+04:00  INFO 84197 --- [review-plan-service] [           main] c.l.r.consumer.QuestionCreatedConsumer   : question.created success · itemId=9000060001 · 7 nodes created
+2026-05-15T10:02:53.841+04:00  INFO 84197 --- [review-plan-service] [           main] c.l.r.s.CalendarBatchCreateService       : calendar batchCreate ok · wrongItemId=9000060003 · size=7
+2026-05-15T10:02:53.868+04:00  INFO 84197 --- [review-plan-service] [           main] c.l.r.consumer.QuestionCreatedConsumer   : question.created success · itemId=9000060003 · 7 nodes created
+2026-05-15T10:02:53.877+04:00  INFO 84197 --- [review-plan-service] [           main] c.l.r.consumer.QuestionCreatedConsumer   : question.created duplicate · itemId=9000060003
+2026-05-15T10:02:54.002+04:00  INFO 84197 --- [review-plan-service] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-05-15T10:02:54.007+04:00  INFO 84197 --- [review-plan-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-05-15T10:02:54.011+04:00  INFO 84197 --- [review-plan-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 17.61 s -- in com.longfeng.reviewplan.T06QuestionCreatedE2EIT
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- maven-failsafe-plugin:3.1.2:verify (default) @ review-plan-service ---
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  02:55 min
+[INFO] Finished at: 2026-05-15T10:02:54+04:00
+[INFO] ------------------------------------------------------------------------
