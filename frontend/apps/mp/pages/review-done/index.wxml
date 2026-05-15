@@ -1,0 +1,174 @@
+<!-- P09 复习完成页 · 1:1 mirror design/mockups/wrongbook/09_review_done.html -->
+<!-- State machine: LOADING → RESULT | ALL_DONE | ERROR -->
+
+<!-- Hero celebration -->
+<view class="hero {{isForgot ? 'hero--forgot' : ''}}" data-test-id="{{testIds.celebrateHero}}">
+  <!-- Confetti particles -->
+  <view class="confetti" data-test-id="{{testIds.confettiBurst}}">
+    <view
+      wx:for="{{confetti}}"
+      wx:key="index"
+      class="confetti-particle"
+      style="left:{{item.left}};top:{{item.top}};background:{{item.bg}};transform:rotate({{item.rotate}}deg);"
+    />
+  </view>
+
+  <!-- Hero checkmark icon -->
+  <view class="hero-icon" data-test-id="{{testIds.heroCheckmark}}">
+    <view class="hero-icon-core">
+      <image class="hero-icon-svg" src="/images/hero-check.svg" mode="aspectFit" />
+    </view>
+  </view>
+
+  <view class="hero-kicker">Review complete</view>
+  <view class="hero-title" data-test-id="{{testIds.heroTitle}}">
+    <block wx:if="{{pageState === 'ALL_DONE'}}">今日复习全部完成 🎉</block>
+    <block wx:elif="{{isForgot}}">需要再练习</block>
+    <block wx:else>本题已掌握</block>
+  </view>
+  <view class="hero-sub">
+    <block wx:if="{{pageState === 'ALL_DONE'}}">共完成 {{sessionStats.total}} 题 · 掌握 {{sessionStats.mastered}} 题</block>
+    <block wx:else>记忆曲线向前推进一节点 · {{prevT}} → {{nextT}}</block>
+  </view>
+
+  <view class="hero-chips">
+    <block wx:if="{{pageState === 'ALL_DONE'}}">
+      <view class="hero-chip" data-test-id="{{testIds.heroStreakNumber}}">连续 {{sessionStats.done}} 题</view>
+    </block>
+    <block wx:else>
+      <view class="hero-chip">+{{result.intervalAfter - result.intervalBefore}} 记忆度</view>
+      <view class="hero-chip">连续 {{sessionStats.done}} 题</view>
+      <view class="hero-chip">耗时 {{durationFormatted}}</view>
+    </block>
+  </view>
+</view>
+
+<!-- Skeleton (LOADING) -->
+<view wx:if="{{pageState === 'LOADING'}}" class="skeleton">
+  <view class="skeleton-card" />
+  <view class="skeleton-bar" style="width:60%;" />
+  <view class="skeleton-bar" style="width:85%;" />
+  <view class="skeleton-card" />
+</view>
+
+<!-- Scroll content (RESULT / ALL_DONE) -->
+<scroll-view wx:if="{{pageState !== 'LOADING'}}" class="scroll" scroll-y>
+
+  <!-- Memory curve card -->
+  <view class="block-title">
+    <view class="block-title-dot" />
+    <text>记忆曲线进度</text>
+  </view>
+
+  <view class="card" data-test-id="{{testIds.memoryCurve}}">
+    <view class="mc-head">
+      <view>
+        <view class="mc-title">记忆节点进度</view>
+        <view class="mc-sub">复习计划 · 艾宾浩斯遗忘曲线</view>
+      </view>
+      <view class="mc-right">
+        <view class="mc-mastery">{{masteryPct}}%</view>
+        <view class="mc-mastery-label">Mastery</view>
+      </view>
+    </view>
+
+    <!-- 6-node timeline -->
+    <view class="nodes-container">
+      <view class="nodes-row">
+        <view
+          wx:for="{{tLevels}}"
+          wx:key="label"
+          class="node"
+        >
+          <view class="node-dot {{item.dotClass}}" />
+          <text class="node-label {{item.labelClass}}">{{item.label}}</text>
+          <text class="node-date">{{item.interval}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- AI Advance Banner -->
+    <view class="advance" data-test-id="{{testIds.advanceBanner}}">
+      <view class="advance-icon">★</view>
+      <view class="advance-text" data-test-id="{{testIds.advanceBannerText}}">
+        AI 已按艾宾浩斯模型推进节点，下次复习节点 <text class="advance-text-em">{{nextT}}</text>（{{result.intervalAfter}} 天后），未来 6 次提醒已自动更新。
+      </view>
+    </view>
+  </view>
+
+  <!-- Next Due Card -->
+  <view class="next-card" data-test-id="{{testIds.nextDueCard}}">
+    <view class="next-left">
+      <view class="next-icon">📅</view>
+      <view>
+        <view class="next-kicker">下次复习</view>
+        <view class="next-date">{{nextDueFormatted}}</view>
+        <view class="next-memo">提前 30 min 提醒 · 24h 有效窗口</view>
+      </view>
+    </view>
+    <view
+      class="add-calendar-btn {{calendarSubscribed ? 'add-calendar-btn--done' : ''}}"
+      data-test-id="{{testIds.addCalendarBtn}}"
+      bind:tap="onAddCalendar"
+    >
+      {{calendarSubscribed ? '已添加' : '+ 日历'}}
+    </view>
+  </view>
+
+  <!-- Stats Row -->
+  <view class="block-title" style="margin-top:32rpx;">
+    <view class="block-title-dot" style="background:#007AFF;" />
+    <text>今日复习战绩</text>
+    <text class="block-title-right">已完成 {{sessionStats.done}} / {{sessionStats.total}} · 剩余 {{sessionStats.total - sessionStats.done}} 题</text>
+  </view>
+  <view class="stats" data-test-id="{{testIds.statsRow}}">
+    <view class="stat" data-test-id="{{testIds.statsMastered}}">
+      <view class="stat-big stat-green">{{sessionStats.mastered}}</view>
+      <view class="stat-label">Mastered</view>
+    </view>
+    <view class="stat" data-test-id="{{testIds.statsPartial}}">
+      <view class="stat-big stat-blue">{{sessionStats.partial}}</view>
+      <view class="stat-label">Partial</view>
+    </view>
+    <view class="stat" data-test-id="{{testIds.statsForgot}}">
+      <view class="stat-big stat-orange">{{sessionStats.forgot}}</view>
+      <view class="stat-label">Forgot</view>
+    </view>
+  </view>
+
+  <!-- KP Chart -->
+  <view class="block-title" style="margin-top:32rpx;">
+    <view class="block-title-dot" style="background:#5856D6;" />
+    <text>知识点掌握变化</text>
+  </view>
+  <view class="kp-list" data-test-id="{{testIds.kpChart}}">
+    <view wx:for="{{kpDelta}}" wx:key="kp" class="kp-row">
+      <view class="kp-square" style="background:{{kpColors[index]}};" />
+      <text class="kp-name">{{item.kp}}</text>
+      <view class="kp-bar">
+        <view class="kp-bar-fill" style="width:{{item.newPct}}%;background:{{kpGradients[index]}};" />
+      </view>
+      <text class="kp-pct">{{item.newPct}}%</text>
+    </view>
+  </view>
+
+</scroll-view>
+
+<!-- CTA dock -->
+<view wx:if="{{pageState !== 'LOADING'}}" class="cta" data-test-id="{{testIds.ctaRow}}">
+  <van-button
+    custom-class="btn-sec"
+    data-test-id="{{testIds.ctaEndBtn}}"
+    bind:click="onEnd"
+  >结束本次</van-button>
+  <van-button
+    wx:if="{{pageState !== 'ALL_DONE'}}"
+    type="primary"
+    custom-class="btn-pri"
+    data-test-id="{{testIds.ctaContinueBtn}}"
+    bind:click="onContinue"
+  >继续复习 · 第 {{sessionStats.done + 1}} 题</van-button>
+</view>
+
+<!-- Toast -->
+<van-toast id="van-toast" />

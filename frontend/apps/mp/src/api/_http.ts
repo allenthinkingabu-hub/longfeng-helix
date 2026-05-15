@@ -1,20 +1,14 @@
-/**
- * MP HTTP client · 双 runtime adapter
- * - 微信小程序运行时: 用 wx.request
- * - Node 测试运行时 (vitest): 用 global fetch
- *
- * 这层抽象保证 api/*.ts 业务模块代码相同，pages/*/index.ts 真 MP runtime 调真 wx.request，
- * test/api/*.integration.spec.ts vitest 跑接真 backend port (无 wx · 用 fetch)。
- *
- * Backend port map (vite.config.ts 对齐):
- * - /api/file  → http://localhost:8084 (file-service)
- * - /api/wb    → http://localhost:8082 (wrongbook-service)
- * - /api/ai    → http://localhost:8083 (ai-analysis-service)
- * - /api/review→ http://localhost:8085 (review-plan-service)
- * - /s3        → http://localhost:9000 (MinIO)
- */
+// MP HTTP client - dual runtime adapter
+// wx runtime: wx.request | Node test runtime (vitest): global fetch
+// Port map: file=8084 wb=8082 ai=8083 review=8085 s3=9000
 
 declare const wx: any;
+declare const process: { env: Record<string, string | undefined> };
+declare function fetch(url: string, init?: RequestInit): Promise<Response>;
+declare class AbortController { signal: AbortSignal; abort(): void; }
+declare interface RequestInit { method?: string; headers?: Record<string, string>; body?: string; signal?: AbortSignal; }
+declare interface Response { ok: boolean; status: number; statusText: string; json(): Promise<unknown>; }
+declare interface AbortSignal {}
 
 const BACKEND_HOST = process.env.MP_BACKEND_HOST || 'http://localhost';
 
