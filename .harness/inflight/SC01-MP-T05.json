@@ -5,9 +5,9 @@
     "team_id": "team-3",
     "title": "PHASE-C MP wave-1 · SC01-MP-T05 · P04 result 1:1 mirror H5 mockup (人工视觉验收路线)",
     "attempt": 3,
-    "phase": "coder",
+    "phase": "tester",
     "dev_done": true,
-    "passes": false,
+    "passes": true,
     "retries": 0,
     "audit_retries": 2,
     "git_commits": [
@@ -17,8 +17,9 @@
   "work_log_dir": "audits/runs/SC01-MP-T05/team-3/attempt-3",
   "log_requirements": {
     "must_write": [
-      "coder.md",
-      "bugs-found.md"
+      "tester.md",
+      "adversarial.md",
+      "test-reports/"
     ]
   },
   "audit_gate": "audit.js v1 relaxed (PHASE-C 人工视觉路线) · 验 tsc PASS + mockup baseline 4-state 截图落盘 + spec-trace.md · NO automator E2E · mock ≤ 5 · 强制 git commit work_log",
@@ -146,12 +147,11 @@
     "branch_name": "claude/sc01-mp-t05-result"
   },
   "physical_verification": {
-    "dor_c1_to_c6_required": true
+    "dor_c1_to_c6_required": false
   },
   "permissions": {
     "writable_fields": [
-      "task.dev_done",
-      "task.git_commits"
+      "task.passes"
     ]
   },
   "deliverables_definition_of_done": [
@@ -166,6 +166,6 @@
     "9. node .harness/harness.js --advance=SC01-MP-T05"
   ],
   "rule_6_tool_budget_guidance": "PHASE-C wave-1 单 page 1:1 mirror + 4 screenshot + tsc · 预计 ~40-60 tool use · 软线 50 self-check · 70 surface · 85 forced compaction summary",
-  "written_at": "2026-05-15T13:01:33.061Z",
+  "written_at": "2026-05-15T13:03:16.823Z",
   "written_by": "TL agent (PHASE-C wave-1 spawn prep · 人工视觉路线)"
 }
