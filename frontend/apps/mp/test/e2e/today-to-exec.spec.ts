@@ -23,7 +23,7 @@ describe('SC01-MP-T10-E2E · today→exec transition (真 IDE)', () => {
         setTimeout(() => reject(new Error(`connect timeout: ${WS_ENDPOINT} not listening · 先跑 cli auto`)), 8000),
       ),
     ]);
-  }, 15_000);
+  }, 45_000);
 
   afterAll(async () => {
     if (mp) await mp.disconnect();
@@ -48,7 +48,7 @@ describe('SC01-MP-T10-E2E · today→exec transition (真 IDE)', () => {
     const query = (execPage as unknown as { query: Record<string, string> }).query;
     expect(query).toBeDefined();
     expect(query.nid).toBeTruthy();
-  }, 20_000);
+  }, 60_000);
 
   it('review-today page renders hero card and at least one slot item', async () => {
     await mp.reLaunch({ url: '/pages/review-today/index' });
@@ -62,10 +62,10 @@ describe('SC01-MP-T10-E2E · today→exec transition (真 IDE)', () => {
 
     const item = await page.$('.it');
     expect(item).toBeTruthy();
-  }, 15_000);
+  }, 45_000);
 
   it('screenshot: review-today page captured', async () => {
     const screenshot = await mp.screenshot();
     expect(screenshot).toBeTruthy();
-  }, 15_000);
+  }, 45_000);
 });

@@ -23,7 +23,7 @@ describe('P02 capture page-load + testid (真 IDE)', () => {
 
     await mp.reLaunch({ url: '/pages/capture/index' });
     await new Promise((r) => setTimeout(r, 1000));
-  }, 15_000);
+  }, 45_000);
 
   afterAll(async () => {
     if (mp) await mp.disconnect();

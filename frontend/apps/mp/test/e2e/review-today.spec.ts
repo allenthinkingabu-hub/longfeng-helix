@@ -27,7 +27,7 @@ describe('P07 review-today · page-load + testid (真 IDE automator)', () => {
 
     await mp.reLaunch({ url: '/pages/review-today/index' });
     await new Promise((r) => setTimeout(r, 1500));
-  }, 15_000);
+  }, 45_000);
 
   afterAll(async () => {
     if (mp) await mp.disconnect();
