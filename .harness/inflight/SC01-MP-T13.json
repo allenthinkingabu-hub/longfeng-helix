@@ -5,16 +5,22 @@
     "team_id": "team-5",
     "title": "PHASE-C MP wave-1 · SC01-MP-T13 · P09 review-done 1:1 mirror H5 mockup (人工视觉验收路线)",
     "attempt": 1,
-    "phase": "coder",
+    "phase": "tester",
     "dev_done": true,
-    "passes": false,
+    "passes": true,
     "retries": 0,
     "audit_retries": 0,
-    "git_commits": ["acd3fe8"]
+    "git_commits": [
+      "acd3fe8"
+    ]
   },
   "work_log_dir": "audits/runs/SC01-MP-T13/team-5/attempt-1",
   "log_requirements": {
-    "must_write": ["coder.md", "bugs-found.md"]
+    "must_write": [
+      "tester.md",
+      "adversarial.md",
+      "test-reports/"
+    ]
   },
   "audit_gate": "audit.js v1 relaxed (PHASE-C 人工视觉路线) · 验 tsc PASS + mockup baseline 4-state 截图落盘 + spec-trace.md · NO automator E2E · mock ≤ 5 · 强制 git commit work_log",
   "previous_audit_verdict": null,
@@ -39,7 +45,11 @@
       "真起 微信工具 IDE (Coder 不做 · 由 TL 用户人工验收)",
       "backend API 真接 (mock fixture 即可 · 不超 5 mock)"
     ],
-    "sandbox": {"pg_port": 15436, "redis_port": 16383, "minio_api_port": 9008},
+    "sandbox": {
+      "pg_port": 15436,
+      "redis_port": 16383,
+      "minio_api_port": 9008
+    },
     "mockup_chain": "design/mockups/wrongbook/09_review_done.html (设计真相 SoT · 1:1 mirror)"
   },
   "isolation": {
@@ -48,11 +58,12 @@
     "branch_name": "claude/sc01-mp-t13-review-done"
   },
   "physical_verification": {
-    "dor_c1_to_c6_required": false,
-    "rationale": "PHASE-C 人工视觉路线 · DoR C-2/C-4/c4b automator E2E 不适用 · 改 tsc PASS + 4 截图 + spec-trace.md"
+    "dor_c1_to_c6_required": false
   },
   "permissions": {
-    "writable_fields": ["task.dev_done", "task.git_commits"]
+    "writable_fields": [
+      "task.passes"
+    ]
   },
   "deliverables_definition_of_done": [
     "1. frontend/apps/mp/pages/review-done/index.{json,wxml,wxss,ts} 全 1:1 mirror mockup",
@@ -66,6 +77,6 @@
     "9. node .harness/harness.js --advance=SC01-MP-T13"
   ],
   "rule_6_tool_budget_guidance": "PHASE-C wave-1 单 page 1:1 mirror + 4 screenshot + tsc · 预计 ~40-60 tool use · 软线 50 self-check · 70 surface · 85 forced compaction summary",
-  "written_at": "2026-05-15T08:00:00.000Z",
+  "written_at": "2026-05-15T12:54:16.477Z",
   "written_by": "TL agent (PHASE-C wave-1 spawn prep · 人工视觉路线)"
 }

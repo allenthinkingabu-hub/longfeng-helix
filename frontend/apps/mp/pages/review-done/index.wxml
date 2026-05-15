@@ -58,13 +58,14 @@
   <view class="block-title">
     <view class="block-title-dot" />
     <text>记忆曲线进度</text>
+    <text class="block-title-right">题目 #{{result.wrongItemId}} · {{questionSubject}} · {{questionTopic}}</text>
   </view>
 
   <view class="card" data-test-id="{{testIds.memoryCurve}}">
     <view class="mc-head">
       <view>
-        <view class="mc-title">记忆节点进度</view>
-        <view class="mc-sub">复习计划 · 艾宾浩斯遗忘曲线</view>
+        <view class="mc-title">{{questionTitle}}</view>
+        <view class="mc-sub">知识点 · {{questionKpSummary}}</view>
       </view>
       <view class="mc-right">
         <view class="mc-mastery">{{masteryPct}}%</view>
