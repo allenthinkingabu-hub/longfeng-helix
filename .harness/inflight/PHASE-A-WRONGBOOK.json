@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "PHASE-A-WRONGBOOK",
+    "team_id": "team-2",
+    "title": "PHASE-A · wrongbook-service 业务实施 (Coder 自反推 entity/repo/service/controller + Flyway + IT)",
+    "attempt": 3,
+    "phase": "done",
+    "dev_done": true,
+    "passes": true,
+    "retries": 0,
+    "audit_retries": 2,
+    "git_commits": [
+      "7ea3934",
+      "f73b941",
+      "3a7de9e",
+      "21219d8",
+      "4666881",
+      "7aaa90e",
+      "eca67a4",
+      "1c55245"
+    ]
+  },
+  "work_log_dir": "audits/runs/PHASE-A-WRONGBOOK/team-2/attempt-3",
+  "log_requirements": {
+    "must_write": [
+      "tester.md",
+      "adversarial.md",
+      "test-reports/"
+    ]
+  },
+  "audit_gate": "audit.js v1 五维度严卡 (用户红线: 真实测试不可妥协) || dim 1 coder_compliance: coder.md 4 关键词 (地形侦察/编码/自检/提交) + bugs-found.md 真 bug list || dim 2 tester_compliance: tester.md + adversarial.md ≥1 REJECT + ≥1 fix · test-reports/ 含真 surefire+failsafe XML · mock 总闭集 ≤ 5 || dim 3 bug_reality: git_commits[] 全部 git cat-file -e 验真 || dim 4 test_validity: tester.md 声称 testcase 数 == surefire/failsafe XML <testcase> 实际数 (差 1 即 FAIL) || dim 5 spec_alignment: dor_c1_to_c6_required=false → skip · 但 IT 必须用 Testcontainers 接 sandbox 容器 (PG:15433, Redis:16380, MinIO:9002) · 禁止 H2/embedded/Mock 后端 || mvn verify BUILD SUCCESS 是 dev_done=true 唯一硬条件 · failsafe 必须真跑 IT (非 mvn test)",
+  "previous_audit_verdict": {
+    "task_id": "PHASE-A-WRONGBOOK",
+    "attempt": 2,
+    "team_id": "team-2",
+    "audited_at": "2026-05-14T19:46:59.622Z",
+    "audited_by": "audit.js v1 (deterministic · 5 dims)",
+    "pass": false,
+    "checks": [
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_exists",
+        "pass": false,
+        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/team-2-wrongbook/audits/runs/PHASE-A-WRONGBOOK/team-2/attempt-2/coder.md"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "bugs_found_md_exists",
+        "pass": false,
+        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/team-2-wrongbook/audits/runs/PHASE-A-WRONGBOOK/team-2/attempt-2/bugs-found.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "tester_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/team-2-wrongbook/audits/runs/PHASE-A-WRONGBOOK/team-2/attempt-2/tester.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/team-2-wrongbook/audits/runs/PHASE-A-WRONGBOOK/team-2/attempt-2/adversarial.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "test_reports_nonempty",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/team-2-wrongbook/audits/runs/PHASE-A-WRONGBOOK/team-2/attempt-2/test-reports"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_has_reject_round",
+        "pass": true,
+        "evidence": "REJECT/驳回 keyword found"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_has_fix_round",
+        "pass": true,
+        "evidence": "fix/修复 keyword found"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "mock_total_le_5",
+        "pass": true,
+        "evidence": "mock=0/5 (none)"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "maxDiffPixels_le_500",
+        "pass": true,
+        "evidence": "max=0/500"
+      },
+      {
+        "dimension": "bug_reality",
+        "name": "all_git_commits_verified",
+        "pass": true,
+        "evidence": "7/7 hash(es) git cat-file -e PASS"
+      },
+      {
+        "dimension": "test_validity",
+        "name": "tester_md_testcase_count_matches_xml",
+        "pass": true,
+        "evidence": "claimed=14 == xml<testcase>=14"
+      },
+      {
+        "dimension": "test_validity",
+        "name": "adversarial_has_exploratory_keywords",
+        "pass": true,
+        "evidence": "9 matched: [注入,inject,超长,脏数据,boundary]"
+      },
+      {
+        "dimension": "spec_alignment",
+        "name": "dor_e2e_required",
+        "pass": true,
+        "evidence": "inflight.physical_verification.dor_c1_to_c6_required=false — DoR skipped (P0 audit task)"
+      }
+    ],
+    "redo_target": "coder",
+    "redo_reason": "[coder_compliance.coder_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/team-2-wrongbook/audits/runs/PHASE-A-WRONGBOOK/team-2/attempt-2/coder.md · [coder_compliance.bugs_found_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/team-2-wrongbook/audits/runs/PHASE-A-WRONGBOOK/team-2/attempt-2/bugs-found.md"
+  },
+  "context": {
+    "scenario": "PHASE-A 5-team 并行 · wrongbook-service 业务实施",
+    "target_service": "backend/wrongbook-service",
+    "sandbox": {
+      "pg_port": 15433,
+      "redis_port": 16380,
+      "minio_api_port": 9002,
+      "pg_user": "longfeng",
+      "pg_password": "longfeng_dev",
+      "pg_db": "wrongbook"
+    },
+    "sandbox_endpoints_for_testcontainers": {
+      "pg_jdbc": "jdbc:postgresql://localhost:15433/wrongbook",
+      "redis": "redis://localhost:16380",
+      "minio_s3": "http://localhost:9002",
+      "note": "Testcontainers 必须接这些 sandbox 容器 endpoint · 禁止 H2/embedded/Mock"
+    },
+    "spec_refs": "A01-wrongbook-schema.md + A02-wrongbook-api.md",
+    "arch_docs": [
+      "backend/BACKEND_GUIDANCE.md",
+      "audits/SC-01-PHASE-0/A01-wrongbook-schema.md + A02-wrongbook-api.md"
+    ],
+    "biz_refs": [
+      "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2A.4 (S3..S7 service 划分)",
+      "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B (SC-01 业务流)"
+    ],
+    "existing_code_summary": "0 (greenfield · Application skeleton 已建)",
+    "reference_attempt": "audits/runs/PHASE-0-MONOREPO/team-1/attempt-1 (Coder work_log 标杆 · audit PASS 5dims 18checks)",
+    "anti_stub_gap_directive": "基于 PHASE-0 attempt-1 教训: 写任何 stub 前必须先 grep -rE 测试文件全部外部符号清单, 一次性写齐, 不准漏。然后才开始编码 main sources."
+  },
+  "isolation": {
+    "worktree_disabled": false,
+    "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/team-2-wrongbook",
+    "branch_name": "claude/phase-a-wrongbook"
+  },
+  "physical_verification": {
+    "dor_c1_to_c6_required": false
+  },
+  "permissions": {
+    "writable_fields": [
+      "task.passes"
+    ]
+  },
+  "written_at": "2026-05-14T19:48:08.358Z",
+  "written_by": "TL agent (PHASE-A spawn prep)",
+  "deliverables_definition_of_done": [
+    "1. 完整实现 src/main/java 业务层 (entity/repo/service/controller/config)",
+    "2. 写 Flyway migration SQL (file-service: file_asset+wb_file 表 · wrongbook: V1.0.001-039 含 wrong_item/wb_file/question · 其他 service 按需)",
+    "3. 补全 PHASE-0 stub 占位为真业务方法 (不能用空 stub 凑编译过)",
+    "4. application.yml 接 sandbox endpoint (从 inflight context.sandbox.* 读)",
+    "5. 启用 src/test/java 现有 IT 文件 (从 wrongbook-parent testExcludes 移除 *IT.java 或 module 级 surefire/failsafe profile)",
+    "6. 跑 mvn verify BUILD SUCCESS (failsafe 真跑 IT · Testcontainers 接 sandbox · 不是 mvn test)",
+    "7. work_log: coder.md (5 段落含关键词) + bugs-found.md (真 bug list)",
+    "8. git commit 分批 (entity/repo/service/controller/Flyway/IT 各 1 commit)",
+    "9. inflight dev_done=true + git_commits[] 全填",
+    "10. 调 node .harness/harness.js --advance=PHASE-A-WRONGBOOK"
+  ],
+  "rule_6_tool_budget_guidance": "PHASE-A 业务实施 · 预计 ~60-80 tool use · 过 50 自检 · 过 70 surface · 过 85 立即 Rule 6.5 compaction summary 后 return"
+}

@@ -1,0 +1,141 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] wrongbook-parent                                                   [pom]
+[INFO] common                                                             [jar]
+[INFO] wrongbook-service                                                  [jar]
+[INFO] 
+[INFO] -------------------< com.longfeng:wrongbook-parent >--------------------
+[INFO] Building wrongbook-parent 1.0.0-SNAPSHOT                           [1/3]
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] ------------------------< com.longfeng:common >-------------------------
+[INFO] Building common 1.0.0-SNAPSHOT                                     [2/3]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:resources (default-resources) @ common ---
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:compile (default-compile) @ common ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:testResources (default-testResources) @ common ---
+[INFO] skip non existing resourceDirectory /Users/allen/workspace/longfeng/.claude/worktrees/team-2-wrongbook/backend/common/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:testCompile (default-testCompile) @ common ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.1.2:test (default-test) @ common ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- maven-jar-plugin:3.3.0:jar (default-jar) @ common ---
+[INFO] 
+[INFO] -------------------< com.longfeng:wrongbook-service >-------------------
+[INFO] Building wrongbook-service 1.0.0-SNAPSHOT                          [3/3]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:resources (default-resources) @ wrongbook-service ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:compile (default-compile) @ wrongbook-service ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:testResources (default-testResources) @ wrongbook-service ---
+[INFO] skip non existing resourceDirectory /Users/allen/workspace/longfeng/.claude/worktrees/team-2-wrongbook/backend/wrongbook-service/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:testCompile (default-testCompile) @ wrongbook-service ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.1.2:test (default-test) @ wrongbook-service ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.longfeng.wrongbook.ApplicationTests
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.087 s -- in com.longfeng.wrongbook.ApplicationTests
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- maven-jar-plugin:3.3.0:jar (default-jar) @ wrongbook-service ---
+[INFO] 
+[INFO] --- spring-boot-maven-plugin:3.2.5:repackage (repackage) @ wrongbook-service ---
+[INFO] Replacing main artifact /Users/allen/workspace/longfeng/.claude/worktrees/team-2-wrongbook/backend/wrongbook-service/target/wrongbook-service-1.0.0-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /Users/allen/workspace/longfeng/.claude/worktrees/team-2-wrongbook/backend/wrongbook-service/target/wrongbook-service-1.0.0-SNAPSHOT.jar.original
+[INFO] 
+[INFO] --- maven-failsafe-plugin:3.1.2:integration-test (default) @ wrongbook-service ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.longfeng.wrongbook.WrongbookServiceIT
+23:32:39.256 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.longfeng.wrongbook.WrongbookServiceIT]: WrongbookServiceIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+23:32:39.454 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.longfeng.wrongbook.Application for test class com.longfeng.wrongbook.WrongbookServiceIT
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-05-14T23:32:40.421+04:00  INFO 4058 --- [wrongbook-service] [           main] c.longfeng.wrongbook.WrongbookServiceIT  : Starting WrongbookServiceIT using Java 17.0.13 with PID 4058 (started by allen in /Users/allen/workspace/longfeng/.claude/worktrees/team-2-wrongbook/backend/wrongbook-service)
+2026-05-14T23:32:40.423+04:00  INFO 4058 --- [wrongbook-service] [           main] c.longfeng.wrongbook.WrongbookServiceIT  : No active profile set, falling back to 1 default profile: "default"
+2026-05-14T23:32:41.784+04:00  INFO 4058 --- [wrongbook-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-14T23:32:41.964+04:00  INFO 4058 --- [wrongbook-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 170 ms. Found 4 JPA repository interfaces.
+2026-05-14T23:32:42.980+04:00  INFO 4058 --- [wrongbook-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+2026-05-14T23:32:42.991+04:00  INFO 4058 --- [wrongbook-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-14T23:32:42.991+04:00  INFO 4058 --- [wrongbook-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-05-14T23:32:43.069+04:00  INFO 4058 --- [wrongbook-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-14T23:32:43.071+04:00  INFO 4058 --- [wrongbook-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2554 ms
+2026-05-14T23:32:43.851+04:00  INFO 4058 --- [wrongbook-service] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://127.0.0.1:15433/wrongbook (PostgreSQL 15.17)
+2026-05-14T23:32:43.899+04:00  INFO 4058 --- [wrongbook-service] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-05-14T23:32:43.904+04:00  INFO 4058 --- [wrongbook-service] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 1 migration (execution time 00:00.020s)
+2026-05-14T23:32:43.929+04:00  INFO 4058 --- [wrongbook-service] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-05-14T23:32:44.049+04:00  INFO 4058 --- [wrongbook-service] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-05-14T23:32:44.109+04:00  INFO 4058 --- [wrongbook-service] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1.0.001 - wrongbook service tables"
+2026-05-14T23:32:44.271+04:00  INFO 4058 --- [wrongbook-service] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 1 migration to schema "public", now at version v1.0.001 (execution time 00:00.071s)
+2026-05-14T23:32:44.680+04:00  INFO 4058 --- [wrongbook-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-14T23:32:44.761+04:00  INFO 4058 --- [wrongbook-service] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-05-14T23:32:44.816+04:00  INFO 4058 --- [wrongbook-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-14T23:32:45.081+04:00  INFO 4058 --- [wrongbook-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-14T23:32:45.122+04:00  INFO 4058 --- [wrongbook-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-14T23:32:45.173+04:00  INFO 4058 --- [wrongbook-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5f369fc6
+2026-05-14T23:32:45.176+04:00  INFO 4058 --- [wrongbook-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-14T23:32:46.519+04:00  INFO 4058 --- [wrongbook-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-14T23:32:46.601+04:00  INFO 4058 --- [wrongbook-service] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-14T23:32:47.117+04:00  INFO 4058 --- [wrongbook-service] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-05-14T23:32:48.040+04:00  INFO 4058 --- [wrongbook-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 61658 (http) with context path ''
+2026-05-14T23:32:48.055+04:00  INFO 4058 --- [wrongbook-service] [           main] c.longfeng.wrongbook.WrongbookServiceIT  : Started WrongbookServiceIT in 8.124 seconds (process running for 9.97)
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-05-14T23:32:48.990+04:00  INFO 4058 --- [wrongbook-service] [o-auto-1-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-14T23:32:48.991+04:00  INFO 4058 --- [wrongbook-service] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-05-14T23:32:48.997+04:00  INFO 4058 --- [wrongbook-service] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 5 ms
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.49 s -- in com.longfeng.wrongbook.WrongbookServiceIT
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- maven-failsafe-plugin:3.1.2:verify (default) @ wrongbook-service ---
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for wrongbook-parent 1.0.0-SNAPSHOT:
+[INFO] 
+[INFO] wrongbook-parent ................................... SUCCESS [  0.005 s]
+[INFO] common ............................................. SUCCESS [  1.996 s]
+[INFO] wrongbook-service .................................. SUCCESS [ 15.648 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  18.508 s
+[INFO] Finished at: 2026-05-14T23:32:50+04:00
+[INFO] ------------------------------------------------------------------------
