@@ -1,0 +1,131 @@
+<!-- P03 AI 分析中 · 1:1 mirror design/mockups/wrongbook/03_analyzing.html -->
+<!-- State machine: init → analyzing → success | error -->
+
+<!-- Nav bar -->
+<view class="nav">
+  <view class="nav-row">
+    <view class="back" bind:tap="onBackTap">
+      <text class="back-chevron">&lt;</text>
+      <text>拍题</text>
+    </view>
+    <view class="nav-cancel" bind:tap="onCancelTap">
+      <text class="nav-cancel-text">取消</text>
+    </view>
+  </view>
+  <view class="nav-title-row">
+    <text class="nav-title">{{ statusText }}</text>
+    <view class="badge">
+      <text class="badge-text">{{ doneCount }} / 4</text>
+    </view>
+  </view>
+</view>
+
+<!-- Content area -->
+<view class="content">
+
+  <!-- Preview card (mockup: .preview) -->
+  <view class="preview" data-test-id="p03-thumb-card">
+    <view class="thumb" data-test-id="p03-thumb-card-image">
+      <text class="thumb-lbl">{{ subjectLabel }} · 12</text>
+      <text class="thumb-qno">17</text>
+      <text class="thumb-h3">已知 f(x)=x²-4x+3</text>
+      <view class="thumb-strk"></view>
+      <text class="thumb-pen">B</text>
+    </view>
+    <view class="meta">
+      <text class="meta-title" data-test-id="p03-thumb-card-title">第 17 题 · 顶点与对称轴</text>
+      <view class="meta-chips">
+        <text class="chip">{{ subjectLabel }}</text>
+        <text class="chip">G9</text>
+        <text class="chip">2026-04-21 14:28</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Model badge (mockup: .model) -->
+  <view class="model-badge" data-test-id="analyzing-pipeline-model-badge">
+    <view class="model-dot"></view>
+    <text class="model-text">已选模型 <text class="model-bold">{{ currentModel }}</text> · 备用 <text class="model-bold">{{ backupModel }}</text> · 平均时延 <text class="model-bold">4.2s</text></text>
+  </view>
+
+  <!-- Fallback / error banner -->
+  <view wx:if="{{ showBanner }}" class="banner {{ errorMsg ? 'banner-error' : 'banner-slow' }}" data-test-id="p03-fallback-banner">
+    <text>{{ errorMsg || '切换备用模型中（gpt-4o-mini）…' }}</text>
+  </view>
+
+  <!-- 4-step pipeline (mockup: .stages) -->
+  <view class="stages" data-test-id="analyzing-pipeline">
+    <view
+      wx:for="{{ steps }}"
+      wx:key="step"
+      class="step step-{{ item.state }}"
+      data-test-id="analyzing-pipeline-step-{{ item.step }}"
+    >
+      <!-- Connector line -->
+      <view wx:if="{{ index > 0 }}" class="step-connector"></view>
+
+      <!-- Step icon -->
+      <view class="step-ico ico-{{ item.state }}">
+        <van-icon wx:if="{{ item.state === 'done' }}" name="success" color="#fff" size="28rpx" />
+        <van-icon wx:elif="{{ item.state === 'fail' }}" name="cross" color="#fff" size="28rpx" />
+        <text wx:else class="ico-num">{{ item.step }}</text>
+      </view>
+
+      <!-- Step body -->
+      <view class="step-body">
+        <view class="step-title-row">
+          <text class="step-title {{ item.state === 'now' ? 'step-title-active' : '' }} {{ item.state === 'wait' ? 'step-title-wait' : '' }}">{{ item.label }}</text>
+          <text wx:if="{{ item.state === 'done' && item.duration }}" class="step-duration">· {{ item.duration }}</text>
+        </view>
+        <text class="step-desc {{ item.state === 'now' ? 'step-desc-active' : '' }}">{{ item.desc }}</text>
+        <!-- Shimmer bar for active step -->
+        <view wx:if="{{ item.state === 'now' }}" class="shim">
+          <view class="shim-bar"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Streaming JSON terminal (mockup: .stream) -->
+  <view class="stream" data-test-id="analyzing-pipeline-json-stream">
+    <view class="stream-hdr">
+      <text class="stream-hdr-text">SSE · /api/ai/stream · {{ currentModel }}</text>
+      <view class="stream-dots">
+        <view class="dot dot-red"></view>
+        <view class="dot dot-yellow"></view>
+        <view class="dot dot-green"></view>
+      </view>
+    </view>
+    <text class="stream-pre">{{ streamOutput }}</text>
+  </view>
+
+</view>
+
+<!-- Cancel sticky button (mockup: .cancel) -->
+<view class="cancel-wrap" data-test-id="analyzing-pipeline-cancel-btn" bind:tap="onCancelTap">
+  <text class="cancel-text">放弃本次分析</text>
+</view>
+
+<!-- Tab bar (mockup: .tabbar) -->
+<view class="tabbar">
+  <view class="tab">
+    <van-icon name="wap-home-o" size="48rpx" />
+    <text class="tab-label">首页</text>
+  </view>
+  <view class="tab">
+    <van-icon name="notes-o" size="48rpx" />
+    <text class="tab-label">错题本</text>
+  </view>
+  <view class="tab tab-active">
+    <van-icon name="photograph" size="48rpx" />
+    <text class="tab-label">拍题</text>
+  </view>
+  <view class="tab">
+    <van-icon name="bell" size="48rpx" />
+    <text class="tab-label">复习</text>
+  </view>
+  <view class="tab">
+    <van-icon name="contact" size="48rpx" />
+    <text class="tab-label">我的</text>
+  </view>
+</view>
