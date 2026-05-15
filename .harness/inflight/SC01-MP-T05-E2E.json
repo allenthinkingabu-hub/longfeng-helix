@@ -5,9 +5,9 @@
     "team_id": "team-3",
     "title": "PHASE-C MP E2E + VRT · SC01-MP-T05-E2E · result (page-vrt)",
     "attempt": 3,
-    "phase": "coder",
+    "phase": "tester",
     "dev_done": true,
-    "passes": false,
+    "passes": true,
     "retries": 0,
     "audit_retries": 2,
     "git_commits": [
@@ -17,8 +17,9 @@
   "work_log_dir": "audits/runs/SC01-MP-T05-E2E/team-3/attempt-3",
   "log_requirements": {
     "must_write": [
-      "coder.md",
-      "bugs-found.md"
+      "tester.md",
+      "adversarial.md",
+      "test-reports/"
     ]
   },
   "audit_gate": "Phase 1 · 写 spec 不跑 automator · lint + tsc + test:unit PASS · 强制 git commit",
@@ -146,12 +147,11 @@
     "branch_name": "claude/sc01-mp-t05-e2e"
   },
   "physical_verification": {
-    "dor_c1_to_c6_required": true
+    "dor_c1_to_c6_required": false
   },
   "permissions": {
     "writable_fields": [
-      "task.dev_done",
-      "task.git_commits"
+      "task.passes"
     ]
   },
   "deliverables_definition_of_done": [
@@ -162,6 +162,6 @@
     "5. 强制 git commit + node .harness/harness.js --advance=SC01-MP-T05-E2E"
   ],
   "rule_6_tool_budget_guidance": "Phase 1 · 20-30 tool use",
-  "written_at": "2026-05-15T16:21:18.734Z",
+  "written_at": "2026-05-15T16:24:02.502Z",
   "written_by": "TL agent (Phase 1 E2E spec spawn)"
 }
