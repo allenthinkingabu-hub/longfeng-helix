@@ -1,0 +1,371 @@
+<testsuites id="" name="" tests="10" failures="1" skipped="0" errors="8" time="265.480377">
+<testsuite name="sc-01/t13-review-done.spec.ts" timestamp="2026-05-15T04:38:24.768Z" hostname="chromium" tests="10" failures="1" skipped="0" time="254.912" errors="8">
+<testcase name="SC-01-T13 · P09 ReviewDone › AC1 · renders green celebration Hero with confetti + checkmark" classname="sc-01/t13-review-done.spec.ts" time="31.124">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/sc-01-t13-review-done-SC-0-278f7-ero-with-confetti-checkmark-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/sc-01-t13-review-done-SC-0-278f7-ero-with-confetti-checkmark-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/sc-01-t13-review-done-SC-0-278f7-ero-with-confetti-checkmark-chromium/error-context.md]]
+]]>
+</system-out>
+<error message="Test timeout of 30000ms exceeded." type="Error">
+<![CDATA[  [chromium] › sc-01/t13-review-done.spec.ts:113:3 › SC-01-T13 · P09 ReviewDone › AC1 · renders green celebration Hero with confetti + checkmark 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForSelector: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="p09-root"]') to be visible
+
+
+      113 |   test('AC1 · renders green celebration Hero with confetti + checkmark', async ({ page }) => {
+      114 |     await page.goto('/review/done?nodeId=100&sid=200');
+    > 115 |     await page.waitForSelector(`[data-testid="${TID.root}"]`);
+          |                ^
+      116 |
+      117 |     // Hero container visible
+      118 |     const hero = page.locator(`[data-testid="${TID.celebrateHero}"]`);
+        at /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t13-review-done/frontend/apps/h5/tests/e2e/sc-01/t13-review-done.spec.ts:115:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t13-review-done-SC-0-278f7-ero-with-confetti-checkmark-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t13-review-done-SC-0-278f7-ero-with-confetti-checkmark-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/sc-01-t13-review-done-SC-0-278f7-ero-with-confetti-checkmark-chromium/error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="SC-01-T13 · P09 ReviewDone › AC2 · fetches node result via GET /nodes/{nid}/result" classname="sc-01/t13-review-done.spec.ts" time="31.05">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/sc-01-t13-review-done-SC-0-f02a0-lt-via-GET-nodes-nid-result-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/sc-01-t13-review-done-SC-0-f02a0-lt-via-GET-nodes-nid-result-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/sc-01-t13-review-done-SC-0-f02a0-lt-via-GET-nodes-nid-result-chromium/error-context.md]]
+]]>
+</system-out>
+<error message="Test timeout of 30000ms exceeded." type="Error">
+<![CDATA[  [chromium] › sc-01/t13-review-done.spec.ts:148:3 › SC-01-T13 · P09 ReviewDone › AC2 · fetches node result via GET /nodes/{nid}/result 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForSelector: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="p09-root"]') to be visible
+
+
+      159 |
+      160 |     await page.goto('/review/done?nodeId=100&sid=200');
+    > 161 |     await page.waitForSelector(`[data-testid="${TID.root}"]`);
+          |                ^
+      162 |
+      163 |     // Verify API was called
+      164 |     expect(apiCalled).toBe(true);
+        at /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t13-review-done/frontend/apps/h5/tests/e2e/sc-01/t13-review-done.spec.ts:161:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t13-review-done-SC-0-f02a0-lt-via-GET-nodes-nid-result-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t13-review-done-SC-0-f02a0-lt-via-GET-nodes-nid-result-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/sc-01-t13-review-done-SC-0-f02a0-lt-via-GET-nodes-nid-result-chromium/error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="SC-01-T13 · P09 ReviewDone › AC3 · renders memory curve with 6 nodes (done/now/future states)" classname="sc-01/t13-review-done.spec.ts" time="31.034">
+<system-err>
+<![CDATA[
+Warning: attachment ../test-results/sc-01-t13-review-done-SC-0-24b2f-des-done-now-future-states--chromium/test-failed-1.png is missing
+Warning: attachment ../test-results/sc-01-t13-review-done-SC-0-24b2f-des-done-now-future-states--chromium/video.webm is missing
+Warning: attachment ../test-results/sc-01-t13-review-done-SC-0-24b2f-des-done-now-future-states--chromium/error-context.md is missing]]>
+</system-err>
+<error message="Test timeout of 30000ms exceeded." type="Error">
+<![CDATA[  [chromium] › sc-01/t13-review-done.spec.ts:172:3 › SC-01-T13 · P09 ReviewDone › AC3 · renders memory curve with 6 nodes (done/now/future states) 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForSelector: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="memory-curve"]') to be visible
+
+
+      172 |   test('AC3 · renders memory curve with 6 nodes (done/now/future states)', async ({ page }) => {
+      173 |     await page.goto('/review/done?nodeId=100&sid=200');
+    > 174 |     await page.waitForSelector(`[data-testid="${TID.memoryCurve}"]`);
+          |                ^
+      175 |
+      176 |     // Memory curve card visible
+      177 |     const curve = page.locator(`[data-testid="${TID.memoryCurve}"]`);
+        at /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t13-review-done/frontend/apps/h5/tests/e2e/sc-01/t13-review-done.spec.ts:174:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t13-review-done-SC-0-24b2f-des-done-now-future-states--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t13-review-done-SC-0-24b2f-des-done-now-future-states--chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/sc-01-t13-review-done-SC-0-24b2f-des-done-now-future-states--chromium/error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="SC-01-T13 · P09 ReviewDone › AC4 · +日历 button → POST /subscribe → 200 + Toast" classname="sc-01/t13-review-done.spec.ts" time="30.991">
+<system-err>
+<![CDATA[
+Warning: attachment ../test-results/sc-01-t13-review-done-SC-0-698b6--POST-subscribe-→-200-Toast-chromium/test-failed-1.png is missing
+Warning: attachment ../test-results/sc-01-t13-review-done-SC-0-698b6--POST-subscribe-→-200-Toast-chromium/video.webm is missing
+Warning: attachment ../test-results/sc-01-t13-review-done-SC-0-698b6--POST-subscribe-→-200-Toast-chromium/error-context.md is missing]]>
+</system-err>
+<error message="Test timeout of 30000ms exceeded." type="Error">
+<![CDATA[  [chromium] › sc-01/t13-review-done.spec.ts:192:3 › SC-01-T13 · P09 ReviewDone › AC4 · +日历 button → POST /subscribe → 200 + Toast 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForSelector: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="p09-next-due-card-add-calendar-btn"]') to be visible
+
+
+      203 |
+      204 |     await page.goto('/review/done?nodeId=100&sid=200');
+    > 205 |     await page.waitForSelector(`[data-testid="${TID.addCalendarBtn}"]`);
+          |                ^
+      206 |
+      207 |     // Next due card visible
+      208 |     const nextCard = page.locator(`[data-testid="${TID.nextDueCard}"]`);
+        at /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t13-review-done/frontend/apps/h5/tests/e2e/sc-01/t13-review-done.spec.ts:205:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t13-review-done-SC-0-698b6--POST-subscribe-→-200-Toast-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t13-review-done-SC-0-698b6--POST-subscribe-→-200-Toast-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/sc-01-t13-review-done-SC-0-698b6--POST-subscribe-→-200-Toast-chromium/error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="SC-01-T13 · P09 ReviewDone › AC5 · renders 3 stat cards + KP mastery bars" classname="sc-01/t13-review-done.spec.ts" time="30.973">
+<system-err>
+<![CDATA[
+Warning: attachment ../test-results/sc-01-t13-review-done-SC-0-74c18--stat-cards-KP-mastery-bars-chromium/test-failed-1.png is missing
+Warning: attachment ../test-results/sc-01-t13-review-done-SC-0-74c18--stat-cards-KP-mastery-bars-chromium/video.webm is missing
+Warning: attachment ../test-results/sc-01-t13-review-done-SC-0-74c18--stat-cards-KP-mastery-bars-chromium/error-context.md is missing]]>
+</system-err>
+<error message="Test timeout of 30000ms exceeded." type="Error">
+<![CDATA[  [chromium] › sc-01/t13-review-done.spec.ts:229:3 › SC-01-T13 · P09 ReviewDone › AC5 · renders 3 stat cards + KP mastery bars 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForSelector: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="p09-stats-row"]') to be visible
+
+
+      229 |   test('AC5 · renders 3 stat cards + KP mastery bars', async ({ page }) => {
+      230 |     await page.goto('/review/done?nodeId=100&sid=200');
+    > 231 |     await page.waitForSelector(`[data-testid="${TID.statsRow}"]`);
+          |                ^
+      232 |
+      233 |     // Stats row visible with 3 cards
+      234 |     const statsRow = page.locator(`[data-testid="${TID.statsRow}"]`);
+        at /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t13-review-done/frontend/apps/h5/tests/e2e/sc-01/t13-review-done.spec.ts:231:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t13-review-done-SC-0-74c18--stat-cards-KP-mastery-bars-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t13-review-done-SC-0-74c18--stat-cards-KP-mastery-bars-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/sc-01-t13-review-done-SC-0-74c18--stat-cards-KP-mastery-bars-chromium/error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="SC-01-T13 · P09 ReviewDone › TI2 · ALL_DONE state hides continue CTA, only shows end" classname="sc-01/t13-review-done.spec.ts" time="30.899">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/sc-01-t13-review-done-SC-0-21e5c-continue-CTA-only-shows-end-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/sc-01-t13-review-done-SC-0-21e5c-continue-CTA-only-shows-end-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/sc-01-t13-review-done-SC-0-21e5c-continue-CTA-only-shows-end-chromium/error-context.md]]
+]]>
+</system-out>
+<error message="Test timeout of 30000ms exceeded." type="Error">
+<![CDATA[  [chromium] › sc-01/t13-review-done.spec.ts:261:3 › SC-01-T13 · P09 ReviewDone › TI2 · ALL_DONE state hides continue CTA, only shows end 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForSelector: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="p09-root"]') to be visible
+
+
+      261 |   test('TI2 · ALL_DONE state hides continue CTA, only shows end', async ({ page }) => {
+      262 |     await page.goto('/review/done?nodeId=100&sid=200&allDone=true');
+    > 263 |     await page.waitForSelector(`[data-testid="${TID.root}"]`);
+          |                ^
+      264 |
+      265 |     // Hero title shows ALL_DONE text
+      266 |     const title = page.locator(`[data-testid="${TID.heroTitle}"]`);
+        at /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t13-review-done/frontend/apps/h5/tests/e2e/sc-01/t13-review-done.spec.ts:263:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t13-review-done-SC-0-21e5c-continue-CTA-only-shows-end-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t13-review-done-SC-0-21e5c-continue-CTA-only-shows-end-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/sc-01-t13-review-done-SC-0-21e5c-continue-CTA-only-shows-end-chromium/error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="SC-01-T13 · P09 ReviewDone › TI3 · subscribe is idempotent (double-tap does not error)" classname="sc-01/t13-review-done.spec.ts" time="6.187">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/sc-01-t13-review-done-SC-0-c83bc--double-tap-does-not-error--chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/sc-01-t13-review-done-SC-0-c83bc--double-tap-does-not-error--chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/sc-01-t13-review-done-SC-0-c83bc--double-tap-does-not-error--chromium/error-context.md]]
+]]>
+</system-out>
+<failure message="expect(locator).toBeEnabled() failed" type="expect.toBeEnabled">
+<![CDATA[  [chromium] › sc-01/t13-review-done.spec.ts:286:3 › SC-01-T13 · P09 ReviewDone › TI3 · subscribe is idempotent (double-tap does not error) 
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator: locator('[data-testid="p09-next-due-card-add-calendar-btn"]')
+    Expected: enabled
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeEnabled" with timeout 5000ms
+      - waiting for locator('[data-testid="p09-next-due-card-add-calendar-btn"]')
+
+
+      298 |     await page.goto('/review/done?nodeId=100&sid=200');
+      299 |     const addBtn = page.locator(`[data-testid="${TID.addCalendarBtn}"]`);
+    > 300 |     await expect(addBtn).toBeEnabled();
+          |                          ^
+      301 |
+      302 |     // First tap
+      303 |     await addBtn.click();
+        at /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t13-review-done/frontend/apps/h5/tests/e2e/sc-01/t13-review-done.spec.ts:300:26
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t13-review-done-SC-0-c83bc--double-tap-does-not-error--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t13-review-done-SC-0-c83bc--double-tap-does-not-error--chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/sc-01-t13-review-done-SC-0-c83bc--double-tap-does-not-error--chromium/error-context.md
+]]>
+</failure>
+</testcase>
+<testcase name="SC-01-T13 · P09 ReviewDone › CTA · RESULT state shows both continue + end buttons" classname="sc-01/t13-review-done.spec.ts" time="30.965">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/sc-01-t13-review-done-SC-0-8ac5c-s-both-continue-end-buttons-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/sc-01-t13-review-done-SC-0-8ac5c-s-both-continue-end-buttons-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/sc-01-t13-review-done-SC-0-8ac5c-s-both-continue-end-buttons-chromium/error-context.md]]
+]]>
+</system-out>
+<error message="Test timeout of 30000ms exceeded." type="Error">
+<![CDATA[  [chromium] › sc-01/t13-review-done.spec.ts:314:3 › SC-01-T13 · P09 ReviewDone › CTA · RESULT state shows both continue + end buttons 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForSelector: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="p09-cta-row"]') to be visible
+
+
+      314 |   test('CTA · RESULT state shows both continue + end buttons', async ({ page }) => {
+      315 |     await page.goto('/review/done?nodeId=100&sid=200');
+    > 316 |     await page.waitForSelector(`[data-testid="${TID.ctaRow}"]`);
+          |                ^
+      317 |
+      318 |     const continueBtn = page.locator(`[data-testid="${TID.ctaContinueBtn}"]`);
+      319 |     await expect(continueBtn).toBeVisible();
+        at /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t13-review-done/frontend/apps/h5/tests/e2e/sc-01/t13-review-done.spec.ts:316:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t13-review-done-SC-0-8ac5c-s-both-continue-end-buttons-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t13-review-done-SC-0-8ac5c-s-both-continue-end-buttons-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/sc-01-t13-review-done-SC-0-8ac5c-s-both-continue-end-buttons-chromium/error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="SC-01-T13 · P09 ReviewDone › §9 degradation · GET /result 5xx → Hero neutral + Toast" classname="sc-01/t13-review-done.spec.ts" time="30.9">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/sc-01-t13-review-done-SC-0-47d3e-lt-5xx-→-Hero-neutral-Toast-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/sc-01-t13-review-done-SC-0-47d3e-lt-5xx-→-Hero-neutral-Toast-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/sc-01-t13-review-done-SC-0-47d3e-lt-5xx-→-Hero-neutral-Toast-chromium/error-context.md]]
+]]>
+</system-out>
+<error message="Test timeout of 30000ms exceeded." type="Error">
+<![CDATA[  [chromium] › sc-01/t13-review-done.spec.ts:328:3 › SC-01-T13 · P09 ReviewDone › §9 degradation · GET /result 5xx → Hero neutral + Toast 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForSelector: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('[data-testid="p09-root"]') to be visible
+
+
+      332 |
+      333 |     await page.goto('/review/done?nodeId=100&sid=200');
+    > 334 |     await page.waitForSelector(`[data-testid="${TID.root}"]`);
+          |                ^
+      335 |
+      336 |     // Page still renders (RESULT fallback)
+      337 |     const hero = page.locator(`[data-testid="${TID.celebrateHero}"]`);
+        at /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t13-review-done/frontend/apps/h5/tests/e2e/sc-01/t13-review-done.spec.ts:334:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t13-review-done-SC-0-47d3e-lt-5xx-→-Hero-neutral-Toast-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/sc-01-t13-review-done-SC-0-47d3e-lt-5xx-→-Hero-neutral-Toast-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/sc-01-t13-review-done-SC-0-47d3e-lt-5xx-→-Hero-neutral-Toast-chromium/error-context.md
+]]>
+</error>
+</testcase>
+<testcase name="SC-01-T13 · P09 ReviewDone › VRT · captures idle/loading state screenshot" classname="sc-01/t13-review-done.spec.ts" time="0.789">
+</testcase>
+</testsuite>
+</testsuites>
