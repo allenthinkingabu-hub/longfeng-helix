@@ -67,10 +67,11 @@ describe('P04 result page-vrt (真 IDE)', () => {
     const baselineBuf = readFileSync(BASELINE_PATH);
     const baselinePng = PNG.sync.read(baselineBuf);
 
-    // Resize to match if needed — use the smaller dimensions
-    const width = Math.min(actualPng.width, baselinePng.width);
-    const height = Math.min(actualPng.height, baselinePng.height);
+    // Strict dimension check — mismatched sizes produce garbage diffs (Rule 12 Fail loud)
+    expect(actualPng.width, `screenshot width (${actualPng.width}) must match baseline (${baselinePng.width})`).toBe(baselinePng.width);
+    expect(actualPng.height, `screenshot height (${actualPng.height}) must match baseline (${baselinePng.height})`).toBe(baselinePng.height);
 
+    const { width, height } = actualPng;
     const diffPng = new PNG({ width, height });
 
     const numDiffPixels = pixelmatch(
