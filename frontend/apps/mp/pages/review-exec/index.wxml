@@ -1,22 +1,22 @@
 <!-- P08 复习执行 · 1:1 mirror of design/mockups/wrongbook/08_review_exec.html -->
 <!-- trace: design/mockups/wrongbook/08_review_exec.html · @longfeng/testids p08 -->
 
-<view class="review-exec-page" data-test-id="{{testIds.root}}">
+<view class="review-exec-page" data-test-id="p08-root">
 
   <!-- ── Nav (mockup .nav) ──────────────────────────────── -->
-  <view class="nav" data-test-id="{{testIds.topbar}}">
+  <view class="nav" data-test-id="p08-topbar">
     <view class="back" bind:tap="onBackTap">
       <van-icon name="arrow-left" color="#007AFF" size="22px" />
       <text>复习</text>
     </view>
     <view class="center">
-      <text class="title" data-test-id="{{testIds.topbarCursor}}">复习执行 · 第 {{cursor}} 题</text>
+      <text class="title" data-test-id="p08-topbar-cursor">复习执行 · 第 {{cursor}} 题</text>
       <text class="sub">{{cursor}} / {{total}} · 剩余 {{total - cursor}} 题</text>
     </view>
-    <view class="close" bind:tap="onCloseTap" data-test-id="{{testIds.closeBtn}}">
+    <view class="close" bind:tap="onCloseTap" data-test-id="p08-close-btn">
       <van-icon name="cross" color="#636366" size="14px" />
     </view>
-    <view class="ptrack" data-test-id="{{testIds.progressBar}}">
+    <view class="ptrack" data-test-id="p08-progress-bar">
       <text class="plbl">{{progressPct}}% · 预计 6 分钟</text>
       <view class="pbar" style="width: {{progressPct}}%;"></view>
     </view>
@@ -26,7 +26,7 @@
   <scroll-view class="scroll" scroll-y="true">
 
     <!-- ── Meta chips ─────────────────────────────────── -->
-    <view class="metarow" data-test-id="{{testIds.metaChips}}">
+    <view class="metarow" data-test-id="p08-meta-chips">
       <view class="chip chip-red">
         <view class="dot"></view>
         <text>{{node.tLevel}} · 第 {{node.nodeIndex + 1}} 次复习</text>
@@ -40,7 +40,7 @@
     </view>
 
     <!-- ── Question card ──────────────────────────────── -->
-    <view class="qcard" data-test-id="{{testIds.questionHero}}">
+    <view class="qcard" data-test-id="p08-question-hero">
       <text class="qkicker">错题回顾 · 原题</text>
       <view class="qstem">
         <text>{{question.stem}}</text>
@@ -56,7 +56,7 @@
       <view class="block-title-dot"></view>
       <text>你的解答 · 手写</text>
     </view>
-    <view class="work" data-test-id="{{testIds.answerArea}}" bind:touchstart="onCanvasTouch">
+    <view class="work" data-test-id="p08-answer-area" bind:touchstart="onCanvasTouch">
       <view class="paper">
         <view class="handwritten">
           <text>f(x) = x² − 4x + 3\n      = (x² − 4x + 4) − 4 + 3\n      = (x − 2)² − 1\n∴ 顶点 (2, −1)</text>
@@ -87,7 +87,7 @@
         round
         loading="{{isRevealing}}"
         disabled="{{execState !== 'ANSWERING' || isRevealing}}"
-        data-test-id="{{testIds.revealBtn}}"
+        data-test-id="p08-reveal-btn"
         bind:click="onRevealTap"
       >
         {{isRevealing ? '加载中…' : '👁 揭示答案'}}
@@ -101,10 +101,10 @@
         <text>参考答案 · 已揭示</text>
       </view>
     </block>
-    <view class="reveal {{isRevealed ? 'reveal-visible' : 'reveal-hidden'}}" data-test-id="{{testIds.revealContent}}">
+    <view class="reveal {{isRevealed ? 'reveal-visible' : 'reveal-hidden'}}" data-test-id="p08-reveal-content">
       <view class="reveal-head">
         <view class="reveal-head-l">
-          <view class="reveal-ico" data-test-id="{{testIds.revealCheckmark}}">
+          <view class="reveal-ico" data-test-id="p08-reveal-checkmark">
             <van-icon name="success" color="#fff" size="12px" />
           </view>
           <text class="reveal-ttl">标准解答</text>
@@ -124,7 +124,7 @@
     </view>
 
     <!-- ── Node timeline ──────────────────────────────── -->
-    <view class="nodes" data-test-id="{{testIds.memoryCurve}}">
+    <view class="nodes" data-test-id="memory-curve">
       <block wx:for="{{nodeDots}}" wx:key="idx">
         <view class="{{item.cls}}" data-test-id="memory-curve-node-{{item.tLevel}}"></view>
         <view wx:if="{{item.hasLine}}" class="node-line {{item.lineGreen ? 'node-line-green' : ''}}"></view>
@@ -135,7 +135,7 @@
   </scroll-view>
 
   <!-- ── Rating bar (fixed bottom) ────────────────────── -->
-  <view class="rating" data-test-id="{{testIds.gradeButtons}}">
+  <view class="rating" data-test-id="p08-grade-buttons">
     <view class="rtitle">
       <text class="rtitle-l">本次复习你的自评？</text>
       <text class="rtitle-r">将用于更新记忆曲线</text>
@@ -144,7 +144,7 @@
       <view
         class="rbtn rbtn-forgot {{!isRevealed || isGrading ? 'rbtn-disabled' : ''}}"
         data-grade="FORGOT"
-        data-test-id="{{testIds.gradeBtnForgot}}"
+        data-test-id="p08-grade-buttons-forgot"
         bind:tap="onGradeTap"
       >
         <view class="ri ri-red">✗</view>
@@ -154,7 +154,7 @@
       <view
         class="rbtn rbtn-partial {{!isRevealed || isGrading ? 'rbtn-disabled' : ''}}"
         data-grade="PARTIAL"
-        data-test-id="{{testIds.gradeBtnPartial}}"
+        data-test-id="p08-grade-buttons-partial"
         bind:tap="onGradeTap"
       >
         <view class="ri ri-orange">◐</view>
@@ -164,7 +164,7 @@
       <view
         class="rbtn rbtn-master {{!isRevealed || isGrading ? 'rbtn-disabled' : ''}}"
         data-grade="MASTERED"
-        data-test-id="{{testIds.gradeBtnMastered}}"
+        data-test-id="p08-grade-buttons-mastered"
         bind:tap="onGradeTap"
       >
         <view class="ri ri-green">✓</view>
@@ -176,7 +176,7 @@
 
   <!-- ── Exit confirm sheet ───────────────────────────── -->
   <van-overlay show="{{showExitSheet}}" bind:click="onExitCancel" />
-  <view wx:if="{{showExitSheet}}" class="sheet-overlay" data-test-id="{{testIds.exitConfirmSheet}}">
+  <view wx:if="{{showExitSheet}}" class="sheet-overlay" data-test-id="p08-exit-confirm-sheet">
     <view class="sheet">
       <text class="sheet-title">退出本次复习？</text>
       <text class="sheet-body">本次复习尚未自评，退出将保留在原计划</text>

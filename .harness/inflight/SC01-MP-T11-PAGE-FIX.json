@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "task": {"id": "SC01-MP-T11-PAGE-FIX", "team_id": "team-4", "title": "PHASE-C MP E2E page-fix · SC01-MP-T11-PAGE-FIX · pages/review-exec 让 e2e spec 通", "attempt": 1, "phase": "coder", "dev_done": true, "passes": false, "retries": 0, "audit_retries": 0, "git_commits": ["9327bb2"]},
+  "work_log_dir": "audits/runs/SC01-MP-T11-PAGE-FIX/team-4/attempt-1",
+  "log_requirements": {"must_write": ["coder.md", "bugs-found.md"]},
+  "audit_gate": "Phase 5 · 让 page-vrt spec 通 · lint+typecheck+test:unit pass · 强制 git commit",
+  "previous_audit_verdict": {"phase": "Phase 4 TL serial verify", "summary": "7/55 PASS · 29 fail · 主因: page wxml 用 {{testIds.X}} 动态绑定但 spec 用静态 selector 不匹配", "redo_target": "coder", "redo_reason": "改 pages/review-exec/index.wxml 加静态 data-test-id 或对应 class 让 spec selector 找得到"},
+  "context": {
+    "scenario": "Phase 5 page-level fix",
+    "target_page": "pages/review-exec",
+    "target_spec": "frontend/apps/mp/test/e2e/review-exec.spec.ts",
+    "scope_in": [
+      "读 frontend/apps/mp/test/e2e/review-exec.spec.ts 看 selector",
+      "读 frontend/apps/mp/pages/review-exec/index.wxml 看实际 testid/class",
+      "决策: 改 wxml 加静态 testid 或改 spec 用真选择器 (推 wxml 加 testid · 更可持续)",
+      "跑 pnpm -F mp lint + typecheck + test:unit · 必 PASS · 禁 --no-verify",
+      "不跑 automator (TL Phase 6 串行验)"
+    ]
+  },
+  "isolation": {"worktree_disabled": false, "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t11-page-fix", "branch_name": "claude/sc01-mp-t11-page-fix"},
+  "physical_verification": {"dor_c1_to_c6_required": false},
+  "permissions": {"writable_fields": ["task.dev_done", "task.git_commits"]},
+  "deliverables_definition_of_done": ["1. wxml 或 spec 改完", "2. lint+typecheck+test:unit PASS", "3. coder.md + bugs-found.md", "4. 强制 git commit + advance"],
+  "rule_6_tool_budget_guidance": "20-30 tool use",
+  "written_at": "2026-05-16T03:00:00.000Z"
+}
