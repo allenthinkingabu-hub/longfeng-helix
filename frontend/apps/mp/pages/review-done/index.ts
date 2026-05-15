@@ -182,6 +182,12 @@ Page({
     } catch {
       // best-effort: navigate home even if API fails
     }
-    wx.switchTab({ url: '/pages/capture/index' });
+    // T14: P09→P-HOME transition · fallback to capture if home page not yet available (T08)
+    wx.reLaunch({
+      url: '/pages/home/index',
+      fail() {
+        wx.reLaunch({ url: '/pages/capture/index' });
+      },
+    });
   },
 });
