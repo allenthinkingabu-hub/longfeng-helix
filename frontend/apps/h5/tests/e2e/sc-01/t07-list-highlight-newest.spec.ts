@@ -261,20 +261,31 @@ test.describe('SC01-T07 · P04→P05 transition + highlight', () => {
     const qid = await highlightedCard.getAttribute('data-qid');
     expect(qid).toBe(MOCK_QID);
 
-    // AC3: green border CSS
+    // AC3: green border CSS — color + width (REJECT Round 1 fix: was missing width check)
     const borderColor = await highlightedCard.evaluate((el) => window.getComputedStyle(el).borderColor);
     expect(borderColor).toContain('52, 199, 89');
+    const borderWidth = await highlightedCard.evaluate((el) => window.getComputedStyle(el).borderWidth);
+    expect(borderWidth).toBe('2px');
 
     // ── VRT: highlighted state ──
     await expect(page).toHaveScreenshot('p05-highlighted.png', {
       maxDiffPixels: 500,
     });
 
-    // AC3: wait for 3s highlight to fade
-    await page.waitForTimeout(3500);
+    // AC3: wait for 3s highlight + 0.8s CSS transition to fully complete
+    // Timeline: t=0 HIGHLIGHTED → t=3s fade starts → t=3.8s fade done → LIST
+    await page.waitForTimeout(4500); // 4.5s gives comfortable margin past 3.8s
 
-    // After fade, data-highlighted should be gone
+    // After full fade, data-highlighted should be gone
     await expect(highlightedCard).not.toBeVisible({ timeout: 3000 });
+
+    // TI2: verify border has returned to default (no green residue) — REJECT Round 1 fix
+    // At t=4.5s, inner setTimeout (800ms) has fired, card is plain .card (no border)
+    const cardAfterFade = page.locator(`[data-qid="${MOCK_QID}"]`);
+    await expect(cardAfterFade).toBeVisible({ timeout: 3000 });
+    const postFadeBorder = await cardAfterFade.evaluate((el) => window.getComputedStyle(el).borderColor);
+    // After fade completes, card should have no green border (no rgb(52,199,89) residue)
+    expect(postFadeBorder).not.toContain('52, 199, 89');
   });
 
   test('AC4: highlighted card renders all required elements', async ({ page }) => {
