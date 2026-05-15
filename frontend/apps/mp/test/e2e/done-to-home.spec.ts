@@ -1,16 +1,11 @@
 /**
  * SC01-MP-T14-E2E · P09→P-HOME transition E2E (review-done → home)
- * kind: transition
- * trace: pages/review-done/index.ts onEnd() → wx.reLaunch('/pages/home/index')
  *
- * Business flow:
- *   1. User is on review-done page (P09) after completing a review session
- *   2. User taps "结束本次" CTA → triggers onEnd()
- *   3. onEnd calls completeSession API (best-effort)
- *   4. wx.reLaunch navigates to /pages/home/index (clears stack)
- *   5. currentPage.path should be 'pages/home/index'
+ * Phase 3: fix mp.reLaunch syntax (must be { url: ... }) · drop pixelmatch
  *
- * Phase 1: spec only (no automator execution) · Phase 2: TL串行跑
+ * Business flow: User on P09 taps "结束本次" CTA → reLaunch to home
+ *
+ * trace: pages/review-done → pages/home
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import automator from 'miniprogram-automator';
@@ -34,7 +29,8 @@ describe('SC01-MP-T14-E2E · done→home transition (真 IDE)', () => {
   });
 
   it('navigate to review-done page via reLaunch', async () => {
-    await mp.reLaunch('/pages/review-done/index');
+    await mp.reLaunch({ url: '/pages/review-done/index' });
+    await new Promise((r) => setTimeout(r, 1000));
     const page = await mp.currentPage();
     expect(page.path).toBe('pages/review-done/index');
   });
@@ -47,11 +43,9 @@ describe('SC01-MP-T14-E2E · done→home transition (真 IDE)', () => {
 
   it('tap "结束本次" CTA → reLaunch to /pages/home/index', async () => {
     const page = await mp.currentPage();
-    // Find the "结束本次" button by data-test-id and tap (真人操作, 不用 callMethod)
     const endBtn = await page.$('[data-test-id="p09-cta-row-end-btn"]');
     expect(endBtn).toBeTruthy();
     await endBtn.tap();
-    // Wait for reLaunch navigation to settle
     await new Promise((resolve) => setTimeout(resolve, 1500));
     const homePage = await mp.currentPage();
     expect(homePage.path).toBe('pages/home/index');
