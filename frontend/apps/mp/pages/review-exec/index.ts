@@ -44,7 +44,7 @@ const MOCK_QUESTION: QuestionData = {
 
 const MOCK_NODE: NodeData = {
   nid: '0',
-  nodeIndex: 2,
+  nodeIndex: 1,
   tLevel: 'T2',
   easeFactor: 2.5,
 };
