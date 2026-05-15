@@ -1,0 +1,17 @@
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v1.6.1 /Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t10-e2e/frontend/apps/mp
+
+ ✓ test/unit/wrongbook-list.spec.ts  (19 tests) 51ms
+ ✓ test/unit/review-today.spec.ts  (24 tests) 10ms
+ ✓ test/unit/review-done-end.spec.ts  (5 tests) 7ms
+ ✓ test/unit/home.spec.ts  (16 tests) 4ms
+ ✓ test/unit/review-today-tap.spec.ts  (11 tests) 3ms
+ ✓ test/unit/api-modules.spec.ts  (17 tests) 2ms
+ ✓ test/unit/_http.spec.ts  (5 tests)
+
+ Test Files  7 passed (7)
+      Tests  97 passed (97)
+   Start at  20:21:54
+   Duration  1.53s (transform 484ms, setup 0ms, collect 625ms, tests 77ms, environment 0ms, prepare 273ms)
+
