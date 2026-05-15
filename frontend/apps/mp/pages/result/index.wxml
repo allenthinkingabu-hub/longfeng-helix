@@ -1,0 +1,185 @@
+<!-- P04 AI分析结果页 · 1:1 mirror design/mockups/wrongbook/04_result.html -->
+<!-- trace: design/mockups/wrongbook/04_result.html · @longfeng/testids p04 -->
+
+<view class="result-page" data-test-id="p04-root">
+
+  <!-- Nav bar -->
+  <view class="nav" data-test-id="p04-navbar">
+    <view class="nav-row">
+      <view class="nav-back" bind:tap="onBackTap">
+        <van-icon name="arrow-left" color="#007AFF" size="20px" />
+        <text class="nav-back-text">分析</text>
+      </view>
+      <view class="nav-actions">
+        <van-icon name="edit" color="#007AFF" size="20px" />
+        <van-icon name="down" color="#007AFF" size="20px" />
+      </view>
+    </view>
+    <view class="nav-title-row">
+      <text class="nav-h1">分析完成</text>
+      <van-tag type="success" round size="medium">{{analysisDuration}}</van-tag>
+    </view>
+  </view>
+
+  <!-- Loading skeleton -->
+  <view class="content" wx:if="{{pageState === 'LOADING'}}">
+    <van-skeleton title row="5" loading="{{true}}" />
+  </view>
+
+  <!-- Error state -->
+  <view class="content error-content" wx:elif="{{pageState === 'ERROR'}}">
+    <view class="error-box">
+      <van-icon name="warning-o" size="48px" color="#FF3B30" />
+      <text class="error-title">加载失败</text>
+      <text class="error-desc">请检查网络后重试</text>
+      <van-button type="primary" size="small" round bind:click="onRetryTap">重试</van-button>
+    </view>
+  </view>
+
+  <!-- Empty state -->
+  <view class="content empty-content" wx:elif="{{pageState === 'EMPTY'}}">
+    <view class="empty-box">
+      <van-icon name="search" size="48px" color="#8E8E93" />
+      <text class="empty-title">暂无分析结果</text>
+      <text class="empty-desc">请先拍题后再查看分析</text>
+    </view>
+  </view>
+
+  <!-- Success / Draft state -->
+  <scroll-view class="content" scroll-y wx:else>
+
+    <!-- Hero: question thumbnail + meta -->
+    <view class="hero" data-test-id="p04-question-hero">
+      <view class="thumb">
+        <text class="thumb-lbl">{{question.subjectLabel}} · 12</text>
+        <text class="thumb-qno">17</text>
+        <text class="thumb-h3">已知 f(x)=x²−4x+3</text>
+        <view class="thumb-strk"></view>
+        <text class="thumb-pen">B</text>
+      </view>
+      <view class="hero-meta">
+        <text class="hero-kicker">{{question.subjectLabel}} · 二次函数 · 顶点式</text>
+        <text class="hero-stem" data-test-id="result-hero-stem">{{question.stem}}</text>
+        <text class="hero-formula" wx:if="{{question.formula}}">{{question.formula}}</text>
+      </view>
+    </view>
+
+    <!-- Answers duo -->
+    <view class="answers" data-test-id="p04-answers-row">
+      <view class="ans ans-wrong" data-test-id="p04-answers-row-wrong">
+        <view class="ans-t ans-t-wrong">
+          <van-icon name="cross" size="12px" color="#FF3B30" />
+          <text>你的作答</text>
+        </view>
+        <text class="ans-v" data-test-id="p04-answers-row-wrong-text">{{question.myAnswer}}</text>
+        <text class="ans-n">混淆顶点式符号</text>
+        <view class="ans-deco ans-deco-wrong"></view>
+      </view>
+      <view class="ans ans-right" data-test-id="p04-answers-row-right">
+        <view class="ans-t ans-t-right">
+          <van-icon name="success" size="12px" color="#34C759" />
+          <text>正确答案</text>
+        </view>
+        <text class="ans-v" data-test-id="p04-answers-row-right-text">{{question.correctAnswer}}</text>
+        <text class="ans-n">顶点 (2, −1)，对称轴 x = 2</text>
+        <view class="ans-deco ans-deco-right"></view>
+      </view>
+    </view>
+
+    <!-- Error reason section -->
+    <view class="sec">
+      <text class="sec-title">错因诊断</text>
+      <view class="sec-line"></view>
+      <text class="sec-tag sec-tag-red">CONCEPT · 概念混淆</text>
+    </view>
+    <view class="reason" data-test-id="p04-reason-card">
+      <view class="reason-ix">
+        <van-icon name="warning" size="16px" color="#fff" />
+      </view>
+      <text class="reason-txt" data-test-id="p04-reason-card-text">{{question.reasonMarkdown}}</text>
+    </view>
+
+    <!-- Solution steps -->
+    <view class="sec">
+      <text class="sec-title">解答步骤</text>
+      <view class="sec-line"></view>
+      <text class="sec-tag sec-tag-gray">{{question.steps.length}} STEPS</text>
+    </view>
+    <view class="steps" data-test-id="p04-solution-stepper">
+      <view
+        class="step"
+        wx:for="{{question.steps}}"
+        wx:key="idx"
+        data-test-id="p04-solution-stepper-step-{{item.idx}}"
+      >
+        <view class="step-num">{{item.idx}}</view>
+        <view class="step-body">
+          <text class="step-exp">{{item.title}}</text>
+          <text class="step-fm" wx:if="{{item.formula}}">{{item.formula}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Knowledge points + difficulty -->
+    <view class="kp-row" data-test-id="p04-meta-chips">
+      <view class="kp-card">
+        <text class="kp-hdr">涉及知识点</text>
+        <view class="kp-chips">
+          <text
+            class="chip {{index === question.knowledgePoints.length - 1 ? 'chip-outline' : ''}}"
+            wx:for="{{question.knowledgePoints}}"
+            wx:key="id"
+          >{{item.name}}</text>
+        </view>
+      </view>
+      <view class="diff-card">
+        <text class="diff-hdr">难度</text>
+        <view class="stars">
+          <text wx:for="{{diffStars}}" wx:key="index" class="star {{item ? '' : 'star-dim'}}">★</text>
+        </view>
+        <text class="diff-level">{{diffLabel}}</text>
+      </view>
+    </view>
+
+    <!-- Ebbinghaus preview -->
+    <view class="ebbing" data-test-id="p04-memory-curve">
+      <view class="ebbing-t">
+        <van-icon name="clock-o" size="14px" color="#5856D6" />
+        <text>艾宾浩斯复习计划预览</text>
+      </view>
+      <text class="ebbing-h4">保存后将在日历自动生成 6 个复习节点</text>
+      <view class="ebbing-nodes">
+        <view
+          class="node {{index === 0 ? 'node-first' : ''}}"
+          wx:for="{{timelineNodes}}"
+          wx:key="tLevel"
+          data-test-id="result-timeline-node-{{item.tLevel}}"
+        >
+          <view class="node-pill"></view>
+          <text class="node-lv">{{item.tLevel}}</text>
+          <text class="node-dt">{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Bottom spacer for CTA -->
+    <view style="height: 240rpx;"></view>
+  </scroll-view>
+
+  <!-- CTA dock -->
+  <view class="cta" wx:if="{{pageState !== 'LOADING' && pageState !== 'ERROR' && pageState !== 'EMPTY'}}">
+    <view class="cta-row">
+      <van-button class="cta-btn" plain hairline round bind:click="onManualFixTap">手动修正</van-button>
+      <van-button
+        class="cta-btn"
+        type="primary"
+        round
+        loading="{{isSaving}}"
+        loading-text="保存中…"
+        data-test-id="p04-save-cta"
+        bind:click="onSaveTap"
+      >保存并开启复习</van-button>
+    </view>
+    <text class="cta-note">保存后将按《艾宾浩斯》自动生成 T1–T6 共 6 个日历提醒</text>
+  </view>
+</view>

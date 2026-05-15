@@ -1,0 +1,606 @@
+/* P04 AI分析结果页 · 1:1 mirror design/mockups/wrongbook/04_result.html */
+/* px → rpx: 1px ≈ 2rpx on 750rpx baseline */
+
+page {
+  background: #F2F2F7;
+}
+
+.result-page {
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 240rpx;
+}
+
+/* ── Nav ──────────────────────────────────────────── */
+.nav {
+  padding: 12rpx 40rpx 16rpx;
+  background: rgba(242,242,247,.78);
+  backdrop-filter: blur(22px) saturate(180%);
+  border-bottom: 1rpx solid rgba(60,60,67,.14);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72rpx;
+}
+
+.nav-back {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  color: #007AFF;
+  font-size: 34rpx;
+}
+
+.nav-back-text {
+  color: #007AFF;
+  font-size: 34rpx;
+}
+
+.nav-actions {
+  display: flex;
+  gap: 36rpx;
+  align-items: center;
+  color: #007AFF;
+}
+
+.nav-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 20rpx;
+  margin-top: 4rpx;
+}
+
+.nav-h1 {
+  font-size: 44rpx;
+  font-weight: 700;
+  letter-spacing: 0.72rpx;
+}
+
+/* ── Content area ─────────────────────────────────── */
+.content {
+  padding: 24rpx 32rpx 32rpx;
+}
+
+/* ── Error state ─────────────────────────────────── */
+.error-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.error-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.error-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #1C1C1E;
+}
+
+.error-desc {
+  font-size: 28rpx;
+  color: #8E8E93;
+  margin-bottom: 24rpx;
+}
+
+/* ── Empty state ─────────────────────────────────── */
+.empty-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.empty-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.empty-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #1C1C1E;
+}
+
+.empty-desc {
+  font-size: 28rpx;
+  color: #8E8E93;
+}
+
+/* ── Hero: stem + thumb ───────────────────────────── */
+.hero {
+  background: #FFFFFF;
+  border-radius: 36rpx;
+  padding: 28rpx;
+  display: flex;
+  gap: 24rpx;
+  box-shadow: 0 2rpx 0 rgba(0,0,0,.03), 0 16rpx 44rpx rgba(40,50,90,.06);
+}
+
+.thumb {
+  width: 160rpx;
+  height: 192rpx;
+  border-radius: 20rpx;
+  background: linear-gradient(180deg, #fbf8f0, #f1ece0);
+  position: relative;
+  overflow: hidden;
+  flex: 0 0 160rpx;
+  box-shadow: inset 0 0 0 2rpx rgba(0,0,0,.05);
+}
+
+.thumb-lbl {
+  position: absolute;
+  top: 12rpx;
+  left: 12rpx;
+  font-size: 12rpx;
+  color: #a78a3c;
+  letter-spacing: 0.36rpx;
+  font-weight: 700;
+}
+
+.thumb-qno {
+  position: absolute;
+  top: 28rpx;
+  left: 12rpx;
+  font-size: 14rpx;
+  font-weight: 700;
+  color: #7a3b3b;
+  background: #fde9e9;
+  border-radius: 4rpx;
+  padding: 2rpx 6rpx;
+}
+
+.thumb-h3 {
+  position: absolute;
+  top: 48rpx;
+  left: 12rpx;
+  right: 12rpx;
+  font-family: Georgia, serif;
+  font-size: 14rpx;
+  line-height: 1.4;
+  color: #222;
+  font-weight: 600;
+}
+
+.thumb-strk {
+  position: absolute;
+  top: 116rpx;
+  left: 16rpx;
+  width: 112rpx;
+  height: 12rpx;
+  background: rgba(255,80,80,.55);
+  transform: rotate(-2deg);
+  border-radius: 2rpx;
+}
+
+.thumb-pen {
+  position: absolute;
+  top: 132rpx;
+  left: 32rpx;
+  font-family: cursive;
+  font-size: 20rpx;
+  color: #c9302c;
+}
+
+.hero-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-kicker {
+  font-size: 22rpx;
+  color: #007AFF;
+  font-weight: 700;
+  letter-spacing: 1rpx;
+  text-transform: uppercase;
+}
+
+.hero-stem {
+  font-size: 28rpx;
+  line-height: 1.5;
+  margin-top: 8rpx;
+  font-weight: 500;
+  letter-spacing: 0.2rpx;
+}
+
+.hero-formula {
+  margin-top: 12rpx;
+  font-family: "Times New Roman", serif;
+  font-style: italic;
+  font-size: 28rpx;
+  color: #3C3C43;
+}
+
+/* ── Answers duo ──────────────────────────────────── */
+.answers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20rpx;
+  margin-top: 24rpx;
+}
+
+.ans {
+  border-radius: 28rpx;
+  padding: 24rpx 24rpx 28rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+.ans-wrong {
+  background: linear-gradient(160deg, #FFE8E6 0%, #FFF 70%);
+  border: 1rpx solid rgba(255,59,48,.25);
+}
+
+.ans-right {
+  background: linear-gradient(160deg, #E4F7EA 0%, #FFF 70%);
+  border: 1rpx solid rgba(52,199,89,.25);
+}
+
+.ans-t {
+  font-size: 22rpx;
+  font-weight: 700;
+  letter-spacing: 1.2rpx;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.ans-t-wrong {
+  color: #FF3B30;
+}
+
+.ans-t-right {
+  color: #34C759;
+}
+
+.ans-v {
+  font-size: 40rpx;
+  font-weight: 700;
+  margin-top: 12rpx;
+  letter-spacing: 0.4rpx;
+}
+
+.ans-n {
+  font-size: 24rpx;
+  color: #8E8E93;
+  margin-top: 4rpx;
+}
+
+.ans-deco {
+  position: absolute;
+  right: -28rpx;
+  bottom: -28rpx;
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  opacity: .15;
+}
+
+.ans-deco-wrong {
+  background: #FF3B30;
+}
+
+.ans-deco-right {
+  background: #34C759;
+}
+
+/* ── Section header ───────────────────────────────── */
+.sec {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin: 36rpx 8rpx 16rpx;
+}
+
+.sec-title {
+  font-size: 26rpx;
+  color: #8E8E93;
+  letter-spacing: 1rpx;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.sec-line {
+  flex: 1;
+  height: 1rpx;
+  background: rgba(60,60,67,.14);
+}
+
+.sec-tag {
+  font-size: 22rpx;
+  font-weight: 700;
+  letter-spacing: 0.8rpx;
+}
+
+.sec-tag-red {
+  color: #FF3B30;
+}
+
+.sec-tag-gray {
+  color: #8E8E93;
+}
+
+/* ── Error reason card ────────────────────────────── */
+.reason {
+  background: #FFFFFF;
+  border-radius: 28rpx;
+  padding: 24rpx 28rpx;
+  box-shadow: 0 2rpx 0 rgba(0,0,0,.03);
+  display: flex;
+  gap: 20rpx;
+  align-items: flex-start;
+  border-left: 8rpx solid #FF3B30;
+}
+
+.reason-ix {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 16rpx;
+  background: linear-gradient(180deg, #FF7A73, #FF3B30);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 60rpx;
+}
+
+.reason-txt {
+  font-size: 27rpx;
+  line-height: 1.55;
+  color: #1C1C1E;
+}
+
+/* ── Steps ────────────────────────────────────────── */
+.steps {
+  background: #FFFFFF;
+  border-radius: 28rpx;
+  padding: 12rpx 8rpx;
+  box-shadow: 0 2rpx 0 rgba(0,0,0,.03);
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 24rpx;
+  padding: 20rpx 28rpx;
+  border-top: 1rpx solid rgba(60,60,67,.14);
+}
+
+.step:first-child {
+  border-top: none;
+}
+
+.step-num {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #5FA8FF, #007AFF);
+  color: #fff;
+  font-size: 24rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 48rpx;
+  box-shadow: 0 8rpx 20rpx rgba(0,122,255,.3);
+}
+
+.step-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.step-exp {
+  font-size: 27rpx;
+  line-height: 1.5;
+}
+
+.step-fm {
+  margin-top: 10rpx;
+  font-family: "Times New Roman", serif;
+  font-style: italic;
+  color: #5856D6;
+  font-size: 28rpx;
+  background: rgba(88,86,214,.08);
+  padding: 8rpx 16rpx;
+  border-radius: 12rpx;
+  display: inline-block;
+}
+
+/* ── Knowledge points + difficulty ────────────────── */
+.kp-row {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 24rpx;
+}
+
+.kp-card {
+  flex: 2;
+  background: #FFFFFF;
+  border-radius: 28rpx;
+  padding: 24rpx 28rpx;
+  box-shadow: 0 2rpx 0 rgba(0,0,0,.03);
+}
+
+.kp-hdr {
+  font-size: 22rpx;
+  color: #8E8E93;
+  font-weight: 700;
+  letter-spacing: 1rpx;
+  text-transform: uppercase;
+}
+
+.kp-chips {
+  margin-top: 16rpx;
+  display: flex;
+  gap: 12rpx;
+  flex-wrap: wrap;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 10rpx 18rpx;
+  border-radius: 999rpx;
+  background: rgba(88,86,214,.10);
+  color: #5856D6;
+  font-size: 24rpx;
+  font-weight: 600;
+  border: 1rpx solid rgba(88,86,214,.2);
+}
+
+.chip-outline {
+  background: #F2F2F7;
+  color: #3C3C43;
+  border-color: rgba(60,60,67,.14);
+}
+
+.diff-card {
+  flex: 1;
+  background: #FFFFFF;
+  border-radius: 28rpx;
+  padding: 24rpx 28rpx;
+  box-shadow: 0 2rpx 0 rgba(0,0,0,.03);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.diff-hdr {
+  font-size: 22rpx;
+  color: #8E8E93;
+  font-weight: 700;
+  letter-spacing: 1rpx;
+  text-transform: uppercase;
+}
+
+.stars {
+  margin-top: 14rpx;
+  display: flex;
+  gap: 6rpx;
+  color: #FF9500;
+  font-size: 36rpx;
+}
+
+.star-dim {
+  color: #E5E5EA;
+}
+
+.diff-level {
+  font-size: 24rpx;
+  color: #3C3C43;
+  margin-top: 6rpx;
+}
+
+/* ── Ebbinghaus preview card ──────────────────────── */
+.ebbing {
+  margin-top: 28rpx;
+  background: linear-gradient(160deg, #EEF4FF 0%, #F7ECFF 100%);
+  border: 1rpx solid rgba(88,86,214,.18);
+  border-radius: 32rpx;
+  padding: 28rpx;
+}
+
+.ebbing-t {
+  font-size: 24rpx;
+  color: #5856D6;
+  font-weight: 700;
+  letter-spacing: 1rpx;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.ebbing-h4 {
+  font-size: 30rpx;
+  font-weight: 700;
+  margin-top: 8rpx;
+  letter-spacing: 0.2rpx;
+}
+
+.ebbing-nodes {
+  margin-top: 20rpx;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.node {
+  flex: 1;
+  text-align: center;
+}
+
+.node-pill {
+  height: 16rpx;
+  border-radius: 8rpx;
+  background: #E5E5EA;
+}
+
+.node-first .node-pill {
+  background: linear-gradient(90deg, #5FA8FF, #007AFF);
+  box-shadow: 0 0 0 8rpx rgba(0,122,255,.18);
+}
+
+.node-lv {
+  font-size: 20rpx;
+  color: #8E8E93;
+  margin-top: 8rpx;
+  font-weight: 600;
+  letter-spacing: 0.6rpx;
+}
+
+.node-first .node-lv {
+  color: #007AFF;
+}
+
+.node-dt {
+  font-size: 18rpx;
+  color: #8E8E93;
+  margin-top: 2rpx;
+}
+
+/* ── CTA dock ─────────────────────────────────────── */
+.cta {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 28rpx 32rpx calc(env(safe-area-inset-bottom) + 16rpx);
+  background: linear-gradient(180deg, rgba(242,242,247,0), rgba(242,242,247,.9) 30%, #F2F2F7 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  z-index: 10;
+}
+
+.cta-row {
+  display: flex;
+  gap: 16rpx;
+}
+
+.cta-btn {
+  flex: 1;
+}
+
+.cta-note {
+  text-align: center;
+  font-size: 22rpx;
+  color: #8E8E93;
+  letter-spacing: 0.4rpx;
+}

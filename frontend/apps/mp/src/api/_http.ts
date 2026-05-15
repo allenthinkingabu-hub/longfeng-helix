@@ -3,8 +3,8 @@
  * - 微信小程序运行时: 用 wx.request
  * - Node 测试运行时 (vitest): 用 global fetch
  *
- * 这层抽象保证 api/*.ts 业务模块代码相同，pages/*/index.ts 真 MP runtime 调真 wx.request，
- * test/api/*.integration.spec.ts vitest 跑接真 backend port (无 wx · 用 fetch)。
+ * 这层抽象保证 api/ 下业务模块代码相同，pages/ 下 index.ts 真 MP runtime 调真 wx.request，
+ * test/api/ 下 integration.spec.ts vitest 跑接真 backend port (无 wx, 用 fetch)。
  *
  * Backend port map (vite.config.ts 对齐):
  * - /api/file  → http://localhost:8084 (file-service)
