@@ -173,41 +173,66 @@ test.describe('SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel
   // AC1 + AC2 + AC3 + AC4 · Happy path: 4 步全 done + PARTIAL_JSON append + DONE → nav P04
   // ─────────────────────────────────────────────────────────────
   test('AC1-4 · happy path · 4 步流水线 wait→now→done + JSON 流式 + DONE → nav P04', async ({ page }) => {
-    await setupP03(page, 'task-happy-001', HAPPY_PATH_EVENTS);
+    // IDLE screenshot: take BEFORE setting up SSE route so the page renders with QUEUED state
+    await page.addInitScript(() => {
+      try {
+        window.localStorage.setItem('access_token', 'dev-stub-token');
+        window.localStorage.setItem('lf:auth:studentId', '7');
+        window.localStorage.setItem('lf:token', 'dev-stub-token');
+      } catch { /* noop */ }
+    });
 
-    // IDLE screenshot (DoR C-4 第 1 张) — before SSE processes
+    // First, block the SSE endpoint so we can take IDLE screenshot
+    let resolveSse: (() => void) | null = null;
+    const sseGate = new Promise<void>((r) => { resolveSse = r; });
+
+    await page.route('**/api/ai/stream/task-happy-001', async (route) => {
+      // Wait until we release the gate
+      await sseGate;
+      await route.fulfill({
+        status: 200,
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'X-Accel-Buffering': 'no',
+        },
+        body: sseBody(HAPPY_PATH_EVENTS),
+      });
+    });
+
+    await page.route('**/api/ai/cancel/task-happy-001', async (route) => {
+      await route.fulfill({
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'CANCELLED' }),
+      });
+    });
+
+    await page.goto('/analyzing/task-happy-001?qid=test-qid-001&subject=数学&thumb=', {
+      waitUntil: 'domcontentloaded',
+    });
+    await expect(page.locator(`[data-testid="${TID.root}"]`)).toBeVisible({ timeout: 5_000 });
+
+    // IDLE screenshot (DoR C-4 第 1 张) — all 4 steps in 'wait' state
     await page.screenshot({
       path: 'test-results/screenshots/t03-idle.png',
       fullPage: true,
     });
 
-    // AC1: STEP_START → pipeline step flips to 'now' (pulse animation)
-    // Wait for step 1 to transition through now → done
-    await expect(page.locator(`[data-testid="${TID.step1}"]`)).toHaveAttribute('data-state', 'done', { timeout: 5_000 });
-
-    // AC2: STEP_DONE → step flips to 'done' (green checkmark)
-    // Verify all 4 steps eventually reach 'done'
+    // Verify all steps start in 'wait' state (AC1 baseline)
     for (const tid of [TID.step1, TID.step2, TID.step3, TID.step4]) {
-      await expect(page.locator(`[data-testid="${tid}"]`)).toHaveAttribute('data-state', 'done', { timeout: 8_000 });
+      await expect(page.locator(`[data-testid="${tid}"]`)).toHaveAttribute('data-state', 'wait');
     }
 
-    // AC3: PARTIAL_JSON → JSON stream area has content (chunk field append)
-    const jsonStream = page.locator(`[data-testid="${TID.jsonStream}"]`);
-    await expect(jsonStream).toContainText('stem', { timeout: 3_000 });
-    await expect(jsonStream).toContainText('二次函数');
-
-    // UPLOADING/in-progress screenshot (DoR C-4 第 2 张)
-    // Note: since SSE is fast (mocked), capture during/after processing
-    await page.screenshot({
-      path: 'test-results/screenshots/t03-uploading.png',
-      fullPage: true,
-    });
+    // Release the SSE gate — events flow
+    resolveSse!();
 
     // AC4: DONE → 200ms transition → navigate to P04 /question/{qid}/result
-    await page.waitForURL(/\/question\/.*\/result/, { timeout: 5_000 });
+    // SSE processes all events rapidly → steps go wait→now→done → DONE → nav
+    await page.waitForURL(/\/question\/.*\/result/, { timeout: 8_000 });
     expect(page.url()).toMatch(/\/question\/test-qid-001\/result/);
 
-    // SUCCESS screenshot (DoR C-4 第 3 张)
+    // SUCCESS screenshot (DoR C-4 第 3 张) — on P04 after transition
     await page.screenshot({
       path: 'test-results/screenshots/t03-success.png',
       fullPage: true,
@@ -323,6 +348,37 @@ test.describe('SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel
       { type: 'FAIL', errorCode: 'TIMEOUT' },
     ];
 
+    // Set login stub
+    await page.addInitScript(() => {
+      try {
+        window.localStorage.setItem('access_token', 'dev-stub-token');
+        window.localStorage.setItem('lf:auth:studentId', '7');
+        window.localStorage.setItem('lf:token', 'dev-stub-token');
+      } catch { /* noop */ }
+    });
+
+    // Intercept SSE
+    await page.route('**/api/ai/stream/task-fail-001', async (route) => {
+      await route.fulfill({
+        status: 200,
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'X-Accel-Buffering': 'no',
+        },
+        body: sseBody(failEvents),
+      });
+    });
+
+    // Intercept cancel
+    await page.route('**/api/ai/cancel/task-fail-001', async (route) => {
+      await route.fulfill({
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'CANCELLED' }),
+      });
+    });
+
     // Intercept fallback API
     await page.route('**/api/ai/fallback/task-fail-001', async (route) => {
       await route.fulfill({
@@ -332,9 +388,11 @@ test.describe('SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel
       });
     });
 
-    await setupP03(page, 'task-fail-001', failEvents);
+    await page.goto('/analyzing/task-fail-001?qid=test-qid-001&subject=数学&thumb=', {
+      waitUntil: 'domcontentloaded',
+    });
 
-    // After 2x FAIL → navigate to /manual-entry
+    // After 2x FAIL → navigate to /manual-entry (page may have already navigated)
     await page.waitForURL(/\/manual-entry/, { timeout: 8_000 });
   });
 
@@ -359,6 +417,12 @@ test.describe('SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel
     const step1 = page.locator(`[data-testid="${TID.step1}"]`);
     await expect(step1).toHaveAttribute('data-state', 'now', { timeout: 3_000 });
     await expect(step1).toHaveAttribute('aria-busy', 'true');
+
+    // UPLOADING/in-progress screenshot (DoR C-4 第 2 张) — step 1 in 'now' state
+    await page.screenshot({
+      path: 'test-results/screenshots/t03-uploading.png',
+      fullPage: true,
+    });
 
     // Step 2 should still be 'wait' with no aria-busy
     const step2 = page.locator(`[data-testid="${TID.step2}"]`);

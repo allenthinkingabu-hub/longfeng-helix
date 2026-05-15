@@ -1,0 +1,6 @@
+{
+  "name": "@longfeng/frontend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "龙凤错题本 · 前端 pnpm workspace root"
+}
