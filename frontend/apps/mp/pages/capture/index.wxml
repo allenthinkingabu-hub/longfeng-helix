@@ -1,17 +1,150 @@
-<!-- P02 拍题页 · Hello World 骨架 · PHASE-C bootstrap -->
-<view class="capture-page" data-test-id="p02-root">
-  <view class="capture-hero">
-    <text class="capture-title">龙凤错题本</text>
-    <text class="capture-subtitle">拍照即可智能解题</text>
+<!-- P02 拍题页 · 1:1 mirror design/mockups/wrongbook/02_capture.html -->
+<!-- 状态机: IDLE → UPLOADING → UPLOADED → [nav P03] / ERROR -->
+<view class="screen" data-test-id="p02-root">
+
+  <!-- Nav bar (transparent over camera) -->
+  <view class="nav" data-test-id="p02-topbar">
+    <view class="icon-btn" data-test-id="p02-topbar-back" bindtap="onBack">
+      <van-icon name="arrow-left" color="#fff" size="18px" />
+    </view>
+    <text class="nav-title">拍下错题</text>
+    <view class="icon-btn" data-test-id="p02-topbar-flash-btn" bindtap="onToggleFlash">
+      <van-icon name="{{ flashOn ? 'bulb-o' : 'bulb-o' }}" color="{{ flashOn ? '#FFCC00' : '#fff' }}" size="18px" />
+    </view>
   </view>
 
-  <van-button
-    type="primary"
-    size="large"
-    round
-    data-test-id="capture-shutter"
-    bind:click="onCaptureTap"
-  >
-    拍题
-  </van-button>
+  <!-- Auto-detect badge -->
+  <view class="detect" data-test-id="p02-detect-badge" wx:if="{{ state === 'IDLE' }}">
+    <view class="detect-pulse"></view>
+    <text>已识别页面边界 · 自动矫正中</text>
+  </view>
+
+  <!-- Tip card -->
+  <view class="tip" data-test-id="p02-tip-card" wx:if="{{ state === 'IDLE' }}">
+    <van-icon name="shield-o" color="#FFCC00" size="18px" />
+    <text class="tip-text">对准题目并保持稳定，AI 将自动裁剪并去除手写涂鸦</text>
+  </view>
+
+  <!-- Viewfinder -->
+  <view class="view" data-test-id="p02-viewfinder">
+    <!-- Faux paper -->
+    <view class="paper" data-test-id="p02-paper">
+      <text class="paper-lbl">数学 · 第 12 章 复习题</text>
+      <text class="paper-qno">17</text>
+      <text class="paper-heading">已知函数 f(x) = x² − 4x + 3，求其顶点坐标与对称轴方程。</text>
+      <text class="paper-formula">f(x) = (x − 1)² − 2</text>
+      <view class="paper-opts">
+        <text>A. (1, −2)</text><text>B. (2, −1)</text>
+        <text>C. (−1, 2)</text><text>D. (2, 1)</text>
+      </view>
+      <text class="paper-ans">学生作答：</text>
+      <view class="paper-strike"></view>
+      <text class="paper-pen">B ✗</text>
+    </view>
+
+    <!-- Corner brackets -->
+    <view class="bracket bracket-tl"></view>
+    <view class="bracket bracket-tr"></view>
+    <view class="bracket bracket-bl"></view>
+    <view class="bracket bracket-br"></view>
+
+    <!-- Scan line -->
+    <view class="scan"></view>
+
+    <!-- Upload progress overlay -->
+    <view class="upload-overlay" wx:if="{{ state === 'UPLOADING' }}" data-test-id="p02-upload-progress">
+      <van-loading type="spinner" color="#007AFF" size="48px" />
+      <text class="upload-pct">{{ uploadPct }}%</text>
+    </view>
+  </view>
+
+  <!-- Error banner -->
+  <view class="error-banner" wx:if="{{ state === 'ERROR' || errorMsg }}" data-test-id="p02-error-banner">
+    <van-icon name="warning-o" color="#FF3B30" size="16px" />
+    <text class="error-text">{{ errorMsg || '上传失败，请重试' }}</text>
+  </view>
+
+  <!-- Subject chips -->
+  <view class="subjects" data-test-id="p02-subjects">
+    <view
+      wx:for="{{ subjects }}"
+      wx:key="value"
+      class="subj {{ subject === item.value ? 'subj-on' : '' }}"
+      data-test-id="{{ item.testid }}"
+      data-value="{{ item.value }}"
+      bindtap="onSubjectTap"
+    >
+      <text>{{ item.label }}</text>
+    </view>
+  </view>
+
+  <!-- Mode tabs -->
+  <view class="modes" data-test-id="p02-mode-tabs">
+    <view
+      wx:for="{{ modeList }}"
+      wx:key="value"
+      class="mode-btn {{ mode === item.value ? 'mode-on' : '' }}"
+      data-test-id="{{ item.testid }}"
+      data-value="{{ item.value }}"
+      bindtap="onModeTap"
+    >
+      <text>{{ item.label }}</text>
+      <view class="mode-indicator" wx:if="{{ mode === item.value }}"></view>
+    </view>
+  </view>
+
+  <!-- Dock gradient -->
+  <view class="dock"></view>
+
+  <!-- Controls -->
+  <view class="controls">
+    <!-- Gallery -->
+    <view class="control-btn" data-test-id="p02-gallery-btn" bindtap="onGalleryTap">
+      <view class="control-ic">
+        <van-icon name="photo-o" color="#fff" size="22px" />
+      </view>
+      <text class="control-label">相册</text>
+    </view>
+
+    <!-- Shutter -->
+    <view class="shutter" data-test-id="capture-shutter" bindtap="onShutterTap">
+      <view class="shutter-core">
+        <van-icon name="photograph" color="#fff" size="24px" />
+      </view>
+    </view>
+
+    <!-- File -->
+    <view class="control-btn" bindtap="onGalleryTap">
+      <view class="control-ic">
+        <van-icon name="description" color="#fff" size="22px" />
+      </view>
+      <text class="control-label">文件</text>
+    </view>
+  </view>
+
+  <!-- Tab bar -->
+  <view class="tabbar">
+    <view class="tab" bindtap="onTabHome">
+      <van-icon name="wap-home-o" size="24px" />
+      <text>首页</text>
+    </view>
+    <view class="tab" bindtap="onTabWrongbook">
+      <van-icon name="notes-o" size="24px" />
+      <text>错题本</text>
+    </view>
+    <view class="tab tab-active">
+      <van-icon name="photograph" size="24px" />
+      <text>拍题</text>
+    </view>
+    <view class="tab">
+      <van-icon name="clock-o" size="24px" />
+      <text>复习</text>
+    </view>
+    <view class="tab">
+      <van-icon name="contact" size="24px" />
+      <text>我的</text>
+    </view>
+  </view>
 </view>
+
+<van-toast id="van-toast" />
