@@ -14,7 +14,7 @@
     "automator_ws": "ws://127.0.0.1:9420",
     "scope_in": [
       "写 frontend/apps/mp/test/e2e/<page-or-flow>.spec.ts (用 miniprogram-automator)",
-      "spec 必含: beforeAll connect (8s timeout) · 1+ test (currentPage / page.\$ / mp.screenshot) · afterAll disconnect",
+      "spec 必含: beforeAll connect (8s timeout) · 1+ test (currentPage / page.$ / mp.screenshot) · afterAll disconnect",
       "page-vrt kind 额外: pixelmatch 对比 actual screenshot vs baseline_png · diff < 5000 pixel 判 PASS",
       "transition kind: 调 wx tap / wx.navigateTo · 验证 currentPage().path 跳转后改变",
       "api-only kind (T06): 调 src/api/review.ts 函数 · 验证响应契约 (补 health-check soft-skip)",
