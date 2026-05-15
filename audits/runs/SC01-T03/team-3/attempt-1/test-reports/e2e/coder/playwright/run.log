@@ -1,12 +1,12 @@
 
 Running 7 tests using 1 worker
 
-  ✓  1 [chromium] › tests/e2e/sc-01/t03-ai-stream-pipeline.spec.ts:175:3 › SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › AC1-4 · happy path · 4 步流水线 wait→now→done + JSON 流式 + DONE → nav P04 (2.9s)
-  ✓  2 [chromium] › tests/e2e/sc-01/t03-ai-stream-pipeline.spec.ts:245:3 › SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › AC5 · TC-01.03 · qwen timeout → FALLBACK_MODEL → 黄条 + model badge switch (994ms)
-  ✓  3 [chromium] › tests/e2e/sc-01/t03-ai-stream-pipeline.spec.ts:269:3 › SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › AC6 · cancel button → POST /cancel → nav P-HOME (/) (1.2s)
-  ✓  4 [chromium] › tests/e2e/sc-01/t03-ai-stream-pipeline.spec.ts:307:3 › SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › TI3 · pipeline step order strict: step N done before step N+1 starts (812ms)
-  ✓  5 [chromium] › tests/e2e/sc-01/t03-ai-stream-pipeline.spec.ts:325:3 › SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › alias testids render alongside canonical testids (620ms)
-  ✓  6 [chromium] › tests/e2e/sc-01/t03-ai-stream-pipeline.spec.ts:343:3 › SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › FAIL events: 2x FAIL triggers fallback to /manual-entry (665ms)
-  ✓  7 [chromium] › tests/e2e/sc-01/t03-ai-stream-pipeline.spec.ts:402:3 › SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › a11y: pipeline has aria-live=polite, active step has aria-busy (829ms)
+  ✓  1 [chromium] › tests/e2e/sc-01/t03-ai-stream-pipeline.spec.ts:175:3 › SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › AC1-4 · happy path · 4 步流水线 wait→now→done + JSON 流式 + DONE → nav P04 (1.5s)
+  ✓  2 [chromium] › tests/e2e/sc-01/t03-ai-stream-pipeline.spec.ts:245:3 › SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › AC5 · TC-01.03 · qwen timeout → FALLBACK_MODEL → 黄条 + model badge switch (835ms)
+  ✓  3 [chromium] › tests/e2e/sc-01/t03-ai-stream-pipeline.spec.ts:269:3 › SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › AC6 · cancel button → POST /cancel → nav P-HOME (/) (985ms)
+  ✓  4 [chromium] › tests/e2e/sc-01/t03-ai-stream-pipeline.spec.ts:307:3 › SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › TI3 · pipeline step order strict: step N done before step N+1 starts (796ms)
+  ✓  5 [chromium] › tests/e2e/sc-01/t03-ai-stream-pipeline.spec.ts:325:3 › SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › alias testids render alongside canonical testids (606ms)
+  ✓  6 [chromium] › tests/e2e/sc-01/t03-ai-stream-pipeline.spec.ts:343:3 › SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › FAIL events: 2x FAIL triggers fallback to /manual-entry (536ms)
+  ✓  7 [chromium] › tests/e2e/sc-01/t03-ai-stream-pipeline.spec.ts:402:3 › SC-01-T03 · P03 AI 4 步流水线 SSE 推送 + fallback + cancel › a11y: pipeline has aria-live=polite, active step has aria-busy (614ms)
 
-  7 passed (9.6s)
+  7 passed (6.8s)

@@ -1,23 +1,13 @@
-# bugs-found.md · SC01-T03 · team-3 · attempt-1
+# Bugs Found · SC01-T03 · attempt-1
 
-## Bug 列表
+## Bug 1: P03 React 暗色主题与 mockup 浅色主题完全不匹配
+- **文件**: `frontend/apps/h5/src/pages/Analyzing/Analyzing.module.css` + `index.tsx`
+- **描述**: 原实现使用 Mood C 暗色主题 (dark gradient #1A1A2E→#0F0F23)，mockup HTML 使用浅色 iOS 主题 (#F2F2F7 bg + #FFFFFF cards)。DOM 结构也有显著差异：缺少 nav bar、preview card 细节、model badge green dot、stages 卡片描述、terminal header dots、tab bar。
+- **修复**: 完全重写 CSS (293 行) + JSX 结构以 1:1 匹配 mockup。
+- **Commit**: cc74088
 
-### Bug 1: E2E happy path race — SSE 处理太快导致 nav 前 assertion 失败
-- **文件**: `frontend/apps/h5/tests/e2e/sc-01/t03-ai-stream-pipeline.spec.ts`
-- **描述**: Playwright route.fulfill 一次性返回全部 SSE 帧，hook 同步处理后 200ms 内 nav 到 P04，测试来不及断言中间状态
-- **修复**: 使用 Promise gate 阻塞 SSE 响应，先截图 IDLE 态再释放 gate；中间态 (uploading) 截图移到 a11y 测试 (hangStream 模式)
-- **Commit**: 见下方第二个 commit
-
-### Bug 2: FAIL 测试中 p03-root visibility check 在 page 已 nav 后执行
-- **文件**: `frontend/apps/h5/tests/e2e/sc-01/t03-ai-stream-pipeline.spec.ts`
-- **描述**: setupP03 内等待 p03-root visible，但 2x FAIL 后 page 已 nav 到 /manual-entry，p03-root 不在 DOM
-- **修复**: FAIL 测试不使用 setupP03，直接 inline setup + 只等待 /manual-entry URL
-- **Commit**: 见下方第二个 commit
-
-### Bug 3: pnpm workspace 基础设施缺失
-- **文件**: `frontend/` (多个)
-- **描述**: `@longfeng/*` workspace 包缺少 package.json，pnpm install 无法解析 workspace:* 依赖
-- **修复**: 创建 pnpm-workspace.yaml + 各包 package.json + stub clients
-- **Commit**: 见下方第二个 commit
-
-共发现 3 个 bug，均已修复。
+## Bug 2: E2E 测试连接到错误的 dev server
+- **文件**: E2E test configuration
+- **描述**: 端口 5174 上的 Vite dev server 来自其他 worktree，该 worktree 没有 /analyzing/:taskId 路由，导致所有测试页面空白。
+- **修复**: 在本 worktree 启动独立 dev server (port 5182)，使用 PLAYWRIGHT_BASE_URL=http://localhost:5182 运行测试。
+- **Commit**: (runtime fix, no code change needed)
