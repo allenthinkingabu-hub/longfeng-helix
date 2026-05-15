@@ -26,6 +26,20 @@
 - Round 2: 探索性测试 (连点/DOM注入/超长/race) → retry bug found → fixed
 - Round 3: PASS
 
+## Attempt-3 independent tester verification (2026-05-15)
+
+| Check | Result | Evidence |
+|---|---|---|
+| `pnpm -F mp typecheck` re-run | PASS exit 0 | Ran independently, 0 errors |
+| WXML ↔ mockup 1:1 DOM structure | PASS | All 9 sections match: nav, hero, answers, reason, steps, kp-row, ebbing, CTA, cta-note |
+| State machine 4-branch WXML | PASS | LOADING (skeleton), ERROR (retry), EMPTY (message), DRAFT (scroll-view) |
+| Timeline nodes = 6 (T1–T6) | PASS | `_buildTimeline()` levels array + `timelineNodes` default data both = 6 |
+| `onRetryTap` uses `_qid` fallback | PASS | Line 165: `this._qid \|\| this._questionRaw?.id \|\| ''` |
+| coder.md + bugs-found.md exist | PASS | Fixing attempt-2 audit REDO (coder_compliance) |
+| `icon="success"` added to save CTA | PASS | Matches mockup checkmark SVG via Vant icon |
+| No `page.route` / excessive mock | PASS | 0 mocks in test-reports |
+| git diff HEAD -- index.wxml | Only `icon="success"` addition | Correct 1:1 mirror refinement |
+
 ## PHASE-C route note
 
 Per `audit_gate`: "NO automator E2E". Physical verification = tsc + screenshot presence + code review + mockup comparison + exploratory code analysis.
