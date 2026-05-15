@@ -1,7 +1,7 @@
 {
   "pages": [
     "pages/capture/index",
-    "pages/result/index"
+    "pages/review-exec/index"
   ],
   "window": {
     "navigationBarBackgroundColor": "#ffffff",
