@@ -178,6 +178,7 @@
         loading-text="保存中…"
         data-test-id="p04-save-cta"
         bind:click="onSaveTap"
+        icon="success"
       >保存并开启复习</van-button>
     </view>
     <text class="cta-note">保存后将按《艾宾浩斯》自动生成 T1–T6 共 6 个日历提醒</text>
