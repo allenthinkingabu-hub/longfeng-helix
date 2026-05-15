@@ -61,7 +61,7 @@ pnpm -F mp test:e2e -- test/api/review-plan-transparency.spec.ts
 
 ## 5. 提交
 
-- Commit hash: (见 git commit 后填充)
+- Commit hash: debe960
 - 改动文件:
   - `frontend/apps/mp/src/api/review.ts` (+140 -8 行)
   - `frontend/apps/mp/test/api/review-plan-transparency.spec.ts` (新文件 · 170 行)
