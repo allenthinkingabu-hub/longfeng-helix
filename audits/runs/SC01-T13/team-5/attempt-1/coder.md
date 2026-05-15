@@ -101,4 +101,6 @@
 
 ## 5. 提交
 
-**Commits**: (will be filled after git commit)
+**Commits**:
+- `c14203d` — feat(SC01-T13): P09 ReviewDone page + review API client + E2E spec (prior)
+- `877ff95` — fix(SC01-T13): resolve PHASE-A merge gaps + E2E 10/10 PASS + audit artifacts
