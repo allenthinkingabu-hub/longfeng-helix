@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "task": {"id": "SC01-MP-T03-PAGE-FIX", "team_id": "team-2", "title": "PHASE-C MP E2E page-fix · SC01-MP-T03-PAGE-FIX · pages/analyzing 让 e2e spec 通", "attempt": 1, "phase": "coder", "dev_done": true, "passes": false, "retries": 0, "audit_retries": 0, "git_commits": []},
+  "task": {"id": "SC01-MP-T03-PAGE-FIX", "team_id": "team-2", "title": "PHASE-C MP E2E page-fix · SC01-MP-T03-PAGE-FIX · pages/analyzing 让 e2e spec 通", "attempt": 1, "phase": "coder", "dev_done": true, "passes": false, "retries": 0, "audit_retries": 0, "git_commits": ["3f9ada8"]},
   "work_log_dir": "audits/runs/SC01-MP-T03-PAGE-FIX/team-2/attempt-1",
   "log_requirements": {"must_write": ["coder.md", "bugs-found.md"]},
   "audit_gate": "Phase 5 · 让 page-vrt spec 通 · lint+typecheck+test:unit pass · 强制 git commit",
