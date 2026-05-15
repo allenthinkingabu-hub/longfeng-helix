@@ -4,17 +4,17 @@
     "id": "SC01-MP-T13-E2E",
     "team_id": "team-5",
     "title": "PHASE-C MP E2E + VRT · SC01-MP-T13-E2E · review-done (page-vrt)",
-    "attempt": 1,
+    "attempt": 2,
     "phase": "tester",
     "dev_done": true,
     "passes": true,
     "retries": 0,
-    "audit_retries": 0,
+    "audit_retries": 1,
     "git_commits": [
       "ef77ba1"
     ]
   },
-  "work_log_dir": "audits/runs/SC01-MP-T13-E2E/team-5/attempt-1",
+  "work_log_dir": "audits/runs/SC01-MP-T13-E2E/team-5/attempt-2",
   "log_requirements": {
     "must_write": [
       "tester.md",
@@ -23,7 +23,126 @@
     ]
   },
   "audit_gate": "Phase 1 · 写 spec 不跑 automator · lint + tsc + test:unit PASS · 强制 git commit",
-  "previous_audit_verdict": null,
+  "previous_audit_verdict": {
+    "task_id": "SC01-MP-T13-E2E",
+    "attempt": 1,
+    "team_id": "team-5",
+    "audited_at": "2026-05-15T16:23:30.799Z",
+    "audited_by": "audit.js v1 (deterministic · 5 dims)",
+    "pass": false,
+    "checks": [
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t13-e2e/audits/runs/SC01-MP-T13-E2E/team-5/attempt-1/coder.md"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_地形侦察",
+        "pass": true,
+        "evidence": "1×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_编码",
+        "pass": true,
+        "evidence": "1×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_自检",
+        "pass": true,
+        "evidence": "1×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_提交",
+        "pass": true,
+        "evidence": "1×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "bugs_found_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t13-e2e/audits/runs/SC01-MP-T13-E2E/team-5/attempt-1/bugs-found.md"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "bugs_found_md_has_declaration",
+        "pass": true,
+        "evidence": "\"0 bug\" declaration found"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "tester_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t13-e2e/audits/runs/SC01-MP-T13-E2E/team-5/attempt-1/tester.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t13-e2e/audits/runs/SC01-MP-T13-E2E/team-5/attempt-1/adversarial.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "test_reports_nonempty",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t13-e2e/audits/runs/SC01-MP-T13-E2E/team-5/attempt-1/test-reports"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_has_reject_round",
+        "pass": true,
+        "evidence": "REJECT/驳回 keyword found"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_has_fix_round",
+        "pass": true,
+        "evidence": "fix/修复 keyword found"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "mock_total_le_5",
+        "pass": true,
+        "evidence": "mock=2/5 (vi.mock,page.route)"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "maxDiffPixels_le_500",
+        "pass": false,
+        "evidence": "max=5000/500 OVER in audits/runs/SC01-MP-T13-E2E/team-5/attempt-1/tester.md"
+      },
+      {
+        "dimension": "bug_reality",
+        "name": "all_git_commits_verified",
+        "pass": true,
+        "evidence": "1/1 hash(es) git cat-file -e PASS"
+      },
+      {
+        "dimension": "test_validity",
+        "name": "tester_md_testcase_count_matches_xml",
+        "pass": false,
+        "evidence": "claimed=97 but no <testcase> in XML — tester.md may inflate"
+      },
+      {
+        "dimension": "test_validity",
+        "name": "adversarial_has_exploratory_keywords",
+        "pass": true,
+        "evidence": "4 matched: [DOM,block,timeout,500]"
+      },
+      {
+        "dimension": "spec_alignment",
+        "name": "dor_e2e_required",
+        "pass": true,
+        "evidence": "inflight.physical_verification.dor_c1_to_c6_required=false — DoR skipped (P0 audit task)"
+      }
+    ],
+    "redo_target": "tester",
+    "redo_reason": "[tester_compliance.maxDiffPixels_le_500] max=5000/500 OVER in audits/runs/SC01-MP-T13-E2E/team-5/attempt-1/tester.md · [test_validity.tester_md_testcase_count_matches_xml] claimed=97 but no <testcase> in XML — tester.md may inflate"
+  },
   "context": {
     "scenario": "PHASE-C MP 真 E2E + VRT (阈值 5000 pixel) · page-vrt",
     "kind": "page-vrt",
@@ -73,6 +192,6 @@
     "5. 强制 git commit + node .harness/harness.js --advance=SC01-MP-T13-E2E"
   ],
   "rule_6_tool_budget_guidance": "Phase 1 · 20-30 tool use",
-  "written_at": "2026-05-15T16:18:13.324Z",
+  "written_at": "2026-05-15T16:23:31.069Z",
   "written_by": "TL agent (Phase 1 E2E spec spawn)"
 }
