@@ -13,8 +13,7 @@
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import automator from 'miniprogram-automator';
-import { readFileSync } from 'node:fs';
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { PNG } from 'pngjs';
 
@@ -78,10 +77,13 @@ describe('P03 Analyzing page · E2E + VRT', () => {
     const baselinePng = PNG.sync.read(baselineBuf);
     const actualPng = PNG.sync.read(actualBuf);
 
-    // Resize to match if dimensions differ (use smaller as reference)
-    const width = Math.min(baselinePng.width, actualPng.width);
-    const height = Math.min(baselinePng.height, actualPng.height);
+    // Fail explicitly if dimensions mismatch — silent crop would give false PASS
+    expect(
+      actualPng.width === baselinePng.width && actualPng.height === baselinePng.height,
+      `dimension mismatch: actual ${actualPng.width}×${actualPng.height} vs baseline ${baselinePng.width}×${baselinePng.height}`,
+    ).toBe(true);
 
+    const { width, height } = baselinePng;
     const diffPng = new PNG({ width, height });
 
     const diffPixels = pixelmatch(
