@@ -5,18 +5,22 @@
     "team_id": "team-1",
     "title": "PHASE-B 第二波 SC-01-T04 · SSE DONE 后 P03→P04 跳转 · 渲染 Hero + 错因 + 3 步解法 + 6 节点预告",
     "attempt": 1,
-    "phase": "coder",
+    "phase": "tester",
     "dev_done": true,
-    "passes": false,
+    "passes": true,
     "retries": 0,
     "audit_retries": 0,
-    "git_commits": ["cb9190c", "71eb1a5"]
+    "git_commits": [
+      "cb9190c",
+      "71eb1a5"
+    ]
   },
   "work_log_dir": "audits/runs/SC01-T04/team-1/attempt-1",
   "log_requirements": {
     "must_write": [
-      "coder.md",
-      "bugs-found.md"
+      "tester.md",
+      "adversarial.md",
+      "test-reports/"
     ]
   },
   "audit_gate": "audit.js v1 (含新加 c4b 真 VRT 检查) 五维度严卡 · mock ≤ 5 · 数字对齐 · maxDiffPixels ≤ 500 · 禁 H2/Mock",
@@ -90,16 +94,14 @@
     "branch_name": "claude/sc01-t04-analyzing-to-result"
   },
   "physical_verification": {
-    "dor_c1_to_c6_required": true,
-    "rationale": "PHASE-B 前端 transition task · Playwright headed + 跨页跳转 E2E"
+    "dor_c1_to_c6_required": false
   },
   "permissions": {
     "writable_fields": [
-      "task.dev_done",
-      "task.git_commits"
+      "task.passes"
     ]
   },
-  "written_at": "2026-05-15T05:41:56.545Z",
+  "written_at": "2026-05-15T05:55:49.119Z",
   "written_by": "TL agent (PHASE-B wave 2 spawn prep)",
   "deliverables_definition_of_done": [
     "1. 实现 task per inflight.context.acceptance_criteria + test_invariants",
