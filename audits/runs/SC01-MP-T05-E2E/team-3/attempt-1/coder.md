@@ -45,4 +45,4 @@ Phase 1 scope: 只写 spec 不跑 automator (inflight `physical_verification.dor
 
 ## 5. 提交
 
-commit hash: (见下方 git commit)
+commit hash: 8e71d5d
