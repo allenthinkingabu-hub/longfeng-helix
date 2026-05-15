@@ -1,0 +1,9 @@
+
+Running 4 tests using 1 worker
+
+  ✓  1 [chromium] › tests/e2e/sc-01/t04-analyze-done-to-result.spec.ts:201:3 › SC01-T04 · SSE DONE → P03→P04 transition + P04 渲染 › AC1-4 · P03 SSE DONE → 200ms transition → P04 renders Hero + 错因 + 3步 + 6节点 (1.1s)
+  ✓  2 [chromium] › tests/e2e/sc-01/t04-analyze-done-to-result.spec.ts:275:3 › SC01-T04 · SSE DONE → P03→P04 transition + P04 渲染 › AC5 · TC-01.04 · confidence < 0.6 → 黄条 + 保存触发确认弹窗 (1.3s)
+  ✓  3 [chromium] › tests/e2e/sc-01/t04-analyze-done-to-result.spec.ts:342:3 › SC01-T04 · SSE DONE → P03→P04 transition + P04 渲染 › direct P04 mount — DRAFT renders all sections correctly (561ms)
+  ✓  4 [chromium] › tests/e2e/sc-01/t04-analyze-done-to-result.spec.ts:396:3 › SC01-T04 · SSE DONE → P03→P04 transition + P04 渲染 › P04 GET API error → ERROR state fallback (2.6s)
+
+  4 passed (6.3s)

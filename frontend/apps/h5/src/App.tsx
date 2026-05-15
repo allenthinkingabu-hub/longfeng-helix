@@ -9,6 +9,18 @@ const HomeStub: React.FC = () => (
   </div>
 );
 
+const WrongbookStub: React.FC = () => (
+  <div data-testid="p05-root" style={{ padding: 20, color: '#333' }}>
+    <h2>错题本</h2>
+  </div>
+);
+
+const ManualEntryStub: React.FC = () => (
+  <div data-testid="manual-entry-root" style={{ padding: 20, color: '#333' }}>
+    <h2>手动填写</h2>
+  </div>
+);
+
 export const App: React.FC = () => (
   <Routes>
     <Route path="/" element={<HomeStub />} />

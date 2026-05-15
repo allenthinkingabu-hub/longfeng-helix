@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "SC01-T04",
+    "team_id": "team-1",
+    "title": "PHASE-B 第二波 SC-01-T04 · SSE DONE 后 P03→P04 跳转 · 渲染 Hero + 错因 + 3 步解法 + 6 节点预告",
+    "attempt": 3,
+    "phase": "done",
+    "dev_done": true,
+    "passes": true,
+    "retries": 0,
+    "audit_retries": 2,
+    "git_commits": [
+      "cb9190c",
+      "71eb1a5"
+    ]
+  },
+  "work_log_dir": "audits/runs/SC01-T04/team-1/attempt-3",
+  "log_requirements": {
+    "must_write": [
+      "tester.md",
+      "adversarial.md",
+      "test-reports/"
+    ]
+  },
+  "audit_gate": "audit.js v1 (含新加 c4b 真 VRT 检查) 五维度严卡 · mock ≤ 5 · 数字对齐 · maxDiffPixels ≤ 500 · 禁 H2/Mock",
+  "previous_audit_verdict": {
+    "task_id": "SC01-T04",
+    "attempt": 2,
+    "team_id": "team-1",
+    "audited_at": "2026-05-15T06:08:00.181Z",
+    "audited_by": "audit.js v1 (deterministic · 5 dims)",
+    "pass": false,
+    "checks": [
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_exists",
+        "pass": false,
+        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result/audits/runs/SC01-T04/team-1/attempt-2/coder.md"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "bugs_found_md_exists",
+        "pass": false,
+        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result/audits/runs/SC01-T04/team-1/attempt-2/bugs-found.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "tester_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result/audits/runs/SC01-T04/team-1/attempt-2/tester.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result/audits/runs/SC01-T04/team-1/attempt-2/adversarial.md"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "test_reports_nonempty",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result/audits/runs/SC01-T04/team-1/attempt-2/test-reports"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_has_reject_round",
+        "pass": true,
+        "evidence": "REJECT/驳回 keyword found"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "adversarial_has_fix_round",
+        "pass": true,
+        "evidence": "fix/修复 keyword found"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "mock_total_le_5",
+        "pass": true,
+        "evidence": "mock=4/5 (vi.mock,page.route,MockMvc,jest.mock)"
+      },
+      {
+        "dimension": "tester_compliance",
+        "name": "maxDiffPixels_le_500",
+        "pass": true,
+        "evidence": "max=500/500"
+      },
+      {
+        "dimension": "bug_reality",
+        "name": "all_git_commits_verified",
+        "pass": true,
+        "evidence": "2/2 hash(es) git cat-file -e PASS"
+      },
+      {
+        "dimension": "test_validity",
+        "name": "tester_md_testcase_count_matches_xml",
+        "pass": true,
+        "evidence": "claimed=4 == xml<testcase>=4"
+      },
+      {
+        "dimension": "test_validity",
+        "name": "adversarial_has_exploratory_keywords",
+        "pass": true,
+        "evidence": "3 matched: [DOM,注入,500]"
+      },
+      {
+        "dimension": "spec_alignment",
+        "name": "dor_e2e_required",
+        "pass": true,
+        "evidence": "inflight.physical_verification.dor_c1_to_c6_required=false — DoR skipped (P0 audit task)"
+      }
+    ],
+    "redo_target": "coder",
+    "redo_reason": "[coder_compliance.coder_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result/audits/runs/SC01-T04/team-1/attempt-2/coder.md · [coder_compliance.bugs_found_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result/audits/runs/SC01-T04/team-1/attempt-2/bugs-found.md"
+  },
+  "context": {
+    "scenario": "PHASE-B 第二波 · TC-01.01 步 7-8 + TC-01.04 (低置信黄条) · SSE DONE 后 P03→P04 跳转 · 渲染 Hero + 错因 + 3 步解法 + 6 节点预告",
+    "target_page": "P03→P04",
+    "page_state_machine": "analyzing.SUCCEEDED → result.DRAFT",
+    "biz_step_range": "biz §2B.2 步 7-8",
+    "biz_refs": [
+      "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 7-8",
+      "biz §2A.4 P04 规格卡",
+      "TC-01.04"
+    ],
+    "spec_refs": "P03-analyzing.spec.md §6 + P04-result.spec.md §5",
+    "primary_services": [
+      "frontend/apps/h5",
+      "backend/wrongbook-service",
+      "backend/ai-analysis-service"
+    ],
+    "primary_apis": [
+      "GET /api/wb/questions/{qid}",
+      "GET /analysis/{itemId}/latest"
+    ],
+    "acceptance_criteria": [
+      {
+        "id": "AC1",
+        "text": "SSE DONE event 到达 → analysis_result 已落库 (wrong_item_analysis 行存在)"
+      },
+      {
+        "id": "AC2",
+        "text": "P03 淡出 + P04 淡入 ≤ 300ms · 滚动条置顶"
+      },
+      {
+        "id": "AC3",
+        "text": "GET /api/wb/questions/{qid} 返聚合 {question, plannedNodes} · plain JSON 不裹 ApiResult · FE 直接 destructure"
+      },
+      {
+        "id": "AC4",
+        "text": "P04 完整渲染: Hero (题干+公式) + 错解红条 + 正解绿卡 + 3 步解法 + KP chips + 难度 ★ + 6 节点预告 T0=now/T1-T6=future"
+      },
+      {
+        "id": "AC5",
+        "text": "TC-01.04 · confidence < 0.6 → 顶部黄条「AI 不太确定，请复核」+ 保存按钮可用但触发前端强制确认弹窗 · 埋点 wb_result_low_conf"
+      }
+    ],
+    "test_invariants": [
+      "TI1: 6 节点时间线初始 T0=now · T1-T6=future (非 SCHEDULED 因尚未 save)",
+      "TI2: confidence 字段 ∈ [0,1] (DB constraint · ai-analysis-service 写入时校验)",
+      "TI3: 滚动到底部触发 wb_result_scroll{depth%} 埋点",
+      "TI4: P04 4 态 (draft/editing/saving/saved) 中 draft 态 VRT screenshot"
+    ],
+    "key_invariants": [
+      "P04 进场必须满足 analysis_result 已落库 (SSE DONE 后 GET 应返回完整 analysis)"
+    ],
+    "sandbox": {
+      "pg_port": 15434,
+      "redis_port": 16381,
+      "minio_api_port": 9004,
+      "pg_user": "longfeng",
+      "pg_password": "longfeng_dev",
+      "pg_db": "wrongbook"
+    },
+    "mockup_directive": "03_analyzing.html→04_result.html (transition · DONE → P04 hero + 错因 + 3 步)",
+    "e2e_protocol": "DoR C-1..C-6 per dor_c1_to_c6_required · 真 sandbox · 禁 Mock",
+    "phase_b_wave_1_prerequisites": "PHASE-B 第一波 5 page 已 merge main: Capture/Analyzing/Result/ReviewExec/ReviewDone · 可作为 transition 起点"
+  },
+  "isolation": {
+    "worktree_disabled": false,
+    "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t04-analyzing-to-result",
+    "branch_name": "claude/sc01-t04-analyzing-to-result"
+  },
+  "physical_verification": {
+    "dor_c1_to_c6_required": false
+  },
+  "permissions": {
+    "writable_fields": [
+      "task.passes"
+    ]
+  },
+  "written_at": "2026-05-15T06:09:55.206Z",
+  "written_by": "TL agent (PHASE-B wave 2 spawn prep)",
+  "deliverables_definition_of_done": [
+    "1. 实现 task per inflight.context.acceptance_criteria + test_invariants",
+    "2. 起 backend service + 前端 dev server 真联调 (per primary_services + sandbox endpoint)",
+    "3. work_log: coder.md (5 段落) + bugs-found.md (真 bug list)",
+    "4. git commit 分批 · hash 全部 git cat-file -e 验真",
+    "5. **强制 git add audits/runs/SC01-T04/team-*/attempt-1/ + git commit** (per 上波教训)",
+    "6. inflight dev_done=true + git_commits[]",
+    "7. node .harness/harness.js --advance=SC01-T04"
+  ],
+  "rule_6_tool_budget_guidance": "PHASE-B 第二波 · transition task 比 page task 简单 · 预计 ~50-70 tool use"
+}
