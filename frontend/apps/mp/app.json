@@ -1,7 +1,7 @@
 {
   "pages": [
     "pages/capture/index",
-    "pages/analyzing/index"
+    "pages/result/index"
   ],
   "window": {
     "navigationBarBackgroundColor": "#ffffff",
