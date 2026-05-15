@@ -1,0 +1,27 @@
+
+Running 6 tests using 1 worker
+
+  ✓  1 [chromium] › tests/e2e/sc-01/t11-reveal.spec.ts:78:3 › SC-01-T11 · P08 揭示答案 → 绿色答案卡展开 › happy path · tap reveal → POST /reveal 200 → 答案卡展开 + grade buttons enabled (902ms)
+  ✓  2 [chromium] › tests/e2e/sc-01/t11-reveal.spec.ts:161:3 › SC-01-T11 · P08 揭示答案 → 绿色答案卡展开 › AC3 · memory curve current T node visible + pulse after reveal (486ms)
+  ✓  3 [chromium] › tests/e2e/sc-01/t11-reveal.spec.ts:186:3 › SC-01-T11 · P08 揭示答案 → 绿色答案卡展开 › TI1 · reveal request sends no body (readonly lifecycle timestamp) (332ms)
+  ✓  4 [chromium] › tests/e2e/sc-01/t11-reveal.spec.ts:204:3 › SC-01-T11 · P08 揭示答案 → 绿色答案卡展开 › TI2 · reveal response contains only nid + revealedAt (no MQ/outbox fields) (335ms)
+  ✓  5 [chromium] › tests/e2e/sc-01/t11-reveal.spec.ts:223:3 › SC-01-T11 · P08 揭示答案 → 绿色答案卡展开 › spec §9 · reveal 502 → UI still expands answer card (eventually consistent) (477ms)
+  ✓  6 [chromium] › tests/e2e/sc-01/t11-reveal.spec.ts:247:3 › SC-01-T11 · P08 揭示答案 → 绿色答案卡展开 › UI structure · topbar + progress + meta + question hero all visible (271ms)
+
+  6 passed (3.6s)
+<testsuites id="" name="" tests="6" failures="0" skipped="0" errors="0" time="3.5966890000000005">
+<testsuite name="sc-01/t11-reveal.spec.ts" timestamp="2026-05-15T04:53:22.407Z" hostname="chromium" tests="6" failures="0" skipped="0" time="2.803" errors="0">
+<testcase name="SC-01-T11 · P08 揭示答案 → 绿色答案卡展开 › happy path · tap reveal → POST /reveal 200 → 答案卡展开 + grade buttons enabled" classname="sc-01/t11-reveal.spec.ts" time="0.902">
+</testcase>
+<testcase name="SC-01-T11 · P08 揭示答案 → 绿色答案卡展开 › AC3 · memory curve current T node visible + pulse after reveal" classname="sc-01/t11-reveal.spec.ts" time="0.486">
+</testcase>
+<testcase name="SC-01-T11 · P08 揭示答案 → 绿色答案卡展开 › TI1 · reveal request sends no body (readonly lifecycle timestamp)" classname="sc-01/t11-reveal.spec.ts" time="0.332">
+</testcase>
+<testcase name="SC-01-T11 · P08 揭示答案 → 绿色答案卡展开 › TI2 · reveal response contains only nid + revealedAt (no MQ/outbox fields)" classname="sc-01/t11-reveal.spec.ts" time="0.335">
+</testcase>
+<testcase name="SC-01-T11 · P08 揭示答案 → 绿色答案卡展开 › spec §9 · reveal 502 → UI still expands answer card (eventually consistent)" classname="sc-01/t11-reveal.spec.ts" time="0.477">
+</testcase>
+<testcase name="SC-01-T11 · P08 揭示答案 → 绿色答案卡展开 › UI structure · topbar + progress + meta + question hero all visible" classname="sc-01/t11-reveal.spec.ts" time="0.271">
+</testcase>
+</testsuite>
+</testsuites>

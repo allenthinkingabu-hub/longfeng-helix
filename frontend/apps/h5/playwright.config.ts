@@ -38,7 +38,11 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        // Override to mobile viewport matching mockup phone frame (393×852)
+        viewport: { width: 393, height: 852 },
+      },
     },
   ],
   // Playwright 默认输出到当前 cwd 的 test-results/ —— 整个目录会被拷进 work_log_dir
