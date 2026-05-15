@@ -4,62 +4,91 @@
     "id": "SC01-MP-T10-E2E",
     "team_id": "team-4",
     "title": "PHASE-C MP E2E + VRT · SC01-MP-T10-E2E · review-today (transition)",
-    "attempt": 3,
-    "phase": "tester",
+    "attempt": 4,
+    "phase": "coder",
     "dev_done": true,
-    "passes": true,
+    "passes": false,
     "retries": 0,
-    "audit_retries": 2,
+    "audit_retries": 3,
     "git_commits": [
       "056fc0e"
     ]
   },
-  "work_log_dir": "audits/runs/SC01-MP-T10-E2E/team-4/attempt-3",
+  "work_log_dir": "audits/runs/SC01-MP-T10-E2E/team-4/attempt-4",
   "log_requirements": {
     "must_write": [
-      "tester.md",
-      "adversarial.md",
-      "test-reports/"
+      "coder.md",
+      "bugs-found.md"
     ]
   },
   "audit_gate": "Phase 1 · 写 spec 不跑 automator · lint + tsc + test:unit PASS · 强制 git commit",
   "previous_audit_verdict": {
     "task_id": "SC01-MP-T10-E2E",
-    "attempt": 2,
+    "attempt": 3,
     "team_id": "team-4",
-    "audited_at": "2026-05-15T16:22:10.178Z",
+    "audited_at": "2026-05-15T16:26:13.875Z",
     "audited_by": "audit.js v1 (deterministic · 5 dims)",
     "pass": false,
     "checks": [
       {
         "dimension": "coder_compliance",
         "name": "coder_md_exists",
-        "pass": false,
-        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t10-e2e/audits/runs/SC01-MP-T10-E2E/team-4/attempt-2/coder.md"
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t10-e2e/audits/runs/SC01-MP-T10-E2E/team-4/attempt-3/coder.md"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_地形侦察",
+        "pass": true,
+        "evidence": "1×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_编码",
+        "pass": true,
+        "evidence": "1×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_自检",
+        "pass": true,
+        "evidence": "1×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_提交",
+        "pass": true,
+        "evidence": "1×"
       },
       {
         "dimension": "coder_compliance",
         "name": "bugs_found_md_exists",
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t10-e2e/audits/runs/SC01-MP-T10-E2E/team-4/attempt-3/bugs-found.md"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "bugs_found_md_has_declaration",
         "pass": false,
-        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t10-e2e/audits/runs/SC01-MP-T10-E2E/team-4/attempt-2/bugs-found.md"
+        "evidence": "neither \"0 bug\" declaration nor bug list found"
       },
       {
         "dimension": "tester_compliance",
         "name": "tester_md_exists",
         "pass": true,
-        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t10-e2e/audits/runs/SC01-MP-T10-E2E/team-4/attempt-2/tester.md"
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t10-e2e/audits/runs/SC01-MP-T10-E2E/team-4/attempt-3/tester.md"
       },
       {
         "dimension": "tester_compliance",
         "name": "adversarial_md_exists",
         "pass": true,
-        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t10-e2e/audits/runs/SC01-MP-T10-E2E/team-4/attempt-2/adversarial.md"
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t10-e2e/audits/runs/SC01-MP-T10-E2E/team-4/attempt-3/adversarial.md"
       },
       {
         "dimension": "tester_compliance",
         "name": "test_reports_nonempty",
         "pass": true,
-        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t10-e2e/audits/runs/SC01-MP-T10-E2E/team-4/attempt-2/test-reports"
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t10-e2e/audits/runs/SC01-MP-T10-E2E/team-4/attempt-3/test-reports"
       },
       {
         "dimension": "tester_compliance",
@@ -101,7 +130,7 @@
         "dimension": "test_validity",
         "name": "adversarial_has_exploratory_keywords",
         "pass": true,
-        "evidence": "4 matched: [连点,DOM,注入,边界]"
+        "evidence": "5 matched: [连点,DOM,注入,超长,边界]"
       },
       {
         "dimension": "spec_alignment",
@@ -111,7 +140,7 @@
       }
     ],
     "redo_target": "coder",
-    "redo_reason": "[coder_compliance.coder_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t10-e2e/audits/runs/SC01-MP-T10-E2E/team-4/attempt-2/coder.md · [coder_compliance.bugs_found_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t10-e2e/audits/runs/SC01-MP-T10-E2E/team-4/attempt-2/bugs-found.md"
+    "redo_reason": "[coder_compliance.bugs_found_md_has_declaration] neither \"0 bug\" declaration nor bug list found"
   },
   "context": {
     "scenario": "PHASE-C MP 真 E2E + VRT (阈值 5000 pixel) · transition",
@@ -147,11 +176,12 @@
     "branch_name": "claude/sc01-mp-t10-e2e"
   },
   "physical_verification": {
-    "dor_c1_to_c6_required": false
+    "dor_c1_to_c6_required": true
   },
   "permissions": {
     "writable_fields": [
-      "task.passes"
+      "task.dev_done",
+      "task.git_commits"
     ]
   },
   "deliverables_definition_of_done": [
@@ -162,6 +192,6 @@
     "5. 强制 git commit + node .harness/harness.js --advance=SC01-MP-T10-E2E"
   ],
   "rule_6_tool_budget_guidance": "Phase 1 · 20-30 tool use",
-  "written_at": "2026-05-15T16:23:37.669Z",
+  "written_at": "2026-05-15T16:26:14.042Z",
   "written_by": "TL agent (Phase 1 E2E spec spawn)"
 }
