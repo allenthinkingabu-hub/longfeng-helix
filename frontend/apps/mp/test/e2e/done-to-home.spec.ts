@@ -45,10 +45,12 @@ describe('SC01-MP-T14-E2E · done→home transition (真 IDE)', () => {
     expect(anyView).toBeTruthy();
   });
 
-  it('trigger onEnd → reLaunch to /pages/home/index', async () => {
+  it('tap "结束本次" CTA → reLaunch to /pages/home/index', async () => {
     const page = await mp.currentPage();
-    // Invoke the page's onEnd method directly via callMethod
-    await page.callMethod('onEnd');
+    // Find the "结束本次" button by data-test-id and tap (真人操作, 不用 callMethod)
+    const endBtn = await page.$('[data-test-id="p09-cta-row-end-btn"]');
+    expect(endBtn).toBeTruthy();
+    await endBtn.tap();
     // Wait for reLaunch navigation to settle
     await new Promise((resolve) => setTimeout(resolve, 1500));
     const homePage = await mp.currentPage();
