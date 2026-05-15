@@ -1,0 +1,5 @@
+
+> @longfeng/mp@0.1.0 typecheck /Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t01-capture/frontend/apps/mp
+> tsc --noEmit
+
+TSC_EXIT=0
