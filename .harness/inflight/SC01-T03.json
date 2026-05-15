@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "SC01-T03",
+    "team_id": "team-3",
+    "title": "PHASE-B SC-01-T03 · AI 4 步流水线 SSE 推送 · 模型 fallback · 取消按钮",
+    "attempt": 1,
+    "phase": "coder",
+    "dev_done": true,
+    "passes": false,
+    "retries": 0,
+    "audit_retries": 0,
+    "git_commits": ["cc74088", "d1f6014"]
+  },
+  "work_log_dir": "audits/runs/SC01-T03/team-3/attempt-1",
+  "log_requirements": {
+    "must_write": [
+      "coder.md",
+      "bugs-found.md"
+    ]
+  },
+  "audit_gate": "audit.js v1 五维度严卡 · 用户红线: 真实测试不可妥协 · dim 5 spec_alignment DoR C-1..C-6 必过 (Playwright 真 sandbox 跑) · mock ≤ 5 · 数字对齐 · maxDiffPixels ≤ 500 · IT/E2E 接 sandbox 真容器 · 禁 H2/embedded/Mock 后端",
+  "previous_audit_verdict": null,
+  "context": {
+    "scenario": "PHASE-B SC-01 · TC-01.01 步 6 + TC-01.03 (qwen 超时切 gpt) · AI 4 步流水线 SSE 推送 · 模型 fallback · 取消按钮",
+    "target_page": "P03-analyzing",
+    "page_state_machine": "QUEUED → STEP_1 (OCR) → STEP_2 (ANALYSIS) → STEP_3 (STEPS) → STEP_4 (DONE)",
+    "biz_step_range": "biz §2B.2 步 6",
+    "biz_refs": [
+      "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.2 步 6",
+      "biz §2A.4 P03 规格卡 (4 步流水线)",
+      "TC-01.03"
+    ],
+    "spec_refs": [
+      "design/system/pages/P03-analyzing.spec.md §4 type union",
+      "design/system/pages/P03-analyzing.spec.md §6 状态机 SLOW"
+    ],
+    "primary_services": [
+      "frontend/apps/h5",
+      "backend/ai-analysis-service"
+    ],
+    "primary_apis": [
+      "GET /api/ai/stream/{taskId} (SSE)",
+      "POST /api/ai/cancel/{taskId}"
+    ],
+    "acceptance_criteria": [
+      {
+        "id": "AC1",
+        "text": "SSE 收到 STEP_START → 对应流水线节点翻 'now' (pulse 动画)"
+      },
+      {
+        "id": "AC2",
+        "text": "SSE 收到 STEP_DONE → 节点翻 'done' (绿 checkmark)"
+      },
+      {
+        "id": "AC3",
+        "text": "SSE 收到 PARTIAL_JSON → 右侧 JSON 流式打字机 append (chunk 字段 · 非 partialJson)"
+      },
+      {
+        "id": "AC4",
+        "text": "4 步全部走完 (OCR→ANALYSIS→STEPS→DONE) · 总耗时 4-8s 内 · 节点状态严格 wait→now→done"
+      },
+      {
+        "id": "AC5",
+        "text": "TC-01.03 · qwen-vl-max 超时 > 10s → FALLBACK_MODEL event (chunk='qwen-vl-max→gpt-4o-mini') · 顶部黄条「切换备用模型中」· 自动切 gpt-4o-mini · 埋点 wb_ai_stream_fail{code=TIMEOUT} 1 + _start{model=gpt-4o-mini} 1"
+      },
+      {
+        "id": "AC6",
+        "text": "取消按钮始终可点 · Tap → POST /api/ai/cancel/{taskId} → BE 先发 CANCELLED 帧再 complete sink · FE 据 type=CANCELLED 触发 onCancelled · 返 P02"
+      }
+    ],
+    "test_invariants": [
+      "TI1: PARTIAL_JSON payload 在 chunk 字段 (A04 spec drift fix)",
+      "TI2: FALLBACK_MODEL 只在非主 provider 命中时 emit · 主 provider 成功静默",
+      "TI3: 4 步 SSE 完成顺序严格 (STEP_DONE 必须先于下一步 STEP_START)",
+      "TI4: 中途断网 SSE 自动重连 (≤ 3 次 · indicator 显式提示)",
+      "TI5: 取消后服务端 CANCELLED 帧到达 FE · sink complete · 资源回收"
+    ],
+    "key_invariants": [
+      "SSE 4 步全程不阻塞 UI 主线程",
+      "禁止返回键 / 左滑返回 / 系统 Home 静默丢任务 (必调 cancel API)"
+    ],
+    "sandbox": {
+      "pg_port": 15434,
+      "redis_port": 16381,
+      "minio_api_port": 9004,
+      "pg_user": "longfeng",
+      "pg_password": "longfeng_dev",
+      "pg_db": "wrongbook",
+      "pg_jdbc": "jdbc:postgresql://localhost:15434/wrongbook",
+      "redis_url": "redis://localhost:16381",
+      "minio_s3": "http://localhost:9004"
+    },
+    "frontend_setup": "frontend/apps/h5 是 pnpm workspace · 先 corepack enable && corepack prepare pnpm@10 --activate · 然后 cd frontend && pnpm install · 启 dev: pnpm --filter @longfeng/h5 dev",
+    "backend_running_required": "PHASE-A 已在 main 完成 5 service · 起对应 backend service: cd backend/<svc> && mvn spring-boot:run (Spring Boot 默认从 application.yml 读 sandbox endpoint · 已配 sandbox PG/Redis/MinIO)",
+    "anti_stub_gap_directive": "基于 PHASE-A 教训: 写代码前先 grep -rE 测试文件外部符号 + 现有源代码引用 一次性补齐",
+    "e2e_protocol": ".harness/agents/SHARED-E2E-PROTOCOL.md DoR C-1..C-6 必须执行 · 12 张截图 (4 态×3类) · spec-trace.md · env-snapshot.md docker ps · run.log BUILD SUCCESS · 真 Playwright headed mode 跑 sandbox"
+  },
+  "isolation": {
+    "worktree_disabled": false,
+    "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-t03-analyzing",
+    "branch_name": "claude/sc01-t03-analyzing"
+  },
+  "physical_verification": {
+    "dor_c1_to_c6_required": true,
+    "rationale": "PHASE-B 前端业务 task · 必须 Playwright headed E2E + 4 态截图 + DoR C-1..C-6 全过"
+  },
+  "permissions": {
+    "writable_fields": [
+      "task.dev_done",
+      "task.git_commits"
+    ]
+  },
+  "written_at": "2026-05-15T04:09:50.519Z",
+  "written_by": "TL agent (PHASE-B first-wave spawn prep)",
+  "deliverables_definition_of_done": [
+    "1. 前端 page 组件 + 状态机 (per spec.md §6) + testid (per spec.md)",
+    "2. API call (per primary_apis · 真 backend 端点)",
+    "3. Playwright spec.ts (frontend/apps/h5/tests/e2e/sc-01/<task-id>.spec.ts · trace 头 + 4 态)",
+    "4. 起 backend service (mvn spring-boot:run · sandbox 端口) + 起 frontend (pnpm dev)",
+    "5. 真 Playwright headed 跑 BUILD SUCCESS · 12 张截图 (idle/uploading/success/error × baseline/actual/diff)",
+    "6. work_log_dir/test-reports/e2e/coder/{playwright,backend-it,screenshots,spec-trace.md,env-snapshot.md}",
+    "7. coder.md (5 段落) + bugs-found.md (真 bug list)",
+    "8. git commits 分批 · hash 全部 git cat-file -e 验真",
+    "9. inflight dev_done=true + git_commits[]",
+    "10. node .harness/harness.js --advance=SC01-T03"
+  ],
+  "rule_6_tool_budget_guidance": "PHASE-B 前端+E2E task · 复杂 · 预计 ~70-100 tool use · 过 50 自检 · 过 70 surface · 过 85 立即 Rule 6.5 compaction"
+}
