@@ -1,0 +1,17 @@
+<!-- P02 拍题页 · Hello World 骨架 · PHASE-C bootstrap -->
+<view class="capture-page" data-test-id="p02-root">
+  <view class="capture-hero">
+    <text class="capture-title">龙凤错题本</text>
+    <text class="capture-subtitle">拍照即可智能解题</text>
+  </view>
+
+  <van-button
+    type="primary"
+    size="large"
+    round
+    data-test-id="capture-shutter"
+    bind:click="onCaptureTap"
+  >
+    拍题
+  </van-button>
+</view>

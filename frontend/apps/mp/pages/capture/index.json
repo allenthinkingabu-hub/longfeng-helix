@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "拍题",
+  "usingComponents": {
+    "van-button": "@vant/weapp/button/index"
+  }
+}

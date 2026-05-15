@@ -1,0 +1,12 @@
+{
+  "pages": [
+    "pages/capture/index"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "龙凤错题本",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f5f5f5"
+  },
+  "sitemapLocation": "sitemap.json"
+}

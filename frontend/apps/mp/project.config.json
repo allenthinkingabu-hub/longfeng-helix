@@ -1,0 +1,21 @@
+{
+  "miniprogramRoot": "./",
+  "projectname": "longfeng-mp",
+  "description": "龙凤错题本微信小程序",
+  "appid": "touristappid",
+  "setting": {
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": false,
+    "newFeature": true,
+    "autoAudits": false,
+    "urlCheck": false,
+    "compileHotReLoad": true,
+    "useCompilerPlugins": ["typescript"],
+    "packNpmManually": false,
+    "packNpmRelationList": []
+  },
+  "compileType": "miniprogram",
+  "condition": {}
+}
