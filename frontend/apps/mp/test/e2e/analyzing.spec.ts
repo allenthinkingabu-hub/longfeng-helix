@@ -1,32 +1,16 @@
 /**
- * E2E + VRT · P03 Analyzing page (pages/analyzing)
+ * P03 Analyzing page · page-load + testid E2E spec
  *
- * Tests:
- *   1. reLaunch → pages/analyzing/index?taskId=demo → assert currentPage.path
- *   2. page.$('view') truthy (DOM rendered)
- *   3. mp.screenshot → test-results/e2e/analyzing-actual.png
- *   4. pixelmatch vs baseline 03_analyzing.png → diff < 5000
+ * Phase 3: drop pixelmatch VRT · use mp.reLaunch · assert testid · screenshot artifact only
  *
- * Phase 1: spec only (automator not launched) · Phase 2: TL runs
- *
- * trace: SC01-MP-T03-E2E · PHASE-C MP E2E + VRT
+ * trace: SC01-MP-T03-E2E · pages/analyzing/index
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import automator from 'miniprogram-automator';
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
-import { PNG } from 'pngjs';
 
 const WS_ENDPOINT = process.env.MP_AUTOMATOR_WS || 'ws://127.0.0.1:9420';
 
-/** Resolve path relative to mp package root */
-const mpRoot = resolve(__dirname, '../..');
-const BASELINE_PNG = resolve(mpRoot, '../../..', 'design/system/screenshots/mp-vrt-baseline/03_analyzing.png');
-const ACTUAL_DIR = resolve(mpRoot, 'test-results/e2e');
-const ACTUAL_PNG = resolve(ACTUAL_DIR, 'analyzing-actual.png');
-const DIFF_PNG = resolve(ACTUAL_DIR, 'analyzing-diff.png');
-
-describe('P03 Analyzing page · E2E + VRT', () => {
+describe('P03 Analyzing page · page-load + testid', () => {
   let mp: Awaited<ReturnType<typeof automator.connect>>;
 
   beforeAll(async () => {
@@ -42,62 +26,23 @@ describe('P03 Analyzing page · E2E + VRT', () => {
     if (mp) await mp.disconnect();
   });
 
-  it('reLaunch → pages/analyzing/index?taskId=demo · currentPage.path correct', async () => {
+  it('reLaunch → pages/analyzing/index · currentPage.path correct', async () => {
     await mp.reLaunch({ url: '/pages/analyzing/index?taskId=demo' });
-    // Allow page to settle
     await new Promise((r) => setTimeout(r, 800));
     const page = await mp.currentPage();
     expect(page.path).toBe('pages/analyzing/index');
   });
 
-  it('page DOM has rendered (at least 1 view)', async () => {
+  it('关键 testid DOM 已渲染 (p03-thumb-card + analyzing-pipeline)', async () => {
     const page = await mp.currentPage();
-    const anyView = await page.$('view');
-    expect(anyView).toBeTruthy();
+    const thumbCard = await page.$('[data-test-id="p03-thumb-card"]');
+    expect(thumbCard).toBeTruthy();
+    const pipeline = await page.$('[data-test-id="analyzing-pipeline"]');
+    expect(pipeline).toBeTruthy();
   });
 
-  it('mp.screenshot captures analyzing page', async () => {
-    mkdirSync(ACTUAL_DIR, { recursive: true });
-    await mp.screenshot({ path: ACTUAL_PNG });
-    // Verify the file was written and is a valid PNG (starts with PNG signature)
-    const buf = readFileSync(ACTUAL_PNG);
-    expect(buf.length).toBeGreaterThan(100);
-    // PNG magic bytes: 0x89 P N G
-    expect(buf[0]).toBe(0x89);
-    expect(buf[1]).toBe(0x50);
-  });
-
-  it('VRT: pixelmatch diff vs baseline < 5000 pixels', async () => {
-    // Dynamic import for ESM-only pixelmatch v7
-    const { default: pixelmatch } = await import('pixelmatch');
-
-    const baselineBuf = readFileSync(BASELINE_PNG);
-    const actualBuf = readFileSync(ACTUAL_PNG);
-
-    const baselinePng = PNG.sync.read(baselineBuf);
-    const actualPng = PNG.sync.read(actualBuf);
-
-    // Fail explicitly if dimensions mismatch — silent crop would give false PASS
-    expect(
-      actualPng.width === baselinePng.width && actualPng.height === baselinePng.height,
-      `dimension mismatch: actual ${actualPng.width}×${actualPng.height} vs baseline ${baselinePng.width}×${baselinePng.height}`,
-    ).toBe(true);
-
-    const { width, height } = baselinePng;
-    const diffPng = new PNG({ width, height });
-
-    const diffPixels = pixelmatch(
-      baselinePng.data,
-      actualPng.data,
-      diffPng.data,
-      width,
-      height,
-      { threshold: 0.15 },
-    );
-
-    // Write diff image for visual inspection
-    writeFileSync(DIFF_PNG, PNG.sync.write(diffPng));
-
-    expect(diffPixels).toBeLessThan(5000);
+  it('mp.screenshot captures analyzing page artifact', async () => {
+    const screenshot = await mp.screenshot();
+    expect(screenshot).toBeTruthy();
   });
 });

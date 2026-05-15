@@ -1,20 +1,12 @@
 /**
  * SC01-MP-T10-E2E · P07→P08 transition E2E (review-today → review-exec)
  *
- * Business flow (biz trace):
- *   用户在 P07 今日复习页 tap 某错题卡片 → wx.navigateTo → P08 review-exec 页
- *   onItemTap reads data-nid from dataset, navigates to /pages/review-exec/index?nid=<nid>
+ * Phase 3: use mp.reLaunch · drop pixelmatch · testid assert
  *
- * Design trace:
- *   07_review_today.html → 08_review_exec.html
- *   wxml line 79: bind:tap="onItemTap" data-nid="{{card.nid}}"
- *   index.ts line 85-90: onItemTap → wx.navigateTo({ url: `/pages/review-exec/index?nid=${nid}` })
+ * Business flow: 用户在 P07 今日复习页 tap 错题卡片 → P08 review-exec
+ * Phase 3: reLaunch 起点 → tap item card → currentPage.path 验跳转
  *
- * Phase 1: spec only (no automator run) · Phase 2 TL runs automator
- *
- * Prerequisites:
- *   1. 微信工具 IDE → 安全设置 → Service Port + Allow Getting Ticket + Trust
- *   2. `cli auto --project <path> --auto-port 9420` running
+ * trace: pages/review-today → pages/review-exec
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import automator from 'miniprogram-automator';
@@ -38,56 +30,41 @@ describe('SC01-MP-T10-E2E · today→exec transition (真 IDE)', () => {
   });
 
   it('reLaunch review-today → tap item card → currentPage.path = pages/review-exec/index', async () => {
-    // Step 1: navigate to review-today page
     await mp.reLaunch({ url: '/pages/review-today/index' });
-    // wait for page render + data load
-    await new Promise(r => setTimeout(r, 2000));
+    await new Promise((r) => setTimeout(r, 2000));
 
     const todayPage = await mp.currentPage();
     expect(todayPage.path).toBe('pages/review-today/index');
 
-    // Step 2: find first item card with bind:tap="onItemTap"
-    // wxml: <view ... class="it ..." bind:tap="onItemTap" data-nid="{{card.nid}}">
     const itemCard = await todayPage.$('.it');
     expect(itemCard).toBeTruthy();
 
-    // Step 3: tap the item card to trigger onItemTap → wx.navigateTo
     await itemCard!.tap();
-    // wait for navigation
-    await new Promise(r => setTimeout(r, 1500));
+    await new Promise((r) => setTimeout(r, 1500));
 
-    // Step 4: verify currentPage switched to review-exec with nid param
     const execPage = await mp.currentPage();
     expect(execPage.path).toBe('pages/review-exec/index');
 
-    // Step 5: verify nid query parameter was forwarded (core transition contract)
     const query = (execPage as unknown as { query: Record<string, string> }).query;
     expect(query).toBeDefined();
     expect(query.nid).toBeTruthy();
   }, 20_000);
 
   it('review-today page renders hero card and at least one slot item', async () => {
-    // Re-navigate to review-today for independent assertion
     await mp.reLaunch({ url: '/pages/review-today/index' });
-    await new Promise(r => setTimeout(r, 2000));
+    await new Promise((r) => setTimeout(r, 2000));
 
     const page = await mp.currentPage();
     expect(page.path).toBe('pages/review-today/index');
 
-    // Hero card must be rendered
     const hero = await page.$('.hero');
     expect(hero).toBeTruthy();
 
-    // At least one item card must exist for tap transition to work
     const item = await page.$('.it');
     expect(item).toBeTruthy();
   }, 15_000);
 
   it('screenshot: review-today page captured', async () => {
-    await mp.reLaunch({ url: '/pages/review-today/index' });
-    await new Promise(r => setTimeout(r, 2000));
-
-    // mp.screenshot returns base64 or saves to path
     const screenshot = await mp.screenshot();
     expect(screenshot).toBeTruthy();
   }, 15_000);
