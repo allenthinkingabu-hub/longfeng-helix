@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="97" failures="0" errors="0" time="0.549">
+    <testsuite name="test/unit/_http.spec.ts" timestamp="2026-05-15T16:20:49.738Z" hostname="Wangs-MacBook-Pro.local" tests="5" failures="0" errors="0" skipped="0" time="0">
+        <testcase classname="test/unit/_http.spec.ts" name="apiBase URL construction (pure) &gt; returns file-service URL with port 8084" time="0">
+        </testcase>
+        <testcase classname="test/unit/_http.spec.ts" name="apiBase URL construction (pure) &gt; returns wrongbook-service URL with port 8082" time="0">
+        </testcase>
+        <testcase classname="test/unit/_http.spec.ts" name="apiBase URL construction (pure) &gt; returns ai-analysis-service URL with port 8083" time="0">
+        </testcase>
+        <testcase classname="test/unit/_http.spec.ts" name="apiBase URL construction (pure) &gt; returns review-plan-service URL with port 8085" time="0">
+        </testcase>
+        <testcase classname="test/unit/_http.spec.ts" name="apiBase URL construction (pure) &gt; all prefixes resolve to distinct ports" time="0">
+        </testcase>
+    </testsuite>
+    <testsuite name="test/unit/api-modules.spec.ts" timestamp="2026-05-15T16:20:49.739Z" hostname="Wangs-MacBook-Pro.local" tests="17" failures="0" errors="0" skipped="0" time="0.001">
+        <testcase classname="test/unit/api-modules.spec.ts" name="api/file.ts exports &gt; exports presign function" time="0">
+        </testcase>
+        <testcase classname="test/unit/api-modules.spec.ts" name="api/wrongbook.ts exports &gt; exports createQuestion function" time="0">
+        </testcase>
+        <testcase classname="test/unit/api-modules.spec.ts" name="api/wrongbook.ts exports &gt; exports getQuestionById function" time="0">
+        </testcase>
+        <testcase classname="test/unit/api-modules.spec.ts" name="api/wrongbook.ts exports &gt; exports listWrongQuestions function (T07)" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/api-modules.spec.ts" name="api/ai.ts exports &gt; exports getAnswerByQid function" time="0">
+        </testcase>
+        <testcase classname="test/unit/api-modules.spec.ts" name="api/ai.ts exports &gt; exports startAnalyze function" time="0">
+        </testcase>
+        <testcase classname="test/unit/api-modules.spec.ts" name="api/ai.ts exports &gt; exports pollAnalyzeStatus function" time="0">
+        </testcase>
+        <testcase classname="test/unit/api-modules.spec.ts" name="api/home.ts exports &gt; exports getHomeTodayCount function" time="0">
+        </testcase>
+        <testcase classname="test/unit/api-modules.spec.ts" name="api/review.ts exports &gt; exports completeSession function (T13)" time="0">
+        </testcase>
+        <testcase classname="test/unit/api-modules.spec.ts" name="api/review.ts exports &gt; exports createSession function (SC-01-C05 #1)" time="0">
+        </testcase>
+        <testcase classname="test/unit/api-modules.spec.ts" name="api/review.ts exports &gt; exports getToday function (SC-01-C05 #2 · T09 P07)" time="0">
+        </testcase>
+        <testcase classname="test/unit/api-modules.spec.ts" name="api/review.ts exports &gt; exports getNode function (SC-01-C05 #3)" time="0">
+        </testcase>
+        <testcase classname="test/unit/api-modules.spec.ts" name="api/review.ts exports &gt; exports openNode function (SC-01-C05 #4)" time="0">
+        </testcase>
+        <testcase classname="test/unit/api-modules.spec.ts" name="api/review.ts exports &gt; exports revealNode function (SC-01-C05 #5)" time="0">
+        </testcase>
+        <testcase classname="test/unit/api-modules.spec.ts" name="api/review.ts exports &gt; exports gradeNode function (SC-01-C05 #6)" time="0">
+        </testcase>
+        <testcase classname="test/unit/api-modules.spec.ts" name="api/review.ts exports &gt; exports nextInSession function (SC-01-C05 #7)" time="0">
+        </testcase>
+        <testcase classname="test/unit/api-modules.spec.ts" name="api/review.ts exports &gt; exports nodeResult function (SC-01-C05 #8)" time="0">
+        </testcase>
+    </testsuite>
+    <testsuite name="test/unit/home.spec.ts" timestamp="2026-05-15T16:20:49.741Z" hostname="Wangs-MacBook-Pro.local" tests="16" failures="0" errors="0" skipped="0" time="0.001">
+        <testcase classname="test/unit/home.spec.ts" name="buildGreeting (pure · time-dependent) &gt; returns a string containing day of week + month + date" time="0">
+        </testcase>
+        <testcase classname="test/unit/home.spec.ts" name="buildGreeting (pure · time-dependent) &gt; contains a separator dot · between parts" time="0">
+        </testcase>
+        <testcase classname="test/unit/home.spec.ts" name="buildGreeting (pure · time-dependent) &gt; ends with a period-of-day greeting" time="0">
+        </testcase>
+        <testcase classname="test/unit/home.spec.ts" name="buildGreeting (pure · time-dependent) &gt; contains day name from 周一..周日" time="0">
+        </testcase>
+        <testcase classname="test/unit/home.spec.ts" name="computeCirclePct (pure) &gt; returns 0 when total is 0" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/home.spec.ts" name="computeCirclePct (pure) &gt; returns 100 when done equals total" time="0">
+        </testcase>
+        <testcase classname="test/unit/home.spec.ts" name="computeCirclePct (pure) &gt; returns 50 for half done" time="0">
+        </testcase>
+        <testcase classname="test/unit/home.spec.ts" name="computeCirclePct (pure) &gt; rounds to nearest integer" time="0">
+        </testcase>
+        <testcase classname="test/unit/home.spec.ts" name="computeCirclePct (pure) &gt; returns 0 when done is 0" time="0">
+        </testcase>
+        <testcase classname="test/unit/home.spec.ts" name="computeCirclePct (pure) &gt; handles large numbers" time="0">
+        </testcase>
+        <testcase classname="test/unit/home.spec.ts" name="derivePageState (pure) &gt; returns LOADING when data is null and no error" time="0">
+        </testcase>
+        <testcase classname="test/unit/home.spec.ts" name="derivePageState (pure) &gt; returns ERROR when data is null and hasError" time="0">
+        </testcase>
+        <testcase classname="test/unit/home.spec.ts" name="derivePageState (pure) &gt; returns EMPTY when total is 0" time="0">
+        </testcase>
+        <testcase classname="test/unit/home.spec.ts" name="derivePageState (pure) &gt; returns READY when total &gt; 0" time="0">
+        </testcase>
+        <testcase classname="test/unit/home.spec.ts" name="derivePageState (pure) &gt; returns READY even if hasError but data exists" time="0">
+        </testcase>
+        <testcase classname="test/unit/home.spec.ts" name="derivePageState (pure) &gt; EMPTY takes precedence over error when data.total = 0" time="0">
+        </testcase>
+    </testsuite>
+    <testsuite name="test/unit/review-done-end.spec.ts" timestamp="2026-05-15T16:20:49.743Z" hostname="Wangs-MacBook-Pro.local" tests="5" failures="0" errors="0" skipped="0" time="0.003">
+        <testcase classname="test/unit/review-done-end.spec.ts" name="T14 · review-done onEnd (P09→P-HOME transition) &gt; calls completeSession with session id before navigating" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/review-done-end.spec.ts" name="T14 · review-done onEnd (P09→P-HOME transition) &gt; navigates to /pages/home/index via wx.reLaunch (primary target)" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/review-done-end.spec.ts" name="T14 · review-done onEnd (P09→P-HOME transition) &gt; falls back to /pages/capture/index when home page fails" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-done-end.spec.ts" name="T14 · review-done onEnd (P09→P-HOME transition) &gt; navigates even if completeSession throws (best-effort)" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-done-end.spec.ts" name="T14 · review-done onEnd (P09→P-HOME transition) &gt; uses reLaunch (not navigateTo) to clear navigation stack" time="0">
+        </testcase>
+    </testsuite>
+    <testsuite name="test/unit/review-today-tap.spec.ts" timestamp="2026-05-15T16:20:49.744Z" hostname="Wangs-MacBook-Pro.local" tests="11" failures="0" errors="0" skipped="0" time="0">
+        <testcase classname="test/unit/review-today-tap.spec.ts" name="extractNidFromTap &gt; extracts string nid from dataset" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today-tap.spec.ts" name="extractNidFromTap &gt; converts numeric nid to string" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today-tap.spec.ts" name="extractNidFromTap &gt; returns null for missing dataset" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today-tap.spec.ts" name="extractNidFromTap &gt; returns null for empty string nid" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today-tap.spec.ts" name="extractNidFromTap &gt; returns null for null nid" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today-tap.spec.ts" name="extractNidFromTap &gt; returns null for undefined event" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today-tap.spec.ts" name="extractNidFromTap &gt; returns null when currentTarget missing" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today-tap.spec.ts" name="buildExecUrl &gt; builds correct URL with sid and nid" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today-tap.spec.ts" name="buildExecUrl &gt; encodes special characters in sid" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today-tap.spec.ts" name="buildExecUrl &gt; encodes special characters in nid" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today-tap.spec.ts" name="buildExecUrl &gt; URL is parseable with URLSearchParams" time="0">
+        </testcase>
+    </testsuite>
+    <testsuite name="test/unit/review-today.spec.ts" timestamp="2026-05-15T16:20:49.745Z" hostname="Wangs-MacBook-Pro.local" tests="24" failures="0" errors="0" skipped="0" time="0.004">
+        <testcase classname="test/unit/review-today.spec.ts" name="buildCountdown (pure logic · no backend) &gt; ≤ 15 min → state &quot;now&quot;, label &quot;X 分钟&quot;" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="buildCountdown (pure logic · no backend) &gt; 0 min → &quot;0 分钟&quot; (never negative)" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="buildCountdown (pure logic · no backend) &gt; 15 min boundary → still &quot;now&quot;" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="buildCountdown (pure logic · no backend) &gt; 16-120 min → state &quot;soon&quot;, label in hours" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="buildCountdown (pure logic · no backend) &gt; 120 min boundary → still &quot;soon&quot;" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="buildCountdown (pure logic · no backend) &gt; &gt; 120 min → state &quot;wait&quot;, label &quot;X h Y m&quot;" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="buildCountdown (pure logic · no backend) &gt; exact hours → no trailing &quot;m&quot;" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="formatHHMM (pure) &gt; pads single-digit hours and minutes" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="formatHHMM (pure) &gt; does not pad double-digit hours" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="formatHHMM (pure) &gt; midnight → 00:00" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="getSlotKey (pure) &gt; hour &lt; 12 → &quot;now&quot;" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="getSlotKey (pure) &gt; hour 12-17 → &quot;afternoon&quot;" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="getSlotKey (pure) &gt; hour &gt;= 18 → &quot;evening&quot;" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="getSlotTitle (pure) &gt; &quot;now&quot; → &quot;现在 · 上午&quot;" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="getSlotTitle (pure) &gt; &quot;afternoon&quot; → &quot;下午&quot;" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="getSlotTitle (pure) &gt; &quot;evening&quot; → &quot;晚上&quot;" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="getSlotIconClass (pure) &gt; maps slot keys to CSS classes" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="buildSlotsFromItems (pure · integration of all helpers) &gt; groups morning items into &quot;now&quot; slot" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="buildSlotsFromItems (pure · integration of all helpers) &gt; groups afternoon items into &quot;afternoon&quot; slot" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="buildSlotsFromItems (pure · integration of all helpers) &gt; mixed times → multiple slots in order" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="buildSlotsFromItems (pure · integration of all helpers) &gt; empty items → empty slots" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="buildSlotsFromItems (pure · integration of all helpers) &gt; countdown state for items near now" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="buildSlotsFromItems (pure · integration of all helpers) &gt; tLevel format matches T{nodeIndex}" time="0">
+        </testcase>
+        <testcase classname="test/unit/review-today.spec.ts" name="buildSlotsFromItems (pure · integration of all helpers) &gt; hhmm formatting with padding" time="0">
+        </testcase>
+    </testsuite>
+    <testsuite name="test/unit/wrongbook-list.spec.ts" timestamp="2026-05-15T16:20:49.748Z" hostname="Wangs-MacBook-Pro.local" tests="19" failures="0" errors="0" skipped="0" time="0.021">
+        <testcase classname="test/unit/wrongbook-list.spec.ts" name="formatDueLabel (pure · no backend) &gt; returns &quot;已逾期&quot; when nextDueAt is in the past" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/wrongbook-list.spec.ts" name="formatDueLabel (pure · no backend) &gt; returns minutes when due &lt; 1 hour from now" time="0">
+        </testcase>
+        <testcase classname="test/unit/wrongbook-list.spec.ts" name="formatDueLabel (pure · no backend) &gt; returns &quot;1 小时后&quot; when due is 1-2 hours away" time="0">
+        </testcase>
+        <testcase classname="test/unit/wrongbook-list.spec.ts" name="formatDueLabel (pure · no backend) &gt; returns hours when due is 2-24 hours away" time="0">
+        </testcase>
+        <testcase classname="test/unit/wrongbook-list.spec.ts" name="formatDueLabel (pure · no backend) &gt; returns &quot;明日 09:00&quot; when due is 1-2 days away" time="0">
+        </testcase>
+        <testcase classname="test/unit/wrongbook-list.spec.ts" name="formatDueLabel (pure · no backend) &gt; returns &quot;N 天后&quot; when due is &gt; 2 days away" time="0">
+        </testcase>
+        <testcase classname="test/unit/wrongbook-list.spec.ts" name="formatTimeAgo (pure · no backend) &gt; returns &quot;刚刚&quot; for &lt; 1 minute" time="0">
+        </testcase>
+        <testcase classname="test/unit/wrongbook-list.spec.ts" name="formatTimeAgo (pure · no backend) &gt; returns &quot;N 分钟前&quot; for 1-59 minutes" time="0">
+        </testcase>
+        <testcase classname="test/unit/wrongbook-list.spec.ts" name="formatTimeAgo (pure · no backend) &gt; returns &quot;今日 HH:MM 入库&quot; for same-day" time="0">
+        </testcase>
+        <testcase classname="test/unit/wrongbook-list.spec.ts" name="formatTimeAgo (pure · no backend) &gt; returns &quot;昨天&quot; for 1-2 days ago" time="0">
+        </testcase>
+        <testcase classname="test/unit/wrongbook-list.spec.ts" name="formatTimeAgo (pure · no backend) &gt; returns &quot;N 天前&quot; for &gt; 2 days" time="0">
+        </testcase>
+        <testcase classname="test/unit/wrongbook-list.spec.ts" name="buildStarsLabel (pure) &gt; returns correct number of stars" time="0">
+        </testcase>
+        <testcase classname="test/unit/wrongbook-list.spec.ts" name="buildStarsLabel (pure) &gt; clamps to 0-5 range" time="0">
+        </testcase>
+        <testcase classname="test/unit/wrongbook-list.spec.ts" name="enrichItem (pure · derives display fields) &gt; maps subject to label and color" time="0">
+        </testcase>
+        <testcase classname="test/unit/wrongbook-list.spec.ts" name="enrichItem (pure · derives display fields) &gt; maps masteryLabel to text and color" time="0">
+        </testcase>
+        <testcase classname="test/unit/wrongbook-list.spec.ts" name="enrichItem (pure · derives display fields) &gt; builds stageDots with correct done/now markers" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/wrongbook-list.spec.ts" name="enrichItem (pure · derives display fields) &gt; truncates stemShort to 20 chars" time="0">
+        </testcase>
+        <testcase classname="test/unit/wrongbook-list.spec.ts" name="enrichItem (pure · derives display fields) &gt; falls back to NOT_MASTERED config for unknown masteryLabel" time="0">
+        </testcase>
+        <testcase classname="test/unit/wrongbook-list.spec.ts" name="api/wrongbook.ts exports (no HTTP) &gt; exports listWrongQuestions function" time="0.017">
+        </testcase>
+    </testsuite>
+</testsuites>
