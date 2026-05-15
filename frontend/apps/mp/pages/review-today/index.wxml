@@ -1,0 +1,124 @@
+<!-- P07 今日复习 · 1:1 mirror of design/mockups/wrongbook/07_review_today.html -->
+<!-- trace: design/mockups/wrongbook/07_review_today.html · @longfeng/testids p07 -->
+
+<view class="review-today-page" data-test-id="{{testIds.root}}">
+
+  <!-- ── Nav bar (mockup .nav) ───────────────────────── -->
+  <view class="nav">
+    <view class="nav-row">
+      <view class="back" bind:tap="onBackTap">
+        <van-icon name="arrow-left" color="#007AFF" size="20px" />
+        <text>首页</text>
+      </view>
+      <text class="nav-right">排序 · 时间</text>
+    </view>
+    <text class="nav-title">今日复习</text>
+  </view>
+
+  <!-- ── Content scroll area ─────────────────────────── -->
+  <scroll-view class="content" scroll-y="true">
+
+    <!-- ── Hero summary card ───────────────────────── -->
+    <view class="hero" data-test-id="{{testIds.todayReviewCard}}">
+      <view class="bubble b1" data-test-id="{{testIds.heroParticles}}"></view>
+      <view class="bubble b2"></view>
+
+      <view class="hero-tag">
+        <view class="live-dot"></view>
+        <text>{{dateStr}} · {{weekday}} · GMT+8</text>
+      </view>
+
+      <view class="hero-h2">
+        <text class="hero-total" data-test-id="{{testIds.heroTotal}}">{{totalCount}} 题待复习</text>
+        <text class="hero-sz" data-test-id="{{testIds.heroEstMin}}">预计 {{estMinutes}} 分钟</text>
+      </view>
+
+      <view class="stats-row">
+        <view class="st">
+          <text class="st-v" data-test-id="{{testIds.heroDone}}">{{doneCount}}</text>
+          <text class="st-l">已完成</text>
+        </view>
+        <view class="st">
+          <text class="st-v">{{inProgressCount}}</text>
+          <text class="st-l">进行中</text>
+        </view>
+        <view class="st">
+          <text class="st-v">{{waitCount}}</text>
+          <text class="st-l">未开始</text>
+        </view>
+      </view>
+
+      <view class="pg" data-test-id="{{testIds.heroProgressBar}}">
+        <view class="pg-fill" style="width: {{progressPct}}%;"></view>
+      </view>
+      <view class="pg-txt">
+        <text data-test-id="{{testIds.heroProgressPct}}">进度 {{progressPct}}%</text>
+        <text data-test-id="{{testIds.heroMasteryPct}}">掌握度 {{masteryPct}}%</text>
+      </view>
+    </view>
+
+    <!-- ── Empty state ─────────────────────────────── -->
+    <view wx:if="{{pageState === 'today.EMPTY'}}" class="empty" data-test-id="{{testIds.emptyState}}">
+      <text class="empty-title">今日无题 · 拍一道试试</text>
+      <text class="empty-sub">还没有待复习的题目</text>
+    </view>
+
+    <!-- ── Slot groups ─────────────────────────────── -->
+    <block wx:for="{{slots}}" wx:key="key">
+      <view class="slot">
+        <view class="slot-icon {{item.iconClass}}">
+          <van-icon wx:if="{{item.key === 'now'}}" name="clock-o" size="12px" />
+          <van-icon wx:elif="{{item.key === 'afternoon'}}" name="fire-o" size="12px" />
+          <van-icon wx:else name="star-o" size="12px" />
+        </view>
+        <text class="slot-title">{{item.title}}</text>
+        <view class="slot-line"></view>
+        <text class="slot-count">{{item.items.length}} 题</text>
+      </view>
+
+      <view wx:for="{{item.items}}" wx:for-item="card" wx:key="nid" class="it {{card.sideColor}}" bind:tap="onItemTap" data-nid="{{card.nid}}">
+        <view class="side"></view>
+        <view class="tc">
+          <text class="hh">{{card.hhmm}}</text>
+          <text class="lv">{{card.tLevel}}</text>
+        </view>
+        <view class="body">
+          <view class="body-h">
+            <text class="sub {{card.sideColor}}">{{card.subject}}</text>
+            <text> · {{card.kp}}</text>
+          </view>
+          <text class="stem">{{card.stem}}</text>
+          <view class="tags">
+            <text wx:for="{{card.tags}}" wx:for-item="tag" wx:key="*this" class="tg {{tag[0] === '★' ? 'tg-m' : ''}}">{{tag}}</text>
+          </view>
+        </view>
+        <view class="right">
+          <text class="cd {{card.countdownState === 'now' ? 'cd-now' : card.countdownState === 'soon' ? 'cd-soon' : 'cd-wait'}}">{{card.countdownLabel}}</text>
+          <view class="arrow">
+            <van-icon name="arrow" color="#C7C7CC" size="13px" />
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <!-- bottom spacer for CTA -->
+    <view style="height: 140rpx;"></view>
+  </scroll-view>
+
+  <!-- ── Floating CTA ────────────────────────────── -->
+  <view wx:if="{{pageState !== 'today.EMPTY' && pageState !== 'today.ALL_DONE'}}" class="cta" bind:tap="onStartAllTap" data-test-id="{{testIds.bottomCtaStartAllBtn}}">
+    <van-icon name="play" color="#fff" size="20px" />
+    <text>全部开始</text>
+    <text class="cta-sz">{{totalCount}} 题 · {{estMinutes}} min</text>
+  </view>
+
+  <!-- ── Tab bar ─────────────────────────────────── -->
+  <view class="tabbar">
+    <view class="tab" bind:tap="onTabHome"><van-icon name="wap-home-o" size="24px" /><text>首页</text></view>
+    <view class="tab"><van-icon name="description" size="24px" /><text>错题本</text></view>
+    <view class="tab"><van-icon name="photograph" size="24px" /><text>拍题</text></view>
+    <view class="tab active"><van-icon name="bell-o" size="24px" /><text>复习</text><text class="badge">{{totalCount}}</text></view>
+    <view class="tab"><van-icon name="manager-o" size="24px" /><text>我的</text></view>
+  </view>
+
+</view>

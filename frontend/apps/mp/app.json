@@ -6,7 +6,8 @@
     "pages/result/index",
     "pages/wrongbook-list/index",
     "pages/review-exec/index",
-    "pages/review-done/index"
+    "pages/review-done/index",
+    "pages/review-today/index"
   ],
   "window": {
     "navigationBarBackgroundColor": "#ffffff",
