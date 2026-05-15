@@ -132,9 +132,9 @@ describe('P05 wrongbook-list (page-vrt)', () => {
     const diffPng = new PNG({ width: compareWidth, height: compareHeight });
 
     const diffPixels = pixelmatch(
-      new Uint8Array(baseData),
-      new Uint8Array(actData),
-      new Uint8Array(diffPng.data),
+      baseData,
+      actData,
+      diffPng.data,
       compareWidth,
       compareHeight,
       { threshold: 0.15 },
