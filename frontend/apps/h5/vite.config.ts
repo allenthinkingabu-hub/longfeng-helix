@@ -54,6 +54,11 @@ export default defineConfig({
         target: process.env.VITE_AI_PROXY_TARGET || 'http://localhost:8083',
         changeOrigin: true,
       },
+      // SC-01-T10: review-plan-service (sessions / today / nodes / grade)
+      '/api/review': {
+        target: process.env.VITE_REVIEW_PROXY_TARGET || 'http://localhost:8085',
+        changeOrigin: true,
+      },
       // SC-01-T01: proxy MinIO presigned uploads to avoid CORS issues in E2E
       '/s3': {
         target: process.env.VITE_MINIO_TARGET || 'http://localhost:9000',
