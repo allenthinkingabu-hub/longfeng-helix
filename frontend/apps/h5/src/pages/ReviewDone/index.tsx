@@ -197,7 +197,9 @@ export const ReviewDonePage: React.FC = () => {
   }, [nid, pageState]);
 
   // ── Derived values ───────────────────────────────────────
-  const isForgot = result.nodeState === 'ACTIVE' && !result.mastered;
+  // T12: FORGOT variant detection — from query param (P08 passes grade) or result state
+  const gradeParam = params.get('grade');
+  const isForgot = gradeParam === 'FORGOT' || (result.nodeState === 'ACTIVE' && !result.mastered);
   const prevT = `T${Math.max(0, result.nodeIndex)}`;
   const nextT = `T${result.nodeIndex + 1}`;
   const masteryPct = Math.round(result.easeAfter * 32); // approximate display

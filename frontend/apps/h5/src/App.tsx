@@ -1,6 +1,8 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { CapturePage } from './pages/Capture/index';
+import { ReviewExecPage } from './pages/ReviewExec/index';
+import { ReviewDonePage } from './pages/ReviewDone/index';
 
 // Stub pages for routing (real implementations in other tasks)
 const AnalyzingStub: React.FC = () => (
@@ -21,6 +23,8 @@ export const App: React.FC = () => (
     <Route path="/" element={<HomeStub />} />
     <Route path="/capture" element={<CapturePage />} />
     <Route path="/analyzing/:taskId" element={<AnalyzingStub />} />
+    <Route path="/review/exec/:nid" element={<ReviewExecPage />} />
+    <Route path="/review/done" element={<ReviewDonePage />} />
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 );
