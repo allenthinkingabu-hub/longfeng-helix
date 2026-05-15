@@ -11,7 +11,8 @@
     "retries": 0,
     "audit_retries": 2,
     "git_commits": [
-      "7287ba1"
+      "7287ba1",
+      "ff2d080"
     ]
   },
   "work_log_dir": "audits/runs/SC01-MP-T08-E2E/team-2/attempt-3",

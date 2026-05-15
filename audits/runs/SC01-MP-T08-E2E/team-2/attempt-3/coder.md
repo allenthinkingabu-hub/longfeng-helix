@@ -59,5 +59,5 @@ Phase 1 scope: 写 spec 不跑 automator (Phase 2 TL 串行验)。
 ## 5. 提交
 
 - original spec commit: `7287ba1` (feat: home page E2E + VRT spec · 4 tests)
-- attempt-3 work log commit: see below (this commit)
+- attempt-3 work log commit: `ff2d080`
 - 文件变更: `frontend/apps/mp/test/e2e/home.spec.ts` (+150 行 · 新文件 · from attempt-1)
