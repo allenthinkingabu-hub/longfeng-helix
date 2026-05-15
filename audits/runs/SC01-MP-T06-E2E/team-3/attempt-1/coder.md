@@ -68,4 +68,4 @@ API path ↔ spec 对照表（Phase 1 静态对照）：
 
 ## 5. 提交
 
-commit hash: (待写入)
+commit hash: fed89d4

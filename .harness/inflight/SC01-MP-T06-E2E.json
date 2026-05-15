@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "task": {"id": "SC01-MP-T06-E2E", "team_id": "team-3", "title": "PHASE-C MP E2E + VRT · SC01-MP-T06-E2E · review-api (api-only)", "attempt": 1, "phase": "coder", "dev_done": true, "passes": false, "retries": 0, "audit_retries": 0, "git_commits": ["fed89d4"]},
+  "work_log_dir": "audits/runs/SC01-MP-T06-E2E/team-3/attempt-1",
+  "log_requirements": {"must_write": ["coder.md", "bugs-found.md"]},
+  "audit_gate": "Phase 1 · 写 spec 不跑 automator · lint + tsc + test:unit PASS · 强制 git commit",
+  "previous_audit_verdict": null,
+  "context": {
+    "scenario": "PHASE-C MP 真 E2E + VRT (阈值 5000 pixel) · api-only",
+    "kind": "api-only",
+    "target_page": "pages/review-api",
+    "mockup_html": "design/mockups/wrongbook/review-plan.html",
+    "baseline_png": "design/system/screenshots/mp-vrt-baseline/review-plan-contract",
+    "automator_ws": "ws://127.0.0.1:9420",
+    "scope_in": [
+      "写 frontend/apps/mp/test/e2e/<page-or-flow>.spec.ts (用 miniprogram-automator)",
+      "spec 必含: beforeAll connect (8s timeout) · 1+ test (currentPage / page.\$ / mp.screenshot) · afterAll disconnect",
+      "page-vrt kind 额外: pixelmatch 对比 actual screenshot vs baseline_png · diff < 5000 pixel 判 PASS",
+      "transition kind: 调 wx tap / wx.navigateTo · 验证 currentPage().path 跳转后改变",
+      "api-only kind (T06): 调 src/api/review.ts 函数 · 验证响应契约 (补 health-check soft-skip)",
+      "Phase 1 不跑 automator (只写 spec + lint + tsc + test:unit · Phase 2 串行跑)"
+    ],
+    "scope_out": ["修现有 page 代码 (除非 Phase 3 fix Coder)", "跑 automator (Phase 2 TL 负责)", "miniprogram-ci"],
+    "backend_ports": {"file": 8084, "wb": 8082, "ai": 8083, "review": 8085},
+    "shared_infra": "main 上已备: pixelmatch + pngjs + playwright-core + 23 mockup baseline + test/e2e/automator-smoke.spec.ts 可参考"
+  },
+  "isolation": {"worktree_disabled": false, "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/sc01-mp-t06-e2e", "branch_name": "claude/sc01-mp-t06-e2e"},
+  "physical_verification": {"dor_c1_to_c6_required": false, "rationale": "Phase 1 写 spec 不跑 automator · TL Phase 2 串行验"},
+  "permissions": {"writable_fields": ["task.dev_done", "task.git_commits"]},
+  "deliverables_definition_of_done": [
+    "1. test/e2e/<page-or-flow>.spec.ts (符合 scope_in)",
+    "2. pnpm -F mp lint + typecheck PASS",
+    "3. pnpm -F mp test:unit 仍 100% PASS",
+    "4. coder.md (5段) + bugs-found.md → audits/runs/SC01-MP-T06-E2E/team-3/attempt-1/",
+    "5. 强制 git commit + node .harness/harness.js --advance=SC01-MP-T06-E2E"
+  ],
+  "rule_6_tool_budget_guidance": "Phase 1 · 20-30 tool use",
+  "written_at": "2026-05-15T13:00:00.000Z",
+  "written_by": "TL agent (Phase 1 E2E spec spawn)"
+}
