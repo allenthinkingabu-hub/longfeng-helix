@@ -1,6 +1,9 @@
 {
   "pages": [
     "pages/capture/index",
+    "pages/analyzing/index",
+    "pages/result/index",
+    "pages/review-exec/index",
     "pages/review-done/index"
   ],
   "window": {
