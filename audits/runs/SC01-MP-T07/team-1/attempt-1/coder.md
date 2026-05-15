@@ -88,4 +88,4 @@ bug: URLSearchParams 在 MP 环境未定义 → 改用手工拼接 query string 
 
 ## 5. 提交
 
-Commit hash: (will be filled after git commit)
+Commit hash: f4cd981
