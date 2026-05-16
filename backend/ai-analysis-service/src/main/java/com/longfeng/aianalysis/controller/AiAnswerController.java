@@ -97,6 +97,7 @@ public class AiAnswerController {
             // 业务降级：reasonMarkdown 空 · steps 空 · FE 显示 fallback 文案 · 不进 ERROR 态
             body.put("reasonMarkdown", "");
             body.put("steps", List.of());
+            body.put("stem", r.getStem() == null ? "" : r.getStem());
             body.put("confidence", 0.0);
             log.info("AI answer 200 (degraded) · qid={} · task FAILED", qid);
             return ResponseEntity.ok(body);
@@ -104,6 +105,10 @@ public class AiAnswerController {
 
         body.put("reasonMarkdown", r.getErrorReason() == null ? "" : r.getErrorReason());
         body.put("steps", parseSteps(r.getSteps()));
+        // OCR'd stem lives on analysis_result.stem · wrongbook-service does not persist it
+        // back to wb_question, so P04 needs the AI sidecar to surface stem too. Otherwise
+        // the result page shows the AI diagnosis with an empty 题干 banner.
+        body.put("stem", r.getStem() == null ? "" : r.getStem());
         // 当前 schema 未持久化 confidence · 给保守 default 0.0 让 FE 不显示置信度
         body.put("confidence", 0.0);
         return ResponseEntity.ok(body);

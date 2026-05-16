@@ -38,6 +38,11 @@ export interface AiAnswer {
   provider?: string;
   /** Parsed steps from BE analysis_result.steps JSON. */
   steps?: AiStep[];
+  /**
+   * OCR-extracted题干. wrongbook-service does not persist this back to wb_question,
+   * so P04 reads it from the AI sidecar to show 题干 even when q.stem is empty.
+   */
+  stem?: string;
 }
 
 /** GET /api/ai/:qid/answer */

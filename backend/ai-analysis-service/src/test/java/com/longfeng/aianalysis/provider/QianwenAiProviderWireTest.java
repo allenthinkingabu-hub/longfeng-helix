@@ -42,7 +42,7 @@ class QianwenAiProviderWireTest extends IntegrationTestBase {
         var desc = provider.describe();
         assertThat(desc.get("name")).isEqualTo("qianwen");
         assertThat(desc.get("chatModel")).isEqualTo("qwen-plus");
-        assertThat(desc.get("ocrModel")).isEqualTo("qwen-vl-plus");
+        assertThat(desc.get("ocrModel")).isEqualTo("qwen-vl-max");
         // api-key is wired (env var or inflight literal · either way: configured)
         assertThat(desc.get("apiKeyConfigured")).isEqualTo("true");
     }

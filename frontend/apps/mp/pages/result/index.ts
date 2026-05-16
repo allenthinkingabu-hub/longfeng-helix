@@ -139,6 +139,11 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
     const mergedReason = (aiResp && aiResp.reasonMarkdown)
       ? aiResp.reasonMarkdown
       : (q.reasonMarkdown || '');
+    // wb_question doesn't persist OCR'd stem · pull from AI sidecar when present so
+    // the 题干 banner isn't blank on real-backend runs.
+    const mergedStem = (q.stem && q.stem.trim().length > 0)
+      ? q.stem
+      : (aiResp && aiResp.stem ? aiResp.stem : '');
     if (aiResp && typeof aiResp.confidence === 'number') {
       q.confidence = aiResp.confidence;
     }
@@ -168,6 +173,7 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
     this._questionRaw = q;
     q.reasonMarkdown = finalReason;
     q.steps = mergedSteps;
+    q.stem = mergedStem;
 
     const difficulty = q.difficulty || 3;
     const diffStars = Array.from({ length: 5 }, (_, i) => i < difficulty);

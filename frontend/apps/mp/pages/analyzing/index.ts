@@ -83,7 +83,13 @@ Page({
   _qid: '',
 
   onLoad(options: Record<string, string | undefined>) {
-    const imageUrl = options.imageUrl || '';
+    // capture page does encodeURIComponent(presignResp.image_url) before navigateTo so
+    // the embedded MinIO `?X-Amz-...&sig=...` doesn't collide with the route's own
+    // query string. WeChat's options parser does NOT auto-decode here, so we get the
+    // %3A%2F%2F-laden literal back and have to undo it once. Without this the BE sees
+    // a malformed URL → DashScope returns "URL does not appear to be valid" → OCR fails.
+    const rawImageUrl = options.imageUrl || '';
+    const imageUrl = rawImageUrl ? decodeURIComponent(rawImageUrl) : '';
     const subject = options.subject || '数学';
     this._qid = options.qid || '';
     this.setData({ subjectLabel: subject });

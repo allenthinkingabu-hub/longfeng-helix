@@ -152,6 +152,63 @@ class QianwenAiProviderTest {
     }
 
     @Test
+    @DisplayName("inline · public https URL passes through unchanged (zero-copy)")
+    void inlinePublicUrlPassthrough() {
+        String url = "https://oss.example.com/wrongbook/abc.jpg?sig=xxx";
+        assertThat(provider.maybeInlineLocalImage(url)).isEqualTo(url);
+    }
+
+    @Test
+    @DisplayName("inline · data: URI passes through unchanged (already inlined)")
+    void inlineDataUriPassthrough() {
+        String url = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ==";
+        assertThat(provider.maybeInlineLocalImage(url)).isEqualTo(url);
+    }
+
+    @Test
+    @DisplayName("inline · localhost URL fetches bytes and returns data:image/jpeg;base64,...")
+    void inlineLocalhostFetchesAndEncodes() {
+        byte[] bytes = new byte[]{(byte) 0xFF, (byte) 0xD8, (byte) 0xFF, (byte) 0xE0, 0x01, 0x02};
+        mockServer.expect(requestTo("http://localhost:9000/wrongbook-dev/abc.jpg?sig=xxx"))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withSuccess(bytes, MediaType.IMAGE_JPEG));
+
+        String out = provider.maybeInlineLocalImage("http://localhost:9000/wrongbook-dev/abc.jpg?sig=xxx");
+        assertThat(out).startsWith("data:image/jpeg;base64,");
+        // Base64 of {FF D8 FF E0 01 02} == "/9j/4AEC" (48 bits → 8 chars, no padding)
+        assertThat(out).endsWith(",/9j/4AEC");
+        mockServer.verify();
+    }
+
+    @Test
+    @DisplayName("inline · URL-encoded http://localhost gets decoded then inlined")
+    void inlineUrlEncodedLocalhost() {
+        byte[] bytes = new byte[]{9, 8, 7};
+        // WX FE encoded form: encodeURIComponent('http://localhost:9000/x.jpg')
+        String encoded = "http%3A%2F%2Flocalhost%3A9000%2Fx.jpg";
+        mockServer.expect(requestTo("http://localhost:9000/x.jpg"))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withSuccess(bytes, MediaType.IMAGE_JPEG));
+
+        String out = provider.maybeInlineLocalImage(encoded);
+        assertThat(out).startsWith("data:image/jpeg;base64,");
+        mockServer.verify();
+    }
+
+    @Test
+    @DisplayName("inline · 127.0.0.1 is treated as local")
+    void inline127FetchesAndEncodes() {
+        byte[] bytes = new byte[]{1, 2, 3};
+        mockServer.expect(requestTo("http://127.0.0.1:9000/x.png"))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withSuccess(bytes, MediaType.IMAGE_PNG));
+
+        String out = provider.maybeInlineLocalImage("http://127.0.0.1:9000/x.png");
+        assertThat(out).startsWith("data:image/png;base64,");
+        mockServer.verify();
+    }
+
+    @Test
     @DisplayName("contract · describe() surfaces config without leaking key")
     void describeNoLeak() {
         var d = provider.describe();

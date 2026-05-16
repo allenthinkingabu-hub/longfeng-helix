@@ -5,7 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.longfeng.aianalysis.config.AiProperties;
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +72,9 @@ public class QianwenAiProvider implements AiProvider {
         if (imageUrl == null || imageUrl.isBlank()) {
             throw new AiProviderException("qianwen.ocr: imageUrl is blank");
         }
+        // DashScope cannot reach localhost / private-network presigned URLs (MinIO dev)
+        // -> fetch bytes and inline as data:image/...;base64,...  (OpenAI-compat).
+        String embedUrl = maybeInlineLocalImage(imageUrl);
         try {
             ObjectNode body = json.createObjectNode();
             body.put("model", cfg.getOcrModel());
@@ -81,7 +89,7 @@ public class QianwenAiProvider implements AiProvider {
                                     + "只输出题干文本本身，不要任何解释或前缀。");
             ObjectNode imgPart = content.addObject();
             imgPart.put("type", "image_url");
-            imgPart.putObject("image_url").put("url", imageUrl);
+            imgPart.putObject("image_url").put("url", embedUrl);
 
             JsonNode resp = call("/chat/completions", body);
             String text = resp.path("choices").path(0).path("message").path("content").asText("").trim();
@@ -144,6 +152,72 @@ public class QianwenAiProvider implements AiProvider {
             throw e;
         } catch (Exception e) {
             throw new AiProviderException("qianwen.analyze failed: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * If {@code imageUrl} points at a host DashScope cannot reach (localhost / 127.x /
+     * private RFC1918 ranges · typical MinIO presigned URL in dev), fetch the bytes locally
+     * and return a {@code data:<mime>;base64,...} URI that DashScope can consume inline.
+     * Public URLs pass through unchanged so production OSS / CDN paths stay zero-copy.
+     */
+    String maybeInlineLocalImage(String imageUrl) {
+        if (imageUrl.startsWith("data:")) {
+            return imageUrl;
+        }
+        // Defensive: a caller (e.g. WX FE that did encodeURIComponent + WX runtime that
+        // didn't auto-decode) may hand us `http%3A%2F%2F...`. URI.create() can't parse
+        // that as a hierarchical URI (host comes back null), so we'd skip inlining and
+        // forward the malformed URL to DashScope → "URL does not appear to be valid".
+        // Detect the encoded `%3A%2F%2F` head and undo once.
+        String candidate = imageUrl;
+        if (candidate.regionMatches(true, 0, "http%3A%2F%2F", 0, 13)
+                || candidate.regionMatches(true, 0, "https%3A%2F%2F", 0, 14)) {
+            try {
+                candidate = URLDecoder.decode(candidate, StandardCharsets.UTF_8);
+            } catch (Exception ignored) {
+                // fall through with original
+            }
+        }
+        URI uri;
+        try {
+            uri = URI.create(candidate);
+        } catch (IllegalArgumentException e) {
+            return imageUrl;
+        }
+        String host = uri.getHost();
+        if (host == null || !isLocalOrPrivate(host)) {
+            return imageUrl;
+        }
+        try {
+            ResponseEntity<byte[]> resp = http.exchange(uri, HttpMethod.GET, HttpEntity.EMPTY, byte[].class);
+            byte[] bytes = resp.getBody();
+            if (bytes == null || bytes.length == 0) {
+                throw new AiProviderException("qianwen.ocr: empty bytes fetched from " + host);
+            }
+            MediaType mt = resp.getHeaders().getContentType();
+            String mime = (mt != null) ? mt.toString() : "image/jpeg";
+            String b64 = Base64.getEncoder().encodeToString(bytes);
+            log.debug("qianwen.ocr inlined local image · host={} mime={} bytes={}", host, mime, bytes.length);
+            return "data:" + mime + ";base64," + b64;
+        } catch (AiProviderException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new AiProviderException("qianwen.ocr: failed to fetch local image: " + e.getMessage(), e);
+        }
+    }
+
+    private static boolean isLocalOrPrivate(String host) {
+        String h = host.toLowerCase();
+        if (h.equals("localhost") || h.endsWith(".localhost") || h.endsWith(".local")) {
+            return true;
+        }
+        try {
+            InetAddress addr = InetAddress.getByName(h);
+            return addr.isLoopbackAddress() || addr.isSiteLocalAddress() || addr.isLinkLocalAddress()
+                    || addr.isAnyLocalAddress();
+        } catch (Exception e) {
+            return false;
         }
     }
 
