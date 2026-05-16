@@ -6,7 +6,7 @@
  * API: GET /api/wb/questions/<qid>  (wrongbook-service :8082)
  *      GET /api/ai/<qid>/answer     (ai-analysis-service :8083)
  */
-import { getQuestionById } from '../../src/api/wrongbook';
+import { getQuestionById, saveQuestion } from '../../src/api/wrongbook';
 import { getAnswerByQid } from '../../src/api/ai';
 import type { AiAnswer, AiStep } from '../../src/api/ai';
 import type { QuestionDetail, PlannedNode, QuestionStep } from '../../src/api/wrongbook';
@@ -230,12 +230,19 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
 
   async onSaveTap() {
     if (this.data.isSaving) return;
+    const qid = this._questionRaw?.id || this._qid;
+    if (!qid) {
+      wx.showToast({ title: '题目缺失，无法保存', icon: 'none' });
+      return;
+    }
     this.setData({ isSaving: true });
 
     try {
-      // T07: save + transition to P05 wrongbook list
+      // Real save: wrong_item.status → 3 CONFIRMED + outbox event + sync trigger
+      // to review-plan-service to create 7 EBBINGHAUS_SM2 nodes (T0..T6) so the
+      // "保存后将按《艾宾浩斯》自动生成 T1-T6 共 6 个日历提醒" promise actually holds.
+      await saveQuestion(qid);
       wx.showToast({ title: '保存成功', icon: 'success' });
-      const qid = this._questionRaw?.id || this._qid;
       setTimeout(() => {
         wx.navigateTo({
           url: `/pages/wrongbook-list/index?highlight=${qid}`,

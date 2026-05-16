@@ -9,17 +9,38 @@ import com.longfeng.wrongbook.repo.WrongItemRepository;
 import com.longfeng.wrongbook.support.SnowflakeIdGenerator;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class WrongItemService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(WrongItemService.class);
+
     private final WrongItemRepository repo;
     private final WrongItemOutboxRepository outboxRepo;
     private final SnowflakeIdGenerator idGen;
+    private final RestTemplate http = new RestTemplate();
+
+    /**
+     * Direct HTTP target for review-plan-service in local dev / multi-team sandbox.
+     * Production uses RocketMQ (question.created.topic → QuestionCreatedConsumer);
+     * locally the topic isn't running so we synchronously POST to this URL after
+     * the outbox is written so the user actually gets a 7-node plan after clicking
+     * "保存并开启复习". Blank value disables the sync call (production behavior).
+     */
+    @Value("${review.plan.sync-url:http://localhost:8085/internal/plans/from-question}")
+    private String reviewPlanSyncUrl;
 
     public WrongItemService(WrongItemRepository repo,
                             WrongItemOutboxRepository outboxRepo,
@@ -73,7 +94,8 @@ public class WrongItemService {
     @Transactional
     public WrongItem save(Long id) {
         WrongItem item = getById(id);
-        if (item.getStatus() < 3) {
+        boolean firstConfirm = item.getStatus() < 3;
+        if (firstConfirm) {
             item.setStatus((short) 3); // CONFIRMED
             item.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
             item = repo.save(item);
@@ -94,6 +116,28 @@ public class WrongItemService {
                 outbox.setSent(false);
                 outbox.setCreatedAt(OffsetDateTime.now(ZoneOffset.UTC));
                 outboxRepo.save(outbox);
+            }
+        }
+        // Local-dev fallback: when RocketMQ relay isn't running the
+        // QuestionCreatedConsumer never fires, so the user gets confirmed status
+        // but no 7-node review plan → "保存并开启复习" is half-broken. Synchronously
+        // POST to review-plan-service so the plan rows land regardless of MQ. The
+        // BE side is idempotent via planRepo.existsByWrongItemId, so this call is
+        // safe even when MQ also delivers the event later.
+        if (firstConfirm && reviewPlanSyncUrl != null && !reviewPlanSyncUrl.isBlank()) {
+            try {
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                String body = String.format(
+                        "{\"wrongItemId\":%d,\"studentId\":%d,\"occurredAt\":\"%s\"}",
+                        item.getId(),
+                        item.getStudentId(),
+                        item.getUpdatedAt().toInstant().toString());
+                http.postForEntity(reviewPlanSyncUrl, new HttpEntity<>(body, headers), Map.class);
+            } catch (RuntimeException e) {
+                // MQ path is still in play · don't fail the save TX on network blip.
+                LOG.warn("review-plan sync call failed (MQ path will retry · wrongItemId={}): {}",
+                        item.getId(), e.getMessage());
             }
         }
         return item;

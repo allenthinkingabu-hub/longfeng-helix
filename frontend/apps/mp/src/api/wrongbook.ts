@@ -148,6 +148,33 @@ export function createQuestion(req: CreateQuestionReq): Promise<CreateQuestionRe
   );
 }
 
+// ── save / confirm question (P04 "保存并开启复习" button) ───────
+
+export interface SaveQuestionResp {
+  /** Echoed qid (DB primary key as string). */
+  qid: string;
+  /** wrong_item.status after save · 3 == CONFIRMED. */
+  status: number;
+  /** Optional msgkey for FE toast (e.g. "msgkey:wb.save.success"). */
+  message?: string;
+}
+
+/**
+ * POST /api/wb/questions/{qid}/save
+ *
+ * <p>Transitions wrong_item.status → 3 (CONFIRMED), writes question.created.topic
+ * outbox event, and (in local dev) synchronously triggers review-plan-service to
+ * create the 7 SM-2 / Ebbinghaus review nodes. Production path also publishes the
+ * event via RocketMQ for downstream consumers; review-plan-service de-dupes by
+ * wrongItemId so the sync + async paths can coexist.
+ */
+export function saveQuestion(qid: string): Promise<SaveQuestionResp> {
+  return httpJSON<SaveQuestionResp>(
+    `${apiBase('wb')}/api/wb/questions/${qid}/save`,
+    { method: 'POST', body: {} },
+  );
+}
+
 // ── list wrong questions (P05 wrongbook list page) ───────────
 
 export interface WrongQuestionListItem {
