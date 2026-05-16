@@ -23,11 +23,11 @@ if echo "$CHANGED" | grep -q "^frontend/apps/h5/"; then
   }
 fi
 
-# Backend — checkstyle + spotbugs (if configured); skipTests for speed
+# Backend — checkstyle only (SpotBugs 已停用 · 2026-05-16 用户决策); skipTests for speed
 if echo "$CHANGED" | grep -q "^backend/.*\.java$"; then
-  echo "[pre-commit] Backend Java changed → mvn checkstyle:check spotbugs:check"
-  (cd backend && mvn -q checkstyle:check spotbugs:check -DskipTests) || {
-    echo "[pre-commit] ✗ Backend static-analysis failed · commit blocked"
+  echo "[pre-commit] Backend Java changed → mvn checkstyle:check"
+  (cd backend && mvn -q checkstyle:check -DskipTests) || {
+    echo "[pre-commit] ✗ Backend checkstyle failed · commit blocked"
     exit 1
   }
 fi

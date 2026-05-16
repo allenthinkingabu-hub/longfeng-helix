@@ -67,7 +67,7 @@
    - 改 `dev_done=true` 之前必须按对应 stack 跑：
      - **MP** (`frontend/apps/mp/*`)：`pnpm -F mp lint` (= node lint.mjs + tsc --noEmit) → 0 error；`pnpm -F mp test:unit` → 100% PASS；如改 wxml/wxss/json 必跑 `pnpm -F mp build:mp` (miniprogram-ci 真编译) → 0 error。
      - **H5** (`frontend/apps/h5/*`)：`pnpm -F h5 lint` (eslint + 未来的 lint-routes) → 0 error；`pnpm -F h5 typecheck` → 0 error。
-     - **Backend** (`backend/**/*.java`)：`mvn checkstyle:check spotbugs:check` → 0 violation；`mvn verify` 单测全 PASS。
+     - **Backend** (`backend/**/*.java`)：`mvn checkstyle:check` → 0 violation；`mvn verify` 单测全 PASS。(SpotBugs 已停用 · 2026-05-16 用户决策 · 不再让 Coder/Tester/TL 跑 spotbugs:check)
    - 静态 lint 主要 catch：跨文件一致性（page-ref / route-ref / usingComponents / tabBar）、API export contract 完整性、wxml tag 必须注册、wx.switchTab 必须 tabBar 配置、**`^__.*__$` reserved directory 不准出现** (Fix-3 · 2026-05-16 · MP IDE 拒编 vitest/playwright `__screenshots__/__snapshots__` 产物路径)。
    - 真编译（miniprogram-ci / mvn package）catch：tsc 抓不到的 wxml/wxss 语法、资源缺失、import 路径错。
    - 红线：lint 或 build 任一失败 → 立刻修 → 直到全绿才能 commit + 改 `dev_done=true`。**禁止 commit 含 lint error 的代码**（root 仓库 `.husky/pre-commit` 钩子会硬拒）。
