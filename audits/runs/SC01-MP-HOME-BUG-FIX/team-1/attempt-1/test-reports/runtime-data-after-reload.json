@@ -1,0 +1,188 @@
+{
+  "path": "pages/home/index",
+  "data": {
+    "testIds": {
+      "root": "p-home-root",
+      "greetingHero": "greeting-hero",
+      "streakFireIcon": "streak-bar-fire-icon",
+      "streakDaysNumber": "streak-bar-days-number",
+      "todayReviewCard": "today-review-card",
+      "circleProgress": "today-review-card-circle-progress",
+      "totalLabel": "today-review-card-total",
+      "estMin": "today-review-card-est-min",
+      "startAllBtn": "today-review-card-start-all-btn",
+      "weeklySparkline": "p-home-weekly-sparkline",
+      "weekStrip": "week-strip",
+      "messages": "p-home-messages",
+      "messagesMoreLink": "p-home-messages-more-link",
+      "weakKp": "p-home-weak-kp",
+      "quickEntries": "p-home-quick-entries"
+    },
+    "pageState": "READY",
+    "greeting": "周六 · 5 月 16 日 · 早安",
+    "studentName": "小 A",
+    "streak": 12,
+    "mastered": 142,
+    "todayTotal": 8,
+    "todayDone": 3,
+    "estMin": 25,
+    "circleProgress": 0.38,
+    "circlePctText": "38%",
+    "subjects": [
+      {
+        "name": "数学",
+        "count": 3,
+        "color": "#C41E3A"
+      },
+      {
+        "name": "物理",
+        "count": 2,
+        "color": "#0057B7"
+      },
+      {
+        "name": "英语",
+        "count": 3,
+        "color": "#9C4F00"
+      }
+    ],
+    "weekStats": {
+      "mastered": 23,
+      "newItems": 8,
+      "forgotten": 2,
+      "masteryRate": 68
+    },
+    "weekLabel": "4 月 20–26 日",
+    "weekDays": [
+      {
+        "w": "一",
+        "d": "20",
+        "dots": [
+          "#C41E3A",
+          "#0057B7"
+        ],
+        "today": false,
+        "num": 0
+      },
+      {
+        "w": "二",
+        "d": "22",
+        "dots": [
+          "#C41E3A",
+          "#0057B7",
+          "#9C4F00",
+          "#C41E3A",
+          "#FF2D55"
+        ],
+        "today": true,
+        "num": 8
+      },
+      {
+        "w": "三",
+        "d": "22",
+        "dots": [
+          "#1A6B3A",
+          "#30B0C7"
+        ],
+        "today": false,
+        "num": 0
+      },
+      {
+        "w": "四",
+        "d": "23",
+        "dots": [
+          "#C41E3A",
+          "#1A6B3A",
+          "#9C4F00"
+        ],
+        "today": false,
+        "num": 0
+      },
+      {
+        "w": "五",
+        "d": "24",
+        "dots": [
+          "#0057B7",
+          "#30B0C7"
+        ],
+        "today": false,
+        "num": 0
+      },
+      {
+        "w": "六",
+        "d": "25",
+        "dots": [
+          "#9C4F00"
+        ],
+        "today": false,
+        "num": 0
+      },
+      {
+        "w": "日",
+        "d": "26",
+        "dots": [
+          "#1A6B3A",
+          "#30B0C7",
+          "#C41E3A"
+        ],
+        "today": false,
+        "num": 0
+      }
+    ],
+    "messages": [
+      {
+        "title": "记忆曲线 T3 · 二次函数",
+        "subtitle": "今晚 20:30 · 3 题即将到期",
+        "time": "10 min",
+        "icon": "bell",
+        "iconColor": "#5856D6",
+        "theme": "ind"
+      },
+      {
+        "title": "妈妈分享了「5 月月考安排」",
+        "subtitle": "5 月 12 日 · 周一 · 已同步到日历",
+        "time": "昨天",
+        "icon": "calendar-o",
+        "iconColor": "#FF2D55",
+        "theme": "pnk"
+      },
+      {
+        "title": "本周免打扰时段已更新",
+        "subtitle": "23:00 – 07:30 · 记忆曲线节奏不变",
+        "time": "周日",
+        "icon": "clock-o",
+        "iconColor": "#30B0C7",
+        "theme": "tea"
+      }
+    ],
+    "quickEntries": [
+      {
+        "title": "错题本",
+        "subtitle": "128 题 · 未掌握 42",
+        "icon": "description",
+        "theme": "red",
+        "url": "/pages/capture/index"
+      },
+      {
+        "title": "拍一道新错题",
+        "subtitle": "自动识别 · 多学科",
+        "icon": "photograph",
+        "theme": "grn",
+        "url": "/pages/capture/index"
+      },
+      {
+        "title": "完整日历",
+        "subtitle": "月 / 周 / 日视图",
+        "icon": "calendar-o",
+        "theme": "blu",
+        "url": ""
+      },
+      {
+        "title": "偏好与提醒",
+        "subtitle": "免打扰 · 节奏 · 语言",
+        "icon": "setting-o",
+        "theme": "pur",
+        "url": ""
+      }
+    ]
+  }
+}

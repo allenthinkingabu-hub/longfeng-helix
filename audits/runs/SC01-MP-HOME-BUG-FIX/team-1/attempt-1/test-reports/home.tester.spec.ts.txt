@@ -1,0 +1,12 @@
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v1.6.1 /Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/frontend/apps/mp
+
+ ✓ test/unit/home.tester.spec.ts  (18 tests) 8ms
+
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+   Start at  06:01:44
+   Duration  198ms (transform 30ms, setup 1ms, collect 27ms, tests 8ms, environment 0ms, prepare 51ms)
+
+EXIT=0
