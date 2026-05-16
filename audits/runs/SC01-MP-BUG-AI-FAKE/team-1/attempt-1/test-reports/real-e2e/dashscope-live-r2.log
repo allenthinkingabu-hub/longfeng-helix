@@ -1,0 +1,12 @@
+# Real DashScope live wire call (Tester R2 · 2026-05-16 12:40 local)
+# command:
+#   curl -m 30 -sS -X POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions \
+#     -H "Authorization: Bearer sk-21ba4e60ac11464a89c2ab2e9abf9901" \
+#     -H "Content-Type: application/json" \
+#     -d '{"model":"qwen-plus","messages":[{"role":"user","content":"ping (Tester R2 real-e2e probe). Reply with one short word."}]}'
+# HTTP exit code: 0 (curl), HTTP status: 200
+
+# response body:
+{"model":"qwen-plus","id":"chatcmpl-f0a80c11-3663-9f4a-b6db-786c3fa52bfb","choices":[{"message":{"content":"Pong","role":"assistant"},"index":0,"finish_reason":"stop"}],"created":1778920859,"object":"chat.completion","usage":{"total_tokens":27,"completion_tokens":2,"prompt_tokens":25,"prompt_tokens_details":{"cached_tokens":0}}}
+
+# verdict: TL clause 4 PASS · DashScope live + qwen-plus model + Bearer auth all working from this worktree

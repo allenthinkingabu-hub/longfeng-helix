@@ -1,0 +1,13 @@
+=== R4 FE Field Shape Check (camelCase) ===
+
+qid: "test-qid-r4-math-v5-data"
+taskId: "test-qid-r4-math-v5-data"
+provider: "qianwen"
+modelInfo.name: "qianwen"
+modelInfo.version: "qwen-plus"
+reasonMarkdown: "学生未识别该公式为一元二次方程求根公式，缺乏对变量a、b、c对应系数的辨析能力"
+steps[0].stepNo: 1
+steps[0].text: "明确公式名称为求根公式，专用于解形如ax²+bx+c=0的一元二次方程"
+confidence: 0.0
+
+Total camelCase fields hit: 9/9

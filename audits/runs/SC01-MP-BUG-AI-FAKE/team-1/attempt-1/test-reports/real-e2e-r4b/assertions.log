@@ -1,0 +1,27 @@
+=== R4b 真数学题 E2E 断言（taskId: discriminant chart） ===
+
+TaskId: test-qid-r4b-discriminant-142249
+
+--- Assertion A: reasonMarkdown 真含数学概念词 ---
+x轴
+Δ
+二次
+交点
+函数
+判别式
+图象
+符号
+A: 8 个唯一数学概念词命中 (≥3 算 PASS)
+
+--- Assertion B: steps 真含解题动作词 ---
+  step 1 : 第一步：确认二次函数图象与x轴交点个数反映Δ的符号
+  step 2 : 第二步：若图象与x轴有两个交点，则Δ>0；一个交点则Δ=0；无交点则Δ<0
+  step 3 : 第三步：结合题干所附图象实际交点情况，对应选择正确选项
+B: 3 个步骤 (≥3 算 PASS)
+
+--- Assertion C: modelInfo.name == qianwen + reasonMarkdown.length ≥ 10 ---
+  modelInfo.name = qianwen (期望 qianwen · NOT stub)
+  reasonMarkdown.length = 22 (期望 ≥10)
+
+--- VERDICT ---
+R4b ALL PASS · 真数学题图端到端真闭环 · 用户视角 P04 不再空白

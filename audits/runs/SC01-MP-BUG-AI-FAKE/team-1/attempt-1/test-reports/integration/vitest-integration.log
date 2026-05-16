@@ -1,0 +1,40 @@
+     58|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  test/api/review-exec.integration.spec.ts > P08 review-exec · integration (真 API · 0 mock) > POST /api/review/nodes/{nid}/reveal returns 200 or 404
+AssertionError: expected [ 200, 404 ] to include 400
+ ❯ test/api/review-exec.integration.spec.ts:61:24
+     59| 
+     60|     // Accept 200 (reveal success) or 404 (no test data) — both prove …
+     61|     expect([200, 404]).toContain(resp.status);
+       |                        ^
+     62| 
+     63|     if (resp.status === 200) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  test/api/review-plan-transparency.spec.ts > SC01-MP-T06 · review-plan API transparency (真 backend · 0 mock) > createSession → getToday round-trip proves API shape
+AssertionError: expected undefined to be +0 // Object.is equality
+
+- Expected: 
+0
+
++ Received: 
+undefined
+
+ ❯ test/api/review-plan-transparency.spec.ts:193:27
+    191| 
+    192|     const todayEnv = await getToday();
+    193|     expect(todayEnv.code).toBe(0);
+       |                           ^
+    194|     expect(todayEnv.data.items).toBeDefined();
+    195| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+ Test Files  4 failed | 6 passed (10)
+      Tests  5 failed | 25 passed (30)
+   Start at  12:27:02
+   Duration  2.41s (transform 65ms, setup 1ms, collect 76ms, tests 2.16s, environment 0ms, prepare 55ms)
+

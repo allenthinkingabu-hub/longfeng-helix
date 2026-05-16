@@ -1,0 +1,16 @@
+=== 3 CORE ASSERTIONS (Tester R3) ===
+
+Assertion 1: reasonMarkdown.length >= 10
+  reasonMarkdown.length = 19
+  PASS
+
+Assertion 2: steps.length >= 3
+  steps.length = 3
+  PASS
+
+Assertion 3: modelInfo.name == 'qianwen' (NOT 'stub')
+  modelInfo.name = qianwen
+  PASS
+
+=== Summary ===
+ALL 3 ASSERTIONS PASS
