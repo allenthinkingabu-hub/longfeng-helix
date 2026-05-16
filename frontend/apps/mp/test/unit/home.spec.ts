@@ -8,6 +8,8 @@
 import { describe, it, expect } from 'vitest';
 
 import {
+  SUBJECT_COLORS,
+  buildCurrentWeekStrip,
   buildGreeting,
   computeCirclePct,
   derivePageState,
@@ -102,5 +104,99 @@ describe('derivePageState (pure)', () => {
 
   it('EMPTY takes precedence over error when data.total = 0', () => {
     expect(derivePageState(makeData(0), true)).toBe('EMPTY');
+  });
+});
+
+// ── buildCurrentWeekStrip (B4 · B5 pure) ─────────────────────────
+// 修复点回归 (intent encoded):
+//   B4 — 周一→周日 d 值必须连续 · 旧硬编码周二/周三 d=22 重复是 bug
+//   B5 — label 与 days 必须随 now 动态变化 · 旧硬编码 "4 月 20-26 日" 与今天 (2026-05-16 周六) 不符
+
+describe('buildCurrentWeekStrip (B4 + B5 · pure)', () => {
+  it('returns 7 days, 周一→周日 order', () => {
+    const strip = buildCurrentWeekStrip(new Date(2026, 4, 16)); // 2026-05-16 周六
+    expect(strip.days).toHaveLength(7);
+    expect(strip.days.map((d) => d.w)).toEqual(['一', '二', '三', '四', '五', '六', '日']);
+  });
+
+  it('B4 regression · 周一-周日 d values are 7 distinct consecutive numbers (no 22-duplicate)', () => {
+    const strip = buildCurrentWeekStrip(new Date(2026, 4, 16)); // 周六 → Mon=5/11 ... Sun=5/17
+    const ds = strip.days.map((d) => parseInt(d.d, 10));
+    expect(new Set(ds).size).toBe(7); // 全部不重复
+    for (let i = 1; i < ds.length; i++) {
+      expect(ds[i] - ds[i - 1]).toBe(1); // 严格连续
+    }
+  });
+
+  it('B5 regression · today is 周六 → days[5].today === true · others false', () => {
+    const strip = buildCurrentWeekStrip(new Date(2026, 4, 16)); // Saturday
+    const todays = strip.days.map((d) => d.today);
+    expect(todays).toEqual([false, false, false, false, false, true, false]);
+    expect(strip.days[5].num).toBe(8); // today 上挂 badge
+    expect(strip.days[0].num).toBe(0);
+  });
+
+  it('B5 regression · 周日 (Sunday) 算本周最后一天 · today index = 6', () => {
+    const strip = buildCurrentWeekStrip(new Date(2026, 4, 17)); // 2026-05-17 周日
+    expect(strip.days[6].today).toBe(true);
+    expect(strip.days.filter((d) => d.today)).toHaveLength(1);
+  });
+
+  it('B5 regression · 周一 → today index = 0', () => {
+    const strip = buildCurrentWeekStrip(new Date(2026, 4, 11)); // 2026-05-11 周一
+    expect(strip.days[0].today).toBe(true);
+    expect(strip.days[0].d).toBe('11');
+    expect(strip.days[6].d).toBe('17');
+  });
+
+  it('B5 regression · label reflects current week range (not hardcoded "4 月 20–26 日")', () => {
+    const strip = buildCurrentWeekStrip(new Date(2026, 4, 16)); // 周六 → label 5 月 11–17 日
+    expect(strip.label).toBe('5 月 11–17 日');
+    expect(strip.label).not.toContain('4 月 20');
+  });
+
+  it('label uses 2-digit day padding only when > 9 · single digit days unpadded inside label', () => {
+    // 2026-05-04 周一 → 本周 5/4 - 5/10 · label = "5 月 4–10 日" (label 不要 pad)
+    const strip = buildCurrentWeekStrip(new Date(2026, 4, 4));
+    expect(strip.label).toBe('5 月 4–10 日');
+    // 但 days[i].d 必须 pad 到 2 位 (UI 对齐)
+    expect(strip.days[0].d).toBe('04');
+    expect(strip.days[6].d).toBe('10');
+  });
+
+  it('每个 day 必带 dots[] (mockup 占位) · today 必带 num=8', () => {
+    const strip = buildCurrentWeekStrip(new Date(2026, 4, 16));
+    for (const d of strip.days) {
+      expect(Array.isArray(d.dots)).toBe(true);
+      expect(d.dots.length).toBeGreaterThan(0);
+    }
+    const today = strip.days.find((d) => d.today)!;
+    expect(today.num).toBe(8);
+  });
+});
+
+// ── SUBJECT_COLORS regression (B6) ───────────────────────────────
+// 修复点 intent:
+//   B6 — chip 在深蓝 reviewhero 卡上 · 暗色 #C41E3A/#0057B7/#9C4F00 看起来同色调
+//        必须改 mockup 亮色 (#FF6B6B 数学 / #FFD166 物理 / #6DE895 英语)
+
+describe('SUBJECT_COLORS (B6 · 亮色 regression)', () => {
+  it('数学 is mockup bright red #FF6B6B (not legacy dark #C41E3A)', () => {
+    expect(SUBJECT_COLORS['数学']).toBe('#FF6B6B');
+    expect(SUBJECT_COLORS['数学']).not.toBe('#C41E3A');
+  });
+
+  it('物理 is mockup bright yellow #FFD166 (not legacy dark #0057B7)', () => {
+    expect(SUBJECT_COLORS['物理']).toBe('#FFD166');
+    expect(SUBJECT_COLORS['物理']).not.toBe('#0057B7');
+  });
+
+  it('英语 is mockup bright green #6DE895 (not legacy brown #9C4F00)', () => {
+    expect(SUBJECT_COLORS['英语']).toBe('#6DE895');
+    expect(SUBJECT_COLORS['英语']).not.toBe('#9C4F00');
+  });
+
+  it('all 4 subjects defined', () => {
+    expect(Object.keys(SUBJECT_COLORS).sort()).toEqual(['化学', '数学', '物理', '英语'].sort());
   });
 });

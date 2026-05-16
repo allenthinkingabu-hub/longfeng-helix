@@ -7,13 +7,28 @@
     "pages/wrongbook-list/index",
     "pages/review-today/index",
     "pages/review-exec/index",
-    "pages/review-done/index"
+    "pages/review-done/index",
+    "pages/me/index"
   ],
   "window": {
+    "navigationStyle": "custom",
     "navigationBarBackgroundColor": "#ffffff",
     "navigationBarTitleText": "龙凤错题本",
     "navigationBarTextStyle": "black",
     "backgroundColor": "#f5f5f5"
+  },
+  "tabBar": {
+    "color": "#8E8E93",
+    "selectedColor": "#007AFF",
+    "backgroundColor": "#F2F2F7",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/home/index", "text": "首页" },
+      { "pagePath": "pages/wrongbook-list/index", "text": "错题本" },
+      { "pagePath": "pages/capture/index", "text": "拍题" },
+      { "pagePath": "pages/review-today/index", "text": "复习" },
+      { "pagePath": "pages/me/index", "text": "我的" }
+    ]
   },
   "sitemapLocation": "sitemap.json"
 }
