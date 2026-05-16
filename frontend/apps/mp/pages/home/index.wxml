@@ -95,39 +95,60 @@
     <!-- ── 始终渲染 sections (LOADING/READY/EMPTY/ERROR 共用 home framework) ─── -->
     <block>
 
-      <!-- ── Weekly summary (B3 · sparkline SVG + days bar) ──── -->
+      <!-- ── Weekly summary (SC-16-T02 · weekSummary 4 数字 wire to today.weekSummary · INV-6) -->
       <view class="sec">
         <text class="sec-t">本周回顾</text>
-        <text class="sec-m">查看全部 ›</text>
+        <text
+          class="sec-m"
+          data-test-id="{{testIds.weeklyHomeLink}}"
+          bind:tap="onWeeklyHomeTap"
+        >查看全部 ›</text>
       </view>
       <view class="weekly" data-test-id="p-home-weekly-sparkline">
         <view class="weekly-row">
-          <view class="stat">
-            <text class="stat-n stat-green">{{weekStats.mastered}}</text>
-            <text class="stat-l">掌握</text>
-          </view>
-          <view class="stat-sep"></view>
-          <view class="stat">
-            <text class="stat-n stat-blue">{{weekStats.newItems}}</text>
-            <text class="stat-l">新增</text>
-          </view>
-          <view class="stat-sep"></view>
-          <view class="stat">
-            <text class="stat-n stat-orange">{{weekStats.forgotten}}</text>
-            <text class="stat-l">遗忘</text>
-          </view>
-          <view class="stat-sep"></view>
-          <view class="stat">
-            <text class="stat-n stat-indigo">{{weekStats.masteryRate}}%</text>
+          <view class="stat tile mastery">
+            <!-- AC8 a · masteryRate null → "—%" / num → "NN%" -->
+            <text
+              class="stat-n big stat-indigo"
+              data-test-id="{{testIds.weekSummary.masteryRateNum}}"
+            >{{weekSummaryMasteryText}}</text>
             <text class="stat-l">掌握率</text>
           </view>
+          <view class="stat-sep"></view>
+          <!-- AC8 c · streak chip · 0 时整体不渲染 -->
+          <view
+            wx:if="{{weekSummaryStreak > 0}}"
+            class="stat streakchip"
+            data-test-id="{{testIds.weekSummary.streakChip}}"
+          >
+            <text class="stat-n stat-green">{{weekSummaryStreak}}</text>
+            <text class="stat-l">Streak 天</text>
+          </view>
+          <view wx:if="{{weekSummaryStreak > 0}}" class="stat-sep"></view>
+          <view class="stat">
+            <!-- AC8 d · newCount=0 时仍显 "+0" (区别于 streak 兜底语义) -->
+            <text
+              class="stat-n stat-orange"
+              data-test-id="{{testIds.weekSummary.newCountNum}}"
+            >+{{weekSummaryNewCount}}</text>
+            <text class="stat-l">本周新增</text>
+          </view>
         </view>
-        <!-- (B3) sparkline SVG · 7 日趋势折线 + 今日端点 高亮 -->
-        <!-- MP 不支持原生 <svg> 标签 · 用 <image src="data:image/svg+xml;..."> 兜底 -->
-        <view class="spark" data-test-id="p-home-weekly-spark-svg">
-          <image class="spark-svg" src="{{sparklineSvgUri}}" mode="scaleToFill" />
+        <!-- AC8 b · sparkline svg · null 索引断笔 (helpers.buildSparklineSvgFromWeekSummary) -->
+        <view class="spark" data-test-id="{{testIds.weekSummary.sparklineSvg}}">
+          <image
+            wx:if="{{weekSummarySparklineUri}}"
+            class="spark-svg"
+            src="{{weekSummarySparklineUri}}"
+            mode="scaleToFill"
+          />
+          <image
+            wx:else
+            class="spark-svg"
+            src="{{sparklineSvgUri}}"
+            mode="scaleToFill"
+          />
         </view>
-        <!-- (B3) days bar · 周一→周日 标签 + 今日高亮 -->
         <view class="days" data-test-id="p-home-weekly-days">
           <text class="day">周一</text>
           <text class="day">周二</text>

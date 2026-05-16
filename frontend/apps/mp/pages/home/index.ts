@@ -4,15 +4,20 @@
 // API: src/api/home.ts · getHomeTodayCount · 真 API · 0 mock
 
 import { TEST_IDS } from '@longfeng/testids';
-import { getHomeTodayCount } from '../../src/api/home';
+import { getHomeTodayCount, getHomeTodayAggregate, type HomeWeekSummaryDto } from '../../src/api/home';
 import {
   SUBJECT_COLORS,
   buildCurrentWeekStrip,
   buildGreeting,
   computeCirclePct,
   derivePageState,
+  buildSparklineSvgFromWeekSummary,
+  formatMasteryPctFromWeekSummary,
 } from './helpers';
 import type { PageState } from './helpers';
+
+// SC-16-T02 · MVP studentId (登录上线时改读 store · 与 weekly 页同源)
+const MVP_STUDENT_ID = '1';
 
 // ─── Mock/MVP data ──────────────────────────────────────────────
 const MVP_SUBJECTS = [
@@ -21,7 +26,10 @@ const MVP_SUBJECTS = [
   { name: '英语', count: 3, color: SUBJECT_COLORS['英语'] },
 ];
 
-const MVP_WEEK_STATS = { mastered: 23, newItems: 8, forgotten: 2, masteryRate: 68 };
+// SC-16-T02: weekStats 旧 mock 字段 (mastered/newItems/forgotten/masteryRate)
+// 已被 weekSummary (masteryRate/sparkline/streak/newCount) 替换 · 不再消费
+// 保留常量供 vrt baseline 兜底 (LOADING 态前) · 不绑到 wxml
+const LEGACY_WEEK_STATS_PLACEHOLDER = { mastered: 0, newItems: 0, forgotten: 0, masteryRate: 0 };
 
 // (B4 · B5) MVP_WEEK_DAYS / weekLabel 由 buildCurrentWeekStrip() 动态生成
 // 旧硬编码 (周二/周三 d=22 重复 · 4 月 20-26 日) 已删除
@@ -77,8 +85,16 @@ Page({
     circlePctText: '0%',
     subjects: MVP_SUBJECTS,
 
-    // weekly
-    weekStats: MVP_WEEK_STATS,
+    // SC-16-T02 · weekSummary 4 字段 wire (替代旧 weekStats / sparklineSvgUri) · INV-6
+    // null = LOADING / 未拉到 · 不显 "0%" (空周语义 · biz §10.14)
+    homeWeekSummary: null as HomeWeekSummaryDto | null,
+    // 派生字段 (helpers 计算): 减少 wxml 表达式复杂度
+    weekSummaryMasteryText: '—%',
+    weekSummarySparklineUri: '',
+    weekSummaryStreak: 0,
+    weekSummaryNewCount: 0,
+    // legacy fallback (LOADING / ERROR 态)
+    weekStats: LEGACY_WEEK_STATS_PLACEHOLDER,
     sparklineSvgUri: SPARKLINE_SVG_URI,
 
     // week schedule · 动态 (B4 + B5)
@@ -94,6 +110,8 @@ Page({
 
   onLoad() {
     this._fetchTodayData();
+    // SC-16-T02 · 并行拉 weekSummary (P-HOME 4 数字 wire · 不调 /api/home/weekly)
+    this._fetchWeekSummary();
   },
 
   onShow() {
@@ -146,8 +164,45 @@ Page({
     }
   },
 
+  /**
+   * SC-16-T02 · 拉 P-HOME 4 数字 (今日聚合含 weekSummary)
+   * INV-6: P-HOME 必须仅从此投影消费 · 不调用 /api/home/weekly
+   */
+  async _fetchWeekSummary() {
+    try {
+      const data = await getHomeTodayAggregate(MVP_STUDENT_ID);
+      const ws = data.weekSummary || null;
+      if (ws) {
+        const sparklineUri = buildSparklineSvgFromWeekSummary(ws.sparkline);
+        this.setData({
+          homeWeekSummary: ws,
+          weekSummaryMasteryText: formatMasteryPctFromWeekSummary(ws.masteryRate),
+          weekSummarySparklineUri: sparklineUri,
+          weekSummaryStreak: ws.streak,
+          weekSummaryNewCount: ws.newCount,
+        });
+      }
+    } catch {
+      // 静默降级 · 让 P-HOME 其他 sections 继续渲染 · weekSummary 显 "—%"
+      this.setData({
+        homeWeekSummary: null,
+        weekSummaryMasteryText: '—%',
+        weekSummaryStreak: 0,
+        weekSummaryNewCount: 0,
+      });
+    }
+  },
+
   onStartAll() {
     wx.navigateTo({ url: '/pages/review-exec/index' });
+  },
+
+  /**
+   * SC-16-T02 · Tap P-HOME .bento「查看全部 ›」 → P-WEEKLY-REVIEW
+   * 锚 mockup 01_home_v2.html line 291 视觉锚 · spec §7 entry
+   */
+  onWeeklyHomeTap() {
+    wx.navigateTo({ url: '/pages/me/weekly/index' });
   },
 
   onQuickTap(e: WechatMiniprogram.TouchEvent) {

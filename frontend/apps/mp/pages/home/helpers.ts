@@ -112,3 +112,61 @@ export function buildCurrentWeekStrip(now: Date): WeekStrip {
 
   return { label, days };
 }
+
+// ── SC-16-T02 · P-HOME weekSummary helpers ─────────────────────
+// trace: design/system/pages/P-HOME.spec.md §5.2 + biz §10.14
+
+/**
+ * masteryRate 0..1 → "68%" · null → "—%" (em dash U+2014)
+ * spec §5.2: null 时显 "—%" 不显 "0%"
+ */
+export function formatMasteryPctFromWeekSummary(rate: number | null | undefined): string {
+  if (rate === null || rate === undefined) return '—%';
+  return `${Math.round(rate * 100)}%`;
+}
+
+/**
+ * sparkline (Array<number | null> 长度 7) → svg data URI 字符串
+ * - null 索引在 path M/L 命令断笔 (不 forward-fill · 不打底 0)
+ * - viewBox 300×40 · 与既有 SPARKLINE_SVG_URI 同尺寸 (vrt baseline 复用)
+ * - 返回 'data:image/svg+xml;utf8,...' 给 <image src=...> 直接消费
+ */
+export function buildSparklineSvgFromWeekSummary(
+  sparkline: Array<number | null>,
+): string {
+  if (!Array.isArray(sparkline) || sparkline.length === 0) {
+    return '';
+  }
+  const W = 300;
+  const H = 40;
+  const step = W / Math.max(1, sparkline.length - 1);
+
+  const segments: string[] = [];
+  let current: string[] = [];
+
+  for (let i = 0; i < sparkline.length; i++) {
+    const v = sparkline[i];
+    if (v === null || v === undefined || !Number.isFinite(v)) {
+      if (current.length > 0) {
+        segments.push(current.join(' '));
+        current = [];
+      }
+      continue;
+    }
+    const y = Math.max(0, Math.min(H, (1 - v) * H));
+    const x = i * step;
+    if (current.length === 0) {
+      current.push(`M${x.toFixed(1)},${y.toFixed(1)}`);
+    } else {
+      current.push(`L${x.toFixed(1)},${y.toFixed(1)}`);
+    }
+  }
+  if (current.length > 0) segments.push(current.join(' '));
+
+  const path = segments.join(' ');
+  const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+  <path d="${path}" stroke="#34C759" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}

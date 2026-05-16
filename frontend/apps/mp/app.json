@@ -8,7 +8,8 @@
     "pages/review-today/index",
     "pages/review-exec/index",
     "pages/review-done/index",
-    "pages/me/index"
+    "pages/me/index",
+    "pages/me/weekly/index"
   ],
   "window": {
     "navigationStyle": "custom",
