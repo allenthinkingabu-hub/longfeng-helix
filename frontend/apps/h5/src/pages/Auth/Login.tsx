@@ -28,10 +28,19 @@ const REDIRECT_WHITELIST_PREFIXES = [
 
 // inflight scope_in #10/#11 + spec §7.2: default redirect = /home · whitelist applies
 // to non-default ?redirect= values · cross-origin / non-whitelist → downgrade to /home
+//
+// 2026-05-17 Tester adversarial T1 fix · path-traversal hardening:
+//   ?redirect=/home/../admin previously passed startsWith('/home') and was returned
+//   verbatim · react-router then resolved it to /admin (open-redirect vuln). We now
+//   reject any input containing '..' segment OR backslash before whitelist check.
 function sanitizeRedirect(raw: string | null): string {
   if (!raw) return '/home';
   if (!raw.startsWith('/')) return '/home'; // strip absolute http://… / //evil
   if (raw.startsWith('//')) return '/home';
+  // Reject any path-traversal payload — '..' segment or backslash-escaped traversal.
+  // The whole raw value (path + query + hash) is the corpus since it's fed verbatim
+  // into navigate(); '..' anywhere is suspicious for an internal-path-only redirect.
+  if (raw.includes('..') || raw.includes('\\')) return '/home';
   const path = raw.split('?')[0].split('#')[0];
   for (const prefix of REDIRECT_WHITELIST_PREFIXES) {
     if (path === prefix || path.startsWith(prefix)) return raw;
@@ -274,9 +283,8 @@ export const LoginPage: React.FC = () => {
 
       <button
         type="button"
-        className={`${s.btn} ${s.btnPrimary}`}
+        className={`${s.btn} ${s.btnPrimary} ${!canSubmit ? s.btnDisabled : ''}`}
         onClick={() => handleSubmit()}
-        disabled={!canSubmit}
         data-testid={TEST_IDS.p00.loginSubmitBtn}
       >
         {authState === 'VERIFYING' ? (

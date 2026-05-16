@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "PHASE-A-LOGIN-H5",
+    "team_id": "team-1",
+    "title": "PHASE-A · P00 login h5 端真页 (1:1 mirror mockup) + auth-service 后端 (Maven 模块新建 · POST /api/auth/login 邮箱+密码 + JWT 签发 + 5 次锁定限流) + Playwright e2e (happy + 3 异常) 全绿",
+    "attempt": 1,
+    "phase": "tester",
+    "dev_done": true,
+    "passes": true,
+    "retries": 0,
+    "audit_retries": 0,
+    "git_commits": [
+      "3cdb81d",
+      "ce93117",
+      "e63bab5",
+      "d7e86dc"
+    ]
+  },
+  "work_log_dir": "audits/runs/PHASE-A-LOGIN-H5/team-1/attempt-1",
+  "log_requirements": {
+    "must_write": [
+      "tester.md",
+      "adversarial.md",
+      "test-reports/"
+    ]
+  },
+  "audit_gate": "audit.js v1 五维度严卡 (用户明示本次跳过 TestDesigner Phase 1 · 走 SC01-MP 同款 Coder/Tester 对抗) || dim 1 coder_compliance: coder.md (5 段 · 地形侦察/编码/自检/提交/反省) + bugs-found.md 真 bug list || dim 2 tester_compliance: tester.md + adversarial.md ≥1 REJECT + ≥1 fix · test-reports/ 含真 Playwright report + surefire/failsafe XML · mock 总闭集 ≤ 5 || dim 3 bug_reality: git_commits[] 全部 git cat-file -e 验真 || dim 4 test_validity: tester.md 声称 testcase 数 == Playwright report + Maven failsafe XML <testcase> 实际数 (差 1 即 FAIL) || dim 5 spec_alignment: dor_c1_to_c6_required=true · IT 必须用 Testcontainers 接 sandbox 容器 (PG:15432, Redis:16379) · 禁止 H2/embedded/Mock 后端 || 用户红线: e2e 完全跑通 · mvn verify BUILD SUCCESS + pnpm test:e2e --grep 'PHASE-A-LOGIN-H5' 全绿 · 任一 RED 即 dev_done=false",
+  "previous_audit_verdict": null,
+  "context": {
+    "scenario": "新建 P00 邮箱+密码登录全栈链路 (h5 端) · auth-service 后端模块首次起 · Playwright e2e 真跑通 happy path + 错密码 + 错邮箱 + 5 次锁定 4 个 case",
+    "target_page": "P00 (h5 端 only · mp 端 P00 留未来 SC00-MP-LOGIN task)",
+    "mockup_path": "design/mockups/wrongbook/00_login.html",
+    "spec_path": "design/system/pages/P00-login.spec.md",
+    "biz_refs": [
+      "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2A.3.1 决策树 (节点 4 未命中 → P-LANDING → 用户 tap 「已有账号 → 登录」→ P00)",
+      "biz §2A.4 P00 spec (page id / path / 状态集 / API 触点)",
+      "biz §10.x auth API 契约"
+    ],
+    "api_contracts_in_scope": [
+      "POST /api/auth/login (实现 · 邮箱+密码 + bcrypt verify + HS256 JWT exp 7d + refresh token + student dto)",
+      "GET /actuator/health (auth-service 健康检查)",
+      "POST /api/auth/refresh (stub controller · 返 200 + 假 jwt · 仅证明 endpoint 可达 · 真实现留未来)"
+    ],
+    "api_contracts_out_of_scope": [
+      "POST /api/auth/wechat-login (SC-12 + mp 端范围)",
+      "POST /api/auth/apple-login (iOS 端 + 未来)",
+      "POST /api/auth/anonymous-claim (SC-12 范围)",
+      "POST /api/auth/forget-password (P1)"
+    ],
+    "scope_in": [
+      "1. backend/auth-service/ Maven 模块新建 · pom.xml inherit wrongbook-parent (沿用 calendar-core / file-service 继承样板) · mvn -pl auth-service compile BUILD SUCCESS · Spring Boot 端口 8091",
+      "2. AuthServiceApplication.java + application-dev.yml (数据源指向 sandbox PG:15432 用户 longfeng/longfeng · Redis:16379) + /actuator/health 200 {status:UP}",
+      "3. Flyway V20260516_01__auth_user.sql · 1 张 auth_user 表 (id BIGSERIAL · email VARCHAR(255) UNIQUE NOT NULL · password_hash VARCHAR(72) NOT NULL bcrypt · status ENUM/CHECK ACTIVE/LOCKED/DELETED · last_login_at · failed_attempts INT DEFAULT 0 · locked_until TIMESTAMP NULL · created_at) + 索引 idx_auth_user_email · 1 row test fixture (email='test@example.com' · password='Test@1234' bcrypt hash · status=ACTIVE)",
+      "4. POST /api/auth/login 真实现 · Body {provider:'EMAIL', email, password, rememberMe, consentAt} · 流程: ① email 查 auth_user ② bcrypt verify 密码 ③ 签 HS256 JWT (sub=user.id, exp=now+7d, iss=longfeng, aud=h5) + refresh token (UUID v4 + Redis 30d TTL) ④ 返 {jwt, refreshToken, expiresIn:604800, student:{id, nickMasked:'测试*员'}}",
+      "5. POST /api/auth/login 异常: 邮箱不存在 / 密码 hash 不 match → 401 INVALID_CREDENTIALS · 同一 email 5 次失败 → status=LOCKED + locked_until=now+5min · 5 min 内任何登录尝试返 423 ACCOUNT_LOCKED · 锁定基于 DB 字段 (不靠 Redis 滑动窗口 · 简化版)",
+      "6. POST /api/auth/refresh stub controller · 接 Authorization: Bearer <refreshToken> · 返 200 + 假 jwt + expiresIn:604800 · 仅证明 endpoint 可达 (真实现留未来)",
+      "7. frontend/apps/h5/src/pages/Auth/Login.tsx · 1:1 mirror mockup design/mockups/wrongbook/00_login.html 视觉 (Logo + 凭据卡 + 邮箱/密码 input + 记住我 checkbox + 忘记密码 link + 主 CTA 蓝渐变 + 分隔线 'or' + Apple/微信 OAuth button + ConsentBar)",
+      "8. testids/src/index.ts p00.* 现有 9 个 + 补全 6 个 (p00-email-input · p00-password-input · p00-remember-me · p00-forget-password-link · p00-login-submit-btn · p00-apple-cta-btn) · TEST_IDS.p00.* 全部命中可被 Playwright getByTestId 拿到",
+      "9. 状态机 IDLE → VERIFYING → SUCCESS / FAILED · ANONYMOUS_CLAIM 子态本 task 不实现 (留 SC-12 · 仅 if URL ?guestSessionId= 存在时显示 toast「游客 claim 功能开发中」)",
+      "10. 登录成功 → localStorage 写 jwt + refreshToken + expiresAt → router.replace(?redirect ?? '/home') · P-HOME 已存在 (frontend/apps/h5/src/pages/Home/) · 期望看到 P-HOME 根节点 testid p-home-root",
+      "11. ?redirect= URL query 支持 · 解析 + 白名单 (内部 path only · /home /capture /question/ /review/ /calendar /s/ /observer/ /welcome /welcome-back /auth · 含其他 host/scheme 一律降级 /home) · 顶部小字「登录后将自动打开 ...」(若有 redirect)",
+      "12. ConsentBar 必勾才能点登录 · 未勾 → 主 CTA disabled (opacity 50%) + tap 时 toast「请先同意服务条款与隐私政策」",
+      "13. Apple/微信/忘记密码 按钮存在 + 视觉与 mockup 完全一致 · 点击不报错 · 都 toast「功能开发中 · 暂请用邮箱密码登录」(SC-12 / 未来覆盖)",
+      "14. Playwright e2e: frontend/apps/h5/tests/e2e/auth/login.spec.ts · 4 个 testcase 必须 PASS: (a) happy: test@example.com + Test@1234 → /home (b) wrong_password: 错密码 → 行内 error '邮箱或密码错误' (c) wrong_email: 不存在邮箱 → 同上 error (统一文案防探测) (d) lockout: 同一 email 连续 5 次错密码 → 第 6 次得到 '账号已锁定 · 5 分钟后重试'",
+      "15. 后端 IT: backend/auth-service/src/test/java/.../AuthServiceLoginE2EIT.java · @SpringBootTest + Testcontainers (PG:15432 · Redis:16379) · @Test methods 4 个 (happy / wrong_password / non_existent_email / 5_strike_lockout) · mvn -pl auth-service verify BUILD SUCCESS",
+      "16. 强制 git commit 所有产物 (backend/auth-service/ + frontend/apps/h5/src/pages/Auth/ + frontend/packages/testids/src/index.ts + audits/runs/PHASE-A-LOGIN-H5/team-1/attempt-1/) · git commit hash 写入 inflight.task.git_commits[]"
+    ],
+    "scope_out": [
+      "mp 端 P00 login (未来独立 task)",
+      "微信 OAuth wx.login 真链路 (SC-12 范围)",
+      "Apple Sign-In 真接入 (未来 iOS 端)",
+      "SMS 验证码登录 (P1)",
+      "ANONYMOUS_CLAIM 完整链路 (SC-12 范围)",
+      "POST /api/auth/forget-password 真实现 (P1)",
+      "POST /api/auth/refresh 真实现 (本 task 仅 stub)",
+      "TestDesigner test-cases.md (用户明示本次跳过 Phase 1 · 走 Coder/Tester 对抗)",
+      "用户合规 ConsentBar 未成年人保护强校验 (本 task 仅 UI · 真实合规法务 P1)"
+    ],
+    "sandbox": {
+      "team_env_file": ".harness/docker/team-1.env",
+      "pg_port": 15432,
+      "redis_port": 16379,
+      "compose_project_name": "team-1",
+      "startup_command": "docker compose -f .harness/docker/docker-compose.team.yml --env-file .harness/docker/team-1.env up -d"
+    },
+    "mockup_chain": "design/mockups/wrongbook/00_login.html (设计真相 SoT · 1:1 mirror)",
+    "test_case_first_required": false,
+    "opt_out_reason": "用户明示本次跳过 TestDesigner Phase 1 · 走 SC01-MP 同款 Coder/Tester 对抗 · audit.js 5 维度而非 7 维度"
+  },
+  "isolation": {
+    "worktree_disabled": false,
+    "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c",
+    "branch_name": "claude/nifty-kepler-3deb2c"
+  },
+  "physical_verification": {
+    "dor_c1_to_c6_required": false
+  },
+  "permissions": {
+    "writable_fields": [
+      "task.passes"
+    ]
+  },
+  "deliverables_definition_of_done": [
+    "1. backend/auth-service/ Maven 模块完整 + mvn -pl auth-service compile + spring-boot:run 端口 8091 健康检查 200",
+    "2. Flyway V20260516_01__auth_user.sql 迁移成功 · auth_user 表存在 + 1 row test fixture (test@example.com / Test@1234 bcrypt) · psql 验证",
+    "3. POST /api/auth/login 4 path: happy / wrong_password / non_existent_email / lockout 全实现 + curl 验证",
+    "4. POST /api/auth/refresh stub 返 200",
+    "5. frontend/apps/h5/src/pages/Auth/Login.tsx 1:1 mirror mockup · testids p00.* 全命中",
+    "6. ?redirect= 透传 + 白名单守护 + 顶部小字提示",
+    "7. ConsentBar 必勾守护 + 3 个未实装 OAuth 按钮 toast 提示",
+    "8. Playwright e2e 4 case 全绿 (pnpm -F h5 test:e2e --grep 'PHASE-A-LOGIN-H5')",
+    "9. 后端 IT 4 case 全绿 (mvn -pl auth-service verify BUILD SUCCESS)",
+    "10. work_log: coder.md (5 段) + bugs-found.md 全部落 audits/runs/PHASE-A-LOGIN-H5/team-1/attempt-1/",
+    "11. 强制 git add + git commit 全部产物 · commit hash 写入 inflight.task.git_commits[]",
+    "12. inflight dev_done=true + node .harness/harness.js --advance=PHASE-A-LOGIN-H5 通知 harness 推 Tester 阶段"
+  ],
+  "rule_6_tool_budget_guidance": "全栈新建 task (前端 + 后端 + DDL + IT + e2e) · 预计 ~80-120 tool use · 软线 50 self-checkpoint · 70 surface · 85 强制 Rule 6.5 compaction summary",
+  "written_at": "2026-05-16T20:06:35.601Z",
+  "written_by": "TL agent (本会话 · 用户明示 spawn 1 team · 跳 TestDesigner · Coder/Tester 对抗到 e2e 全绿)"
+}

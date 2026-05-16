@@ -216,7 +216,7 @@
   color: #fff;
   box-shadow: 0 10px 24px -8px rgba(10, 132, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
-.btnPrimary[disabled] {
+.btnDisabled {
   opacity: 0.5;
   cursor: not-allowed;
 }

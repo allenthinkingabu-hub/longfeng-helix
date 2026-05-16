@@ -1,0 +1,12 @@
+<testsuites id="" name="" tests="4" failures="0" skipped="0" errors="0" time="5.804343">
+<testsuite name="auth/login.spec.ts" timestamp="2026-05-16T20:17:12.553Z" hostname="chromium" tests="4" failures="0" skipped="0" time="5.082" errors="0">
+<testcase name="PHASE-A-LOGIN-H5 · P00 login (4 cases) › PHASE-A-LOGIN-H5 happy: test@example.com + Test@1234 → /home" classname="auth/login.spec.ts" time="1.179">
+</testcase>
+<testcase name="PHASE-A-LOGIN-H5 · P00 login (4 cases) › PHASE-A-LOGIN-H5 wrong_password → inline 邮箱或密码错误" classname="auth/login.spec.ts" time="0.836">
+</testcase>
+<testcase name="PHASE-A-LOGIN-H5 · P00 login (4 cases) › PHASE-A-LOGIN-H5 wrong_email → same 邮箱或密码错误 (prevent enumeration)" classname="auth/login.spec.ts" time="0.555">
+</testcase>
+<testcase name="PHASE-A-LOGIN-H5 · P00 login (4 cases) › PHASE-A-LOGIN-H5 lockout: 5 connectives wrong → 账号已锁定 · 5 分钟后重试" classname="auth/login.spec.ts" time="2.512">
+</testcase>
+</testsuite>
+</testsuites>
