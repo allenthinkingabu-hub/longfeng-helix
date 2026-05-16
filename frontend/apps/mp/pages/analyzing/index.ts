@@ -109,6 +109,12 @@ Page({
     try {
       this.setData({ pageState: 'analyzing', statusText: 'AI 正在分析…', steps: buildSteps(1, 'analyzing'), doneCount: 0 });
       const resp = await startAnalyze({ imageUrl, subject });
+      // Guard: backend must hand back a non-empty task id. Setting an undefined
+      // data field triggers a WX warning AND would seed the poller with
+      // `tasks/undefined/status` — surface this as an error instead.
+      if (!resp.taskId) {
+        throw new Error('startAnalyze: backend returned empty taskId');
+      }
       this.setData({ taskId: resp.taskId });
       this._startPolling(resp.taskId);
     } catch {

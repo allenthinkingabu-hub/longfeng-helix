@@ -32,6 +32,24 @@ export interface HttpOptions {
   timeout?: number;
 }
 
+/**
+ * Auto-unwrap ApiResult envelope. Spring backend returns
+ * `{ code: 0, message: "ok", data: {...} }`; FE callers only ever care about
+ * `data`. If the response doesn't look like ApiResult, pass through.
+ */
+export function unwrapApiResult<T>(raw: unknown): T {
+  if (
+    raw !== null
+    && typeof raw === 'object'
+    && 'code' in raw
+    && 'data' in raw
+    && Object.keys(raw as object).every((k) => k === 'code' || k === 'message' || k === 'data')
+  ) {
+    return (raw as { data: T }).data;
+  }
+  return raw as T;
+}
+
 export async function httpJSON<T = unknown>(
   url: string,
   options: HttpOptions = {},
@@ -51,9 +69,9 @@ export async function httpJSON<T = unknown>(
         data: body,
         header: baseHeaders,
         timeout,
-        success: (res: { statusCode: number; data: T }) => {
+        success: (res: { statusCode: number; data: unknown }) => {
           if (res.statusCode >= 200 && res.statusCode < 400) {
-            resolve(res.data);
+            resolve(unwrapApiResult<T>(res.data));
           } else {
             reject(new Error(`HTTP ${res.statusCode}`));
           }
@@ -76,7 +94,7 @@ export async function httpJSON<T = unknown>(
     if (!resp.ok) {
       throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
     }
-    return (await resp.json()) as T;
+    return unwrapApiResult<T>(await resp.json());
   } finally {
     clearTimeout(t);
   }

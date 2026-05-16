@@ -8,6 +8,13 @@ import { presign } from '../../src/api/file';
 import { createQuestion } from '../../src/api/wrongbook';
 
 type Subject = 'math' | 'physics' | 'chemistry' | 'english' | 'chinese';
+
+/** RFC 4122-ish v4 generator using Math.random — fine for an Idempotency-Key
+ *  client token (server treats it opaquely). MP has no global `crypto`. */
+function buildIdempotencyKey(): string {
+  const rand = () => Math.floor(Math.random() * 0x10000).toString(16).padStart(4, '0');
+  return `${rand()}${rand()}-${rand()}-4${rand().slice(1)}-${(8 + Math.floor(Math.random() * 4)).toString(16)}${rand().slice(1)}-${rand()}${rand()}${rand()}`;
+}
 type CaptureState = 'IDLE' | 'UPLOADING' | 'UPLOADED' | 'ERROR';
 
 interface SubjectItem {
@@ -107,11 +114,14 @@ Page({
     this.setData({ state: 'UPLOADING', uploadPct: 0, errorMsg: '' });
 
     try {
-      // Step 1: presign
+      // Step 1: presign (backend requires X-Idempotency-Key per SC-01-T01 AC6).
+      // One key per capture attempt — a weak-network retry of the same shutter
+      // press should reuse it so wb_file stays 1 row.
       const presignResp = await presign({
         mime: 'image/jpeg',
         size,
         filename: 'capture.jpg',
+        idempotencyKey: buildIdempotencyKey(),
       });
       this.setData({ uploadPct: 20 });
 
