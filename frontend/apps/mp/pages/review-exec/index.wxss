@@ -286,6 +286,73 @@ page {
   color: #007AFF;
 }
 
+/* ── Keyboard / Formula input modes ─────────────────── */
+.paper-input {
+  background: #FCFCFE;
+  border-radius: 24rpx;
+  border: 2rpx solid rgba(120,120,128,0.16);
+  padding: 24rpx 28rpx;
+  min-height: 248rpx;
+}
+
+.kb-input {
+  width: 100%;
+  min-height: 200rpx;
+  font-size: 32rpx;
+  line-height: 1.55;
+  color: #1C1C1E;
+  letter-spacing: 0.2rpx;
+}
+
+.fm-display {
+  min-height: 96rpx;
+  padding: 16rpx 20rpx;
+  border-radius: 16rpx;
+  background: rgba(120,120,128,0.06);
+  font-size: 32rpx;
+  line-height: 1.55;
+  color: #1F4FD6;
+  letter-spacing: 0.4rpx;
+  word-break: break-all;
+}
+
+.fm-placeholder {
+  color: #8E8E93;
+  font-size: 26rpx;
+  font-style: italic;
+}
+
+.fm-keypad {
+  margin-top: 16rpx;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12rpx;
+}
+
+.fm-key {
+  height: 72rpx;
+  border-radius: 16rpx;
+  background: #FFFFFF;
+  border: 2rpx solid rgba(120,120,128,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1C1C1E;
+}
+
+.fm-key:active {
+  background: rgba(0,122,255,0.08);
+  border-color: rgba(0,122,255,0.3);
+}
+
+.fm-key-util {
+  background: rgba(120,120,128,0.10);
+  color: #636366;
+  font-size: 24rpx;
+}
+
 /* ── Reveal button ──────────────────────────────────── */
 .reveal-btn-wrap {
   margin: 24rpx 0;

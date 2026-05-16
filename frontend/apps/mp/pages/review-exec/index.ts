@@ -9,6 +9,13 @@ import { getNode, revealNode, gradeNode } from '../../src/api/review';
 // ─── Types ──────────────────────────────────────────────────────
 type ExecState = 'READING' | 'ANSWERING' | 'REVEALED' | 'GRADED';
 type GradeValue = 'FORGOT' | 'PARTIAL' | 'MASTERED';
+type AnswerMode = 'handwrite' | 'keyboard' | 'formula';
+
+// spec §3 答题区 3 mode tab · 公式面板常用符号集 (高中数学覆盖度优先)
+const FORMULA_SYMBOLS = [
+  'x²', 'x³', '√', '÷', '×', '±',
+  '≤', '≥', '≠', 'π', '°', '∞',
+];
 
 interface QuestionData {
   qid: string;
@@ -79,6 +86,11 @@ Page({
     isGrading: false,
     showExitSheet: false,
 
+    // spec §4.1 answerDraft · 3 mode tab (handwrite/keyboard/formula)
+    answerMode: 'handwrite' as AnswerMode,
+    userAnswer: '',                          // keyboard / formula 累积输入
+    formulaSymbols: FORMULA_SYMBOLS,
+
     // derived
     isRevealed: false,
     isAnswering: false,
@@ -140,6 +152,58 @@ Page({
         isAnswering: true,
       });
     }
+  },
+
+  // ── Answer mode tabs (spec §3 AnswerArea 3-mode) ──────────
+  // 切换答题输入方式 · 不直接进入 ANSWERING (要真敲键盘 / 点公式 / 触摸 canvas 才进)
+  onToolTap(e: WechatMiniprogram.TouchEvent) {
+    const mode = e.currentTarget.dataset.mode as AnswerMode;
+    if (!mode || mode === this.data.answerMode) return;
+    try { wx.vibrateShort({ type: 'light' }); } catch { /* noop */ }
+    this.setData({ answerMode: mode });
+  },
+
+  // keyboard mode · <textarea> input
+  onKeyboardInput(e: WechatMiniprogram.Input) {
+    const v = (e.detail.value ?? '') as string;
+    const patch: Record<string, unknown> = { userAnswer: v };
+    if (this.data.execState === 'READING' && v.length > 0) {
+      patch.execState = 'ANSWERING' as ExecState;
+      patch.isAnswering = true;
+    }
+    this.setData(patch);
+  },
+
+  // formula mode · 点符号插入 userAnswer
+  onFormulaInsert(e: WechatMiniprogram.TouchEvent) {
+    const sym = e.currentTarget.dataset.sym as string;
+    if (!sym) return;
+    try { wx.vibrateShort({ type: 'light' }); } catch { /* noop */ }
+    const next = (this.data.userAnswer ?? '') + sym;
+    const patch: Record<string, unknown> = { userAnswer: next };
+    if (this.data.execState === 'READING') {
+      patch.execState = 'ANSWERING' as ExecState;
+      patch.isAnswering = true;
+    }
+    this.setData(patch);
+  },
+
+  // formula mode · 退格
+  onFormulaBackspace() {
+    const cur = this.data.userAnswer ?? '';
+    if (cur.length === 0) return;
+    try { wx.vibrateShort({ type: 'light' }); } catch { /* noop */ }
+    // 注意 · 部分符号 (x² 等) 是 2 char · Array.from 按字素切
+    const arr = Array.from(cur);
+    arr.pop();
+    this.setData({ userAnswer: arr.join('') });
+  },
+
+  // formula mode · 清空
+  onFormulaClear() {
+    if ((this.data.userAnswer ?? '').length === 0) return;
+    try { wx.vibrateShort({ type: 'light' }); } catch { /* noop */ }
+    this.setData({ userAnswer: '' });
   },
 
   async onRevealTap() {

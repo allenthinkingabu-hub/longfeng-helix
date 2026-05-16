@@ -57,23 +57,73 @@
       <text>你的解答 · 手写</text>
     </view>
     <view class="work" data-test-id="p08-answer-area" bind:touchstart="onCanvasTouch">
-      <view class="paper">
+      <!-- ── Mode: handwrite (paper · 手写笔迹 demo · canvas 后续接入) ── -->
+      <view wx:if="{{answerMode === 'handwrite'}}" class="paper">
         <view class="handwritten">
           <text>f(x) = x² − 4x + 3\n      = (x² − 4x + 4) − 4 + 3\n      = (x − 2)² − 1\n∴ 顶点 (2, −1)</text>
           <view class="cursor-blink"></view>
         </view>
       </view>
+
+      <!-- ── Mode: keyboard (textarea 输入) ── -->
+      <view wx:elif="{{answerMode === 'keyboard'}}" class="paper paper-input" catch:touchstart="onCanvasTouch">
+        <textarea
+          class="kb-input"
+          placeholder="在此输入你的解答…"
+          value="{{userAnswer}}"
+          bindinput="onKeyboardInput"
+          maxlength="-1"
+          auto-height
+          adjust-position="{{false}}"
+          data-test-id="p08-answer-keyboard"
+        />
+      </view>
+
+      <!-- ── Mode: formula (符号面板) ── -->
+      <view wx:else class="paper paper-input">
+        <view class="fm-display" data-test-id="p08-answer-formula-display">
+          <text wx:if="{{userAnswer}}">{{userAnswer}}</text>
+          <text wx:else class="fm-placeholder">点下方符号拼接你的解答…</text>
+        </view>
+        <view class="fm-keypad" data-test-id="p08-answer-formula-keypad">
+          <view
+            wx:for="{{formulaSymbols}}"
+            wx:key="*this"
+            class="fm-key"
+            data-sym="{{item}}"
+            bind:tap="onFormulaInsert"
+          >{{item}}</view>
+          <view class="fm-key fm-key-util" bind:tap="onFormulaBackspace">⌫</view>
+          <view class="fm-key fm-key-util" bind:tap="onFormulaClear">清空</view>
+        </view>
+      </view>
+
       <view class="tools">
-        <view class="tool">
-          <van-icon name="edit" size="14px" color="#636366" />
+        <view
+          class="tool {{answerMode === 'handwrite' ? 'tool-prime' : ''}}"
+          data-mode="handwrite"
+          data-test-id="p08-tool-handwrite"
+          bind:tap="onToolTap"
+        >
+          <van-icon name="edit" size="14px" color="{{answerMode === 'handwrite' ? '#007AFF' : '#636366'}}" />
           <text>手写</text>
         </view>
-        <view class="tool">
-          <van-icon name="comment-o" size="14px" color="#636366" />
+        <view
+          class="tool {{answerMode === 'keyboard' ? 'tool-prime' : ''}}"
+          data-mode="keyboard"
+          data-test-id="p08-tool-keyboard"
+          bind:tap="onToolTap"
+        >
+          <van-icon name="comment-o" size="14px" color="{{answerMode === 'keyboard' ? '#007AFF' : '#636366'}}" />
           <text>键盘</text>
         </view>
-        <view class="tool tool-prime">
-          <van-icon name="star" size="14px" color="#007AFF" />
+        <view
+          class="tool {{answerMode === 'formula' ? 'tool-prime' : ''}}"
+          data-mode="formula"
+          data-test-id="p08-tool-formula"
+          bind:tap="onToolTap"
+        >
+          <van-icon name="star" size="14px" color="{{answerMode === 'formula' ? '#007AFF' : '#636366'}}" />
           <text>公式面板</text>
         </view>
       </view>
