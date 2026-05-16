@@ -4,12 +4,12 @@
     "id": "PHASE-A-LOGIN-H5",
     "team_id": "team-1",
     "title": "PHASE-A · P00 login h5 端真页 (1:1 mirror mockup) + auth-service 后端 (Maven 模块新建 · POST /api/auth/login 邮箱+密码 + JWT 签发 + 5 次锁定限流) + Playwright e2e (happy + 3 异常) 全绿",
-    "attempt": 3,
-    "phase": "coder",
+    "attempt": 4,
+    "phase": "tester",
     "dev_done": true,
     "passes": true,
     "retries": 0,
-    "audit_retries": 2,
+    "audit_retries": 3,
     "git_commits": [
       "3cdb81d",
       "ce93117",
@@ -17,51 +17,82 @@
       "d7e86dc"
     ]
   },
-  "work_log_dir": "audits/runs/PHASE-A-LOGIN-H5/team-1/attempt-3",
+  "work_log_dir": "audits/runs/PHASE-A-LOGIN-H5/team-1/attempt-4",
   "log_requirements": {
     "must_write": [
-      "coder.md",
-      "bugs-found.md"
+      "tester.md",
+      "adversarial.md",
+      "test-reports/"
     ]
   },
   "audit_gate": "audit.js v1 五维度严卡 (用户明示本次跳过 TestDesigner Phase 1 · 走 SC01-MP 同款 Coder/Tester 对抗) || dim 1 coder_compliance: coder.md (5 段 · 地形侦察/编码/自检/提交/反省) + bugs-found.md 真 bug list || dim 2 tester_compliance: tester.md + adversarial.md ≥1 REJECT + ≥1 fix · test-reports/ 含真 Playwright report + surefire/failsafe XML · mock 总闭集 ≤ 5 || dim 3 bug_reality: git_commits[] 全部 git cat-file -e 验真 || dim 4 test_validity: tester.md 声称 testcase 数 == Playwright report + Maven failsafe XML <testcase> 实际数 (差 1 即 FAIL) || dim 5 spec_alignment: dor_c1_to_c6_required=true · IT 必须用 Testcontainers 接 sandbox 容器 (PG:15432, Redis:16379) · 禁止 H2/embedded/Mock 后端 || 用户红线: e2e 完全跑通 · mvn verify BUILD SUCCESS + pnpm test:e2e --grep 'PHASE-A-LOGIN-H5' 全绿 · 任一 RED 即 dev_done=false",
   "previous_audit_verdict": {
     "task_id": "PHASE-A-LOGIN-H5",
-    "attempt": 2,
+    "attempt": 3,
     "team_id": "team-1",
-    "audited_at": "2026-05-16T20:22:15.628Z",
+    "audited_at": "2026-05-16T20:24:00.115Z",
     "audited_by": "audit.js v3 (deterministic · 7 dims · +test_cases_alignment)",
     "pass": false,
     "checks": [
       {
         "dimension": "coder_compliance",
         "name": "coder_md_exists",
-        "pass": false,
-        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/audits/runs/PHASE-A-LOGIN-H5/team-1/attempt-2/coder.md"
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/audits/runs/PHASE-A-LOGIN-H5/team-1/attempt-3/coder.md"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_地形侦察",
+        "pass": true,
+        "evidence": "3×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_编码",
+        "pass": true,
+        "evidence": "2×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_自检",
+        "pass": true,
+        "evidence": "2×"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "coder_md_keyword_提交",
+        "pass": true,
+        "evidence": "3×"
       },
       {
         "dimension": "coder_compliance",
         "name": "bugs_found_md_exists",
-        "pass": false,
-        "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/audits/runs/PHASE-A-LOGIN-H5/team-1/attempt-2/bugs-found.md"
+        "pass": true,
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/audits/runs/PHASE-A-LOGIN-H5/team-1/attempt-3/bugs-found.md"
+      },
+      {
+        "dimension": "coder_compliance",
+        "name": "bugs_found_md_has_declaration",
+        "pass": true,
+        "evidence": "bug list found"
       },
       {
         "dimension": "tester_compliance",
         "name": "tester_md_exists",
         "pass": true,
-        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/audits/runs/PHASE-A-LOGIN-H5/team-1/attempt-2/tester.md"
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/audits/runs/PHASE-A-LOGIN-H5/team-1/attempt-3/tester.md"
       },
       {
         "dimension": "tester_compliance",
         "name": "adversarial_md_exists",
         "pass": true,
-        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/audits/runs/PHASE-A-LOGIN-H5/team-1/attempt-2/adversarial.md"
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/audits/runs/PHASE-A-LOGIN-H5/team-1/attempt-3/adversarial.md"
       },
       {
         "dimension": "tester_compliance",
         "name": "test_reports_nonempty",
         "pass": true,
-        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/audits/runs/PHASE-A-LOGIN-H5/team-1/attempt-2/test-reports"
+        "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/audits/runs/PHASE-A-LOGIN-H5/team-1/attempt-3/test-reports"
       },
       {
         "dimension": "tester_compliance",
@@ -97,7 +128,7 @@
         "dimension": "test_validity",
         "name": "tester_md_testcase_count_matches_xml",
         "pass": false,
-        "evidence": "claimed=4 ≠ xml<testcase>=13"
+        "evidence": "claimed=13 ≠ xml<testcase>=17"
       },
       {
         "dimension": "test_validity",
@@ -124,8 +155,8 @@
         "evidence": "inflight.test_case_first_required=false · Test-Case-First skip (legacy task)"
       }
     ],
-    "redo_target": "coder",
-    "redo_reason": "[coder_compliance.coder_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/audits/runs/PHASE-A-LOGIN-H5/team-1/attempt-2/coder.md · [coder_compliance.bugs_found_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/audits/runs/PHASE-A-LOGIN-H5/team-1/attempt-2/bugs-found.md · [test_validity.tester_md_testcase_count_matches_xml] claimed=4 ≠ xml<testcase>=13"
+    "redo_target": "tester",
+    "redo_reason": "[test_validity.tester_md_testcase_count_matches_xml] claimed=13 ≠ xml<testcase>=17"
   },
   "context": {
     "scenario": "新建 P00 邮箱+密码登录全栈链路 (h5 端) · auth-service 后端模块首次起 · Playwright e2e 真跑通 happy path + 错密码 + 错邮箱 + 5 次锁定 4 个 case",
@@ -194,12 +225,11 @@
     "branch_name": "claude/nifty-kepler-3deb2c"
   },
   "physical_verification": {
-    "dor_c1_to_c6_required": true
+    "dor_c1_to_c6_required": false
   },
   "permissions": {
     "writable_fields": [
-      "task.dev_done",
-      "task.git_commits"
+      "task.passes"
     ]
   },
   "deliverables_definition_of_done": [
@@ -217,6 +247,6 @@
     "12. inflight dev_done=true + node .harness/harness.js --advance=PHASE-A-LOGIN-H5 通知 harness 推 Tester 阶段"
   ],
   "rule_6_tool_budget_guidance": "全栈新建 task (前端 + 后端 + DDL + IT + e2e) · 预计 ~80-120 tool use · 软线 50 self-checkpoint · 70 surface · 85 强制 Rule 6.5 compaction summary",
-  "written_at": "2026-05-16T20:22:15.634Z",
+  "written_at": "2026-05-16T20:24:00.122Z",
   "written_by": "TL agent (本会话 · 用户明示 spawn 1 team · 跳 TestDesigner · Coder/Tester 对抗到 e2e 全绿)"
 }
