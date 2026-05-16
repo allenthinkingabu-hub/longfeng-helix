@@ -370,6 +370,29 @@ function auditTestCasesAlignment() {
     record(DIM, 'both_reviewers_approved', cApprove && tApprove,
       `coder=${cApprove?'APPROVE':'?'} · tester=${tApprove?'APPROVE':'?'}`);
   }
+
+  // ── Phase 2.5 · User Approval Gate (2026-05-16 · 人在环 · 防 AI 互相批准失效) ──
+  // RC: AI 互评仍是 alignment failure 另一面 · Coder/Tester 同 model 同盲区 ·
+  //     test-cases.md 是用户视角契约 · 用户不签字等于跳过最关键的 stakeholder
+  // 实现: test-cases.md 末尾必须有 ## User Approval section + verdict: APPROVE
+  //       由用户手动编辑该 section · audit text-based grep · 不靠 inflight (与现有 review 机制一致)
+  if (nonEmpty(casesPath)) {
+    const body = readText(casesPath);
+    const hasUserSection = /^##\s+User\s+Approval/im.test(body);
+    record(DIM, 'user_approval_section_present', hasUserSection,
+      hasUserSection ? 'has "## User Approval" section'
+                     : 'missing "## User Approval" section · TestDesigner AI-approve 后必须 append 空 section 等用户签字');
+
+    if (hasUserSection) {
+      // 只在 User Approval section 之后 grep verdict APPROVE · 防把 Coder/Tester review 的 APPROVE 误算
+      const userSectionStart = body.search(/^##\s+User\s+Approval/im);
+      const userSection = userSectionStart >= 0 ? body.slice(userSectionStart) : '';
+      const userApproved = /verdict\s*:?\s*APPROVE/i.test(userSection);
+      record(DIM, 'user_verdict_approve', userApproved,
+        userApproved ? 'user verdict: APPROVE'
+                     : 'user verdict ≠ APPROVE · 阻塞 Coder dev · 等用户编辑 test-cases.md 填 "verdict: APPROVE"');
+    }
+  }
 }
 
 // ─── 维度 6 · ide_smoke (Fix-1 · 2026-05-16) ────────────────────

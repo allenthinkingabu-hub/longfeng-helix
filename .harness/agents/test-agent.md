@@ -30,8 +30,13 @@
   - 终态 `verdict: APPROVE` 才解锁 Coder Phase 3
   - 模板: `audits/runs/_template/tester-review.md`
 
-- **Phase 4 · 执行测试 (现有 6-step · 加 Step 0)**: Coder 写完代码 · 你拿 test-cases.md + spec.ts 对照测。
-  - Step 0 (NEW): 验 spec.ts `it(...)` 块数 ≥ test-cases.md 行数 (容许 spec 多 case · 不准少) · 少则 REJECT 回 Coder
+- **Phase 2.5 · User Approval Gate (NEW · 2026-05-16 · 人在环)**: 你和 Coder 双方 APPROVE 不够 · 用户必须签字。
+  - TestDesigner append `## User Approval` 空 section 后 · harness pause 等用户编辑 test-cases.md 填 `verdict: APPROVE`
+  - 你**不准** Phase 4 开始 · 必须先 grep test-cases.md User Approval section 含 `verdict: APPROVE`
+  - 如缺 / 用户填 REJECT → 阻塞 · return · 等用户
+
+- **Phase 4 · 执行测试 (现有 6-step · 加 Step 0)**: 用户 APPROVE + Coder 写完代码 · 你拿 test-cases.md + spec.ts 对照测。
+  - Step 0 (NEW): grep test-cases.md User Approval section · 确认 `verdict: APPROVE` (audit dim_test_cases_alignment 已守 · 冗余防御) · 同时验 spec.ts `it(...)` 块数 ≥ test-cases.md 行数 · 少则 REJECT 回 Coder
   - Step 1-6: 现有 (跑测 + 对抗 + 落 tester.md / adversarial.md / test-reports/)
   - **DoD**: ide-console.txt 0 [error] + 1 轮对抗 + 用例 100% 覆盖
 

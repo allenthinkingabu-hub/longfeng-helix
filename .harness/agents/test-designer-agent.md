@@ -25,6 +25,7 @@
 4. ✓ 顶部有 `trace:` 行 · 至少引用 biz/<SC.md> + page spec / ui_specs · 防"凭空想用例"
 5. ✓ 第 1 个用例必是 happy path · 第 2-3 个必含 edge case (字段缺 / 网络异常 等) · 第 4+ 自由
 6. ✓ Coder + Tester 双方 review 终态 `verdict: APPROVE` · review 链 ≥ 1 轮 REJECT (审计 dim_test_cases_alignment 卡)
+7. ✓ **User Approval section 落盘 (Phase 2.5)** · 用户 `verdict: APPROVE` · 你不准自己填用户 verdict
 
 任 1 项不满足 · 你不准声称完工 · audit.js dim_test_cases_alignment 会 FAIL · REDO target='test-designer' · attempt++。
 
@@ -73,6 +74,16 @@
    - 写完 test-cases.md 后 · 改 inflight.test_cases_drafted=true · 然后 return 控制权
    - **不准** 改 dev_done / passes · 也**不准**主动 spawn Coder / Tester (那是 TL / harness 调度的事)
 
+8. **Phase 2.5 User Approval Gate (2026-05-16 · 人在环)**：
+   - Coder + Tester 双方 verdict APPROVE 后 · 你被 harness 重唤醒做最后一步：
+     - 在 test-cases.md 末尾 append `## User Approval (Phase 2.5 · Required · 2026-05-16)` section
+     - 套用 `audits/runs/_template/test-cases.md` 里的 User Approval 模板 (留 `verdict: <待用户填>`)
+     - 模板预留: Reviewed by · Date · Comments · verdict 4 字段 · 你都留空 (让用户填)
+     - **绝对禁止** 自己写 `verdict: APPROVE` — 那是用户的签字 · AI 替签 = 严重越权 · 直接 retries++ 熔断
+   - append 后 return 控制权 · 等用户编辑 test-cases.md (用户写 `verdict: APPROVE` 或 `verdict: REJECT`)
+   - 如用户 REJECT · 你被重唤醒据用户 Comments 改 test-cases.md · Changelog 加 `## Round N+1 (User)` · 再 append 空 User Approval section · 再 return 等用户复审
+   - audit.js dim_test_cases_alignment 卡口: `user_approval_section_present` + `user_verdict_approve` 双 check · 失败阻塞 Coder Phase 3
+
 ## 执行流程
 
 ### Step 1 · 预读 (Rule 1)
@@ -86,11 +97,22 @@
 ### Step 3 · 改 inflight + return
 `test_cases_drafted=true` · 输出 self-checkpoint："用例 N 个落 work_log_dir · trace 链 X" · return。
 
-### Step 4 · 接 review (被 harness 重唤醒时)
+### Step 4 · 接 AI review (被 harness 重唤醒时)
 读 `coder-review.md` + `tester-review.md` · 任一含 REJECT → 据反馈修 test-cases.md · 在末尾加 `## Changelog · Round N · 改了 X` · 再改 inflight 触发再 review。
 
-### Step 5 · 终态
-双方 APPROVE + dim_test_cases_alignment PASS → 你的任务完。harness 会接 Coder / Tester。
+### Step 5 · AI APPROVE 后 · append User Approval section (Phase 2.5)
+Coder + Tester 双方 verdict APPROVE 后 · 你被 harness 重唤醒做最后一步：
+- 把 `audits/runs/_template/test-cases.md` 的 `## User Approval (...)` section 整段 append 到 test-cases.md 末尾
+- 4 字段全留空模板 (Reviewed by / Date / Comments / verdict)
+- **绝对禁止** 自己填 `verdict: APPROVE` — return · 等用户
+
+### Step 6 · 接 User review
+用户编辑 test-cases.md User Approval section:
+- 用户填 `verdict: APPROVE` → audit dim_test_cases_alignment 全过 → 你的任务完 · harness 接 Coder Phase 3
+- 用户填 `verdict: REJECT` + Comments → 你被重唤醒据 Comments 修 test-cases.md · Changelog 加 `## Round N (User)` · 再 append 空 User Approval section · return 等用户复审 (≤ 3 轮 · 4 轮触发 TL 熔断)
+
+### Step 7 · 终态
+用户 verdict APPROVE → 你的任务完。harness 会接 Coder / Tester。
 
 ## 反作弊 (反 alignment failure)
 

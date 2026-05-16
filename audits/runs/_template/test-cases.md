@@ -25,3 +25,26 @@ trace: biz/<file>.md §<X.Y> · design/specs/<page>.spec.md §<5,9 等> · ui_sp
 
 ## Round 1 · 初版
 - TestDesigner agent <name> 起草 · 4 用例
+
+## User Approval (Phase 2.5 · Required · 2026-05-16)
+
+<!--
+由 TestDesigner 在 AI 互评 APPROVE 后自动 append 空模板 (verdict: <待用户填>)。
+用户编辑此 section · 把 verdict 改为 APPROVE 或 REJECT。
+audit.js dim_test_cases_alignment 检查:
+  - user_approval_section_present: 必须有此 section
+  - user_verdict_approve: section 内必须含 "verdict: APPROVE"
+两个 check 任一 FAIL → 阻塞 Coder dev · 不准进 Phase 3。
+-->
+
+Reviewed by: <user name · 例: Allen>
+Date: <YYYY-MM-DD · 例: 2026-05-16>
+
+Comments:
+<!-- 任何用户视角反馈 · 业务边界 · 觉得不严的地方 -->
+-
+
+verdict: <APPROVE | REJECT · 待用户填>
+
+<!-- 如 REJECT · 加 ## Round N+1 (User) · 写驳回理由 · TestDesigner 据此再修 · 再加 User Approval 等用户复审 -->
+

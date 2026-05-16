@@ -30,7 +30,13 @@
   - 终态 `verdict: APPROVE` 才解锁 Phase 3
   - 模板: `audits/runs/_template/coder-review.md`
 
-- **Phase 3 · 开发 (现有 · 加 Step 0.5)**: 评审通过后 · 你按 test-cases.md 一对一翻译成 spec.ts 的 it block · 然后正常 7-step 开发。
+- **Phase 2.5 · User Approval Gate (NEW · 2026-05-16 · 人在环)**: AI 互评双方 APPROVE 不够 · 用户必须签字。
+  - TestDesigner append `## User Approval` 空 section 后 · harness pause 等用户编辑 test-cases.md 填 `verdict: APPROVE`
+  - 你**不准** Phase 3 开始 · 必须先 grep test-cases.md User Approval section 含 `verdict: APPROVE`
+  - 如缺 / 用户填 REJECT → 阻塞 · return · 等用户
+
+- **Phase 3 · 开发 (现有 · 加 Step 0.5)**: 用户 APPROVE 后 · 你按 test-cases.md 一对一翻译成 spec.ts 的 it block · 然后正常 7-step 开发。
+  - Step 0 (NEW): grep test-cases.md User Approval section · 确认 `verdict: APPROVE` (audit dim_test_cases_alignment 已守 · 你再 grep 是冗余防御 · 防 harness state machine 漏)
   - Step 0.5 (NEW): 把 test-cases.md 每行翻成 1 个 it block (用 `_helpers` 三件套)
   - Step 1-7: 现有流程
   - **DoD**: 用例 spec 100% PASS + lint + typecheck + 落 coder.md / bugs-found.md
