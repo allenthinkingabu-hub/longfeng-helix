@@ -449,8 +449,10 @@ page {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 168rpx;
-  padding: 16rpx 0 48rpx;
+  /* Drop fixed 48rpx bottom padding · use safe-area-inset-bottom so the bar
+     hugs the home-indicator on notched devices instead of being oversized.
+     Drop hard-coded 168rpx height · let content + safe-area size it naturally. */
+  padding: 8rpx 0 env(safe-area-inset-bottom);
   background: rgba(255,255,255,0.78);
   backdrop-filter: blur(22px) saturate(180%);
   border-top: 1rpx solid rgba(60,60,67,0.14);

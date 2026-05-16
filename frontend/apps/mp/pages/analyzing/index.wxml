@@ -106,26 +106,27 @@
   <text class="cancel-text">放弃本次分析</text>
 </view>
 
-<!-- Tab bar (mockup: .tabbar) -->
+<!-- Tab bar (mockup: .tabbar) — sized to match capture page (24px icons),
+     wired with bindtap so taps actually navigate via wx.switchTab. -->
 <view class="tabbar">
-  <view class="tab">
-    <van-icon name="wap-home-o" size="48rpx" />
+  <view class="tab" bindtap="onTabHome">
+    <van-icon name="wap-home-o" size="24px" />
     <text class="tab-label">首页</text>
   </view>
-  <view class="tab">
-    <van-icon name="notes-o" size="48rpx" />
+  <view class="tab" bindtap="onTabWrongbook">
+    <van-icon name="notes-o" size="24px" />
     <text class="tab-label">错题本</text>
   </view>
-  <view class="tab tab-active">
-    <van-icon name="photograph" size="48rpx" />
+  <view class="tab tab-active" bindtap="onTabCapture">
+    <van-icon name="photograph" size="24px" />
     <text class="tab-label">拍题</text>
   </view>
-  <view class="tab">
-    <van-icon name="bell" size="48rpx" />
+  <view class="tab" bindtap="onTabReview">
+    <van-icon name="bell" size="24px" />
     <text class="tab-label">复习</text>
   </view>
-  <view class="tab">
-    <van-icon name="contact" size="48rpx" />
+  <view class="tab" bindtap="onTabMe">
+    <van-icon name="contact" size="24px" />
     <text class="tab-label">我的</text>
   </view>
 </view>

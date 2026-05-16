@@ -281,4 +281,32 @@ Page({
     this._clearPoll();
     wx.navigateBack();
   },
+
+  // ── Bottom tabbar handlers ────────────────────────────────────
+  // P03 is a mid-flow page reached via wx.navigateTo, so the system tabBar
+  // (configured in app.json) doesn't render. The custom tabbar in the wxml
+  // gives the page the visual continuity of having one — but until this fix
+  // the icons had no bindtap, so tapping anywhere did nothing. Use switchTab
+  // which jumps to the tabBar page and resets the navigation stack.
+  onTabHome() {
+    this._clearPoll();
+    wx.switchTab({ url: '/pages/home/index' });
+  },
+  onTabWrongbook() {
+    this._clearPoll();
+    wx.switchTab({ url: '/pages/wrongbook-list/index' });
+  },
+  onTabCapture() {
+    // Already on the capture→analyze flow · go back to capture page.
+    this._clearPoll();
+    wx.switchTab({ url: '/pages/capture/index' });
+  },
+  onTabReview() {
+    this._clearPoll();
+    wx.switchTab({ url: '/pages/review-today/index' });
+  },
+  onTabMe() {
+    this._clearPoll();
+    wx.switchTab({ url: '/pages/me/index' });
+  },
 });
