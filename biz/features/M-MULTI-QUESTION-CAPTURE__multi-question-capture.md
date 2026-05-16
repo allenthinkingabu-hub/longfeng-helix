@@ -5,7 +5,7 @@
 **Created**: 2026-05-16
 **Priority**: **P1** (MVP 14 天不做 · P1 启动)
 **Master ref**: [../业务与技术解决方案_AI错题本_基于日历系统.md](../业务与技术解决方案_AI错题本_基于日历系统.md) (v1.2)
-**Mockup**: (待补 mockup · 02_capture.html / 03_analyzing.html / 04_result.html 都需扩展 · 不新建独立 mockup HTML · 走"现有 mockup + 增量元素"模式)
+**Mockup**: `design/mockups/wrongbook/19_result_multi.html` (P04 多题结果页 · 含 `<AnnotatedOriginPhoto>` 红圈标注 + Swiper + BatchSummary · gen-mockup skill v1 第 2 次实战 · 371 行 · 18 testid · 风格基准 01_home.html · 模仿 SC-18 混合处理场景: 题 1 已掌握 绿圈 / 题 2 待入库 红圈高亮 / 题 3 已跳过 灰虚框) · P02/P03/P05 后续按需追加
 
 ---
 

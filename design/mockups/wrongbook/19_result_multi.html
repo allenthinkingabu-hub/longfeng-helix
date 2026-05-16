@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>P04 · AI 分析结果 · 多题</title>
+<style>
+  :root{
+    --bg:#F2F2F7; --card:#FFFFFF; --sep:rgba(60,60,67,0.14);
+    --text:#1C1C1E; --sec:#636366; --ter:#8E8E93;
+    --blue:#007AFF; --red:#FF3B30; --orange:#FF9500; --green:#34C759;
+    --indigo:#5856D6; --yellow:#FFCC00; --purple:#AF52DE; --teal:#30B0C7;
+    --pink:#FF2D55;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+  html,body{background:#E5E5EA;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","PingFang SC",sans-serif;color:var(--text);}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px 0;}
+
+  /* iPhone 14 Pro shell · 与 01_home.html 一致 */
+  .phone{position:relative;width:393px;height:852px;background:var(--bg);border-radius:54px;box-shadow:inset 0 0 0 6px #111,0 24px 64px rgba(0,0,0,0.22);overflow:hidden;}
+  .phone::before{content:"";position:absolute;left:50%;top:11px;transform:translateX(-50%);width:126px;height:37px;background:#000;border-radius:20px;z-index:50;}
+
+  .statusbar{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;font-size:17px;font-weight:600;z-index:40;color:#fff;}
+  .statusbar .time{margin-top:12px;}
+  .statusbar .icons{margin-top:12px;display:flex;gap:6px;align-items:center;}
+
+  /* Hero header — aurora gradient · 复用 01_home.html 同款 */
+  .hero{position:absolute;top:0;left:0;right:0;height:198px;background:linear-gradient(180deg,#1E3A8A 0%,#3B5BDB 45%,#5B8DEF 100%);overflow:hidden;z-index:10;}
+  .hero::before{content:"";position:absolute;width:280px;height:280px;border-radius:50%;top:-110px;right:-100px;background:radial-gradient(circle,rgba(88,86,214,.55),transparent 70%);filter:blur(20px);}
+  .hero::after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;bottom:-90px;left:-60px;background:radial-gradient(circle,rgba(88,214,255,.45),transparent 70%);filter:blur(20px);}
+  .hero .blob{position:absolute;width:120px;height:120px;border-radius:50%;top:30%;left:55%;background:radial-gradient(circle,rgba(255,45,85,.35),transparent 70%);filter:blur(18px);}
+
+  .hsafe{position:absolute;top:58px;left:20px;right:20px;z-index:20;color:#fff;}
+  .row-top{display:flex;justify-content:space-between;align-items:center;margin-top:4px;}
+  .back-link{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:600;color:rgba(255,255,255,.92);text-decoration:none;padding:6px 10px 6px 4px;border-radius:10px;background:rgba(255,255,255,.10);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.18);}
+  .back-link svg{width:12px;height:12px;}
+  .more{width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;color:#fff;}
+  .kicker{font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.72);text-transform:uppercase;margin-top:14px;}
+  .name{font-size:24px;font-weight:800;letter-spacing:-.2px;line-height:1.15;margin-top:2px;}
+  .name em{font-style:normal;font-weight:700;background:linear-gradient(90deg,#FFD166,#FFB454);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .streakbar{margin-top:10px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:rgba(255,255,255,.92);letter-spacing:.2px;}
+  .streakbar .flame{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.16);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.24);}
+  .streakbar .dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.5);}
+
+  /* Scroll area */
+  .scroll{position:absolute;top:170px;left:0;right:0;bottom:148px;overflow:auto;padding:0 14px 24px;z-index:20;}
+  .scroll::before{content:"";position:absolute;top:0;left:14px;right:14px;height:28px;background:var(--bg);border-top-left-radius:24px;border-top-right-radius:24px;}
+
+  /* section title (与 01_home.html 一致) */
+  .sec{margin:18px 4px 10px;display:flex;align-items:baseline;justify-content:space-between;}
+  .sec .t{font-size:15px;font-weight:800;letter-spacing:.2px;color:var(--text);}
+  .sec .m{font-size:12px;color:var(--blue);font-weight:600;letter-spacing:.1px;}
+
+  /* ====== AnnotatedOriginPhoto · satellite v1.1 灵魂组件 ====== */
+  .annot{position:relative;margin-top:12px;background:var(--card);border-radius:18px;padding:12px;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+  .annot .photo-wrap{position:relative;width:100%;border-radius:12px;overflow:hidden;background:#FBF7EF;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);}
+  .annot .photo-wrap svg{display:block;width:100%;height:auto;}
+  .annot .legend{display:flex;gap:14px;margin-top:10px;padding:0 4px;font-size:11px;color:var(--sec);font-weight:600;}
+  .annot .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .annot .legend i{width:10px;height:10px;border-radius:50%;display:inline-block;}
+  .annot .legend i.g{background:var(--green);}
+  .annot .legend i.r{background:var(--red);}
+  .annot .legend i.k{background:transparent;border:1.5px dashed var(--ter);}
+  .annot .hint{margin-top:6px;padding:0 4px;font-size:10px;color:var(--ter);letter-spacing:.2px;}
+
+  /* batch progress · indicator dots + label */
+  .bpb{margin-top:18px;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(0,122,255,.06);border-radius:12px;border:1px solid rgba(0,122,255,.12);}
+  .bpb-dots{display:flex;gap:6px;align-items:center;}
+  .bpb-dots i{width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,.12);display:inline-block;transition:all .2s;}
+  .bpb-dots i.done{background:var(--green);}
+  .bpb-dots i.active{background:var(--blue);width:24px;border-radius:4px;}
+  .bpb-label{font-size:12px;color:var(--blue);font-weight:700;letter-spacing:.2px;}
+
+  /* ====== Question Swiper card (current question) ====== */
+  .swp{margin-top:12px;}
+  .swp-card{background:var(--card);border-radius:18px;padding:16px;box-shadow:0 4px 14px rgba(0,0,0,.06);position:relative;}
+  .qno{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--red);background:rgba(255,59,48,.08);padding:4px 10px;border-radius:8px;letter-spacing:.3px;}
+  .qno svg{width:11px;height:11px;}
+  .stem{margin-top:10px;font-size:14px;font-weight:600;line-height:1.55;color:var(--text);letter-spacing:.1px;}
+
+  /* AI 解析 block */
+  .ai-block{margin-top:14px;background:linear-gradient(135deg,rgba(88,86,214,.06),rgba(0,122,255,.04));border:1px solid rgba(88,86,214,.18);border-radius:12px;padding:12px;}
+  .ai-label{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;color:var(--indigo);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+  .ai-label svg{width:11px;height:11px;}
+  .ai-body p{font-size:12px;color:var(--sec);line-height:1.6;margin-bottom:4px;}
+  .ai-body p:last-child{margin-bottom:0;}
+  .ai-body strong{color:var(--text);font-weight:700;margin-right:4px;}
+
+  /* 自评掌握度 */
+  .mm{margin-top:14px;padding-top:12px;border-top:.5px solid var(--sep);}
+  .mm-q{font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;letter-spacing:.2px;}
+  .mm-btns{display:flex;gap:8px;}
+  .mm-btn{flex:1;height:38px;border-radius:11px;font-size:13px;font-weight:700;letter-spacing:.2px;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;border:1px solid var(--sep);background:#fff;color:var(--sec);}
+  .mm-btn.mastered{color:var(--green);border-color:rgba(52,199,89,.3);}
+  .mm-btn.mastered.active{background:linear-gradient(180deg,#34C759,#28A745);color:#fff;border-color:transparent;box-shadow:0 3px 10px rgba(52,199,89,.28);}
+  .mm-btn.forgot{color:var(--red);border-color:rgba(255,59,48,.3);}
+  .mm-btn.forgot.active{background:linear-gradient(180deg,#FF3B30,#E0291F);color:#fff;border-color:transparent;box-shadow:0 3px 10px rgba(255,59,48,.28);}
+
+  /* save checkbox */
+  .save-check{margin-top:12px;display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(0,122,255,.04);border-radius:10px;cursor:pointer;border:1px solid rgba(0,122,255,.12);}
+  .save-check input{display:none;}
+  .save-check .cb-box{flex:none;width:18px;height:18px;border-radius:5px;background:var(--blue);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,122,255,.3);}
+  .save-check .cb-box svg{width:11px;height:11px;}
+  .save-check.unchecked .cb-box{background:transparent;border:1.5px solid var(--ter);box-shadow:none;}
+  .save-check .cb-lbl{font-size:12px;font-weight:600;color:var(--text);flex:1;}
+  .save-check .cb-meta{font-size:10px;color:var(--ter);}
+
+  /* swiper nav arrows */
+  .swp-nav{margin-top:12px;display:flex;gap:8px;}
+  .swp-arr{flex:1;height:40px;border-radius:11px;background:var(--card);border:1px solid var(--sep);display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:700;color:var(--blue);cursor:pointer;text-decoration:none;}
+  .swp-arr.prev{color:var(--green);}
+  .swp-arr svg{width:12px;height:12px;}
+
+  /* EMPTY hero variant (默认隐藏 · 全题 discard) */
+  .empty-hero{display:none;margin-top:24px;background:var(--card);border-radius:18px;padding:32px 20px;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+  .empty-hero .eh-icon{font-size:38px;margin-bottom:8px;}
+  .empty-hero .eh-title{font-size:15px;font-weight:800;color:var(--text);}
+  .empty-hero .eh-body{font-size:12px;color:var(--ter);margin-top:4px;}
+
+  /* ====== Batch Summary fixed bottom (above tabbar) ====== */
+  .batch-sum{position:absolute;left:0;right:0;bottom:84px;height:64px;padding:10px 18px;background:rgba(255,255,255,.94);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border-top:.5px solid var(--sep);display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:35;}
+  .bs-left{flex:1;min-width:0;}
+  .bs-count{font-size:14px;font-weight:800;color:var(--text);letter-spacing:.2px;}
+  .bs-count em{font-style:normal;color:var(--blue);font-size:18px;font-weight:800;}
+  .bs-detail{font-size:10px;color:var(--ter);font-weight:600;margin-top:2px;letter-spacing:.2px;}
+  .bs-btn{flex:none;height:44px;padding:0 22px;border-radius:14px;background:linear-gradient(180deg,#007AFF,#0062E1);color:#fff;font-size:14px;font-weight:800;letter-spacing:.2px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 6px 16px rgba(0,122,255,.32);text-decoration:none;}
+  .bs-btn svg{width:14px;height:14px;}
+
+  /* tabbar · 与 01_home.html 一致 */
+  .tabbar{position:absolute;left:0;right:0;bottom:0;height:84px;background:rgba(242,242,247,0.86);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border-top:.5px solid var(--sep);display:flex;align-items:flex-start;padding-top:6px;z-index:40;}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--ter);font-size:10px;font-weight:500;position:relative;text-decoration:none;}
+  .tab svg{width:24px;height:24px;}
+  .tab.active{color:var(--blue);}
+  .home{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#000;opacity:.85;z-index:60;}
+</style>
+</head>
+<body>
+<div class="phone" data-testid="p-result-multi-root">
+
+  <!-- Status bar -->
+  <div class="statusbar">
+    <span class="time">9:41</span>
+    <span class="icons">
+      <svg width="18" height="12" viewBox="0 0 18 12"><g fill="#fff"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></g></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12"><path fill="#fff" d="M8 2.2c2 0 3.9.7 5.4 2l1.4-1.4A9.6 9.6 0 0 0 8 0 9.6 9.6 0 0 0 1.2 2.8l1.4 1.4A7.6 7.6 0 0 1 8 2.2zm0 3.4c1.1 0 2.1.4 2.9 1.1l1.4-1.4A6 6 0 0 0 8 3.8a6 6 0 0 0-4.3 1.5l1.4 1.4A4 4 0 0 1 8 5.6zm0 3.4c.5 0 1 .2 1.4.6l1.4-1.4a4 4 0 0 0-2.8-1.2 4 4 0 0 0-2.8 1.2l1.4 1.4c.4-.4.9-.6 1.4-.6z"/></svg>
+      <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="1" width="22" height="10" rx="2.5" fill="none" stroke="#fff" stroke-width="1"/><rect x="22.5" y="4" width="1.5" height="4" rx=".5" fill="#fff"/><rect x="2" y="3" width="18" height="6" rx="1" fill="#fff"/></svg>
+    </span>
+  </div>
+
+  <!-- Hero header (aurora) -->
+  <div class="hero">
+    <div class="blob"></div>
+  </div>
+
+  <!-- Hero safe area: back + title + subtitle -->
+  <div class="hsafe">
+    <div class="row-top">
+      <a class="back-link" href="03_analyzing.html" data-testid="result-multi-back">
+        <svg viewBox="0 0 12 12" fill="none"><path d="M8 2 L4 6 L8 10" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        分析中
+      </a>
+      <div class="more">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="3" cy="8" r="1.4" fill="#fff"/><circle cx="8" cy="8" r="1.4" fill="#fff"/><circle cx="13" cy="8" r="1.4" fill="#fff"/></svg>
+      </div>
+    </div>
+    <div class="kicker">Multi-question Result</div>
+    <div class="name" data-testid="result-multi-title">已识别 <em>3 题</em> · 请确认</div>
+    <div class="streakbar" data-testid="result-multi-subtitle">
+      <span class="flame">
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M3 6 L7 1 L11 6 L11 11 L3 11 Z" stroke="#FFD166" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        Batch #001
+      </span>
+      <span class="dot"></span>
+      <span>已浏览 2/3</span>
+      <span class="dot"></span>
+      <span style="color:rgba(255,255,255,.72);">5 月 16 日 · 9:41</span>
+    </div>
+  </div>
+
+  <!-- Scroll content -->
+  <div class="scroll">
+
+    <!-- ============ AnnotatedOriginPhoto · 顶部红圈标注原图 ============ -->
+    <div class="sec">
+      <div class="t">原图 · 红圈标注</div>
+      <span class="m">点击圈跳到对应题 ›</span>
+    </div>
+    <div class="annot" data-testid="result-multi-annotated-photo">
+      <div class="photo-wrap">
+        <svg viewBox="0 0 320 220" preserveAspectRatio="xMidYMid meet">
+          <!-- 模拟作业纸照片 (paper texture · 米色背景 + 横线) -->
+          <rect x="0" y="0" width="320" height="220" fill="#FBF7EF"/>
+          <line x1="20" y1="20" x2="300" y2="20" stroke="rgba(0,0,0,.04)" stroke-width="1"/>
+          <line x1="20" y1="48" x2="300" y2="48" stroke="rgba(0,0,0,.04)" stroke-width="1"/>
+          <line x1="20" y1="76" x2="300" y2="76" stroke="rgba(0,0,0,.04)" stroke-width="1"/>
+          <line x1="20" y1="104" x2="300" y2="104" stroke="rgba(0,0,0,.04)" stroke-width="1"/>
+          <line x1="20" y1="132" x2="300" y2="132" stroke="rgba(0,0,0,.04)" stroke-width="1"/>
+          <line x1="20" y1="160" x2="300" y2="160" stroke="rgba(0,0,0,.04)" stroke-width="1"/>
+          <line x1="20" y1="188" x2="300" y2="188" stroke="rgba(0,0,0,.04)" stroke-width="1"/>
+
+          <!-- 题 1 内容 (top area · y≈25-65) -->
+          <text x="32" y="38" font-family="Georgia,serif" font-size="11" fill="#333" font-weight="600">1. 解方程 x² - 5x + 6 = 0</text>
+          <text x="48" y="58" font-family="cursive" font-size="11" fill="#2c5e2e">x₁ = 2, x₂ = 3 ✓</text>
+
+          <!-- 题 2 内容 (middle · y≈85-130) · 当前 swiper 题 -->
+          <text x="32" y="98" font-family="Georgia,serif" font-size="11" fill="#333" font-weight="600">2. 已知 x² + 5x - 6 = 0,</text>
+          <text x="32" y="116" font-family="Georgia,serif" font-size="11" fill="#333" font-weight="600">  求 x₁+x₂ 与 x₁·x₂</text>
+          <line x1="38" y1="123" x2="180" y2="123" stroke="#FF3B30" stroke-width="2" opacity=".55"/>
+          <text x="48" y="138" font-family="cursive" font-size="10" fill="#c9302c">x₁+x₂ = 5 ✗</text>
+
+          <!-- 题 3 内容 (bottom · y≈155-200) -->
+          <text x="32" y="170" font-family="Georgia,serif" font-size="11" fill="#333" font-weight="600">3. 函数 f(x)=x²-4x+3 的最小值</text>
+          <text x="48" y="192" font-family="cursive" font-size="11" fill="#999">(未作答)</text>
+
+          <!-- 题 1 圈 · 绿 (mastered) -->
+          <g data-testid="result-multi-circle-1">
+            <circle cx="92" cy="48" r="40" fill="none" stroke="#34C759" stroke-width="3"/>
+            <circle cx="118" cy="22" r="11" fill="#34C759"/>
+            <text x="118" y="26" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">1</text>
+            <text x="118" y="84" text-anchor="middle" font-size="9" font-weight="700" fill="#34C759">已掌握</text>
+          </g>
+
+          <!-- 题 2 圈 · 红 (default save · current swiper highlight) -->
+          <g data-testid="result-multi-circle-2">
+            <circle cx="120" cy="115" r="48" fill="none" stroke="#FF3B30" stroke-width="3"/>
+            <circle cx="120" cy="115" r="54" fill="none" stroke="#FF3B30" stroke-width="2" opacity=".4"/>
+            <circle cx="160" cy="80" r="11" fill="#FF3B30"/>
+            <text x="160" y="84" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">2</text>
+            <text x="160" y="165" text-anchor="middle" font-size="9" font-weight="700" fill="#FF3B30">当前 · 待入库</text>
+          </g>
+
+          <!-- 题 3 圈 · 灰虚框 (discarded) -->
+          <g data-testid="result-multi-circle-3">
+            <circle cx="120" cy="178" r="40" fill="none" stroke="#8E8E93" stroke-width="2.5" stroke-dasharray="5,3" opacity=".7"/>
+            <circle cx="148" cy="158" r="11" fill="#8E8E93" opacity=".6"/>
+            <text x="148" y="162" text-anchor="middle" font-size="13" font-weight="800" fill="#fff" opacity=".9">3</text>
+            <text x="148" y="212" text-anchor="middle" font-size="9" font-weight="700" fill="#8E8E93">已跳过</text>
+          </g>
+        </svg>
+      </div>
+      <div class="legend">
+        <span><i class="g"></i>已掌握 (1)</span>
+        <span><i class="r"></i>待入库 (1)</span>
+        <span><i class="k"></i>已跳过 (1)</span>
+      </div>
+      <div class="hint">圈数 = swiper 题数 · 颜色实时跟随你的选择</div>
+    </div>
+
+    <!-- ============ Batch progress (1/3 dots) ============ -->
+    <div class="bpb" data-testid="result-multi-batch-progress">
+      <div class="bpb-dots" data-testid="result-multi-swipe-dots">
+        <i class="done" title="题 1 已浏览"></i>
+        <i class="active" title="题 2 当前"></i>
+        <i title="题 3 待浏览"></i>
+      </div>
+      <div class="bpb-label">第 2 题 / 共 3 题</div>
+    </div>
+
+    <!-- ============ Swiper Q card (current question · 题 2) ============ -->
+    <div class="swp" data-testid="result-multi-swiper">
+      <div class="swp-card" data-testid="result-multi-question-card">
+        <div class="qno">
+          <svg viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="5.5" r="4.5" stroke="#FF3B30" stroke-width="1.4"/><text x="5.5" y="8" text-anchor="middle" font-size="7" font-weight="800" fill="#FF3B30">2</text></svg>
+          题 2 · 数学 · 一元二次方程
+        </div>
+        <div class="stem">
+          已知方程 <strong>x² + 5x − 6 = 0</strong> 的两根为 x₁, x₂,
+          求 x₁ + x₂ 与 x₁ · x₂ 的值。
+        </div>
+
+        <div class="ai-block">
+          <div class="ai-label">
+            <svg viewBox="0 0 11 11" fill="none"><path d="M5.5 1 L6.5 4 L9.5 4.5 L7 6.5 L7.5 9.5 L5.5 8 L3.5 9.5 L4 6.5 L1.5 4.5 L4.5 4 Z" fill="#5856D6"/></svg>
+            AI 解析
+          </div>
+          <div class="ai-body">
+            <p><strong>知识点</strong>韦达定理 · 一元二次方程根与系数的关系</p>
+            <p><strong>解法</strong>x₁ + x₂ = −b/a = −5, x₁ · x₂ = c/a = −6</p>
+            <p><strong>易错点</strong>注意符号 · b 和 c 都要带负号代入</p>
+          </div>
+        </div>
+
+        <!-- 自评掌握度 -->
+        <div class="mm">
+          <div class="mm-q">这道题你的掌握程度?</div>
+          <div class="mm-btns">
+            <button class="mm-btn mastered" data-testid="result-multi-mastery-yes">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6 L5 9 L10 3" stroke="#34C759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              已掌握
+            </button>
+            <button class="mm-btn forgot active" data-testid="result-multi-mastery-no">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 3 L9 9 M9 3 L3 9" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+              需复习
+            </button>
+          </div>
+        </div>
+
+        <!-- save checkbox -->
+        <label class="save-check" data-testid="result-multi-save-checkbox">
+          <input type="checkbox" checked/>
+          <span class="cb-box">
+            <svg viewBox="0 0 11 11" fill="none"><path d="M2 5.5 L4.5 8 L9 3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="cb-lbl">加入错题本 · <span class="cb-meta">7 节点艾宾浩斯复习</span></span>
+        </label>
+      </div>
+
+      <!-- swiper nav arrows -->
+      <div class="swp-nav">
+        <a class="swp-arr prev" href="03_analyzing.html?qid=q1">
+          <svg viewBox="0 0 12 12" fill="none"><path d="M8 2 L4 6 L8 10" stroke="#34C759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          上一题 (已掌握)
+        </a>
+        <a class="swp-arr next" href="03_analyzing.html?qid=q3">
+          下一题 (已跳过)
+          <svg viewBox="0 0 12 12" fill="none"><path d="M4 2 L8 6 L4 10" stroke="#007AFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- EMPTY hero variant (默认隐藏 · 全题 discard 时) -->
+    <div class="empty-hero" id="empty-hero" data-testid="result-multi-empty">
+      <div class="eh-icon">
+        <svg width="38" height="38" viewBox="0 0 38 38" fill="none"><rect x="6" y="10" width="26" height="22" rx="3" stroke="#8E8E93" stroke-width="1.6"/><path d="M6 16 H32" stroke="#8E8E93" stroke-width="1.6"/><path d="M14 22 L24 22" stroke="#8E8E93" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
+      <div class="eh-title">全部丢弃</div>
+      <div class="eh-body">这次拍照的 3 题都已跳过 · 未入库</div>
+    </div>
+
+  </div>
+
+  <!-- ============ Batch Summary footer (fixed bottom · above tabbar) ============ -->
+  <div class="batch-sum" data-testid="result-multi-batch-summary">
+    <div class="bs-left">
+      <div class="bs-count">已选 <em>2</em>/3 题</div>
+      <div class="bs-detail">1 已掌握 · 1 待入库 · 1 已跳过</div>
+    </div>
+    <a class="bs-btn" href="05_wrongbook_list.html?batchId=batch-001" data-testid="result-multi-save-btn">
+      <svg viewBox="0 0 14 14" fill="none"><path d="M3 7 L6 10 L11 4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      保存
+    </a>
+  </div>
+
+  <!-- Tab bar (active = 拍题) -->
+  <div class="tabbar">
+    <a class="tab" href="01_home.html">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M3 11 L12 3 L21 11 V20 a1 1 0 0 1 -1 1 H14 V14 H10 V21 H4 a1 1 0 0 1 -1 -1 Z" stroke="#8E8E93" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      <span>首页</span>
+    </a>
+    <a class="tab" href="05_wrongbook_list.html">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M5 4 h10 l4 4 v12 a2 2 0 0 1 -2 2 H5 a2 2 0 0 1 -2 -2 V6 a2 2 0 0 1 2 -2 z" stroke="#8E8E93" stroke-width="1.5"/><path d="M8 13 h8 M8 17 h5" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <span>错题本</span>
+    </a>
+    <a class="tab active" href="02_capture.html">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="13" rx="3" stroke="#007AFF" stroke-width="1.8"/><circle cx="12" cy="13.5" r="3.5" stroke="#007AFF" stroke-width="1.8"/><path d="M9 7 L10 5 h4 L15 7" stroke="#007AFF" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      <span>拍题</span>
+    </a>
+    <a class="tab" href="10_calendar_month.html">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M4 12 a8 8 0 1 1 2.3 5.6" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round"/><path d="M4 18 V12 h6" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 8 V12 L15 14" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <span>复习</span>
+    </a>
+    <a class="tab" href="13_settings.html">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="9" r="4" stroke="#8E8E93" stroke-width="1.5"/><path d="M4 20 c1.5 -4 5 -6 8 -6 s6.5 2 8 6" stroke="#8E8E93" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <span>我的</span>
+    </a>
+  </div>
+
+  <div class="home"></div>
+</div>
+</body>
+</html>
