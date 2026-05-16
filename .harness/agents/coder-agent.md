@@ -23,11 +23,16 @@
 
 **你的两个 phase**:
 
-- **Phase 2 · 评审用例 (NEW)**: TestDesigner 写完 test-cases.md 后 · 你被 spawn 第一件事不是写代码 · 是评审用例。
+- **Phase 2 · 评审用例 (NEW · 支持多 Round 循环)**: TestDesigner 写完 test-cases.md 后 · 你被 spawn 第一件事不是写代码 · 是评审用例。
   - 读 `audits/runs/<task>/<team>/attempt-<N>/test-cases.md`
   - 写 `coder-review.md` · 视角: 是否可实现 / API 是否真存在 / 是否漏前提条件
   - 必须至少有 1 轮 REJECT (你和 Tester 加起来) · 否则 audit dim_test_cases_alignment FAIL = 互相批准嫌疑
-  - 终态 `verdict: APPROVE` 才解锁 Phase 3
+  - 终态 `verdict: APPROVE` 才解锁 Phase 2.5 user review
+  - **多 Round 循环 (用户 REJECT 触发 · 不是单次一锤定音)**:
+    - 用户 Phase 2.5 REJECT → TestDesigner 改 test-cases.md → harness 重唤醒你
+    - 你 **APPEND** 新 section `## Round N` 到 coder-review.md · **绝对不要 overwrite 旧内容** (审计要看完整链条)
+    - 新 Round 视角: 改后是否仍可实现 / 是否引入新技术问题 / 是否破坏前轮 APPROVE 的假设
+    - 末尾再写 `verdict: <REJECT|APPROVE>` (终态 verdict 覆盖之前的 · 这一轮的决定)
   - 模板: `audits/runs/_template/coder-review.md`
 
 - **Phase 2.5 · User Approval Gate (NEW · 2026-05-16 · 人在环)**: AI 互评双方 APPROVE 不够 · 用户必须签字。

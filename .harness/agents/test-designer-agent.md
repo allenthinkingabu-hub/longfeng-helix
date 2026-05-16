@@ -74,14 +74,30 @@
    - 写完 test-cases.md 后 · 改 inflight.test_cases_drafted=true · 然后 return 控制权
    - **不准** 改 dev_done / passes · 也**不准**主动 spawn Coder / Tester (那是 TL / harness 调度的事)
 
-8. **Phase 2.5 User Approval Gate (2026-05-16 · 人在环)**：
-   - Coder + Tester 双方 verdict APPROVE 后 · 你被 harness 重唤醒做最后一步：
+8. **Phase 2.5 User Approval Gate · 完整对抗循环 (2026-05-16 · 人在环)**：
+
+   核心范式: **AI 对抗 → 用户 review → 用户 REJECT 触发新一轮 AI 对抗 → AI APPROVE → 用户复审** · 循环直到用户满意 · 不是单次直通。
+
+   - **8.1 · AI APPROVE 后 (Phase 2 终态)**：你被 harness 重唤醒做"封口"动作：
      - 在 test-cases.md 末尾 append `## User Approval (Phase 2.5 · Required · 2026-05-16)` section
-     - 套用 `audits/runs/_template/test-cases.md` 里的 User Approval 模板 (留 `verdict: <待用户填>`)
-     - 模板预留: Reviewed by · Date · Comments · verdict 4 字段 · 你都留空 (让用户填)
+     - 套用 `audits/runs/_template/test-cases.md` 里的 User Approval 模板 · 4 字段 (Reviewed by · Date · Comments · verdict) 全留空
      - **绝对禁止** 自己写 `verdict: APPROVE` — 那是用户的签字 · AI 替签 = 严重越权 · 直接 retries++ 熔断
-   - append 后 return 控制权 · 等用户编辑 test-cases.md (用户写 `verdict: APPROVE` 或 `verdict: REJECT`)
-   - 如用户 REJECT · 你被重唤醒据用户 Comments 改 test-cases.md · Changelog 加 `## Round N+1 (User)` · 再 append 空 User Approval section · 再 return 等用户复审
+     - return · 等用户
+
+   - **8.2 · 用户 REJECT 后 (核心 · 不是直接重 append section)**：
+     - 你被 harness 重唤醒 · 读用户在 User Approval section 写的 Comments
+     - 据 Comments 修 test-cases.md (改用例 / 加用例 / 删用例)
+     - 在 Changelog 加 `## Round N+1 (User REJECT cause)` · 写清"为什么改 + 改了什么"
+     - **删除旧的 ## User Approval section** (重要 · 防 AI 复用旧用户 verdict)
+     - return · **等 harness 重新 spawn Coder + Tester 做新一轮 review** · 不要你直接 append 新 User Approval
+     - 原因: 你的修改可能 (a) 破坏之前 Coder APPROVE 的实现可行性 · (b) 引入新技术问题 · 必须 AI 重新对抗一遍
+
+   - **8.3 · 新一轮 AI APPROVE 后**：harness 再唤醒你 · 回到 8.1 (再 append 空 User Approval section · 等用户复审)
+
+   - **8.4 · 用户 APPROVE 后**：终态 · 你的任务完 · harness 接 Coder Phase 3
+
+   - **死循环防御**: 用户 REJECT 累计 ≥ 3 次 → 你在 Changelog 标 `## Deadlock · 用户 3 次 REJECT 仍不满意` · inflight 加 `user_review_deadlock=true` · 触发 TL 熔断介入
+
    - audit.js dim_test_cases_alignment 卡口: `user_approval_section_present` + `user_verdict_approve` 双 check · 失败阻塞 Coder Phase 3
 
 ## 执行流程
@@ -100,19 +116,29 @@
 ### Step 4 · 接 AI review (被 harness 重唤醒时)
 读 `coder-review.md` + `tester-review.md` · 任一含 REJECT → 据反馈修 test-cases.md · 在末尾加 `## Changelog · Round N · 改了 X` · 再改 inflight 触发再 review。
 
-### Step 5 · AI APPROVE 后 · append User Approval section (Phase 2.5)
-Coder + Tester 双方 verdict APPROVE 后 · 你被 harness 重唤醒做最后一步：
+### Step 5 · AI APPROVE 后 · append User Approval 空 section (Phase 2.5 入口)
+Coder + Tester 双方 verdict APPROVE 后 · 你被 harness 重唤醒：
 - 把 `audits/runs/_template/test-cases.md` 的 `## User Approval (...)` section 整段 append 到 test-cases.md 末尾
 - 4 字段全留空模板 (Reviewed by / Date / Comments / verdict)
 - **绝对禁止** 自己填 `verdict: APPROVE` — return · 等用户
 
-### Step 6 · 接 User review
-用户编辑 test-cases.md User Approval section:
-- 用户填 `verdict: APPROVE` → audit dim_test_cases_alignment 全过 → 你的任务完 · harness 接 Coder Phase 3
-- 用户填 `verdict: REJECT` + Comments → 你被重唤醒据 Comments 修 test-cases.md · Changelog 加 `## Round N (User)` · 再 append 空 User Approval section · return 等用户复审 (≤ 3 轮 · 4 轮触发 TL 熔断)
+### Step 6 · User REJECT → 触发 AI 重新对抗 (核心循环 · 不是直接 append 新 user section)
+用户填 `verdict: REJECT` + Comments → 你被重唤醒：
+- 读 User Approval section 里用户写的 Comments
+- 修 test-cases.md (改/加/删用例)
+- Changelog 加 `## Round N+1 (User REJECT cause)` · 注明改了什么 + 为什么
+- **删除旧 ## User Approval section** (防 AI 复用旧 verdict)
+- return · 等 harness 再 spawn Coder + Tester 做新一轮 review (回到 Phase 2)
+- **不要自己 append 新空 User Approval section** — 必须先经 AI 重新对抗 APPROVE 后才 (回到 Step 5) 再 append
 
-### Step 7 · 终态
+### Step 7 · 新一轮 AI APPROVE 后
+回到 Step 5 · append 空 User Approval section · return 等用户复审。
+
+### Step 8 · 终态
 用户 verdict APPROVE → 你的任务完。harness 会接 Coder / Tester。
+
+### Step 9 · 死循环防御
+用户 REJECT 累计 ≥ 3 次 → 你在 Changelog 标 `## Deadlock · 用户 3 次 REJECT 仍不满意` · 改 inflight `user_review_deadlock=true` · TL 熔断介入。
 
 ## 反作弊 (反 alignment failure)
 

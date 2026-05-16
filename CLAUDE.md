@@ -28,27 +28,40 @@ When the project takes shape, replace the placeholders below with concrete, repo
 
 **根 RC**：2026-05-16 SC-01-MP "8/8 E2E PASS 但 IDE 一片红" 事故 · 用户视角失败 · audit 5 维度全过 (alignment failure)。Fix-1..4 治症状层 (audit dim_ide_smoke + helper 三件套)。Stage 1 治结构层：**把测试用例从 implicit 升级成 explicit 落盘工件 · 在 Coder 写代码前就锁定**。
 
-**6 Phase 流程** (TL spawn team 后 · 按顺序解锁)：
+**6 Phase 流程 + Phase 2↔2.5 完整对抗循环** (TL spawn team 后 · 按顺序解锁)：
 
 ```
 Phase 0 · 三方独立预读 (TestDesigner / Coder / Tester 并行 · 不互见)
    → 读 biz/<SC>.md + design/specs/<page>.spec.md + 源码 + CLAUDE.md + 自己 agent.md
 Phase 1 · TestDesigner (NEW agent) 写 test-cases.md (Gherkin 6 列表格 · ≥3 ≤6 用例)
    → 改 inflight.test_cases_drafted=true
-Phase 2 · Coder + Tester 并行评审 (各自写 {coder,tester}-review.md · 不互见)
-   → 红线: 至少 1 轮 REJECT (0 REJECT = 互相批准 = audit FAIL)
-   → 双方 verdict: APPROVE → 触发 Phase 2.5
-Phase 2.5 · User Approval Gate (NEW · 2026-05-16 · 人在环)
-   → TestDesigner 在 test-cases.md 末尾 append "## User Approval" 空 section
-   → 用户编辑该 section 填 "verdict: APPROVE" (或 REJECT + Comments 驳回 TestDesigner)
-   → audit dim_test_cases_alignment 卡: user_approval_section_present + user_verdict_approve
-   → 用户 APPROVE → 解锁 Phase 3
-Phase 3 · Coder 按 test-cases.md 一对一翻译 it block + 7 step 开发 (现有)
+       ┌─────────────────────────────────────────────────────────────┐
+       │ ↓ (循环入口)                                                 │
+Phase 2 · Coder + Tester 并行评审 (各自 APPEND ## Round N · 不 overwrite)  │
+   → 红线: 至少 1 轮 REJECT · 双方终态 verdict: APPROVE              │
+       ↓                                                              │
+Phase 2.5 · User Approval Gate (人在环)                              │
+   → TestDesigner append "## User Approval" 空 section · 等用户       │
+   → 用户编辑填 verdict: APPROVE / REJECT + Comments                  │
+   → audit: user_approval_section_present + user_verdict_approve     │
+       ├─ 用户 REJECT → TestDesigner 修 test-cases.md + Changelog 加 │
+       │  Round N+1 (User REJECT cause) + 删旧 User Approval section │
+       │  → 回 Phase 2 (Coder + Tester 再 review) ───────────────────┘
+       └─ 用户 APPROVE → 解锁 Phase 3
+Phase 3 · Coder 按 test-cases.md 翻译 it block + 7 step 开发
    → DoD: 用例 100% spec 覆盖 + lint + typecheck + ide-console.txt 0 [error]
-Phase 4 · Tester 跑 spec + 1 轮对抗 (现有 6 step · 加 Step 0 验 it 块数对齐 + user APPROVE)
+Phase 4 · Tester 跑 spec + 1 轮对抗 (现有 6 step · Step 0 验 it 块数 + user APPROVE)
    → DoD: 用例 100% PASS + IDE Console 0 [error]
 Phase 5 · audit.js 7 dims (test_cases_alignment + 6 现有)
 ```
+
+**Phase 2↔2.5 对抗循环的本质**:
+
+> AI 互评通过 → 给人看 → 人看有问题 → TestDesigner 修 → AI 重新对抗 → AI 通过 → 给人复审 → 重复 直到人满意
+
+不是单次直通。用户 REJECT 触发**完整 AI 对抗重来** (因为修改可能破坏之前 APPROVE 的假设 · 或引入新问题) · 不是 TestDesigner 自己改完就直接再问用户。
+
+防死循环: 用户 REJECT ≥ 3 次 → inflight.user_review_deadlock=true → TL 熔断介入。
 
 **为什么加 Phase 2.5 · 人在环**: 
 - AI 互评仍是 alignment failure 的另一面 · Coder/Tester 同 model 同盲区 · 容易"互相批准"
