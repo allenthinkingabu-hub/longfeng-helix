@@ -104,6 +104,17 @@ Page({
       weekLabel: strip.label,
       weekDays: strip.days,
     });
+    // Sync 复习 tab badge to today's pending review count · mockup line 484 badge=8
+    this._syncReviewBadge();
+  },
+
+  _syncReviewBadge() {
+    const pending = Math.max(0, (this.data.todayTotal as number) - (this.data.todayDone as number));
+    if (pending > 0) {
+      wx.setTabBarBadge({ index: 3, text: String(pending), fail: () => { /* ignore in non-tab context */ } });
+    } else {
+      wx.removeTabBarBadge({ index: 3, fail: () => { /* ignore */ } });
+    }
   },
 
   async _fetchTodayData() {
@@ -122,7 +133,7 @@ Page({
         todayDone: done,
         circleProgress: pct / 100,
         circlePctText: `${pct}%`,
-      });
+      }, () => this._syncReviewBadge());
     } catch {
       // Degrade: show READY with MVP defaults (mockup placeholder data)
       this.setData({
@@ -131,7 +142,7 @@ Page({
         todayDone: 3,
         circleProgress: 0.38,
         circlePctText: '38%',
-      });
+      }, () => this._syncReviewBadge());
     }
   },
 

@@ -1,0 +1,9 @@
+SC01-MP-MENU-FIX backend-it verify.log
+
+This task touches NO backend code.
+Scope: frontend/apps/mp/{app.json, images/tabbar/*.png, pages/home/index.ts, scripts/build-tabbar-icons.mjs, test/e2e/tabbar-visible-all-tabs.spec.ts}
+
+git diff --stat backend/  -> 0 files changed
+git diff --stat services/ -> 0 files changed
+
+No backend verify needed. Placeholder per audit.js requirement.

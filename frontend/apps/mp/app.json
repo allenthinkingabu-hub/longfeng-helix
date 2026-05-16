@@ -23,11 +23,36 @@
     "backgroundColor": "#F2F2F7",
     "borderStyle": "white",
     "list": [
-      { "pagePath": "pages/home/index", "text": "首页" },
-      { "pagePath": "pages/wrongbook-list/index", "text": "错题本" },
-      { "pagePath": "pages/capture/index", "text": "拍题" },
-      { "pagePath": "pages/review-today/index", "text": "复习" },
-      { "pagePath": "pages/me/index", "text": "我的" }
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页",
+        "iconPath": "images/tabbar/home-normal.png",
+        "selectedIconPath": "images/tabbar/home-selected.png"
+      },
+      {
+        "pagePath": "pages/wrongbook-list/index",
+        "text": "错题本",
+        "iconPath": "images/tabbar/book-normal.png",
+        "selectedIconPath": "images/tabbar/book-selected.png"
+      },
+      {
+        "pagePath": "pages/capture/index",
+        "text": "拍题",
+        "iconPath": "images/tabbar/camera-normal.png",
+        "selectedIconPath": "images/tabbar/camera-selected.png"
+      },
+      {
+        "pagePath": "pages/review-today/index",
+        "text": "复习",
+        "iconPath": "images/tabbar/review-normal.png",
+        "selectedIconPath": "images/tabbar/review-selected.png"
+      },
+      {
+        "pagePath": "pages/me/index",
+        "text": "我的",
+        "iconPath": "images/tabbar/profile-normal.png",
+        "selectedIconPath": "images/tabbar/profile-selected.png"
+      }
     ]
   },
   "sitemapLocation": "sitemap.json"
