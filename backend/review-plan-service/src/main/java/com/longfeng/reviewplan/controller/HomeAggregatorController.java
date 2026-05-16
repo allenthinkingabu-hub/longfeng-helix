@@ -2,10 +2,13 @@ package com.longfeng.reviewplan.controller;
 
 import com.longfeng.common.dto.ApiResult;
 import com.longfeng.reviewplan.dto.HomeTodayResp;
+import com.longfeng.reviewplan.dto.WeekSummaryDto;
 import com.longfeng.reviewplan.repo.ReviewPlanRepository;
+import com.longfeng.reviewplan.service.WeeklyAggregateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -17,20 +20,22 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * SC-01-D01 · GET /api/home/today · P-HOME 大卡聚合 controller.
  *
- * <p>A07 推荐"新建独立 home-aggregator module"承载 9 字段完整聚合；本任务范围限定 MVP 黄金路径
- * 必需子集（today.{total, done, circleProgress} + resume 占位）→ 承载于 review-plan-service（拥有
- * review_plan 数据源）。Phase 1 再剥离至独立 module。
+ * <p>SC-16 2026-05-16 扩展: response 加 {@code weekSummary} 4 字段投影 · 调同一
+ * {@link WeeklyAggregateService#aggregate(long, ZoneId)} 同一参数 (INV-1 + INV-6) ·
+ * 既有 today.{total,done,circleProgress} + resume 不动 (向后兼容).
  *
- * <p>语义：
+ * <p>语义:
+ *
  * <ul>
- *   <li>{@code total} = 今日 {@code next_due_at ∈ [todayStart, todayEnd)} 的 review_plan 行数（含已完成）
+ *   <li>{@code total} = 今日 {@code next_due_at ∈ [todayStart, todayEnd)} 的 review_plan 行数
  *   <li>{@code done} = 今日 {@code completed_at ∈ [todayStart, todayEnd)} 的 review_plan 行数
  *   <li>{@code circleProgress} = total &gt; 0 ? done / total : 0.0
- *   <li>{@code resume} = null（B02 决策：session in-memory，不存可恢复元数据）
+ *   <li>{@code resume} = null (B02 决策: session in-memory)
+ *   <li>{@code weekSummary} = 同 weekly_aggregate service 4 字段投影 (SC-16-T01)
  * </ul>
  */
 @RestController
-@Tag(name = "home-aggregator", description = "P-HOME 主聚合（SC-01-D01 · MVP 子集）")
+@Tag(name = "home-aggregator", description = "P-HOME 主聚合 (SC-01-D01 · SC-16 增量 weekSummary)")
 public class HomeAggregatorController {
 
   private static final String USER_ID_HEADER = "X-User-Id";
@@ -38,13 +43,22 @@ public class HomeAggregatorController {
   private static final String DEFAULT_TZ = "Asia/Shanghai";
 
   private final ReviewPlanRepository planRepo;
+  private final WeeklyAggregateService weeklyAggregateService;
+  private final Clock clock;
 
-  public HomeAggregatorController(ReviewPlanRepository planRepo) {
+  public HomeAggregatorController(
+      ReviewPlanRepository planRepo,
+      WeeklyAggregateService weeklyAggregateService,
+      Clock clock) {
     this.planRepo = planRepo;
+    this.weeklyAggregateService = weeklyAggregateService;
+    this.clock = clock;
   }
 
-  @Operation(summary = "P-HOME 今日聚合（SC-01-D01）· today.{total,done,circleProgress} + resume")
-  @ApiResponse(responseCode = "200", description = "today 聚合")
+  @Operation(
+      summary =
+          "P-HOME 今日聚合 (SC-01-D01) + 本周 weekSummary 4 字段投影 (SC-16-T01)")
+  @ApiResponse(responseCode = "200", description = "today 聚合 + weekSummary")
   @GetMapping("/api/home/today")
   public ApiResult<HomeTodayResp> homeToday(
       @RequestParam(value = "tz", required = false) String tzParam,
@@ -53,7 +67,9 @@ public class HomeAggregatorController {
 
     String useTz = pickTz(tzParam, tzHeader);
     ZoneId zone = resolveZone(useTz);
-    LocalDate today = LocalDate.now(zone);
+    // 通过 Clock 注入取当前时间 · 反 wall-clock 依赖 (INV-3 · audit grep 0 命中)
+    Instant now = clock.instant();
+    LocalDate today = now.atZone(zone).toLocalDate();
     Instant start = today.atStartOfDay(zone).toInstant();
     Instant end = today.plusDays(1).atStartOfDay(zone).toInstant();
 
@@ -62,9 +78,23 @@ public class HomeAggregatorController {
     double circleProgress = total > 0 ? (double) done / (double) total : 0.0;
 
     HomeTodayResp.TodayCard card = new HomeTodayResp.TodayCard(total, done, circleProgress);
-    // B02 决策：session 是 in-memory · resume 元数据无持久化 → 返 null（前端隐藏 banner）
-    HomeTodayResp resp = new HomeTodayResp(useTz, card, null);
+
+    // SC-16-T01 · weekSummary 投影 · 同一 weekly_aggregate service 同一参数 (INV-1 + INV-6)
+    WeekSummaryDto weekSummary = projectWeekSummary(userId, zone);
+
+    HomeTodayResp resp = new HomeTodayResp(useTz, card, null, weekSummary);
     return ApiResult.ok(resp);
+  }
+
+  /**
+   * SC-16-T01 · 调 {@link WeeklyAggregateService} 拿 raw POJO 后投影到 {@link WeekSummaryDto} 4
+   * 字段. **不允许内嵌独立 SQL** (INV-1 + INV-6 · audit grep 验证).
+   */
+  private WeekSummaryDto projectWeekSummary(long studentId, ZoneId zone) {
+    WeeklyAggregateService.WeeklyAggregateRaw raw =
+        weeklyAggregateService.aggregate(studentId, zone);
+    return new WeekSummaryDto(
+        raw.weekLabel, raw.masteryRate, raw.sparkline, raw.streak, raw.newCount);
   }
 
   private static String pickTz(String tzParam, String tzHeader) {

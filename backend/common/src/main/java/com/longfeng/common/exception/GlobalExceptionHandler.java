@@ -15,4 +15,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(httpStatus)
                 .body(ApiResult.fail(code, e.getMessage()));
     }
+
+    /**
+     * 兜底 · 未被业务异常 catch 的 RuntimeException → 500 + INTERNAL_ERROR code · ApiResult 信封.
+     *
+     * <p>防止 NullPointerException / SQLException / generic RuntimeException 退化成 Spring
+     * 默认 HTML 错误页 · 保证客户端拿到 ApiResult JSON (含 code).
+     */
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiResult<?>> handleRuntime(RuntimeException e) {
+        return ResponseEntity.status(ErrCode.INTERNAL_ERROR.httpStatus())
+                .body(ApiResult.fail(ErrCode.INTERNAL_ERROR.code(), e.getMessage() != null ? e.getMessage() : "internal_error"));
+    }
 }

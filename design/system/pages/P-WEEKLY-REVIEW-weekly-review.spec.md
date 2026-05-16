@@ -167,16 +167,22 @@ P-WEEKLY-REVIEW 是「**过去时 · 成果视图**」—— 给学生一个"看
 
 ### 4.2 后端 Entity 来源
 
-- **hero.masteryRate / sparkline**: 聚合 `wb_review_record.grade` (GRADED·MASTERED count / total GRADED) · groupBy day(reviewed_at)
+> ⚠ **聚合计算逻辑的字面规约**位于 [biz/features/P-WEEKLY-REVIEW__weekly-review.md §10.14](../../../biz/features/P-WEEKLY-REVIEW__weekly-review.md) (含每个字段的伪 SQL / 空值语义 / streak 算法 / 同源投影规则)。本节是字段→表的速查表 · 不重复计算细节。
+
+- **hero.masteryRate / sparkline**: 聚合 `wb_review_record.grade` (GRADED·MASTERED count / total GRADED) · groupBy day(reviewed_at @ student_tz) · **空周 masteryRate=null · 空日 sparkline[i]=null** (用户 2026-05-16 决策 · 详见 satellite biz §10.14 字段 1/2)
 - **subjectRadar**: 聚合 `wb_review_record` join `wb_question.subject` · groupBy subject
-- **weakKPs**: 聚合 `wb_review_record.grade=FORGOT` join `wb_question.knowledge_tags` · groupBy kpId · orderBy recentMissCount DESC limit 3
+- **weakKPs**: 聚合 `wb_review_record.grade=FORGOT` join `wb_question.knowledge_tags` · groupBy kpId · orderBy `recentMissCount DESC` limit 3 (不允许按 totalMissCount 排 · System Invariant #4)
 - **stats.reviewedCount**: `wb_review_record` count where reviewed_at in [week.from, week.to]
 - **stats.reviewedDurationMin**: 聚合 `wb_review_record.duration_ms` sum / 60000
-- **stats.newCount**: `wb_question` count where created_at in [week.from, week.to]
+- **stats.newCount**: `wb_question` count where created_at in [week.from, week.to] · **空周 newCount=0** (整数字段不为 null · 区别于 masteryRate 语义字段)
 - **failedTop**: `wb_question` join `wb_review_record.grade=FORGOT` count · orderBy count DESC limit 5
 - **aiInsight**: Spring AI 链路（master §6.2 `QuestionAnalyzer` interface 兄弟 prompt）· 用 weakKPs[0] + stats.reviewedCount 拼提示词
 
-来源：satellite §4 (无新增 DB 列声明 · 复用 master §4.5 `wb_review_node` + §4.6 `wb_review_record` + §4.2 `wb_question`) + master §10.10 `weekly_aggregate` service 实现参考。
+**周边界**: ISO 8601 week 周一 00:00 → 周日 23:59 (学生 tz) · UTC 存储 · 跨时区学生走 master §2B.9 SC-08 时区切换逻辑。
+
+**streak 算法** (P-HOME weekSummary.streak · 不直接出现在 WeeklyReviewResp · 但由同一 weekly_aggregate service 投影): 从**昨天**起往回数连续 N 天每日 ≥ 1 GRADED · 今天若有 ≥ 1 GRADED 则 streak 包含今天 (+1) · 详见 satellite biz §10.14 字段 3。
+
+来源：satellite §4 (无新增 DB 列声明 · 复用 master §4.5 `wb_review_node` + §4.6 `wb_review_record` + §4.2 `wb_question`) + master §10.10 `weekly_aggregate` service 实现参考 + satellite biz §10.14 计算逻辑字面规约。
 
 ---
 
@@ -186,7 +192,7 @@ P-WEEKLY-REVIEW 是「**过去时 · 成果视图**」—— 给学生一个"看
 
 | # | Method | Path | Headers (req) | Query (req) | Response | P95 预算 | 失败降级 |
 |---|---|---|---|---|---|---|---|
-| 1 | GET | `/api/home/weekly` | `Authorization: Bearer <STUDENT JWT>` | (none · 默认 current ISO week · P2 预留 `?week=YYYY-Www`) | `200 WeeklyReviewResp` (见 §5.1 全字段) | ≤ 400ms (P99 ≤ 800ms) | 5xx → §9 ERROR 态 + retry · 不缓存（避免学生看到隔周陈旧数据） |
+| 1 | GET | `/api/home/weekly` | `X-User-Id: <student_id>` (MVP · 与 /today 一致 · 登录上线升 JWT) · 可选 `X-User-Timezone` | (none · 默认 current ISO week · P2 预留 `?week=YYYY-Www`) | `200 WeeklyReviewResp` (见 §5.1 全字段) | ≤ 400ms (P99 ≤ 800ms) | 5xx → §9 ERROR 态 + retry · 不缓存（避免学生看到隔周陈旧数据） |
 
 ### 5.1 Response WeeklyReviewResp 字段集 (字符级)
 
@@ -229,14 +235,51 @@ P-WEEKLY-REVIEW 是「**过去时 · 成果视图**」—— 给学生一个"看
 
 | HTTP | code | 含义 | 前端处理 |
 |---|---|---|---|
-| 401 | `UNAUTHORIZED` | JWT 缺失/过期 | 走 SC-00 token 过期重定向 P00 |
+| 401 | `UNAUTHORIZED` | X-User-Id Header 缺失 / 格式非法 (MVP) · 登录上线后含义改为 JWT 缺失/过期 | MVP: 顶部 error banner "请重新登录" · 登录上线后走 SC-00 P00 重定向 |
 | 403 | `STUDENT_DELETED` | 学生账号已注销 | 顶部 error banner + 退到 P-LANDING |
 | 500 | `INTERNAL` | 后端聚合 SQL 失败 / weekly_aggregate service 异常 | §9 ERROR 态 · TC-16.02 覆盖 |
 | 504 | `GATEWAY_TIMEOUT` | 聚合查询超 800ms | 同 500 处理 |
 
 来源：satellite §10.12 字面 + master §10.10 P-OBSERVER 同 service 错误码 + master §15.2 统一错误码（节选）。
 
-⚠ **后端 `/api/home/weekly` controller 尚未存在** · Coder Step 0 需要先在 `backend/home-aggregator-service/.../WeeklyController.java` 新建 controller + 在 `WeeklyService.java` 复用 master §10.10 P-OBSERVER 的 `weekly_aggregate` service 实现（学生端脱敏规则与家长端不同）。
+⚠ **后端 `/api/home/weekly` controller 尚未存在** · Coder Step 0 需要先在 `backend/review-plan-service/.../controller/WeeklyController.java` 新建 controller (与既有 `HomeAggregatorController.java` 同 module · 2026-05-16 用户决策 · 因 home/* endpoint 全部归口 review-plan-service · 不放 wrongbook-service) + 在 `service/WeeklyAggregateService.java` 实现 master §10.10 P-OBSERVER 的 `weekly_aggregate` service · 同时扩展现有 `HomeAggregatorController.getToday()` 加 weekSummary 投影（学生端脱敏规则与家长端不同 · 单一 service 同时供应 /api/home/weekly + /api/home/today.weekSummary 两端 · 见 §5.3）。数据源 wb_review_record / wb_question 在 wrongbook DB schema · 跨 module read-only 访问 (review-plan-service 已有此模式 · 见 HomeTodayIT)。
+
+### 5.3 共享投影 · GET /api/home/today.weekSummary 扩展 (SC-16 增量 · 2026-05-16)
+
+> 主源: [biz/features/P-WEEKLY-REVIEW__weekly-review.md §10.13](../../../biz/features/P-WEEKLY-REVIEW__weekly-review.md) + [P-HOME.spec.md §5.2 weekSummary 字段集](P-HOME.spec.md) (P-HOME 视角速查表)。本节是 P-WEEKLY-REVIEW 视角的归口 · 强调 "同 service 双 endpoint" 关系。
+
+**架构图**:
+
+```
+                       ┌─────────────────────────────────┐
+                       │  weekly_aggregate service        │
+                       │  (master §10.10 · 单一 SQL 聚合)  │
+                       │  studentId + weekIso →           │
+                       │     WeeklyAggregateRaw POJO     │
+                       └────────┬─────────────────┬──────┘
+                                │                 │
+                  ┌─────────────▼──┐          ┌──▼─────────────┐
+                  │ WeeklyController│         │ HomeAggregator │
+                  │ getWeekly()    │         │ getToday()      │
+                  │                │         │                 │
+                  │ raw → Weekly   │         │ raw → 既有 today│
+                  │       ReviewResp│        │       + 新增    │
+                  │  (完整)         │        │       weekSummary│
+                  │                │         │       (4 字段) │
+                  └────────────────┘         └─────────────────┘
+                          │                          │
+                          ▼                          ▼
+                  GET /api/home/weekly      GET /api/home/today
+                  (P-WEEKLY-REVIEW)         (P-HOME)
+```
+
+**关键约束**:
+1. **同一 service · 同一 SQL · 同一 raw POJO** — 两个 controller 调用同一个 `weeklyAggregateService.aggregate(studentId, weekIso)` · 各自映射到不同 DTO · **禁止** controller 内嵌独立 SQL
+2. **投影一致性** — contract test 双调对比: `getWeekly().hero.masteryRate ≡ getToday().weekSummary.masteryRate` (浮点容差 0 · System Invariant #6)
+3. **P-HOME 不调 /weekly** — INV-6 + 反模式 #2 (audit grep 验证 `frontend/apps/mp/pages/home/` 0 命中 `/api/home/weekly`)
+4. **缓存策略** — 两端**均不**缓存 · 因聚合本身廉价 (< 400ms) · 缓存复杂度收益不值 · 也避免缓存不一致风险
+
+**性能预算共享**: `weekly_aggregate.aggregate()` P95 ≤ 350ms · /weekly 序列化加 30ms 外开销 · /today.weekSummary 投影 4 字段加 10ms 外开销 · 总 P95 weekly ≤ 400ms / today ≤ 400ms (满足两端 SLA)。
 
 ---
 
@@ -312,7 +355,7 @@ P-WEEKLY-REVIEW 是「**过去时 · 成果视图**」—— 给学生一个"看
 | GET /weekly 5xx | 后端 weekly_aggregate service 异常 | 骨架屏保留 + 顶部黄条 "数据加载失败 · 网络异常或服务繁忙" + 黄色 retry button | tap retry → 重新 GET · 不允许白屏 · 不允许 toast 即消（错误必须可视化常驻直到用户操作） | TC-16.02 |
 | GET /weekly 504 timeout (P99 > 800ms 触发) | 后端聚合 SQL 慢 / 数据库压力大 | 同上 5xx 反馈 + 黄条文案改 "数据加载超时 · 重试" | 同上 | TC-16.02 变体 |
 | AI insight 超时 (但其他 5 块正常) | `data.aiInsight === null` (后端 Spring AI 链路超时 fallback) | insight 卡单独显示 "AI 复盘生成中 · 稍后刷新可见" + 灰色 dot (不闪) | 其他 5 数据块正常渲染 · 不阻塞页面 · 用户可手动 pull-to-refresh 重新拉取（非本 MVP 范围） | — |
-| Token 过期 (401) | 学生 JWT 在请求时过期 | 自动弹"登录已过期"Sheet → 引导 P00 (走 SC-00 重定向流) | 保留 `redirect=wb://weekly` 参数 | — |
+| 401 (MVP X-User-Id 缺失) | X-User-Id Header 缺失或非法 · 登录上线后含义改为 JWT 过期 | MVP: 顶部 error banner + 退到 P-LANDING · 登录上线后弹"登录已过期"Sheet → 引导 P00 | 保留 `redirect=wb://weekly` 参数 (登录上线后启用) | — |
 | Tap CTA 跳 P05 ≤ 500ms 未完成 | 跨页跳转网络慢 | 路由 loading 转圈 + skeleton | 不允许 tap 后无反馈 · 必须立即视觉响应 | TC-16.01 性能段 |
 | Tap CTA 跳 P05 后 P05 filter 失败 | URL 带 kpId 但 P05 解析不到 | P05 自身降级到全列表 + 顶部 toast "未找到该知识点的错题" | 不阻塞用户 · 让 P05 自治处理 | — (P05 spec.md 范围) |
 
