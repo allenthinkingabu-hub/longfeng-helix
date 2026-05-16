@@ -1,6 +1,9 @@
 /**
  * SC-01 端到端 happy path · 走全部 8 page 真验证
  *
+ * Phase 4 (Fix-2 · 2026-05-16): 用 connectMp + assertConsoleClean 三件套 ·
+ *   替换原 inline mp.on('console') · 现在 helper 自动挂订阅 + 落 ide-console.txt
+ *
  * Flow: home → capture → analyzing → result → review-today → review-exec → review-done → home
  * 真 backend: file=8084 · wb=8082 · ai=8083 · review=8085
  * 真 automator: ws://127.0.0.1:9420
@@ -9,24 +12,20 @@
  * 每步独立 it · 失败时具体定位哪 page block.
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import automator from 'miniprogram-automator';
-
-const WS = process.env.MP_AUTOMATOR_WS || 'ws://127.0.0.1:9420';
+import { type Mp, connectMp, assertConsoleClean, resetIdeConsoleLog } from './_helpers';
 
 describe('SC-01 happy path · 8 pages · real backend + real IDE', () => {
-  let mp: Awaited<ReturnType<typeof automator.connect>>;
+  let mp: Mp;
+  let errors: string[];
 
   beforeAll(async () => {
-    mp = await Promise.race([
-      automator.connect({ wsEndpoint: WS }),
-      new Promise<never>((_, r) =>
-        setTimeout(() => r(new Error(`connect timeout: ${WS} · 先跑 cli auto`)), 10000),
-      ),
-    ]);
+    resetIdeConsoleLog(); // 清上轮 IDE Console log · 本 spec 独享
+    ({ mp, errors } = await connectMp(10_000));
   }, 30_000);
 
   afterAll(async () => {
     if (mp) await mp.disconnect();
+    assertConsoleClean(errors, 'sc01-happy-path · 8 pages');
   });
 
   // ── Step 1: P-HOME ─────────────────────────────────────────

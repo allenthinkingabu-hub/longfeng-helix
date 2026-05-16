@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
-// audit.js — 确定性 5 维度审计。 程序不说谎: grep / file-exists / git cat-file / 数 testcase.
+// audit.js — 确定性 6 维度审计。 程序不说谎: grep / file-exists / git cat-file / 数 testcase / IDE Console.
+// 6 dims: coder_compliance · tester_compliance · bug_reality · test_validity · spec_alignment · ide_smoke
 // 退出码: 0=PASS  1=REDO  2=usage error
 // 落盘: <work_log_dir>/audit-verdict.json
 
@@ -316,8 +317,41 @@ function auditSpecAlignment() {
   }
 }
 
+// ─── 维度 6 · ide_smoke (Fix-1 · 2026-05-16) ────────────────────
+// RC: "E2E 8/8 PASS 但 IDE 一片红" 事故 · audit 5 维度全 PASS 但用户视角失败
+// Fix: Tester PASS 必须落 work_log_dir/test-reports/ide-console.txt · 内容来自
+//      _helpers.ts connectMp() 的 mp.on('console') 订阅 · 0 字节 = PASS · 任何 [error] 行 = REDO
+function auditIdeSmoke() {
+  const DIM = 'ide_smoke';
+
+  // 仅对有 UI 的 team 强制 (mp / h5) · backend / shared / data 不要求
+  const teamId = (inflight.task.team_id || '').toLowerCase();
+  const teamRequiresIde = teamId === 'mp' || teamId === 'h5' || teamId === 'frontend';
+  if (!teamRequiresIde) {
+    record(DIM, 'ide_smoke_required_by_team', true,
+      `team_id=${teamId} · not UI team · IDE smoke skipped`);
+    return;
+  }
+
+  const logPath = path.join(workLogDir, 'test-reports', 'ide-console.txt');
+  if (!exists(logPath)) {
+    record(DIM, 'ide_console_log_exists', false,
+      `missing: ${logPath} · Tester 必须跑 console-aware E2E (_helpers.ts connectMp) 落此文件`);
+    return;
+  }
+  record(DIM, 'ide_console_log_exists', true, logPath);
+
+  const body = readText(logPath);
+  // 严格: 任何 [error] 行 = REDO · [warn] 不计 (deprecated API 等第三方告警暂留 backlog)
+  const errorLines = body.split('\n').filter(l => /^\[error\]/.test(l));
+  const errCount = errorLines.length;
+  record(DIM, 'ide_console_zero_errors', errCount === 0,
+    errCount === 0 ? '0 [error] lines'
+                   : `${errCount} [error] line(s) · 前 3:\n${errorLines.slice(0, 3).join('\n')}`);
+}
+
 // ─── REDO target 决策 ────────────────────────────────────────────
-const CODER_DIMS  = new Set(['coder_compliance', 'bug_reality', 'spec_alignment']);
+const CODER_DIMS  = new Set(['coder_compliance', 'bug_reality', 'spec_alignment', 'ide_smoke']);
 const TESTER_DIMS = new Set(['tester_compliance', 'test_validity']);
 
 function decideRedoTarget(failed) {
@@ -334,6 +368,7 @@ auditTesterCompliance();
 auditBugReality();
 auditTestValidity();
 auditSpecAlignment();
+auditIdeSmoke();
 
 const failed   = checks.filter(c => !c.pass);
 const allPass  = failed.length === 0;
@@ -342,7 +377,7 @@ const verdict  = {
   attempt:     inflight.task.attempt,
   team_id:     inflight.task.team_id,
   audited_at:  new Date().toISOString(),
-  audited_by:  'audit.js v1 (deterministic · 5 dims)',
+  audited_by:  'audit.js v2 (deterministic · 6 dims · +ide_smoke)',
   pass:        allPass,
   checks,
   redo_target: allPass ? null : decideRedoTarget(failed),
@@ -353,7 +388,7 @@ fs.writeFileSync(path.join(workLogDir, 'audit-verdict.json'), JSON.stringify(ver
 
 // ─── pretty print (grouped by dimension) ─────────────────────────
 const RED='\x1b[31m', GREEN='\x1b[32m', YELLOW='\x1b[33m', CYAN='\x1b[36m', BOLD='\x1b[1m', DIM='\x1b[2m', RESET='\x1b[0m';
-const DIM_ORDER = ['coder_compliance','tester_compliance','bug_reality','test_validity','spec_alignment'];
+const DIM_ORDER = ['coder_compliance','tester_compliance','bug_reality','test_validity','spec_alignment','ide_smoke'];
 
 console.log(`${BOLD}[audit] ${taskId} attempt-${inflight.task.attempt} → ${allPass ? GREEN+'PASS' : RED+'REDO target='+verdict.redo_target}${RESET}`);
 for (const dim of DIM_ORDER) {

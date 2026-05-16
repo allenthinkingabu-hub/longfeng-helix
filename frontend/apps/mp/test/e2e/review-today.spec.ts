@@ -1,41 +1,31 @@
 /**
- * SC01-MP-T09-E2E · P07 今日复习 · page-load + testid E2E spec
+ * SC01-MP-T09-E2E · P07 review-today page-load + testid + console-clean
  *
- * Phase 3: drop pixelmatch VRT · use mp.reLaunch · assert testid · screenshot artifact only
+ * Phase 4 (Fix-2 · 2026-05-16): 用 connectMp + assertConsoleClean + assertPageRenders
  *
  * trace: pages/review-today/index · @longfeng/testids p07
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import automator from 'miniprogram-automator';
+import { type Mp, connectMp, assertConsoleClean, assertPageRenders } from './_helpers';
 import { TEST_IDS } from '@longfeng/testids';
 
-const WS_ENDPOINT = process.env.MP_AUTOMATOR_WS || 'ws://127.0.0.1:9420';
-
 describe('P07 review-today · page-load + testid (真 IDE automator)', () => {
-  let mp: Awaited<ReturnType<typeof automator.connect>>;
+  let mp: Mp;
+  let errors: string[];
 
   beforeAll(async () => {
-    mp = await Promise.race([
-      automator.connect({ wsEndpoint: WS_ENDPOINT }),
-      new Promise<never>((_, reject) =>
-        setTimeout(
-          () => reject(new Error(`connect timeout: ${WS_ENDPOINT} not listening · 先跑 cli auto`)),
-          8000,
-        ),
-      ),
-    ]);
-
+    ({ mp, errors } = await connectMp());
     await mp.reLaunch('/pages/review-today/index');
     await new Promise((r) => setTimeout(r, 1500));
   }, 45_000);
 
   afterAll(async () => {
     if (mp) await mp.disconnect();
+    assertConsoleClean(errors, 'review-today.spec');
   });
 
-  it('currentPage path is pages/review-today/index', async () => {
-    const page = await mp.currentPage();
-    expect(page.path).toBe('pages/review-today/index');
+  it('currentPage path is pages/review-today/index 且 view 数 ≥ 8', async () => {
+    await assertPageRenders(mp, 'pages/review-today/index', 8);
   });
 
   it('hero card (data-test-id=today-review-card) is rendered', async () => {

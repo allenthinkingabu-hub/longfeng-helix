@@ -1,37 +1,32 @@
 /**
- * SC01-MP-T08-E2E · Home page E2E (page-load + testid)
+ * SC01-MP-T08-E2E · Home page E2E (page-load + testid + console-clean)
  *
- * Phase 3: drop pixelmatch VRT · keep testid + data binding assertions · screenshot artifact only
+ * Phase 4 (Fix-2 · 2026-05-16): 用 connectMp + assertConsoleClean + assertPageRenders 三件套 ·
+ *   不再裸调 automator.connect + expect(page.path) · 防 IDE Console silent error 漏过
+ *
+ * 历史 RC: 之前 8/8 PASS 时 home 只渲染 hero · 7 sections 未 mount (READY-block 全包) ·
+ *   path 断言绿但 view 数严重不足 · 故 assertPageRenders(minViews=15) 当场炸
  *
  * trace: pages/home/index · home 是 app.json pages[0] 默认落地页
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import automator from 'miniprogram-automator';
-
-const WS_ENDPOINT = process.env.MP_AUTOMATOR_WS || 'ws://127.0.0.1:9420';
+import { type Mp, connectMp, assertConsoleClean, assertPageRenders } from './_helpers';
 
 describe('Home page E2E + testid (SC01-MP-T08-E2E)', () => {
-  let mp: Awaited<ReturnType<typeof automator.connect>>;
+  let mp: Mp;
+  let errors: string[];
 
   beforeAll(async () => {
-    mp = await Promise.race([
-      automator.connect({ wsEndpoint: WS_ENDPOINT }),
-      new Promise<never>((_, reject) =>
-        setTimeout(
-          () => reject(new Error(`connect timeout: ${WS_ENDPOINT} not listening · 先跑 cli auto`)),
-          8000,
-        ),
-      ),
-    ]);
+    ({ mp, errors } = await connectMp());
   }, 45_000);
 
   afterAll(async () => {
     if (mp) await mp.disconnect();
+    assertConsoleClean(errors, 'home.spec');
   });
 
-  it('currentPage path is pages/home/index', async () => {
-    const page = await mp.currentPage();
-    expect(page.path).toBe('pages/home/index');
+  it('currentPage path is pages/home/index 且 view 数 ≥ 15 (sections 全 mount)', async () => {
+    await assertPageRenders(mp, 'pages/home/index', 15);
   });
 
   it('home page renders key DOM nodes with testids', async () => {

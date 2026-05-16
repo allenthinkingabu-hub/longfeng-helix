@@ -4,3 +4,9 @@ coverage/
 dist/
 .miniprogram-build/
 miniprogram_npm/
+
+# IDE reserved directory names (微信开发者工具 拒编 ^__.*__$ 目录)
+# vitest / playwright 习惯产物路径 · 但 MP IDE 报 "reserved directory" error
+__screenshots__/
+**/__screenshots__/
+test-results/

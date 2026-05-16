@@ -1,34 +1,26 @@
 /**
- * SC01-MP-T12-E2E · P08→P09 transition E2E (review-exec → review-done)
+ * SC01-MP-T12-E2E · P08 review-exec → P09 review-done transition + console-clean
  *
- * Phase 3: use mp.reLaunch · drop pixelmatch
+ * Phase 4 (Fix-2 · 2026-05-16): 用 connectMp + assertConsoleClean
  *
  * Business flow: User on P08 taps grade button → navigate to P09 review-done
  *
  * trace: pages/review-exec → pages/review-done
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import automator from 'miniprogram-automator';
-
-const WS_ENDPOINT = process.env.MP_AUTOMATOR_WS || 'ws://127.0.0.1:9420';
+import { type Mp, connectMp, assertConsoleClean } from './_helpers';
 
 describe('SC01-MP-T12-E2E · P08→P09 transition (exec → done)', () => {
-  let mp: Awaited<ReturnType<typeof automator.connect>>;
+  let mp: Mp;
+  let errors: string[];
 
   beforeAll(async () => {
-    mp = await Promise.race([
-      automator.connect({ wsEndpoint: WS_ENDPOINT }),
-      new Promise<never>((_, reject) =>
-        setTimeout(
-          () => reject(new Error(`connect timeout: ${WS_ENDPOINT} not listening · 先跑 cli auto`)),
-          8000,
-        ),
-      ),
-    ]);
+    ({ mp, errors } = await connectMp());
   }, 45_000);
 
   afterAll(async () => {
     if (mp) await mp.disconnect();
+    assertConsoleClean(errors, 'exec-to-done.spec');
   });
 
   it('navigates from review-exec to review-done after grade tap', async () => {

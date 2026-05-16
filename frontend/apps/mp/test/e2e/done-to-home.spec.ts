@@ -1,31 +1,26 @@
 /**
- * SC01-MP-T14-E2E · P09→P-HOME transition E2E (review-done → home)
+ * SC01-MP-T14-E2E · P09 review-done → P-HOME transition + console-clean
  *
- * Phase 3: fix mp.reLaunch syntax (must be { url: ... }) · drop pixelmatch
+ * Phase 4 (Fix-2 · 2026-05-16): 用 connectMp + assertConsoleClean
  *
  * Business flow: User on P09 taps "结束本次" CTA → reLaunch to home
  *
  * trace: pages/review-done → pages/home
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import automator from 'miniprogram-automator';
-
-const WS_ENDPOINT = process.env.MP_AUTOMATOR_WS || 'ws://127.0.0.1:9420';
+import { type Mp, connectMp, assertConsoleClean } from './_helpers';
 
 describe('SC01-MP-T14-E2E · done→home transition (真 IDE)', () => {
-  let mp: Awaited<ReturnType<typeof automator.connect>>;
+  let mp: Mp;
+  let errors: string[];
 
   beforeAll(async () => {
-    mp = await Promise.race([
-      automator.connect({ wsEndpoint: WS_ENDPOINT }),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error(`connect timeout: ${WS_ENDPOINT} not listening · 先跑 cli auto`)), 8000),
-      ),
-    ]);
+    ({ mp, errors } = await connectMp());
   }, 45_000);
 
   afterAll(async () => {
     if (mp) await mp.disconnect();
+    assertConsoleClean(errors, 'done-to-home.spec');
   });
 
   it('navigate to review-done page via reLaunch', async () => {

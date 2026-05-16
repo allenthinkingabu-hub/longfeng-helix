@@ -1,7 +1,7 @@
 /**
- * SC01-MP-T04-E2E · transition P03 analyzing → P04 result
+ * SC01-MP-T04-E2E · P03 analyzing → P04 result transition + console-clean
  *
- * Phase 3: use mp.reLaunch · drop pixelmatch · testid assert
+ * Phase 4 (Fix-2 · 2026-05-16): 用 connectMp + assertConsoleClean
  *
  * 业务剧本: P03 AI 分析轮询 SUCCEEDED → navigateTo P04 result
  * Phase 3 不依赖真后端 · reLaunch 模拟转场
@@ -9,24 +9,19 @@
  * trace: pages/analyzing → pages/result
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import automator from 'miniprogram-automator';
-
-const WS_ENDPOINT = process.env.MP_AUTOMATOR_WS || 'ws://127.0.0.1:9420';
+import { type Mp, connectMp, assertConsoleClean } from './_helpers';
 
 describe('P03→P04 transition: analyzing → result (真 IDE)', () => {
-  let mp: Awaited<ReturnType<typeof automator.connect>>;
+  let mp: Mp;
+  let errors: string[];
 
   beforeAll(async () => {
-    mp = await Promise.race([
-      automator.connect({ wsEndpoint: WS_ENDPOINT }),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error(`connect timeout: ${WS_ENDPOINT} not listening · 先跑 cli auto`)), 8000),
-      ),
-    ]);
+    ({ mp, errors } = await connectMp());
   }, 45_000);
 
   afterAll(async () => {
     if (mp) await mp.disconnect();
+    assertConsoleClean(errors, 'analyzing-to-result.spec');
   });
 
   it('reLaunch to analyzing page with demo taskId', async () => {

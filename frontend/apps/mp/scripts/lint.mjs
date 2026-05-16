@@ -8,6 +8,7 @@
  *  3. pages/<X>/index.json usingComponents 路径在 miniprogram_npm/ 真实存在
  *  4. pages/<X>/index.wxml 中所有 <van-X> 自定义组件必须在 index.json usingComponents 注册
  *  5. app.json pages[] 数组每个 page 4 文件 (json/wxml/wxss/ts) 齐全
+ *  6. (Fix-3 · 2026-05-16) ^__.*__$ reserved dir 禁出现 · IDE 报 "reserved directory" 拒编
  *
  * Usage: node scripts/lint.mjs
  * Exit 0 = clean · Exit 1 = errors found
@@ -170,6 +171,36 @@ for (const jsonFile of pageJsons) {
       err(relWxml, 0, `<${tag}> used in WXML but not registered in ${relJ} usingComponents`);
     }
   }
+}
+
+// ── 6. (Fix-3) ^__.*__$ reserved dir 禁出现 (IDE 拒编) ────────────
+// MP IDE 真错误样本: "Begin and end by '__' is a reserved directory; donutAuthorize__
+//                     is a reserved directory; All files in test/__screenshots__ will be ignored"
+// 来源: vitest / playwright 默认产物路径 (__screenshots__ / __snapshots__) 与 MP 规则冲突
+const RESERVED_DIR_RE = /^__.+__$/;
+const RESERVED_SKIP_DIRS = new Set(['node_modules', 'miniprogram_npm', '.miniprogram-build', 'dist', '.git']);
+
+function findReservedDirs(root, out = []) {
+  if (!existsSync(root)) return out;
+  for (const name of readdirSync(root)) {
+    if (RESERVED_SKIP_DIRS.has(name)) continue;
+    const full = join(root, name);
+    let s;
+    try { s = statSync(full); } catch { continue; }
+    if (!s.isDirectory()) continue;
+    if (RESERVED_DIR_RE.test(name)) {
+      out.push(full);
+      continue; // 不递归进 reserved dir (反正 IDE 都拒编)
+    }
+    findReservedDirs(full, out);
+  }
+  return out;
+}
+
+const reservedDirs = findReservedDirs(PROJECT_ROOT);
+for (const d of reservedDirs) {
+  const rel = d.replace(PROJECT_ROOT + '/', '');
+  err(rel, 0, `reserved dir "^__..__$" — 微信 IDE 拒编 · 删之 (rm -rf "${rel}") 或改名 · vitest/playwright 产物路径 需移 test-results/ 外`);
 }
 
 // ── Report ──────────────────────────────────────────────────────
