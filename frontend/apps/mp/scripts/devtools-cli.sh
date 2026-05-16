@@ -48,6 +48,24 @@ case "${1:-}" in
         echo "  ✓ $pkg_name (from $mp_field/)"
       fi
     done
+    # 额外: workspace 内部 TS 包 (@longfeng/testids) · 用 esbuild 编 → MP runtime 能 import
+    echo "[devtools-cli] esbuild workspace 内部包 → miniprogram_npm/"
+    REPO_ROOT="$(cd ../../.. && pwd)"
+    ESBUILD="$REPO_ROOT/frontend/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/bin/esbuild"
+    if [ -x "$ESBUILD" ]; then
+      for ws_pkg in testids api-contracts telemetry; do
+        src_dir="$REPO_ROOT/frontend/packages/$ws_pkg"
+        if [ -f "$src_dir/src/index.ts" ]; then
+          dst_dir="miniprogram_npm/@longfeng/$ws_pkg"
+          mkdir -p "$dst_dir"
+          "$ESBUILD" "$src_dir/src/index.ts" --bundle --format=cjs --platform=neutral --target=es2017 --outfile="$dst_dir/index.js" 2>/dev/null
+          echo "{\"name\":\"@longfeng/$ws_pkg\",\"version\":\"0.1.0\",\"main\":\"index.js\"}" > "$dst_dir/package.json"
+          echo "  ✓ @longfeng/$ws_pkg (esbuild bundled)"
+        fi
+      done
+    else
+      echo "  ⚠ esbuild not found at $ESBUILD · skip workspace pkg build"
+    fi
     echo "[devtools-cli] miniprogram_npm/ built · IDE 内 Cmd+B 重编译生效"
     ;;
   auto)
