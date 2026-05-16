@@ -121,30 +121,6 @@
       <text class="control-label">文件</text>
     </view>
   </view>
-
-  <!-- Tab bar -->
-  <view class="tabbar">
-    <view class="tab" bindtap="onTabHome">
-      <van-icon name="wap-home-o" size="24px" />
-      <text>首页</text>
-    </view>
-    <view class="tab" bindtap="onTabWrongbook">
-      <van-icon name="notes-o" size="24px" />
-      <text>错题本</text>
-    </view>
-    <view class="tab tab-active">
-      <van-icon name="photograph" size="24px" />
-      <text>拍题</text>
-    </view>
-    <view class="tab">
-      <van-icon name="bell" size="24px" />
-      <text>复习</text>
-    </view>
-    <view class="tab">
-      <van-icon name="contact" size="24px" />
-      <text>我的</text>
-    </view>
-  </view>
 </view>
 
 <van-toast id="van-toast" />

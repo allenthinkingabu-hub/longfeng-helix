@@ -78,10 +78,6 @@ Page({
     wx.navigateBack();
   },
 
-  onTabHome() {
-    wx.reLaunch({ url: '/pages/home/index' });
-  },
-
   onItemTap(e: WechatMiniprogram.TouchEvent) {
     const nid = e.currentTarget.dataset.nid;
     wx.navigateTo({

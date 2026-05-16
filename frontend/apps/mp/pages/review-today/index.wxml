@@ -112,13 +112,4 @@
     <text class="cta-sz">{{totalCount}} 题 · {{estMinutes}} min</text>
   </view>
 
-  <!-- ── Tab bar ─────────────────────────────────── -->
-  <view class="tabbar">
-    <view class="tab" bind:tap="onTabHome"><van-icon name="wap-home-o" size="24px" /><text>首页</text></view>
-    <view class="tab"><van-icon name="description" size="24px" /><text>错题本</text></view>
-    <view class="tab"><van-icon name="photograph" size="24px" /><text>拍题</text></view>
-    <view class="tab active"><van-icon name="bell-o" size="24px" /><text>复习</text><text class="badge">{{totalCount}}</text></view>
-    <view class="tab"><van-icon name="manager-o" size="24px" /><text>我的</text></view>
-  </view>
-
 </view>
