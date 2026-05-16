@@ -125,18 +125,35 @@ Page({
       });
       this.setData({ uploadPct: 20 });
 
-      // Step 2: upload file to presigned URL via wx.uploadFile
-      await new Promise<void>((resolve, reject) => {
-        wx.uploadFile({
-          url: presignResp.upload_url,
+      // Step 2: PUT raw bytes to presigned URL.
+      //
+      // wx.uploadFile() can't be used here: it always wraps the body in
+      // multipart/form-data, but MinIO/S3 presigned PUT URLs are signed for a
+      // RAW body with the exact Content-Type passed to presign(). Multipart
+      // wrapping changes both the bytes and the effective content-type, so the
+      // signature check fails and the user sees "上传失败,请重试".
+      //
+      // Workaround: read the temp file into an ArrayBuffer and PUT it via
+      // wx.request with the matching Content-Type.
+      const fileBuffer = await new Promise<ArrayBuffer>((resolve, reject) => {
+        wx.getFileSystemManager().readFile({
           filePath: tempFilePath,
-          name: 'file',
+          success: (res) => resolve(res.data as ArrayBuffer),
+          fail: (err) => reject(new Error(`readFile failed: ${err.errMsg}`)),
+        });
+      });
+
+      await new Promise<void>((resolve, reject) => {
+        wx.request({
+          url: presignResp.upload_url,
+          method: 'PUT',
+          data: fileBuffer,
           header: { 'Content-Type': 'image/jpeg' },
-          success: (uploadRes: WechatMiniprogram.UploadFileSuccessCallbackResult) => {
-            if (uploadRes.statusCode >= 200 && uploadRes.statusCode < 400) {
+          success: (res: WechatMiniprogram.RequestSuccessCallbackResult) => {
+            if (res.statusCode >= 200 && res.statusCode < 400) {
               resolve();
             } else {
-              reject(new Error(`Upload failed: ${uploadRes.statusCode}`));
+              reject(new Error(`PUT failed: ${res.statusCode} ${JSON.stringify(res.data)}`));
             }
           },
           fail: (err: WechatMiniprogram.GeneralCallbackResult) => {
@@ -163,7 +180,10 @@ Page({
           url: `/pages/analyzing/index?imageUrl=${imageUrl}&subject=${this.data.subject}&qid=${created.qid}`,
         });
       }, 300);
-    } catch {
+    } catch (err) {
+      // Surface the real failure in IDE console so the next failure mode
+      // (presign / PUT / createQuestion) is one tap away instead of buried.
+      console.error('[P02] handleCapture failed:', err);
       this.setData({ state: 'ERROR', errorMsg: '上传失败，请重试' });
     }
   },
