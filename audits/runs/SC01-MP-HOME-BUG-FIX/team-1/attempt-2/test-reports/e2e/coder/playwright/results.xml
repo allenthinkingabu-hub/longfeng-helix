@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="SC01-MP-HOME-BUG-FIX attempt-2 (real vitest unit+e2e)" tests="32" failures="0" errors="0" time="1.041">
+    <testsuite name="test/e2e/home.spec.ts" timestamp="2026-05-16T03:00:27.427Z" hostname="Wangs-MacBook-Pro.local" tests="4" failures="0" errors="0" skipped="0" time="0.385">
+            <testcase classname="test/e2e/home.spec.ts" name="Home page E2E + testid (SC01-MP-T08-E2E) &gt; currentPage path is pages/home/index 且 view 数 ≥ 15 (sections 全 mount)" time="0.041">
+            </testcase>
+            <testcase classname="test/e2e/home.spec.ts" name="Home page E2E + testid (SC01-MP-T08-E2E) &gt; home page renders key DOM nodes with testids" time="0.02">
+            </testcase>
+            <testcase classname="test/e2e/home.spec.ts" name="Home page E2E + testid (SC01-MP-T08-E2E) &gt; page data contains expected MVP values after load" time="0.007">
+            </testcase>
+            <testcase classname="test/e2e/home.spec.ts" name="Home page E2E + testid (SC01-MP-T08-E2E) &gt; mp.screenshot 截图落 artifact" time="0.292">
+            </testcase>
+        </testsuite>
+    <testsuite name="test/unit/home.spec.ts" timestamp="2026-05-16T03:04:12.344Z" hostname="Wangs-MacBook-Pro.local" tests="28" failures="0" errors="0" skipped="0" time="0.004">
+            <testcase classname="test/unit/home.spec.ts" name="buildGreeting (pure · time-dependent) &gt; returns a string containing day of week + month + date" time="0.001">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="buildGreeting (pure · time-dependent) &gt; contains a separator dot · between parts" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="buildGreeting (pure · time-dependent) &gt; ends with a period-of-day greeting" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="buildGreeting (pure · time-dependent) &gt; contains day name from 周一..周日" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="computeCirclePct (pure) &gt; returns 0 when total is 0" time="0.001">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="computeCirclePct (pure) &gt; returns 100 when done equals total" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="computeCirclePct (pure) &gt; returns 50 for half done" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="computeCirclePct (pure) &gt; rounds to nearest integer" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="computeCirclePct (pure) &gt; returns 0 when done is 0" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="computeCirclePct (pure) &gt; handles large numbers" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="derivePageState (pure) &gt; returns LOADING when data is null and no error" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="derivePageState (pure) &gt; returns ERROR when data is null and hasError" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="derivePageState (pure) &gt; returns EMPTY when total is 0" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="derivePageState (pure) &gt; returns READY when total &gt; 0" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="derivePageState (pure) &gt; returns READY even if hasError but data exists" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="derivePageState (pure) &gt; EMPTY takes precedence over error when data.total = 0" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="buildCurrentWeekStrip (B4 + B5 · pure) &gt; returns 7 days, 周一→周日 order" time="0.001">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="buildCurrentWeekStrip (B4 + B5 · pure) &gt; B4 regression · 周一-周日 d values are 7 distinct consecutive numbers (no 22-duplicate)" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="buildCurrentWeekStrip (B4 + B5 · pure) &gt; B5 regression · today is 周六 → days[5].today === true · others false" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="buildCurrentWeekStrip (B4 + B5 · pure) &gt; B5 regression · 周日 (Sunday) 算本周最后一天 · today index = 6" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="buildCurrentWeekStrip (B4 + B5 · pure) &gt; B5 regression · 周一 → today index = 0" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="buildCurrentWeekStrip (B4 + B5 · pure) &gt; B5 regression · label reflects current week range (not hardcoded &quot;4 月 20–26 日&quot;)" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="buildCurrentWeekStrip (B4 + B5 · pure) &gt; label uses 2-digit day padding only when &gt; 9 · single digit days unpadded inside label" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="buildCurrentWeekStrip (B4 + B5 · pure) &gt; 每个 day 必带 dots[] (mockup 占位) · today 必带 num=8" time="0.001">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="SUBJECT_COLORS (B6 · 亮色 regression) &gt; 数学 is mockup bright red #FF6B6B (not legacy dark #C41E3A)" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="SUBJECT_COLORS (B6 · 亮色 regression) &gt; 物理 is mockup bright yellow #FFD166 (not legacy dark #0057B7)" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="SUBJECT_COLORS (B6 · 亮色 regression) &gt; 英语 is mockup bright green #6DE895 (not legacy brown #9C4F00)" time="0">
+            </testcase>
+            <testcase classname="test/unit/home.spec.ts" name="SUBJECT_COLORS (B6 · 亮色 regression) &gt; all 4 subjects defined" time="0">
+            </testcase>
+        </testsuite>
+</testsuites>
