@@ -55,21 +55,41 @@ export function getQuestionById(qid: string): Promise<GetQuestionByIdResp> {
 export interface CreateQuestionReq {
   studentId: number;
   subject: string;
+  /** OSS object key returned by file-service presign(). */
   image_key: string;
   mime: string;
   source_type: number;
+  /**
+   * Required by backend (QuestionDetailController.create). Pass the same key
+   * used for file-service presign so a weak-network retry of the whole
+   * capture chain dedupes on a single wb_question row (TC-01.02 invariant).
+   */
+  idempotencyKey: string;
 }
 
 export interface CreateQuestionResp {
   qid: string;
-  status: string;
+  status?: string;
 }
 
 /** POST /api/wb/questions */
 export function createQuestion(req: CreateQuestionReq): Promise<CreateQuestionResp> {
+  // Backend CreateQuestionReq uses snake_case via @JsonProperty: camelCase
+  // fields like `studentId` get dropped → @NotNull violation → HTTP 400.
+  const body: Record<string, unknown> = {
+    student_id: req.studentId,
+    subject: req.subject,
+    origin_image_key: req.image_key,
+    mime: req.mime,
+    source_type: req.source_type,
+  };
   return httpJSON<CreateQuestionResp>(
     `${apiBase('wb')}/api/wb/questions`,
-    { method: 'POST', body: req },
+    {
+      method: 'POST',
+      body,
+      headers: { 'X-Idempotency-Key': req.idempotencyKey },
+    },
   );
 }
 

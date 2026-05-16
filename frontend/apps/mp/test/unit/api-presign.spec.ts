@@ -14,6 +14,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { presign } from '../../src/api/file';
 import { startAnalyze, pollAnalyzeStatus } from '../../src/api/ai';
+import { createQuestion } from '../../src/api/wrongbook';
 import { unwrapApiResult } from '../../src/api/_http';
 
 type FetchCall = {
@@ -209,5 +210,55 @@ describe('pollAnalyzeStatus (ai-analysis-service)', () => {
   it('throws synchronously when taskId is empty (prevents /tasks/undefined/status regression)', async () => {
     await expect(pollAnalyzeStatus('')).rejects.toThrow(/taskId is required/);
     expect(calls).toHaveLength(0);
+  });
+});
+
+describe('createQuestion client (wrongbook-service)', () => {
+  it('sends snake_case body + X-Idempotency-Key header (matches CreateQuestionReq @JsonProperty)', async () => {
+    // Bug repro: backend CreateQuestionReq declares @JsonProperty("student_id"),
+    // @JsonProperty("origin_image_key"). Sending camelCase `studentId` /
+    // `image_key` makes Jackson drop them → @NotNull violation → HTTP 400.
+    nextResponse = {
+      status: 201,
+      body: { code: 0, message: 'ok', data: { qid: 'Q-1' } },
+    };
+
+    const resp = await createQuestion({
+      studentId: 1,
+      subject: 'math',
+      image_key: 'wrongbook/0/202605/1/123_capture.jpg',
+      mime: 'image/jpeg',
+      source_type: 1,
+      idempotencyKey: 'idem-abc-123',
+    });
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0]!.url).toMatch(/\/api\/wb\/questions$/);
+    expect(calls[0]!.method).toBe('POST');
+    expect(calls[0]!.headers['X-Idempotency-Key']).toBe('idem-abc-123');
+    expect(calls[0]!.body).toEqual({
+      student_id: 1,
+      subject: 'math',
+      origin_image_key: 'wrongbook/0/202605/1/123_capture.jpg',
+      mime: 'image/jpeg',
+      source_type: 1,
+    });
+    // Response: ApiResult-wrapped { qid } unwraps cleanly via shared helper.
+    expect(resp.qid).toBe('Q-1');
+  });
+
+  it('does not leak camelCase field names that backend ignores', async () => {
+    nextResponse = { status: 201, body: { code: 0, data: { qid: 'Q-2' } } };
+    await createQuestion({
+      studentId: 1,
+      subject: 'math',
+      image_key: 'k',
+      mime: 'image/jpeg',
+      source_type: 1,
+      idempotencyKey: 'idem-xyz',
+    });
+    const body = calls[0]!.body as Record<string, unknown>;
+    expect(body).not.toHaveProperty('studentId');
+    expect(body).not.toHaveProperty('image_key');
   });
 });

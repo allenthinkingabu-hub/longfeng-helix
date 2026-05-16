@@ -113,15 +113,18 @@ Page({
 
     this.setData({ state: 'UPLOADING', uploadPct: 0, errorMsg: '' });
 
+    // One idempotency key per capture attempt — shared by presign + createQuestion
+    // so a weak-network retry of the same shutter press dedupes on both
+    // wb_file (file-service) and wb_question (wrongbook-service).
+    const idempotencyKey = buildIdempotencyKey();
+
     try {
       // Step 1: presign (backend requires X-Idempotency-Key per SC-01-T01 AC6).
-      // One key per capture attempt — a weak-network retry of the same shutter
-      // press should reuse it so wb_file stays 1 row.
       const presignResp = await presign({
         mime: 'image/jpeg',
         size,
         filename: 'capture.jpg',
-        idempotencyKey: buildIdempotencyKey(),
+        idempotencyKey,
       });
       this.setData({ uploadPct: 20 });
 
@@ -163,13 +166,15 @@ Page({
       });
       this.setData({ uploadPct: 60 });
 
-      // Step 3: create question record
+      // Step 3: create question record. Backend QuestionDetailController.create
+      // requires X-Idempotency-Key + snake_case body (see api/wrongbook.ts).
       const created = await createQuestion({
         studentId: 1,
         subject: this.data.subject,
         image_key: presignResp.file_key,
         mime: 'image/jpeg',
         source_type: 1,
+        idempotencyKey,
       });
       this.setData({ uploadPct: 100, state: 'UPLOADED' });
 
