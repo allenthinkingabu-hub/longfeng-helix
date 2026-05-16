@@ -90,6 +90,10 @@
           </view>
         </view>
       </view>
+    </block>
+
+    <!-- ── 始终渲染 sections (LOADING/READY/EMPTY/ERROR 共用 home framework) ─── -->
+    <block>
 
       <!-- ── Weekly summary ──────────────────────────── -->
       <view class="sec">
