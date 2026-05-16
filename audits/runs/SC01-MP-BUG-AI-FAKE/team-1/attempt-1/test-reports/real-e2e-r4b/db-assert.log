@@ -1,0 +1,5 @@
+             task_id              | provider |   model   | reason_len | step_count 
+----------------------------------+----------+-----------+------------+------------
+ test-qid-r4b-discriminant-142249 | qianwen  | qwen-plus |         22 |          3
+(1 row)
+

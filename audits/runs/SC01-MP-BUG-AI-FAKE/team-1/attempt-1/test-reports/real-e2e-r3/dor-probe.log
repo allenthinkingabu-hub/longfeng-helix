@@ -1,0 +1,11 @@
+$ curl /api/ai/result/__probe__
+{"status":"NOT_FOUND"}
+--- HTTP 200 ---
+
+$ curl /api/ai/__probe__/answer
+{"message":"No AI analysis result for qid __probe__","code":"AI_ANSWER_NOT_FOUND"}
+--- HTTP 404 ---
+
+$ curl /analysis/provider
+{"status":"healthy","active":"qianwen"}
+--- HTTP 200 ---

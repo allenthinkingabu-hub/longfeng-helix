@@ -1,0 +1,20 @@
+2026-05-16T12:45:07.386+04:00  WARN 69123 --- [ai-analysis-service] [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'qianwenAiProvider' defined in URL [jar:nested:/Users/allen/workspace/longfeng/.claude/worktrees/ai-bailian-integration/backend/ai-analysis-service/target/ai-analysis-service-1.0.0-SNAPSHOT.jar/!BOOT-INF/classes/!/com/longfeng/aianalysis/provider/QianwenAiProvider.class]: Failed to instantiate [com.longfeng.aianalysis.provider.QianwenAiProvider]: No default constructor found
+2026-05-16T12:45:07.387+04:00  INFO 69123 --- [ai-analysis-service] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-05-16T12:45:07.397+04:00  INFO 69123 --- [ai-analysis-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-05-16T12:45:07.403+04:00  INFO 69123 --- [ai-analysis-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-05-16T12:45:07.406+04:00  INFO 69123 --- [ai-analysis-service] [           main] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2026-05-16T12:45:07.435+04:00  INFO 69123 --- [ai-analysis-service] [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
+--
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'qianwenAiProvider' defined in URL [jar:nested:/Users/allen/workspace/longfeng/.claude/worktrees/ai-bailian-integration/backend/ai-analysis-service/target/ai-analysis-service-1.0.0-SNAPSHOT.jar/!BOOT-INF/classes/!/com/longfeng/aianalysis/provider/QianwenAiProvider.class]: Failed to instantiate [com.longfeng.aianalysis.provider.QianwenAiProvider]: No default constructor found
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateBean(AbstractAutowireCapableBeanFactory.java:1317) ~[spring-beans-6.1.6.jar!/:6.1.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1202) ~[spring-beans-6.1.6.jar!/:6.1.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:562) ~[spring-beans-6.1.6.jar!/:6.1.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522) ~[spring-beans-6.1.6.jar!/:6.1.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:326) ~[spring-beans-6.1.6.jar!/:6.1.6]
+--
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [com.longfeng.aianalysis.provider.QianwenAiProvider]: No default constructor found
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:84) ~[spring-beans-6.1.6.jar!/:6.1.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateBean(AbstractAutowireCapableBeanFactory.java:1311) ~[spring-beans-6.1.6.jar!/:6.1.6]
+	... 24 common frames omitted
+Caused by: java.lang.NoSuchMethodException: com.longfeng.aianalysis.provider.QianwenAiProvider.<init>()
+	at java.base/java.lang.Class.getConstructor0(Class.java:3585) ~[na:na]

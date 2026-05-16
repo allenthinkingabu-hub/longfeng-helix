@@ -1,0 +1,2 @@
+{"model":"qwen-plus","id":"chatcmpl-10122f69-ffd0-93f4-ba29-f3b0099fca8e","choices":[{"message":{"content":"Pong! 🏓  \nLet me know if you'd like help with anything—whether it","role":"assistant"},"index":0,"finish_reason":"length"}],"created":1778919895,"object":"chat.completion","usage":{"total_tokens":29,"completion_tokens":20,"prompt_tokens":9,"prompt_tokens_details":{"cached_tokens":0}}}
+[HTTP_CODE:200]

@@ -68,13 +68,20 @@ public class AnalyzeController {
     }
 
     /**
-     * POST /api/ai/analyze · multipart sync (IT/debug path).
-     * Production FE uses analyze-by-url instead.
+     * POST /api/ai/analyze · sync entrypoint used by MP P03 analyzing page.
+     *
+     * <p>Honor caller-provided {@code taskId} when present so that
+     * {@code analysis_result.task_id == qid} for the closing GET /api/ai/{qid}/answer.
+     * Falls back to a random UUID only when the caller does not pass one (legacy CLI / debug).
+     *
+     * <p>SC01-MP-BUG-AI-FAKE root cause #3: previously hardcoded {@code UUID.randomUUID()},
+     * breaking the task_id↔qid closure → P04 GET answered 404 silently.
      */
     @PostMapping("/analyze")
     public ResponseEntity<ApiResult<Map<String, Object>>> analyze(
             @RequestBody AnalyzeByUrlReq req) {
-        String taskId = UUID.randomUUID().toString();
+        String taskId = (req.taskId() != null && !req.taskId().isBlank())
+                ? req.taskId() : UUID.randomUUID().toString();
         AnalysisTask task = analyzer.startAnalysis(taskId, req.subject(), req.imageUrl(), null);
         return ResponseEntity.ok(ApiResult.ok(Map.of(
                 "task_id", task.getTaskId(),

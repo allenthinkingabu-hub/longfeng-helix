@@ -21,11 +21,22 @@ spring:
       port: 6379
 
 # AI provider configuration
+#
+# fallback-chain: 仅 qianwen (real). 移除 openai / zhipu 占位 - 它们没有实现，
+# 配进 chain 会让 FallbackOrchestrator silent fall-through 到 stub bean，违反
+# CLAUDE.md Rule 12 fail-loud. 真实多 provider fallback 需独立 SC-08 task.
 longfeng:
   ai:
-    fallback-chain: qianwen,openai,zhipu
+    fallback-chain: qianwen
     stream-timeout-seconds: 60
     chunk-interval-seconds: 15
     heartbeat-interval-seconds: 30
+    qianwen:
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      # API key 优先取环境变量 DASHSCOPE_API_KEY · 缺省 fallback 到 inflight 配的字面量
+      api-key: ${DASHSCOPE_API_KEY:sk-21ba4e60ac11464a89c2ab2e9abf9901}
+      ocr-model: qwen-vl-plus
+      chat-model: qwen-plus
+      timeout-ms: 30000
   snowflake:
     worker-id: 4

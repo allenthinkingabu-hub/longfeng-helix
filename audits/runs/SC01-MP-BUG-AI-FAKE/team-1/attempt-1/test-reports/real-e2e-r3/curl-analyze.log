@@ -1,0 +1,4 @@
+=== Step 5.1 POST /api/ai/analyze ===
+$ curl -X POST .../api/ai/analyze with taskId=test-qid-real-e2e-r3
+{"code":0,"message":"ok","data":{"status":"ANALYZING","task_id":"test-qid-real-e2e-r3"}}
+--- HTTP 200 ---

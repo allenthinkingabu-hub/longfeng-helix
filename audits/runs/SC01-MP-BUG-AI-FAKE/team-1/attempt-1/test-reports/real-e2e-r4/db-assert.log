@@ -1,0 +1,10 @@
+         task_id          | provider |   model   | reason_len | step_count | usage_tokens |          created_at           
+--------------------------+----------+-----------+------------+------------+--------------+-------------------------------
+ test-qid-r4-math-v5-data | qianwen  | qwen-plus |         39 |          3 |          274 | 2026-05-16 10:06:18.910772+00
+(1 row)
+
+         task_id          | status |                   image_url_prefix                    
+--------------------------+--------+-------------------------------------------------------
+ test-qid-r4-math-v5-data | DONE   | data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQA...
+(1 row)
+

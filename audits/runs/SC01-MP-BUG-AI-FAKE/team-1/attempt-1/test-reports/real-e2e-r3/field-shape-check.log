@@ -1,0 +1,11 @@
+Field check:
+  qid: test-qid-real-e2e-r3
+  taskId (camelCase): test-qid-real-e2e-r3
+  provider: qianwen
+  modelInfo.name: qianwen
+  modelInfo.version: qwen-plus
+  reasonMarkdown: "题干缺失导致无法理解题目要求和解题方向"
+  steps.length: 3
+  step[0].stepNo: 1
+  step[0].text: "确认题目原文是否完整提供，检查是否有遗漏文字或图表"
+  confidence: 0

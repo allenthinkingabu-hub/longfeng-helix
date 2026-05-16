@@ -1,0 +1,26 @@
+=== R2 PROOF · Spring context loaded the @Autowired QianwenAiProvider · BeanInstantiationException eliminated ===
+
+## Spring boot up confirmation (vs R1 bootstrap.log BeanInstantiationException)
+2026-05-16T12:57:42.655+04:00  INFO 70461 --- [ai-analysis-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8083 (http) with context path ''
+2026-05-16T12:57:42.679+04:00  INFO 70461 --- [ai-analysis-service] [           main] com.longfeng.aianalysis.Application      : Started Application in 16.696 seconds (process running for 18.126)
+
+(grep above MUST show 'Started Application' and 'Tomcat started' lines · MUST NOT show 'BeanInstantiationException' line)
+
+## New SpringBootTest regression test result (mvn test)
+QianwenAiProviderWireTest · 1/1 PASS · Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.68 s
+Combined (Qianwen*+AiAnswerControllerTest+ApplicationTests): 15/15 PASS · 0 regression
+
+## Curl smoke (real wire · port 8083 · NOT the old worktree's jar)
+=== probe 1: /api/ai/result/__probe__ ===
+{"status":"NOT_FOUND"}
+--- HTTP 200 ---
+=== probe 2: /api/ai/__probe__/answer (this is the R1-introduced endpoint that triggered the bug) ===
+{"message":"No AI analysis result for qid __probe__","code":"AI_ANSWER_NOT_FOUND"}
+--- HTTP 404 ---
+=== probe 3: /analysis/provider (must say qianwen not stub) ===
+{"active":"qianwen","status":"healthy"}
+--- HTTP 200 ---
+
+## Why curl /__probe__/answer returning {code:AI_ANSWER_NOT_FOUND} proves the new jar is running
+- Tester R2 (Round 1) saw Spring's default {timestamp,status,error,path} 404 = old jar without AiAnswerController
+- Now: {code:AI_ANSWER_NOT_FOUND, message:...} = R1-c164f9e AiAnswerController is serving = new jar is up = bean ambiguity fix resolved the regression

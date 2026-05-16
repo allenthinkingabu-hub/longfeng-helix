@@ -108,7 +108,14 @@ Page({
   async _startAnalysis(imageUrl: string, subject: string) {
     try {
       this.setData({ pageState: 'analyzing', statusText: 'AI 正在分析…', steps: buildSteps(1, 'analyzing'), doneCount: 0 });
-      const resp = await startAnalyze({ imageUrl, subject });
+      // SC01-MP-BUG-AI-FAKE in_scope #6: pass qid as taskId so BE persists
+      // analysis_result.task_id == qid (closure anchor · GET /api/ai/{qid}/answer
+      // on P04 can find a row).
+      const resp = await startAnalyze({
+        imageUrl,
+        subject,
+        taskId: this._qid || undefined,
+      });
       // Guard: backend must hand back a non-empty task id. Setting an undefined
       // data field triggers a WX warning AND would seed the poller with
       // `tasks/undefined/status` — surface this as an error instead.
