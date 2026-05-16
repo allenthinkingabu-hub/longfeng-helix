@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -25,10 +26,17 @@ import org.springframework.web.client.RestTemplate;
  * <p>OCR: multimodal {@code qwen-vl-plus} with image_url message part.
  * Analysis: {@code qwen-plus} with {@code response_format=json_object} for strict JSON output.
  *
- * <p>Bean is conditional on a non-blank {@code longfeng.ai.qianwen.api-key} so that local dev
- * without credentials doesn't blow up Spring context — see {@link com.longfeng.aianalysis.config.QianwenProviderConfig}.
+ * <p>Configuration is bound from {@link AiProperties.Qianwen} (prefix {@code longfeng.ai.qianwen}).
+ * The HTTP client is built from {@link RestTemplateBuilder} so it picks up app-wide interceptors
+ * + the per-provider timeout. If {@code api-key} is blank the call paths throw
+ * {@link AiProviderException} (Rule 12 fail-loud) rather than silently returning a stub answer.
  *
  * <p>SC01-MP-BUG-AI-FAKE · replaces StubAiProvider for the real DashScope wire path.
+ *
+ * <p><b>Bean wiring</b>: the primary constructor is explicitly {@link Autowired}-annotated so that
+ * Spring resolves it unambiguously even when the package-private test-seam constructor exists in
+ * the same class. Round-2 fix (2026-05-16) — see {@code coder.md §6} for the
+ * {@code BeanInstantiationException: No default constructor found} regression this prevents.
  */
 @Component
 public class QianwenAiProvider implements AiProvider {
@@ -41,6 +49,7 @@ public class QianwenAiProvider implements AiProvider {
     private final RestTemplate http;
     private final ObjectMapper json;
 
+    @Autowired
     public QianwenAiProvider(AiProperties props, RestTemplateBuilder builder, ObjectMapper mapper) {
         this.cfg = props.getQianwen();
         Duration timeout = Duration.ofMillis(cfg.getTimeoutMs());
@@ -173,8 +182,15 @@ public class QianwenAiProvider implements AiProvider {
         return s.endsWith("/") ? s.substring(0, s.length() - 1) : s;
     }
 
-    /** Test seam: package-private constructor for unit tests that inject a fake RestTemplate. */
-    QianwenAiProvider(AiProperties.Qianwen cfg, RestTemplate http, ObjectMapper mapper) {
+    /**
+     * Test seam: <b>private</b> constructor for unit tests that inject a fake RestTemplate.
+     *
+     * <p>Round-2 (2026-05-16): kept private (not package-private) so Spring's
+     * {@code AutowiredAnnotationBeanPostProcessor} cannot see it as a candidate constructor.
+     * Combined with the {@link Autowired @Autowired} on the primary constructor this guarantees
+     * unambiguous bean instantiation. Reach it via {@link #forTest(AiProperties.Qianwen, RestTemplate, ObjectMapper)}.
+     */
+    private QianwenAiProvider(AiProperties.Qianwen cfg, RestTemplate http, ObjectMapper mapper) {
         this.cfg = cfg;
         this.http = http;
         this.json = mapper;
