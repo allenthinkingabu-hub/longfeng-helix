@@ -2,6 +2,12 @@
 # Pre-commit hook · cross-stack lint by changed paths
 # Skip if no staged files (e.g. `git commit --allow-empty`)
 
+# ─────────────────────────────────────────────────────────────────
+# 2026-05-16 · 用户暂时停用 pre-commit 所有检查 · 重新启用: 删除下面 2 行即可
+echo "[pre-commit] (disabled · 用户暂时停用 · 见 .husky/pre-commit 文件头)"
+exit 0
+# ─────────────────────────────────────────────────────────────────
+
 CHANGED=$(git diff --cached --name-only)
 [ -z "$CHANGED" ] && exit 0
 
