@@ -1,4 +1,4 @@
-# PHASE-A-LOGIN-H5 · team-1 · attempt-1 · coder.md
+# PHASE-A-LOGIN-H5 · team-1 · attempt-3 · coder.md
 
 **Task**: P00 邮箱+密码 登录全栈链路（h5 端）· auth-service backend 新建 + 1:1 mirror mockup + Playwright e2e + 后端 IT 全绿
 **Coder**: Coder agent (Opus 4.7 1M-ctx)

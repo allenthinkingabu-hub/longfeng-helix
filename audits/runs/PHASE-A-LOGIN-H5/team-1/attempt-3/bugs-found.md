@@ -1,4 +1,4 @@
-# PHASE-A-LOGIN-H5 · team-1 · attempt-1 · bugs-found.md
+# PHASE-A-LOGIN-H5 · team-1 · attempt-3 · bugs-found.md
 
 本轮编码 / 自检过程中**自己发现并立即修复**的 bug（不是 Tester 也不是用户报告），各条都附文件路径 + 简短描述 + 修复 commit hash。
 
