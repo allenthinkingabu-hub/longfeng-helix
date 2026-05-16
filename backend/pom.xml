@@ -20,5 +20,6 @@
     <module>ai-analysis-service</module>
     <module>calendar-core</module>
     <module>review-plan-service</module>
+    <module>auth-service</module>
   </modules>
 </project>

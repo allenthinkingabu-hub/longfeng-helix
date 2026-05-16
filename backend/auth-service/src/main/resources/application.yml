@@ -1,0 +1,45 @@
+server:
+  port: 8091
+
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:postgresql://localhost:15432/wrongbook
+    username: longfeng
+    password: longfeng_dev
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: public
+  flyway:
+    enabled: true
+    # Namespaced under db/auth/ (instead of db/migration/) to avoid colliding with
+    # the common module's own V*.sql files on the classpath. Common's migrations
+    # are owned by services that depend on those tables; auth-service only owns auth_user.
+    locations: classpath:db/auth
+    # Separate history table — common module already populates flyway_schema_history.
+    table: flyway_schema_history_auth
+    baseline-on-migrate: true
+    baseline-version: 0
+  data:
+    redis:
+      host: localhost
+      port: 16379
+
+# Auth-specific tuning
+auth:
+  jwt:
+    secret: longfeng-auth-dev-jwt-secret-min-256-bits-do-not-use-in-prod-please-rotate
+    issuer: longfeng
+    audience: h5
+    access-token-ttl-seconds: 604800   # 7 days
+  refresh:
+    ttl-seconds: 2592000               # 30 days
+    redis-key-prefix: 'auth:refresh:'
+  lockout:
+    max-failed-attempts: 5
+    lock-duration-seconds: 300         # 5 minutes
