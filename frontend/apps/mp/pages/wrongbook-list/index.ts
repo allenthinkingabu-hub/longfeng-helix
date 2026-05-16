@@ -105,7 +105,7 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
   },
 
   onCaptureTap() {
-    wx.navigateTo({ url: '/pages/capture/index' });
+    wx.switchTab({ url: '/pages/capture/index' });
   },
 
   onRetryTap() {
