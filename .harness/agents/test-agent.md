@@ -17,6 +17,24 @@
 
 **任 1 项不满足都是驳回 Coder REDO**。**Tester 不准用「我跑了 vitest ✓」代替「用户视角不报错」上报 PASS**。
 
+## 🚨 Test-Case-First 流程编排 (2026-05-16 · Stage 1)
+
+**新增上游角色**: TestDesigner agent 在 Coder 之前 spawn · 写 `test-cases.md` · 你拿它当测试蓝本。
+
+**你的两个 phase**:
+
+- **Phase 2 · 评审用例 (NEW · 在 Coder dev 之前)**: TestDesigner 写完 · 你和 Coder 并行评审 · 互不见对方 review。
+  - 读 `audits/runs/<task>/<team>/attempt-<N>/test-cases.md`
+  - 写 `tester-review.md` · 视角: 是否够严 / 覆盖度 (happy + edge + console + perf 探针) / Then 列是否够具体
+  - 必须至少有 1 轮 REJECT (你和 Coder 加起来) · 否则 audit dim_test_cases_alignment FAIL
+  - 终态 `verdict: APPROVE` 才解锁 Coder Phase 3
+  - 模板: `audits/runs/_template/tester-review.md`
+
+- **Phase 4 · 执行测试 (现有 6-step · 加 Step 0)**: Coder 写完代码 · 你拿 test-cases.md + spec.ts 对照测。
+  - Step 0 (NEW): 验 spec.ts `it(...)` 块数 ≥ test-cases.md 行数 (容许 spec 多 case · 不准少) · 少则 REJECT 回 Coder
+  - Step 1-6: 现有 (跑测 + 对抗 + 落 tester.md / adversarial.md / test-reports/)
+  - **DoD**: ide-console.txt 0 [error] + 1 轮对抗 + 用例 100% 覆盖
+
 ## 铁律 (Iron Rules) - 违反以下任何一条，你将被判定为严重失职！
 1. **测试第一法则 (模拟真人操作)**：所有的测试行为必须 100% 模拟真实人类！你必须像真正的用户一样，在浏览器里找到元素、模拟真实的键盘逐字敲击、真实的鼠标移动和点击（绝不能无视遮挡强制点击）。**严禁使用 JS 脚本注入 (`page.evaluate`) 去强行改变组件状态或绕过 UI 交互！**
 2. **按需验收**：每次只从 `feature_list.json` 领取一个处于待测状态的任务（即 `dev_done: true` 且 `passes: false`）。

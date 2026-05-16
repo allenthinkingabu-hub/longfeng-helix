@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
-// audit.js — 确定性 6 维度审计。 程序不说谎: grep / file-exists / git cat-file / 数 testcase / IDE Console.
-// 6 dims: coder_compliance · tester_compliance · bug_reality · test_validity · spec_alignment · ide_smoke
+// audit.js — 确定性 7 维度审计。 程序不说谎: grep / file-exists / git cat-file / 数 testcase / IDE Console / 用例对齐.
+// 7 dims: test_cases_alignment · coder_compliance · tester_compliance · bug_reality · test_validity · spec_alignment · ide_smoke
 // 退出码: 0=PASS  1=REDO  2=usage error
 // 落盘: <work_log_dir>/audit-verdict.json
 
@@ -317,6 +317,61 @@ function auditSpecAlignment() {
   }
 }
 
+// ─── 维度 7 · test_cases_alignment (Stage 1 · 2026-05-16) ───────
+// Test-Case-First 流程编排 · TestDesigner 写用例 → Coder + Tester 互评 → APPROVE 才解锁开发
+// 卡口: test-cases.md ≥ 3 行 + 6 列 · review 双方 APPROVE · 链条 ≥ 1 轮 REJECT (防互相批准)
+function auditTestCasesAlignment() {
+  const DIM = 'test_cases_alignment';
+  const casesPath  = path.join(workLogDir, 'test-cases.md');
+  const cReviewPath = path.join(workLogDir, 'coder-review.md');
+  const tReviewPath = path.join(workLogDir, 'tester-review.md');
+
+  // Stage 1 渐进: 老 task 无 test-cases.md 时不卡 · inflight 加 opt-in 字段 test_case_first_required
+  const required = !!(inflight.test_case_first_required);
+  if (!required) {
+    record(DIM, 'test_case_first_required', true,
+      'inflight.test_case_first_required=false · Test-Case-First skip (legacy task)');
+    return;
+  }
+
+  record(DIM, 'test_cases_md_exists', nonEmpty(casesPath), nonEmpty(casesPath) ? casesPath : `missing: ${casesPath}`);
+  record(DIM, 'coder_review_md_exists', nonEmpty(cReviewPath), nonEmpty(cReviewPath) ? cReviewPath : `missing: ${cReviewPath}`);
+  record(DIM, 'tester_review_md_exists', nonEmpty(tReviewPath), nonEmpty(tReviewPath) ? tReviewPath : `missing: ${tReviewPath}`);
+
+  if (nonEmpty(casesPath)) {
+    const body = readText(casesPath);
+    // 数 "| N |" 起始的行 (用例行)
+    const rows = body.split('\n').filter(l => /^\|\s*\d+\s*\|/.test(l));
+    record(DIM, 'test_cases_ge_3_rows', rows.length >= 3,
+      rows.length >= 3 ? `${rows.length} case(s)` : `${rows.length}/3 min`);
+    record(DIM, 'test_cases_le_6_rows', rows.length <= 6,
+      rows.length <= 6 ? `${rows.length}/6 max` : `${rows.length} > 6 · 拆 task (Rule 6 token budget)`);
+    // 表头 6 列严匹配
+    const has6Cols = /\|\s*#\s*\|\s*Given\s*\|\s*When\s*\|\s*Then\s*\|\s*Console\s*\|\s*View[^|]*\|\s*API\s*\|/.test(body);
+    record(DIM, 'test_cases_6_required_cols', has6Cols,
+      has6Cols ? 'header [#|Given|When|Then|Console|View|API] OK' : 'header 6 cols mismatch');
+    // trace 必填
+    const hasTrace = /^trace:\s+/m.test(body);
+    record(DIM, 'test_cases_has_trace', hasTrace,
+      hasTrace ? 'trace 行已写' : 'top 行缺 trace: biz/<file> · design/specs/<page>');
+  }
+
+  if (nonEmpty(cReviewPath) && nonEmpty(tReviewPath)) {
+    const cBody = readText(cReviewPath);
+    const tBody = readText(tReviewPath);
+    // 至少 1 轮 REJECT (review 链不能 0 对抗 = 互相批准嫌疑)
+    const totalRejects = (cBody.match(/REJECT/gi) || []).length + (tBody.match(/REJECT/gi) || []).length;
+    record(DIM, 'review_has_ge_1_reject_round', totalRejects >= 1,
+      totalRejects >= 1 ? `${totalRejects} REJECT keyword(s) in review chain`
+                        : '0 REJECT · 互相批准嫌疑 · TestDesigner 应该写出某些可挑刺的点');
+    // 终态必须 APPROVE
+    const cApprove = /verdict\s*:?\s*APPROVE|approve/i.test(cBody);
+    const tApprove = /verdict\s*:?\s*APPROVE|approve/i.test(tBody);
+    record(DIM, 'both_reviewers_approved', cApprove && tApprove,
+      `coder=${cApprove?'APPROVE':'?'} · tester=${tApprove?'APPROVE':'?'}`);
+  }
+}
+
 // ─── 维度 6 · ide_smoke (Fix-1 · 2026-05-16) ────────────────────
 // RC: "E2E 8/8 PASS 但 IDE 一片红" 事故 · audit 5 维度全 PASS 但用户视角失败
 // Fix: Tester PASS 必须落 work_log_dir/test-reports/ide-console.txt · 内容来自
@@ -351,14 +406,18 @@ function auditIdeSmoke() {
 }
 
 // ─── REDO target 决策 ────────────────────────────────────────────
+const TEST_DESIGNER_DIMS = new Set(['test_cases_alignment']);
 const CODER_DIMS  = new Set(['coder_compliance', 'bug_reality', 'spec_alignment', 'ide_smoke']);
 const TESTER_DIMS = new Set(['tester_compliance', 'test_validity']);
 
 function decideRedoTarget(failed) {
-  const coderFails  = failed.filter(c => CODER_DIMS.has(c.dimension));
-  const testerFails = failed.filter(c => TESTER_DIMS.has(c.dimension));
-  if (coderFails.length)  return 'coder';
-  if (testerFails.length) return 'tester';
+  const designerFails = failed.filter(c => TEST_DESIGNER_DIMS.has(c.dimension));
+  const coderFails    = failed.filter(c => CODER_DIMS.has(c.dimension));
+  const testerFails   = failed.filter(c => TESTER_DIMS.has(c.dimension));
+  // 优先级: TestDesigner 失败 → 上游问题先修 · 然后 Coder · 最后 Tester
+  if (designerFails.length) return 'test-designer';
+  if (coderFails.length)    return 'coder';
+  if (testerFails.length)   return 'tester';
   return null;
 }
 
@@ -369,6 +428,7 @@ auditBugReality();
 auditTestValidity();
 auditSpecAlignment();
 auditIdeSmoke();
+auditTestCasesAlignment();
 
 const failed   = checks.filter(c => !c.pass);
 const allPass  = failed.length === 0;
@@ -377,7 +437,7 @@ const verdict  = {
   attempt:     inflight.task.attempt,
   team_id:     inflight.task.team_id,
   audited_at:  new Date().toISOString(),
-  audited_by:  'audit.js v2 (deterministic · 6 dims · +ide_smoke)',
+  audited_by:  'audit.js v3 (deterministic · 7 dims · +test_cases_alignment)',
   pass:        allPass,
   checks,
   redo_target: allPass ? null : decideRedoTarget(failed),
@@ -388,7 +448,7 @@ fs.writeFileSync(path.join(workLogDir, 'audit-verdict.json'), JSON.stringify(ver
 
 // ─── pretty print (grouped by dimension) ─────────────────────────
 const RED='\x1b[31m', GREEN='\x1b[32m', YELLOW='\x1b[33m', CYAN='\x1b[36m', BOLD='\x1b[1m', DIM='\x1b[2m', RESET='\x1b[0m';
-const DIM_ORDER = ['coder_compliance','tester_compliance','bug_reality','test_validity','spec_alignment','ide_smoke'];
+const DIM_ORDER = ['test_cases_alignment','coder_compliance','tester_compliance','bug_reality','test_validity','spec_alignment','ide_smoke'];
 
 console.log(`${BOLD}[audit] ${taskId} attempt-${inflight.task.attempt} → ${allPass ? GREEN+'PASS' : RED+'REDO target='+verdict.redo_target}${RESET}`);
 for (const dim of DIM_ORDER) {

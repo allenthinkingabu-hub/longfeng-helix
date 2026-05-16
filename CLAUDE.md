@@ -20,9 +20,47 @@ When the project takes shape, replace the placeholders below with concrete, repo
 ### AI Agents & Workflow Assets (AI 代理与工作流资产)
 
 本项目建立了一套 AI 驱动的研发体系。相关的 AI 组件（Agents, Skills, Hooks）**全部**位于 `.harness/` 根下（与 harness 运行时产物 `feature_list.json` / `inflight/` / `audit-verdict.json` 同根 · 2026-05-14 用户决策 · 统一 harness 资产命名空间）。当 AI 协助开发或执行自动化流程时，请参考以下规范：
-- **Agents (智能体定义)**: 存放在 `.harness/agents/` 目录（例如：Coder / Tester / TL Agent · 架构审查 Agent · QA Agent 等）。负责做决策和拆解任务。
+- **Agents (智能体定义)**: 存放在 `.harness/agents/` 目录（例如：TestDesigner / Coder / Tester / TL Agent · 架构审查 Agent · QA Agent 等）。负责做决策和拆解任务。
 - **Skills (核心技能/工具)**: 存放在 `.harness/skills/` 目录（例如：`gen-feature-list.md` 把 biz SC 拆成 feature_list.json · 强制 E2E 测试脚本 · PDF 生成工具等）。负责具体执行的确定性脚本或函数。
 - **Hooks (生命周期钩子)**: 存放在 `.harness/hooks/` 目录。负责在 Git 提交流水线或构建生命周期中自动唤醒上述 Agent。
+
+### Test-Case-First 流程编排 (2026-05-16 · Stage 1 治理已落地 · Stage 2 harness 调度待跑通)
+
+**根 RC**：2026-05-16 SC-01-MP "8/8 E2E PASS 但 IDE 一片红" 事故 · 用户视角失败 · audit 5 维度全过 (alignment failure)。Fix-1..4 治症状层 (audit dim_ide_smoke + helper 三件套)。Stage 1 治结构层：**把测试用例从 implicit 升级成 explicit 落盘工件 · 在 Coder 写代码前就锁定**。
+
+**5 Phase 流程** (TL spawn team 后 · 按顺序解锁)：
+
+```
+Phase 0 · 三方独立预读 (TestDesigner / Coder / Tester 并行 · 不互见)
+   → 读 biz/<SC>.md + design/specs/<page>.spec.md + 源码 + CLAUDE.md + 自己 agent.md
+Phase 1 · TestDesigner (NEW agent) 写 test-cases.md (Gherkin 6 列表格 · ≥3 ≤6 用例)
+   → 改 inflight.test_cases_drafted=true
+Phase 2 · Coder + Tester 并行评审 (各自写 {coder,tester}-review.md · 不互见)
+   → 红线: 至少 1 轮 REJECT (0 REJECT = 互相批准 = audit FAIL)
+   → 双方 verdict: APPROVE → inflight.test_cases_reviewed_by_{coder,tester}=true
+Phase 3 · Coder 按 test-cases.md 一对一翻译 it block + 7 step 开发 (现有)
+   → DoD: 用例 100% spec 覆盖 + lint + typecheck + ide-console.txt 0 [error]
+Phase 4 · Tester 跑 spec + 1 轮对抗 (现有 6 step · 加 Step 0 验 it 块数对齐)
+   → DoD: 用例 100% PASS + IDE Console 0 [error]
+Phase 5 · audit.js 7 dims (test_cases_alignment + 6 现有)
+```
+
+**Stage 1 落地状态 (2026-05-16)**：
+- ✓ `.harness/agents/test-designer-agent.md` (NEW agent)
+- ✓ `.harness/agents/coder-agent.md` 加 Phase 2 review 职责 + Step 0.5
+- ✓ `.harness/agents/test-agent.md` 加 Phase 2 review 职责 + Step 0
+- ✓ `.harness/audit.js` 加 dim_test_cases_alignment (第 7 维)
+- ✓ `audits/runs/_template/{test-cases,coder-review,tester-review}.md` 模板
+- ⏳ Stage 2: harness 调度脚本改造 (顺序 spawn + inflight 新字段) · TL 决定何时启动
+
+**opt-in 字段** (Stage 1 不破坏老 task)：
+- inflight 加 `test_case_first_required: true` 才启用本流程
+- 老 14 SC-01-MP task 不设此字段 · audit dim 自动跳过 · 不 retroactive
+
+**关键约定**：
+- TestDesigner **不写代码 / 不写 spec.ts / 不跑测试** · 只写 test-cases.md
+- Coder + Tester 互评 · audit 强制 ≥ 1 REJECT round (防 AI 互相批准)
+- 1 task 用例 ≤ 6 (token budget · 多了拆 task)
 
 ## 通用工程德行（12 条 · 在项目铁律下生效）
 

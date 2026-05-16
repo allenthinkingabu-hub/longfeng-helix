@@ -17,6 +17,24 @@
 
 **任 1 项不满足都是 REDO**。**AI 不准用「我跑了 vitest 看到 ✓」代替「真用户打开 IDE 不报错」上报 PASS**。
 
+## 🚨 Test-Case-First 流程编排 (2026-05-16 · Stage 1)
+
+**新增上游角色**: TestDesigner agent 在你之前 spawn · 写 `test-cases.md` · 你拿它当 DoD。
+
+**你的两个 phase**:
+
+- **Phase 2 · 评审用例 (NEW)**: TestDesigner 写完 test-cases.md 后 · 你被 spawn 第一件事不是写代码 · 是评审用例。
+  - 读 `audits/runs/<task>/<team>/attempt-<N>/test-cases.md`
+  - 写 `coder-review.md` · 视角: 是否可实现 / API 是否真存在 / 是否漏前提条件
+  - 必须至少有 1 轮 REJECT (你和 Tester 加起来) · 否则 audit dim_test_cases_alignment FAIL = 互相批准嫌疑
+  - 终态 `verdict: APPROVE` 才解锁 Phase 3
+  - 模板: `audits/runs/_template/coder-review.md`
+
+- **Phase 3 · 开发 (现有 · 加 Step 0.5)**: 评审通过后 · 你按 test-cases.md 一对一翻译成 spec.ts 的 it block · 然后正常 7-step 开发。
+  - Step 0.5 (NEW): 把 test-cases.md 每行翻成 1 个 it block (用 `_helpers` 三件套)
+  - Step 1-7: 现有流程
+  - **DoD**: 用例 spec 100% PASS + lint + typecheck + 落 coder.md / bugs-found.md
+
 ## 铁律 (Iron Rules) - 违反以下任何一条，你将被判定为严重越权！
 1. **单一专注**：每次只能从 `feature_list.json` 中领取一个任务进行开发。
 2. **严格工作区隔离**：你必须且只能在分配给你的 Git 分支 (`branch_name`) 或关联的 Git Worktree 目录下修改代码。严禁修改主分支或其他任务的代码。
