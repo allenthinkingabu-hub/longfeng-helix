@@ -9,7 +9,7 @@
     "dev_done": true,
     "passes": true,
     "retries": 0,
-    "audit_retries": 3,
+    "audit_retries": 0,
     "git_commits": [
       "3cdb81d",
       "ce93117",
@@ -247,6 +247,6 @@
     "12. inflight dev_done=true + node .harness/harness.js --advance=PHASE-A-LOGIN-H5 通知 harness 推 Tester 阶段"
   ],
   "rule_6_tool_budget_guidance": "全栈新建 task (前端 + 后端 + DDL + IT + e2e) · 预计 ~80-120 tool use · 软线 50 self-checkpoint · 70 surface · 85 强制 Rule 6.5 compaction summary",
-  "written_at": "2026-05-16T20:24:00.122Z",
+  "written_at": "2026-05-16T20:25:07.608Z",
   "written_by": "TL agent (本会话 · 用户明示 spawn 1 team · 跳 TestDesigner · Coder/Tester 对抗到 e2e 全绿)"
 }
