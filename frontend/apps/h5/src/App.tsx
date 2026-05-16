@@ -8,6 +8,7 @@ import { ReviewDonePage } from './pages/ReviewDone/index';
 import { HomePage } from './pages/Home/index';
 import { ReviewTodayPage } from './pages/ReviewToday/index';
 import { WrongbookListPage } from './pages/WrongbookList/index';
+import { LoginPage } from './pages/Auth/Login';
 
 const ManualEntryStub: React.FC = () => (
   <div data-testid="manual-entry-root" style={{ padding: 20, color: '#333' }}>
@@ -18,6 +19,8 @@ const ManualEntryStub: React.FC = () => (
 export const App: React.FC = () => (
   <Routes>
     <Route path="/" element={<HomePage />} />
+    <Route path="/home" element={<HomePage />} />
+    <Route path="/auth/login" element={<LoginPage />} />
     <Route path="/capture" element={<CapturePage />} />
     <Route path="/analyzing/:taskId" element={<AnalyzingPage />} />
     <Route path="/question/:qid/result" element={<ResultPage />} />

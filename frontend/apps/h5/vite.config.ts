@@ -42,6 +42,12 @@ export default defineConfig({
       // SC-01-T01 attempt-5 (retries=4 · DoR C-2 fix): 前缀分流到 3 个 spring-boot 服务
       // 真后端端口对齐 user 指令: file=8084 · wrongbook=8082 · ai-analysis=8083
       // matching is longest-prefix-first; '/api/file' 必须放在 '/api' 之前
+      // PHASE-A-LOGIN-H5: route /api/auth/* to auth-service on 8091.
+      // Placed before '/api/wb' / '/api/file' so longest-prefix-first ordering applies cleanly.
+      '/api/auth': {
+        target: process.env.VITE_AUTH_PROXY_TARGET || 'http://localhost:8091',
+        changeOrigin: true,
+      },
       '/api/file': {
         target: process.env.VITE_FILE_PROXY_TARGET || 'http://localhost:8084',
         changeOrigin: true,

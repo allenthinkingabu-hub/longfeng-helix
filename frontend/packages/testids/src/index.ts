@@ -234,6 +234,10 @@ export const TEST_IDS = {
   // ── S8 FE-07 · Misc Pages ────────────────────────────────────────────────────
 
   // P00 · 登录 · AuthPage
+  // 2026-05-16 PHASE-A-LOGIN-H5: appended 7 testids previously listed as TBD in
+  // design/system/pages/P00-login.spec.md §13 (rows: email/password/remember-me/
+  // forget-password/login-submit/apple-cta/redirect-banner) — required by Playwright
+  // login.spec.ts to exercise the real DOM.
   p00: {
     root:              'p00-root',
     statusbar:         'p00-statusbar',
@@ -245,6 +249,16 @@ export const TEST_IDS = {
     consentCheckbox:   'p00-consent-bar-checkbox',
     consentLinkTos:    'p00-consent-bar-link-tos',
     consentLinkPrivacy:'p00-consent-bar-link-privacy',
+    // 7 new for PHASE-A-LOGIN-H5
+    emailInput:        'p00-email-input',
+    passwordInput:     'p00-password-input',
+    rememberMe:        'p00-remember-me',
+    forgetPasswordLink:'p00-forget-password-link',
+    loginSubmitBtn:    'p00-login-submit-btn',
+    appleCtaBtn:       'p00-apple-cta-btn',
+    redirectBanner:    'p00-redirect-banner',
+    errorInline:       'p00-error-inline',         // 行内 error (邮箱或密码错误 / 账号已锁定)
+    toast:             'p00-toast',                // 通用 toast (OAuth 未实装 / consent 未勾)
   },
 
   // P-HOME · 今日聚合首页
