@@ -13,7 +13,7 @@
 |---|---|---|---|
 | `PAGE_ID` | ✓ | `P02` / `P-HOME` / `P-LANDING` | — |
 | `PAGE_SLUG` | — | `capture` / `home` / `landing` | 从 biz §2A.4 卡名抽取 |
-| `BIZ_DOC` | — | `biz/业务与技术解决方案_AI错题本_基于日历系统.md` | 仓库唯一一份 |
+| `BIZ_DOC` | — | `biz/业务与技术解决方案_AI错题本_基于日历系统.md` (master) 或 `biz/features/<FEATURE_ID>__<slug>.md` (satellite · 由 gen-biz-doc 产) | 默认 master · 若 PAGE_ID 在 master §2A.3 路由表中不存在 → 自动 fallback 到对应 satellite (`grep -rn "${PAGE_ID}" biz/features/`) |
 | `MOCKUP_PATH` | — | `design/mockups/wrongbook/02_capture.html` | 按 PAGE_ID 自动匹配（02_*=P02 等） |
 | `OUTPUT_PATH` | — | `design/system/pages/P02-capture.spec.md` | `design/system/pages/${PAGE_ID}-${PAGE_SLUG}.spec.md` |
 | `FORCE` | — | `--force` | 不传则已存在时先 Read + 询问 |
@@ -22,9 +22,15 @@
 
 ## 1 · 方法论（6 步 · 严格按序）
 
-### Step 1 · 定位 biz §2A.4 卡
+### Step 1 · 定位 biz §2A.4 卡 (master 优先 · satellite fallback)
 
-`grep -n "#### ${PAGE_ID} ·" biz/业务与技术解决方案_*.md` 找到该页规格卡的章节锚。Read 完整卡（10-12 维度表：页面目的 / 布局分区 / 核心组件 / 数据绑定 / API 触点 / 状态集 / 跳转 / 异常 & 降级 / i18n Key / 埋点事件 / 可访问性）。
+先在 master biz 找：`grep -n "#### ${PAGE_ID} ·" biz/业务与技术解决方案_*.md`
+
+**找不到 → fallback 到 satellite**: `grep -rn "## §2A\\.4\\|#### ${PAGE_ID}" biz/features/` (gen-biz-doc 产的 satellite biz 也用 `#### ${PAGE_ID} ·` schema)
+
+确认 hit 后 Read 完整卡（15 维度表：页面目的 / 布局分区 / 核心组件 / 数据绑定 / API 触点 / 状态集 / 跳转 / 异常态 / i18n Key / 埋点事件 / 可访问性 / 性能预算 / 优先级 / 首屏目标 / 核心组件 - 实际字段以源卡为准）。
+
+**判定 source 是 master 还是 satellite**：本 skill 后续 §15 关联与影响 / §10 验收点 / §5 API 锚必须显式标注来源（不允许混用）。satellite 派生的 spec.md 末尾 metadata 必须含 `Biz refs: [satellite path] (主源) + [master path] (cross-ref 锚)`，不允许只写 master。
 
 ### Step 2 · 找 mockup HTML 视觉源
 
@@ -325,11 +331,11 @@ ASCII / 表格描述。例：
 
 | 节 | 主源 (必读) | 辅源 (验证用) |
 |---|---|---|
-| §1 页面目的 | biz §2A.4 「页面目的」 | mockup HTML 视觉 |
+| §1 页面目的 | biz §2A.4 「页面目的」(master 或 satellite) | mockup HTML 视觉 |
 | §2 布局分区 + wireframe | biz §2A.4 「布局分区」 + mockup HTML | — |
 | §3 核心组件 | biz §2A.4 「核心组件」 + frontend/packages/ui-kit | mockup HTML DOM |
 | §4 数据绑定 | biz §2A.4 「数据绑定」 + frontend/packages/api-contracts | 后端 entity Java class |
-| §5 API 触点 | biz §2A.4 「API 触点」 + audits/SC-${N}-PHASE-0/A0X (字符级) | 控制器代码 |
+| §5 API 触点 | biz §2A.4 「API 触点」+ audits/SC-${N}-PHASE-0/A0X (字符级 · master 派生 spec 用) **或** satellite §10.X (字符级 · satellite 派生 spec 用 · greenfield 没 audit md) | 控制器代码 (若已存在) |
 | §6 状态机 | biz §2A.4 「状态集」 + biz §2A.5 关键状态机 + biz §2B.X 「前端状态」列 | — |
 | §7 跳转 | biz §2A.4 「跳转」 | biz §2A.3 IA 路由表 |
 | §8 Wire format | audits/SC-${N}-PHASE-0/A0X (流式页只 P03) | 后端流控制器代码 |
@@ -405,3 +411,4 @@ ASCII / 表格描述。例：
 | 版本 | 日期 | owner | 摘要 |
 |---|---|---|---|
 | v1 | 2026-05-14 | user | 首版 · 与 gen-feature-list 同次会话产出 · 待 SC-01 8 页生成时实战验证 |
+| v1.1 | 2026-05-16 | user (gen-page-spec 首次跑 satellite biz doc 派生 spec) | 支持 satellite biz doc 作为主源 (§0 BIZ_DOC fallback · §1 Step 1 加 satellite 分支 · §3 §1/§5 源映射加 satellite 选项) · P-WEEKLY-REVIEW-weekly-review.spec.md 首次实战验证 |

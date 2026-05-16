@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>P-WEEKLY-REVIEW · 本周回顾</title>
+<style>
+  :root{
+    --bg:#F6F3EC; --bg-2:#EFEAE0;
+    --card:#FFFFFF;
+    --ink:#0E0E10; --ink-2:#4A4A52; --ink-3:#8A8A94;
+    --line:rgba(14,14,16,.08); --line-2:rgba(14,14,16,.14);
+    --indigo:#3730A3; --indigo-2:#6366F1; --indigo-soft:#EEF0FF;
+    --peach:#F97316; --peach-soft:#FFECD6;
+    --rose:#E11D48; --rose-soft:#FFE1E7;
+    --mint:#059669; --mint-soft:#D9F5E7;
+    --amber:#D97706;
+    --serif:"New York","Canela","Noto Serif SC",Georgia,serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
+  html,body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif;color:var(--ink);background:#2A2A30;}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+
+  /* phone shell · 393×852 iPhone 14 Pro */
+  .phone{position:relative;width:393px;height:852px;border-radius:54px;background:var(--bg);overflow:hidden;box-shadow:inset 0 0 0 6px #111, 0 24px 64px rgba(0,0,0,.22);}
+  .phone::before{content:"";position:absolute;left:50%;top:11px;transform:translateX(-50%);width:126px;height:37px;background:#000;border-radius:24px;z-index:30;}
+  .phone::after{content:"";position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:134px;height:5px;background:#000;border-radius:3px;opacity:.85;z-index:30;}
+
+  .statusbar{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 24px 6px;font-size:17px;font-weight:600;letter-spacing:.2px;}
+  .statusbar .ic{display:flex;gap:6px;align-items:center;}
+
+  /* ambient wash (柔和极光) */
+  .ambient{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+  .ambient .sphere{position:absolute;border-radius:50%;filter:blur(10px);}
+  .ambient .s1{width:200px;height:200px;background:radial-gradient(circle,#FFD6B5 0%,transparent 65%);left:-40px;top:-40px;}
+  .ambient .s2{width:240px;height:240px;background:radial-gradient(circle,#D9DEFF 0%,transparent 65%);right:-60px;top:30px;}
+
+  /* topbar · 标题 + 周次 + 返回 X */
+  .topbar{position:absolute;top:58px;left:20px;right:20px;display:flex;align-items:center;gap:12px;z-index:10;}
+  .back{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.7);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid var(--line);}
+  .titlecol{flex:1;display:flex;flex-direction:column;gap:2px;}
+  .titlecol .t{font-family:var(--serif);font-style:italic;font-size:22px;font-weight:600;color:var(--ink);line-height:1;}
+  .titlecol .s{font-size:11px;color:var(--ink-3);font-weight:600;letter-spacing:.4px;text-transform:uppercase;}
+  .topbar .share{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.7);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;border:1px solid var(--line);}
+
+  /* scroll area */
+  .scroll{position:absolute;top:120px;bottom:84px;left:0;right:0;overflow-y:auto;padding:8px 16px 30px;z-index:5;}
+  .scroll::-webkit-scrollbar{display:none;}
+
+  /* section header */
+  .sec{display:flex;align-items:center;justify-content:space-between;margin:22px 4px 10px;}
+  .sec .t{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--ink-3);display:flex;align-items:center;gap:8px;}
+  .sec .t em{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--ink);text-transform:none;letter-spacing:0;font-weight:400;}
+  .sec .m{font-size:12px;color:var(--indigo);text-decoration:none;font-weight:600;}
+
+  /* ============== HERO 暗卡 · 掌握率 + sparkline + delta ============== */
+  .hero{position:relative;background:#0E0E10;color:#fff;border-radius:20px;padding:20px;overflow:hidden;box-shadow:0 20px 40px -20px rgba(14,14,16,.45);}
+  .hero::before{content:"";position:absolute;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(217,222,255,.18) 0%,transparent 65%);left:-50px;top:-80px;filter:blur(20px);}
+  .hero::after{content:"";position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,214,181,.16) 0%,transparent 65%);right:-40px;bottom:-60px;filter:blur(20px);}
+  .hero-inner{position:relative;z-index:1;}
+  .hero-kicker{display:flex;align-items:center;gap:8px;font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.6);font-weight:600;}
+  .hero-kicker .tag{font-size:9px;padding:2px 7px;background:rgba(253,186,116,.18);color:#FDBA74;border-radius:4px;letter-spacing:.4px;}
+  .hero-display{margin-top:10px;display:flex;align-items:baseline;gap:8px;}
+  .hero-display .big{font-family:var(--serif);font-style:italic;font-size:84px;line-height:.95;font-weight:500;}
+  .hero-display .unit{font-family:var(--serif);font-size:22px;color:rgba(255,255,255,.65);}
+  .hero-display .delta-chip{margin-left:6px;align-self:center;display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;background:rgba(5,150,105,.22);color:#6EE7B7;padding:4px 9px;border-radius:999px;}
+  .hero-display .delta-chip svg{width:9px;height:9px;}
+  .hero-sub{margin-top:8px;font-size:12px;color:rgba(255,255,255,.65);}
+  .hero-sub strong{color:#FDBA74;font-weight:600;}
+
+  /* sparkline 区域 (Hero 内嵌 · 7 天每日掌握率) */
+  .hero-spark{margin-top:18px;position:relative;height:54px;}
+  .hero-spark svg{width:100%;height:100%;overflow:visible;}
+  .hero-spark .axis{margin-top:6px;display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.45);font-weight:600;letter-spacing:.4px;}
+  .hero-spark .axis span.now{color:#FDBA74;font-weight:800;}
+
+  /* ============== 学科雷达图 ============== */
+  .radar-card{background:var(--card);border-radius:20px;padding:16px 16px 12px;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+  .radar-row{display:grid;grid-template-columns:170px 1fr;gap:12px;align-items:center;}
+  .radar{position:relative;width:170px;height:170px;}
+  .radar svg{width:100%;height:100%;}
+  .radar-legend{display:flex;flex-direction:column;gap:7px;font-size:12px;}
+  .lg{display:flex;align-items:center;gap:8px;}
+  .lg .sw{width:9px;height:9px;border-radius:3px;flex:none;}
+  .lg .nm{flex:1;color:var(--ink-2);font-weight:500;}
+  .lg .vl{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--ink);font-weight:600;}
+
+  /* ============== 薄弱 KP top 3 卡片 ============== */
+  .weakcol{display:flex;flex-direction:column;gap:8px;}
+  .wkp{background:var(--card);border-radius:18px;padding:14px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;box-shadow:0 1px 2px rgba(0,0,0,.04);position:relative;overflow:hidden;}
+  .wkp.rank-1{background:linear-gradient(155deg,#FFF7ED 0%,#FFFFFF 60%);border:1px solid #FFE4CC;}
+  .wkp .rk{width:30px;height:30px;border-radius:10px;background:var(--peach-soft);color:var(--peach);font-family:var(--serif);font-style:italic;font-weight:700;font-size:17px;display:flex;align-items:center;justify-content:center;}
+  .wkp.rank-1 .rk{background:var(--peach);color:#fff;}
+  .wkp .info{min-width:0;}
+  .wkp .info .k{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink-3);font-weight:700;display:flex;gap:6px;align-items:center;}
+  .wkp .info .k .sub{padding:1px 6px;background:var(--indigo-soft);color:var(--indigo);border-radius:3px;font-size:9px;letter-spacing:.3px;}
+  .wkp .info .tt{margin-top:3px;font-size:14px;font-weight:700;color:var(--ink);}
+  .wkp .info .tt em{font-family:var(--serif);font-style:italic;font-weight:500;color:var(--rose);margin-left:4px;}
+  .wkp .cta{padding:8px 12px;background:var(--ink);color:#fff;border-radius:11px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px;cursor:pointer;}
+  .wkp .cta svg{width:10px;height:10px;}
+  .wkp .cta.outline{background:transparent;color:var(--ink);border:1px solid var(--line-2);}
+
+  /* ============== 三联 stat (本周已复习 / 复习耗时 / 新增) ============== */
+  .stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .stt{background:var(--card);border-radius:16px;padding:14px 12px;display:flex;flex-direction:column;gap:4px;box-shadow:0 1px 2px rgba(0,0,0,.04);position:relative;overflow:hidden;}
+  .stt .ic{width:28px;height:28px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:4px;}
+  .stt.green .ic{background:var(--mint-soft);} .stt.green .n{color:var(--mint);}
+  .stt.blue  .ic{background:var(--indigo-soft);} .stt.blue .n{color:var(--indigo);}
+  .stt.orange .ic{background:var(--peach-soft);} .stt.orange .n{color:var(--peach);}
+  .stt .n{font-family:var(--serif);font-style:italic;font-size:26px;font-weight:600;line-height:1;}
+  .stt .l{font-size:10px;color:var(--ink-3);font-weight:600;letter-spacing:.3px;}
+
+  /* ============== 失败题横滑 ============== */
+  .failscroller{display:flex;gap:10px;overflow-x:auto;margin:0 -16px;padding:0 16px 8px;scroll-snap-type:x mandatory;}
+  .failscroller::-webkit-scrollbar{display:none;}
+  .fcard{flex:none;width:128px;background:var(--card);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.04);scroll-snap-align:start;cursor:pointer;}
+  .fcard .thumb{height:88px;background:linear-gradient(135deg,#EFEAE0 0%,#E5DFD0 100%);display:flex;align-items:center;justify-content:center;color:var(--ink-3);font-family:var(--serif);font-style:italic;font-size:13px;position:relative;}
+  .fcard .badge{position:absolute;top:6px;right:6px;font-size:9px;font-weight:700;padding:3px 6px;border-radius:6px;background:var(--rose);color:#fff;letter-spacing:.3px;}
+  .fcard .meta{padding:8px 10px 10px;}
+  .fcard .meta .sub{font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink-3);font-weight:700;}
+  .fcard .meta .miss{margin-top:3px;font-size:11px;color:var(--ink);font-weight:600;}
+  .fcard .meta .miss em{font-family:var(--serif);font-style:italic;color:var(--rose);}
+
+  /* ============== AI 一句话复盘气泡 ============== */
+  .insight{position:relative;background:#0E0E10;color:#fff;border-radius:20px;padding:18px;overflow:hidden;box-shadow:0 20px 40px -20px rgba(14,14,16,.45);}
+  .insight::before{content:"";position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(253,186,116,.18) 0%,transparent 65%);right:-40px;top:-50px;filter:blur(20px);}
+  .insight-inner{position:relative;z-index:1;}
+  .ins-head{display:flex;align-items:center;gap:8px;font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.6);font-weight:700;}
+  .ins-head .dot{width:6px;height:6px;border-radius:50%;background:#FDBA74;box-shadow:0 0 8px #FDBA74;}
+  .ins-text{margin-top:10px;font-size:15px;line-height:1.55;color:#fff;}
+  .ins-text em{font-family:var(--serif);font-style:italic;color:#FDBA74;font-weight:600;}
+  .ins-meta{margin-top:10px;font-size:10px;color:rgba(255,255,255,.4);letter-spacing:.3px;}
+
+  /* ============== EMPTY hero (本周复习数=0 时整页换) · 默认隐藏 ============== */
+  .empty-hero{display:none;background:var(--card);border-radius:20px;padding:24px;text-align:center;flex-direction:column;align-items:center;gap:12px;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+  .empty-hero.show{display:flex;}
+  .empty-hero .ill{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#FFECD6 0%,#FFD6B5 100%);display:flex;align-items:center;justify-content:center;}
+  .empty-hero .tt{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--ink);}
+  .empty-hero .ds{font-size:13px;color:var(--ink-3);max-width:240px;line-height:1.5;}
+  .empty-hero .go{margin-top:8px;padding:12px 22px;background:var(--ink);color:#fff;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;}
+
+  /* ============== tabbar (复用 home 同款 · home tab 反高亮表示来自 home) ============== */
+  .tabbar{position:absolute;left:0;right:0;bottom:0;height:84px;backdrop-filter:blur(22px) saturate(180%);background:rgba(255,255,255,.78);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:8px 0 30px;z-index:20;}
+  .tab{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:4px;font-size:10px;color:var(--ink-3);font-weight:600;text-decoration:none;position:relative;}
+  .tab svg{width:24px;height:24px;}
+  .tab.active{color:var(--ink);}
+  .tab .dotmark{display:none;width:4px;height:4px;border-radius:50%;background:var(--ink);position:absolute;bottom:32px;}
+  .tab.active .dotmark{display:block;}
+</style>
+</head>
+<body>
+
+<div class="phone" data-testid="p-weekly-review-root">
+
+  <!-- ambient wash -->
+  <div class="ambient" aria-hidden="true">
+    <div class="sphere s1"></div>
+    <div class="sphere s2"></div>
+  </div>
+
+  <!-- statusbar -->
+  <div class="statusbar">
+    <span>9:41</span>
+    <span class="ic">
+      <svg width="16" height="11" viewBox="0 0 16 11" fill="#0E0E10"><rect x="0" y="6" width="3" height="5" rx=".6"/><rect x="4" y="4" width="3" height="7" rx=".6"/><rect x="8" y="2" width="3" height="9" rx=".6"/><rect x="12" y="0" width="3" height="11" rx=".6"/></svg>
+      <svg width="16" height="11" viewBox="0 0 16 11" fill="none" stroke="#0E0E10" stroke-width="1.2"><path d="M1 4 Q8 -1 15 4"/><path d="M3 6 Q8 2 13 6"/><path d="M6 8 Q8 6 10 8"/></svg>
+      <svg width="24" height="11" viewBox="0 0 24 11" fill="none"><rect x="0" y="0" width="22" height="11" rx="2.6" stroke="#0E0E10" stroke-width="1"/><rect x="1.5" y="1.5" width="17" height="8" rx="1.6" fill="#0E0E10"/><rect x="22" y="3" width="1.6" height="5" rx=".6" fill="#0E0E10"/></svg>
+    </span>
+  </div>
+
+  <!-- topbar: 返回 + 标题 + 周次 + share -->
+  <div class="topbar">
+    <a class="back" href="01_home_v2.html" data-testid="weekly-back" aria-label="返回首页">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2 L4 7 L9 12" stroke="#0E0E10" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <div class="titlecol">
+      <div class="t">本周回顾</div>
+      <div class="s" data-testid="weekly-range">2026 W20 · 5月11 – 17日</div>
+    </div>
+    <div class="share" aria-label="分享周报">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1 V9 M4 4 L7 1 L10 4" stroke="#0E0E10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 8 V12 H12 V8" stroke="#0E0E10" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+
+  <!-- ============== SCROLL ============== -->
+  <div class="scroll">
+
+    <!-- ============== HERO 暗卡: 掌握率 + sparkline + delta ============== -->
+    <div class="hero" data-testid="weekly-hero">
+      <div class="hero-inner">
+        <div class="hero-kicker">
+          掌握率 · Mastery Rate <span class="tag">vs LAST WEEK</span>
+        </div>
+        <div class="hero-display">
+          <span class="big">68</span>
+          <span class="unit">%</span>
+          <span class="delta-chip" data-testid="weekly-delta" aria-label="较上周提升 6 个百分点">
+            <svg viewBox="0 0 10 10" fill="none"><path d="M5 2 V8 M2 5 L5 2 L8 5" stroke="#6EE7B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            +6 pts
+          </span>
+        </div>
+        <div class="hero-sub">本周比上周稳步上升 · <strong>过去 7 天连续 5 天保持掌握率提升</strong></div>
+
+        <!-- sparkline: 7 天每日掌握率 [55, 58, 60, 62, 65, 66, 68] -->
+        <div class="hero-spark" data-testid="weekly-sparkline">
+          <svg viewBox="0 0 340 54" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="hspk" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#FDBA74" stop-opacity=".28"/>
+                <stop offset="100%" stop-color="#FDBA74" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- area fill -->
+            <path d="M0 36 L57 32 L114 28 L171 22 L228 14 L285 11 L340 6 L340 54 L0 54 Z" fill="url(#hspk)"/>
+            <!-- line -->
+            <path d="M0 36 L57 32 L114 28 L171 22 L228 14 L285 11 L340 6" stroke="#FDBA74" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- dots (last 2 emphasized) -->
+            <circle cx="0" cy="36" r="2.4" fill="rgba(253,186,116,.5)"/>
+            <circle cx="57" cy="32" r="2.4" fill="rgba(253,186,116,.5)"/>
+            <circle cx="114" cy="28" r="2.4" fill="rgba(253,186,116,.5)"/>
+            <circle cx="171" cy="22" r="2.4" fill="rgba(253,186,116,.5)"/>
+            <circle cx="228" cy="14" r="2.4" fill="rgba(253,186,116,.5)"/>
+            <circle cx="285" cy="11" r="2.4" fill="rgba(253,186,116,.5)"/>
+            <circle cx="340" cy="6" r="4" fill="#FDBA74" stroke="#0E0E10" stroke-width="1.6"/>
+          </svg>
+          <div class="axis"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span class="now">今</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============== 学科分布 ============== -->
+    <div class="sec">
+      <div class="t">学科分布 <em>By Subject</em></div>
+      <a class="m" href="#">展开详情 ›</a>
+    </div>
+
+    <div class="radar-card" data-testid="weekly-radar">
+      <div class="radar-row">
+        <div class="radar">
+          <svg viewBox="0 0 170 170">
+            <defs>
+              <radialGradient id="rdgrid" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#fff" stop-opacity=".0"/>
+                <stop offset="100%" stop-color="#0E0E10" stop-opacity=".04"/>
+              </radialGradient>
+            </defs>
+            <!-- 网格 5 层 (5 边形) -->
+            <g fill="none" stroke="rgba(14,14,16,.08)" stroke-width="1">
+              <!-- outer pentagon (100%) -->
+              <polygon points="85,15 152,60 126,140 44,140 18,60" fill="url(#rdgrid)"/>
+              <polygon points="85,29 138,65 117,130 53,130 32,65"/>
+              <polygon points="85,43 124,70 108,120 62,120 46,70"/>
+              <polygon points="85,57 110,75 99,110 71,110 60,75"/>
+              <polygon points="85,71 96,80 90,100 80,100 74,80"/>
+            </g>
+            <!-- 轴线 -->
+            <g stroke="rgba(14,14,16,.06)" stroke-width="1">
+              <line x1="85" y1="85" x2="85" y2="15"/>
+              <line x1="85" y1="85" x2="152" y2="60"/>
+              <line x1="85" y1="85" x2="126" y2="140"/>
+              <line x1="85" y1="85" x2="44" y2="140"/>
+              <line x1="85" y1="85" x2="18" y2="60"/>
+            </g>
+            <!-- 数据多边形 · 5 学科 (英语 80 · 数学 72 · 化学 70 · 语文 65 · 物理 58) -->
+            <!-- 顶: 英语 80% / 右: 数学 72% / 右下: 化学 70% / 左下: 语文 65% / 左: 物理 58% -->
+            <polygon points="85,29 133,69 117,130 60,127 41,65"
+              fill="rgba(55,48,163,.18)" stroke="#3730A3" stroke-width="2" stroke-linejoin="round"/>
+            <!-- 数据点 -->
+            <g fill="#3730A3">
+              <circle cx="85" cy="29" r="3"/>
+              <circle cx="133" cy="69" r="3"/>
+              <circle cx="117" cy="130" r="3"/>
+              <circle cx="60" cy="127" r="3"/>
+              <circle cx="41" cy="65" r="3"/>
+            </g>
+            <!-- 学科 label -->
+            <g font-family="-apple-system,sans-serif" font-size="9" font-weight="700" fill="#4A4A52" text-anchor="middle">
+              <text x="85" y="9">英语</text>
+              <text x="160" y="58">数学</text>
+              <text x="134" y="153">化学</text>
+              <text x="36" y="153">语文</text>
+              <text x="10" y="58">物理</text>
+            </g>
+          </svg>
+        </div>
+        <div class="radar-legend">
+          <div class="lg"><span class="sw" style="background:#3730A3"></span><span class="nm">英语</span><span class="vl">80%</span></div>
+          <div class="lg"><span class="sw" style="background:#3730A3"></span><span class="nm">数学</span><span class="vl">72%</span></div>
+          <div class="lg"><span class="sw" style="background:#3730A3"></span><span class="nm">化学</span><span class="vl">70%</span></div>
+          <div class="lg"><span class="sw" style="background:#3730A3"></span><span class="nm">语文</span><span class="vl">65%</span></div>
+          <div class="lg"><span class="sw" style="background:#3730A3"></span><span class="nm">物理</span><span class="vl">58%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============== 薄弱 KP top 3 ============== -->
+    <div class="sec">
+      <div class="t">薄弱 KP top 3 <em>Weak Points</em></div>
+      <a class="m" href="#" style="color:var(--peach);">立即专练 →</a>
+    </div>
+
+    <div class="weakcol">
+      <div class="wkp rank-1" data-testid="weekly-weak-kp-1">
+        <div class="rk">1</div>
+        <div class="info">
+          <div class="k">KP-382 <span class="sub">数学</span></div>
+          <div class="tt">韦达定理<em>· 最近 4 次都错</em></div>
+        </div>
+        <a class="cta" href="05_wrongbook_list.html?kpId=KP-382" aria-label="立即专练 韦达定理">
+          <svg viewBox="0 0 12 12" fill="none"><path d="M3 2 L9 6 L3 10 Z" fill="#fff"/></svg>
+          立即专练
+        </a>
+      </div>
+      <div class="wkp" data-testid="weekly-weak-kp-2">
+        <div class="rk">2</div>
+        <div class="info">
+          <div class="k">KP-201 <span class="sub">物理</span></div>
+          <div class="tt">牛顿第二定律<em>· 最近 3 次错</em></div>
+        </div>
+        <a class="cta outline" href="05_wrongbook_list.html?kpId=KP-201" aria-label="练习 牛顿第二定律">练一次</a>
+      </div>
+      <div class="wkp" data-testid="weekly-weak-kp-3">
+        <div class="rk">3</div>
+        <div class="info">
+          <div class="k">KP-450 <span class="sub">英语</span></div>
+          <div class="tt">现在完成时<em>· 最近 2 次错</em></div>
+        </div>
+        <a class="cta outline" href="05_wrongbook_list.html?kpId=KP-450" aria-label="练习 现在完成时">练一次</a>
+      </div>
+    </div>
+
+    <!-- ============== 三联 stat ============== -->
+    <div class="sec">
+      <div class="t">本周节奏 <em>Pace</em></div>
+      <span class="m" style="color:var(--ink-3);">vs 上周 +12%</span>
+    </div>
+
+    <div class="stat3" data-testid="weekly-stats-trio">
+      <div class="stt green">
+        <div class="ic">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8 L7 12 L13 4" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="n">28</div>
+        <div class="l">已复习 题</div>
+      </div>
+      <div class="stt blue">
+        <div class="ic">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#3730A3" stroke-width="1.6"/><path d="M8 4 V8 L11 10" stroke="#3730A3" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="n">142</div>
+        <div class="l">累计 分钟</div>
+      </div>
+      <div class="stt orange">
+        <div class="ic">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2 V14 M2 8 H14" stroke="#F97316" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="n">+8</div>
+        <div class="l">新增 错题</div>
+      </div>
+    </div>
+
+    <!-- ============== 失败题横滑 ============== -->
+    <div class="sec">
+      <div class="t">本周失败题 top 5 <em>Hardest</em></div>
+      <a class="m" href="05_wrongbook_list.html?filter=failedThisWeek">看全部 ›</a>
+    </div>
+
+    <div class="failscroller" data-testid="weekly-failed-scroller">
+      <a class="fcard" href="06_wrongbook_detail.html?qid=Q-1024">
+        <div class="thumb">题图<span class="badge">×3</span></div>
+        <div class="meta">
+          <div class="sub">数学</div>
+          <div class="miss">错过 <em>3</em> 次</div>
+        </div>
+      </a>
+      <a class="fcard" href="06_wrongbook_detail.html?qid=Q-1019">
+        <div class="thumb">题图<span class="badge">×3</span></div>
+        <div class="meta">
+          <div class="sub">物理</div>
+          <div class="miss">错过 <em>3</em> 次</div>
+        </div>
+      </a>
+      <a class="fcard" href="06_wrongbook_detail.html?qid=Q-1041">
+        <div class="thumb">题图<span class="badge">×2</span></div>
+        <div class="meta">
+          <div class="sub">英语</div>
+          <div class="miss">错过 <em>2</em> 次</div>
+        </div>
+      </a>
+      <a class="fcard" href="06_wrongbook_detail.html?qid=Q-1056">
+        <div class="thumb">题图<span class="badge">×2</span></div>
+        <div class="meta">
+          <div class="sub">化学</div>
+          <div class="miss">错过 <em>2</em> 次</div>
+        </div>
+      </a>
+      <a class="fcard" href="06_wrongbook_detail.html?qid=Q-1063">
+        <div class="thumb">题图<span class="badge">×2</span></div>
+        <div class="meta">
+          <div class="sub">语文</div>
+          <div class="miss">错过 <em>2</em> 次</div>
+        </div>
+      </a>
+    </div>
+
+    <!-- ============== AI 一句话复盘 ============== -->
+    <div class="sec">
+      <div class="t">AI 复盘 <em>One-line Insight</em></div>
+      <span class="m" style="color:var(--ink-3);">智能体生成</span>
+    </div>
+
+    <div class="insight" data-testid="weekly-ai-insight">
+      <div class="insight-inner">
+        <div class="ins-head">
+          <span class="dot"></span>
+          WEEKLY INSIGHT · 智能体复盘
+        </div>
+        <div class="ins-text">你这周在<em>韦达定理</em>上反复栽 4 次,建议先把 3 道经典题练熟。</div>
+        <div class="ins-meta">WI-2026W20-stu123 · 2026-05-17 08:00 生成</div>
+      </div>
+    </div>
+
+    <!-- EMPTY hero (本周复习数=0 · 默认隐藏 · 仅作为占位变体引用) -->
+    <div class="empty-hero" id="empty-hero" data-testid="weekly-empty">
+      <div class="ill">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="3" stroke="#F97316" stroke-width="1.6"/><path d="M3 9 H21" stroke="#F97316" stroke-width="1.6"/><circle cx="12" cy="15" r="2" fill="#F97316"/></svg>
+      </div>
+      <div class="tt">本周还没开始</div>
+      <div class="ds">复习数据为空 · 拍一道新题或开始今日复习,下周这里就会有你的回顾报告</div>
+      <a class="go" href="02_capture.html">去拍一道题</a>
+    </div>
+
+  </div>
+
+  <!-- ============== TabBar (home active · 标识本页是从 home 推入) ============== -->
+  <nav class="tabbar">
+    <a class="tab active" href="01_home_v2.html">
+      <span class="dotmark"></span>
+      <svg viewBox="0 0 24 24" fill="none"><path d="M3 11 L12 3 L21 11 V21 H14 V14 H10 V21 H3 Z" stroke="#0E0E10" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      首页
+    </a>
+    <a class="tab" href="05_wrongbook_list.html">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="2" stroke="#8A8A94" stroke-width="1.6"/><path d="M8 8 H16 M8 12 H16 M8 16 H13" stroke="#8A8A94" stroke-width="1.6" stroke-linecap="round"/></svg>
+      错题本
+    </a>
+    <a class="tab" href="02_capture.html">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#8A8A94" stroke-width="1.6"/><path d="M12 7 V17 M7 12 H17" stroke="#8A8A94" stroke-width="2" stroke-linecap="round"/></svg>
+      拍题
+    </a>
+    <a class="tab" href="10_calendar_month.html">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="#8A8A94" stroke-width="1.6"/><path d="M3 10 H21 M8 2 V6 M16 2 V6" stroke="#8A8A94" stroke-width="1.6" stroke-linecap="round"/></svg>
+      日历
+    </a>
+    <a class="tab" href="13_settings.html">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="9" r="3.5" stroke="#8A8A94" stroke-width="1.6"/><path d="M5 20 C5 16 8 14 12 14 C16 14 19 16 19 20" stroke="#8A8A94" stroke-width="1.6" stroke-linecap="round"/></svg>
+      我的
+    </a>
+  </nav>
+</div>
+
+</body>
+</html>
