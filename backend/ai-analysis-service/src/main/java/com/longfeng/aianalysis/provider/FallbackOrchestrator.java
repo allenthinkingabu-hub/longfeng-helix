@@ -50,9 +50,12 @@ public class FallbackOrchestrator {
         for (String providerName : chain) {
             AiProvider provider = providerMap.get(providerName);
             if (provider == null) {
-                // If configured provider doesn't have an implementation, use stub
-                provider = providerMap.get("stub");
-                if (provider == null) continue;
+                // CLAUDE.md Rule 12 fail-loud: do NOT silent fall-through to stub when a
+                // configured provider name has no implementation. Either the deployer wants
+                // that provider (and must register a bean) or the chain config is stale.
+                log.warn("Configured AI provider '{}' has no bean registered — skipping (no silent stub).",
+                        providerName);
+                continue;
             }
             try {
                 T result = invoker.apply(provider);
