@@ -10,7 +10,9 @@ declare interface RequestInit { method?: string; headers?: Record<string, string
 declare interface Response { ok: boolean; status: number; statusText: string; json(): Promise<unknown>; }
 declare interface AbortSignal {}
 
-const BACKEND_HOST = process.env.MP_BACKEND_HOST || 'http://localhost';
+// MP runtime: `process` doesn't exist · guard with typeof. Node test runtime: read env var.
+const BACKEND_HOST = (typeof process !== 'undefined' && process.env?.MP_BACKEND_HOST)
+  || 'http://localhost';
 
 const PORT_MAP: Record<string, number> = {
   file: 8084,
