@@ -1,14 +1,18 @@
 package com.longfeng.aianalysis.controller;
 
 import com.longfeng.aianalysis.config.AiProperties;
+import com.longfeng.aianalysis.entity.AnalysisResult;
 import com.longfeng.aianalysis.entity.AnalysisTask;
+import com.longfeng.aianalysis.repo.AnalysisResultRepository;
 import com.longfeng.aianalysis.repo.AnalysisTaskRepository;
 import com.longfeng.aianalysis.service.AnalysisStreamHub;
 import com.longfeng.aianalysis.service.QuestionAnalyzerImpl;
 import com.longfeng.common.dto.ApiResult;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,15 +42,18 @@ public class AnalyzeController {
     private final QuestionAnalyzerImpl analyzer;
     private final AnalysisStreamHub streamHub;
     private final AnalysisTaskRepository taskRepo;
+    private final AnalysisResultRepository resultRepo;
     private final AiProperties aiProps;
 
     public AnalyzeController(QuestionAnalyzerImpl analyzer,
                              AnalysisStreamHub streamHub,
                              AnalysisTaskRepository taskRepo,
+                             AnalysisResultRepository resultRepo,
                              AiProperties aiProps) {
         this.analyzer = analyzer;
         this.streamHub = streamHub;
         this.taskRepo = taskRepo;
+        this.resultRepo = resultRepo;
         this.aiProps = aiProps;
     }
 
@@ -103,14 +110,42 @@ public class AnalyzeController {
     }
 
     /**
-     * GET /api/ai/result/{taskId} · polling fallback.
+     * GET /api/ai/result/{taskId} · polling fallback for FE P03 analyzing page.
      * Returns ANALYZING / DONE / FAILED / CANCELLED.
+     *
+     * <p>When the analysis is DONE the body also surfaces real values the FE
+     * needs to drop the mockup placeholders in P03 STEP_DESCS:
+     * <ul>
+     *   <li>{@code stem_length} — char count of OCR'd 题干 (replaces "已提取 132 字符")</li>
+     *   <li>{@code subject} — subject the task was started with</li>
+     *   <li>{@code ocr_model} / {@code chat_model} — wire-time model names</li>
+     * </ul>
+     * Keys stay snake_case for consistency with the rest of the AI controller surface.
      */
     @GetMapping("/result/{taskId}")
-    public ResponseEntity<Map<String, String>> result(@PathVariable String taskId) {
-        return taskRepo.findByTaskId(taskId)
-                .map(t -> ResponseEntity.ok(Map.of("status", t.getStatus())))
-                .orElse(ResponseEntity.ok(Map.of("status", "NOT_FOUND")));
+    public ResponseEntity<Map<String, Object>> result(@PathVariable String taskId) {
+        Optional<AnalysisTask> maybeTask = taskRepo.findByTaskId(taskId);
+        if (maybeTask.isEmpty()) {
+            return ResponseEntity.ok(Map.of("status", "NOT_FOUND"));
+        }
+        AnalysisTask t = maybeTask.get();
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("status", t.getStatus());
+        body.put("subject", t.getSubject() == null ? "" : t.getSubject());
+
+        // Surface real values once analysis_result is persisted (step 4 done).
+        // FE reads these to label STEP_DESCS step 1 (stem length) + step 2 (subject · model).
+        AnalysisResult r = resultRepo.findByTaskId(taskId).orElse(null);
+        if (r != null) {
+            String stem = r.getStem() == null ? "" : r.getStem();
+            body.put("stem_length", stem.length());
+            body.put("chat_model", r.getModel() == null ? "" : r.getModel());
+        } else {
+            body.put("stem_length", 0);
+            body.put("chat_model", "");
+        }
+        body.put("ocr_model", aiProps.getQianwen().getOcrModel());
+        return ResponseEntity.ok(body);
     }
 
     // ========== Request DTOs ==========

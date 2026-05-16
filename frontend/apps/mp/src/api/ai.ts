@@ -100,6 +100,14 @@ export interface PollAnalyzeStatusResponse {
   currentStep?: number;
   result?: Record<string, unknown>;
   error?: string;
+  /** Char count of OCR-extracted 题干 · used by P03 step 1 label. */
+  stemLength?: number;
+  /** Subject the task was launched with (math/physics/...) · used by P03 step 2 label. */
+  subject?: string;
+  /** Multimodal OCR model name (e.g. "qwen-vl-max") · used by P03 step 2 label. */
+  ocrModel?: string;
+  /** Chat / analysis model name (e.g. "qwen-plus"). */
+  chatModel?: string;
 }
 
 /** Backend statuses → MP page state machine. */
@@ -131,6 +139,13 @@ export async function pollAnalyzeStatus(taskId: string): Promise<PollAnalyzeStat
     current_step?: number;
     result?: Record<string, unknown>;
     error?: string;
+    stem_length?: number;
+    stemLength?: number;
+    subject?: string;
+    ocr_model?: string;
+    ocrModel?: string;
+    chat_model?: string;
+    chatModel?: string;
   }>(
     `${apiBase('ai')}/api/ai/result/${taskId}`,
   );
@@ -140,5 +155,9 @@ export async function pollAnalyzeStatus(taskId: string): Promise<PollAnalyzeStat
     currentStep: raw.currentStep ?? raw.current_step,
     result: raw.result,
     error: raw.error,
+    stemLength: raw.stemLength ?? raw.stem_length,
+    subject: raw.subject,
+    ocrModel: raw.ocrModel ?? raw.ocr_model,
+    chatModel: raw.chatModel ?? raw.chat_model,
   };
 }
