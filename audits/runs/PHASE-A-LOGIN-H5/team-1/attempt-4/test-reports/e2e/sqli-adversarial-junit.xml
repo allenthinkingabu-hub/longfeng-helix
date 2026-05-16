@@ -1,0 +1,10 @@
+<testsuites id="" name="" tests="3" failures="0" skipped="0" errors="0" time="6.671031">
+<testsuite name="auth/login-sqli-adversarial.spec.ts" timestamp="2026-05-16T20:27:15.519Z" hostname="chromium" tests="3" failures="0" skipped="0" time="6.185" errors="0">
+<testcase name="PHASE-A-LOGIN-H5 · SQL Injection Adversarial › SQL 注入 email: a&apos; OR &apos;1&apos;=&apos;1 必须被参数化 query 拦下" classname="auth/login-sqli-adversarial.spec.ts" time="2.039">
+</testcase>
+<testcase name="PHASE-A-LOGIN-H5 · SQL Injection Adversarial › SQL 注入 password: &apos; OR 1=1 -- 必须被 bcrypt verify 拒绝" classname="auth/login-sqli-adversarial.spec.ts" time="2.178">
+</testcase>
+<testcase name="PHASE-A-LOGIN-H5 · SQL Injection Adversarial › SQL 注入 LIKE wildcard: %@example.com 不应模糊匹配其他账号" classname="auth/login-sqli-adversarial.spec.ts" time="1.968">
+</testcase>
+</testsuite>
+</testsuites>
