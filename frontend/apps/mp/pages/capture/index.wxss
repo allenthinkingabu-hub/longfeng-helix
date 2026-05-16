@@ -98,7 +98,7 @@
   top: 208rpx;
   left: 0;
   right: 0;
-  bottom: 312rpx;
+  bottom: 480rpx;
   background: radial-gradient(800px 400px at 50% 30%, #1d2433 0%, #0B0F1A 65%);
   overflow: hidden;
 }
@@ -360,7 +360,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: 288rpx;
+  height: 480rpx;
   background: linear-gradient(180deg, rgba(11,15,26,0) 0%, rgba(11,15,26,0.85) 35%, #0B0F1A 100%);
   z-index: 23;
   pointer-events: none;
