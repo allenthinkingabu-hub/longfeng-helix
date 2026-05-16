@@ -1,6 +1,6 @@
 # M-MULTI-QUESTION-CAPTURE · 多题拍照支持 — Satellite Biz Doc
 
-**Status**: Reviewed v1.1 (4/6 决策已定 · 2/6 沿用 sane defaults · N=20 配置化 + P04 红圈标注 增量已回写)
+**Status**: Reviewed v1.2 (5/8 决策已定 · 2/8 沿用 sane defaults · 1/8 留 P1 spike · §6 AI Backend 实装详设新增 · 模型选择/Split Prompt/JSON Schema/置信度阈值 4 项已锁)
 **Owner**: full-stack (backend DDD 改造 + AI service 切割 pipeline + frontend swiper)
 **Created**: 2026-05-16
 **Priority**: **P1** (MVP 14 天不做 · P1 启动)
@@ -349,6 +349,147 @@ SELECT student_id, origin_image_key, 1, 'READY', created_at FROM wb_question WHE
 
 ---
 
+## §6 AI Backend 实装详设 [v1.2 新增 · 补 v1.1 留白 4 项]
+
+> **范围说明**: 本段补 v1.1 留白的 AI 落地骨架 4 项 (模型选择 + split prompt + JSON schema + 置信度阈值) · 写到 Coder 可对接精度。剩 3 项 (并行编排实装 / prometheus 监控 / Resilience4j 熔断) 留 §17 决策 #8 让 backend Coder 跑 spike 后回写。
+>
+> **复用 master §6**: master §6 Spring AI QuestionAnalyzer (单题 4-step pipeline: subject/kp/stem/result) 完全不变 · 本段仅在其前面加 1 个 `RegionSplitter` step · 输出 N 个 sub-imageRef 喂给 N 路并行 QuestionAnalyzer。
+
+### §6.1 模型选择 (主 + 备 + 成本)
+
+| 维度 | 主模型 | 备模型 (fallback) | 决策依据 |
+|---|---|---|---|
+| **模型** | `Claude 3.5 Sonnet` (Anthropic) | `GPT-4o` (OpenAI) | Claude 多模态对中文手写作业纸 OCR + 几何定位 综合优 (P1 启动 spike 20 样本实测后由 backend Coder 终决 · 见 §17 决策 #8) |
+| **接入** | Spring AI `ChatModel` interface · `application.yml: ai.split.provider=anthropic` | `ai.split.provider.fallback=openai` (主 5 次连失或主 P95 > 8s 触发 Resilience4j 切换) | 复用 master §15.1 BOM Spring AI 多 provider abstraction |
+| **成本预算** | Sonnet $3/M input · $15/M output · 单 split ≈ 800 token in (图) + 200 token out (regions JSON) ≈ **$0.005/batch** | GPT-4o $5/$15 · 单 split ≈ $0.007/batch | N=20 极端 batch (1 split + 20×4-step) ≈ $0.10 · 月活 1k 学生 × 月 3 拍 = **月 $300 预算** (粗估 · 实测见 §17 #8) |
+| **图像传输** | base64 inline 直送模型 · 不存中间 OSS | 同 | image_key 已在 OSS · 按需读 · 不沉淀 AI 中间产物 (合规 · master §11 PII 保护) |
+
+### §6.2 Split Prompt 模板 (主 + 备模型共用)
+
+**System Prompt** (固定 · 锁字面 · 改字面需走 satellite 版本号):
+
+```
+你是教育场景多题切割助手。任务: 给定 1 张学生作业纸照片 · 定位其中所有独立题目的边界框。
+
+输入: 1 张 jpg/png 图像 (可能含 0-25 道题)。
+输出: 严格 JSON 数组 (不许 markdown 包裹 · 不许解释文字) · 仅定位 · 不输出解题内容。
+
+规则:
+1. 每题边界框包含: 题号 + 题干 + 学生作答 (含手写涂改) · 不包含与本题无关内容
+2. 题间距 < 8% 图高 视为同题 · ≥ 8% 视为题间隔
+3. 单选/多选/填空/解答 不区分类型 · 都视为 1 题
+4. 表格/图形 紧靠题干 < 5% 距离 → 并入该题 · 否则单独 1 题
+5. 全空白纸 / 单色背景 / 非作业纸 → 返空数组 []
+6. 题数超 25 → 返前 25 题 (不报错 · 上层按 N > N_MAX 处理)
+```
+
+**User Prompt** (per-call 动态拼装):
+
+```
+[image: base64-jpg-data]
+
+请定位上述作业纸所有题目的边界框 · 严格按 JSON schema 输出:
+[{"idx": 0..N-1, "box": [x, y, w, h], "confidence": 0.0-1.0}]
+```
+
+**JSON Schema** (Spring AI `StructuredOutputConverter` 校验 · response 不符直接走 SC-19 分支 A 降级):
+
+```json
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "minItems": 0,
+  "maxItems": 25,
+  "items": {
+    "type": "object",
+    "required": ["idx", "box", "confidence"],
+    "properties": {
+      "idx":        { "type": "integer", "minimum": 0, "maximum": 24 },
+      "box":        { "type": "array", "minItems": 4, "maxItems": 4,
+                      "items": { "type": "number", "minimum": 0.0, "maximum": 1.0 } },
+      "confidence": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+    }
+  }
+}
+```
+
+### §6.3 regions 字段精确格式 (v1.1 留白补完)
+
+| 字段 | 类型 | 单位 / 范围 | 说明 |
+|---|---|---|---|
+| `idx` | int | 0..24 | 题在 batch 内顺序 · 0-indexed · 直接落 `wb_question.batch_order` · 严格按图像 从上到下 + 从左到右 排 |
+| `box` | array[4] | **归一化 0.0-1.0** (相对原图宽高) | `[x, y, w, h]` · 左上角原点 · 与 SVG / Canvas 坐标系一致 · 前端按 `originImage.width × box[0]` 还原像素位置 |
+| `confidence` | float | 0.0-1.0 | 切割框置信度 · 用于 §6.4 阈值判断 |
+
+**为什么归一化而非像素**: 后端 OSS 可能存压缩 / 缩略多版本 · 前端 `<AnnotatedOriginPhoto>` 渲染时 `<img>` 实际 viewport 尺寸变化 · 归一化坐标避免 "DB 存 1920×1440 box · 前端 320×240 渲染错位" 的常见 bug。`wb_question.region_json` JSONB 字段直接落归一化值 · 前端 SVG `viewBox` 按比例计算 · 后端按需 crop 时按 originImage 实际像素乘归一化值。
+
+### §6.4 置信度阈值 SLA (v1.1 留白补完)
+
+**单题接受阈值**:
+
+| 场景 | 阈值 | 处理 |
+|---|---|---|
+| `confidence ≥ 0.75` | **接受** | 落 wb_question · 走正常 4-step 分析 |
+| `0.5 ≤ confidence < 0.75` | **接受但 flag** | 落 wb_question · `ai_split_metadata.low_confidence_qids` 加入该 idx · P04 swiper 该题角标显示 "AI 不太确定" 浅 hint · 不阻塞 |
+| `confidence < 0.5` | **静默丢弃** | 不落 wb_question · 不计入 N · `ai_split_metadata.discarded_count++` · 不通知前端 (用户不感知 AI 自信度噪声) |
+| 全部 regions 都 < 0.5 (= 0 题接受) | **切割失败** | 走 SC-19 分支 A · 降级单题处理 |
+
+**region 重叠 IoU 阈值** (防 AI 把 1 题切成 2 框):
+
+| IoU 范围 | 处理 |
+|---|---|
+| `IoU > 0.4` (重叠 ≥ 40%) | **合并**: 取并集 box · confidence 取平均 · idx 取较小值 · `ai_split_metadata.merged_pairs++` |
+| `0.1 ≤ IoU ≤ 0.4` | 接受两题独立 (常见: 上下题边界轻微相接) |
+| `IoU < 0.1` | 完全独立 · 接受 |
+
+**切割总时长 SLA**:
+
+| 模型 | P95 | P99 | 超时 |
+|---|---|---|---|
+| Claude 3.5 Sonnet | ≤ 2s | ≤ 5s | 8s → SSE `BATCH_SPLIT_FAILED{reason:'TIMEOUT'}` |
+| GPT-4o (fallback) | ≤ 3s | ≤ 7s | 10s → 同上 |
+
+**配置化**: 本段所有阈值落 `application.yml: wrongbook.multi-question.ai.*` (`split-confidence-accept=0.75` / `split-confidence-flag=0.5` / `region-iou-merge=0.4` / `timeout-primary-ms=8000` / `timeout-fallback-ms=10000`) · `@RefreshScope` 可热更 · 不需重启。完整 yml key 列表由 backend Coder 在 §17 决策 #8 spike 完成后补 `application-default.yml` 模板。
+
+### §6.5 留 §17 决策点 #8 (P1 启动时 backend Coder spike 后定)
+
+下列 3 项依赖实测数据 · 提前写 90% 会废 · 故 v1.2 不锁:
+
+- **N 路并行编排具体实装**: CompletableFuture vs Reactor `Flux.parallel(N)` vs Spring `@Async` thread pool · 含线程池大小 + backpressure 策略
+- **Prometheus metrics 命名 + Grafana 告警规则 yaml**: `wrongbook_split_duration_seconds` / `wrongbook_split_confidence_histogram` / `wrongbook_batch_token_cost_total` 等
+- **Resilience4j 熔断完整配置**: retry 次数 / 退避策略 (exponential vs linear) / fallback 路径 (主 → 备 → 降级 SC-19A) · 含 `resilience4j.circuitbreaker.instances.ai-split.*` 全 yml
+
+### §6.6 端到端调用链 (Coder 实装时一图看清)
+
+```
+[前端 P02] POST /api/wb/questions {image_key}
+  └→ [Backend WrongbookController.create]
+      ├→ 落 wb_question_batch (status=PENDING, total_questions=0)
+      └→ 返 {batchId, qids:[]}
+
+[前端 P03] POST /api/ai/analyze {batchId} → 开 SSE
+  └→ [Backend AiAnalyzeService.analyzeBatch]
+      ├→ Step 1: RegionSplitter.split(imageBase64)
+      │   ├→ Spring AI ChatModel (Claude Sonnet · §6.1)
+      │   ├→ Prompt §6.2 · response → JSON schema 校验 §6.2
+      │   ├→ 阈值过滤 §6.4 (accept ≥0.75 / flag 0.5-0.75 / drop <0.5 / IoU>0.4 合并)
+      │   ├→ 落 wb_question_batch.ai_split_metadata + total_questions
+      │   ├→ 批量 INSERT N 行 wb_question (parent_batch_id, region_json, batch_order)
+      │   └→ SSE emit BATCH_SPLIT_DONE{regions:[...]}
+      ├→ Step 2: N 路并发 QuestionAnalyzer.analyze(subImage_i)
+      │   (实装方式 §6.5 决策 · 复用 master §6 单题 4-step)
+      │   └→ per-题 SSE emit STEP_DONE{qid, regionIdx, step}
+      └→ 全完 emit BATCH_DONE{batchId, successCount, failCount, totalMs}
+
+[前端 P04] GET /api/wb/batches/{batchId} → 返 originImageUrl + N 个 question (含 regionJson 归一化)
+  └→ 前端 <AnnotatedOriginPhoto> SVG circle 按 viewBox × regionJson 渲染
+
+[前端 P04 保存] POST /api/wb/batches/{batchId}:confirm {savedQids, discardedQids, masteryMap}
+  └→ [Backend BatchConfirmController] 按 master §7 艾宾浩斯 per-qid 创 plan + 7 node + 7 event
+```
+
+---
+
 ## §10 API 增量 [REQUIRED]
 
 ### 10.13 改造 `POST /api/wb/questions` (向后兼容)
@@ -448,6 +589,10 @@ Resp:    {
 | §1.2 + §2A.4 P04 `<AnnotatedOriginPhoto>` | master §4.2 wb_question.origin_image_key 字段 + 本 satellite §4.15 wb_question.region_json 新列 | L1485 + satellite L295 | 红圈视觉依赖 originImageUrl (后端 OSS presign) + regionJson 几何 · 切割失败时 region 为 null · 退化为普通缩略图 |
 | §1.4 N=20 配置项 | master §15.1 BOM (Spring Boot + actuator/refresh) | L3073 | 复用 Spring `@RefreshScope` 热更 application.yml |
 | §1.4 业务边界 (N≥10 试卷提示) | master §1.3 非 MVP "考前知识点诊断" P1-P2 | L75-L82 | 软引导 · 不强制 · 防止业务越界 |
+| §6.1 模型选择 (Claude Sonnet 主 / GPT-4o 备) | master §15.1 BOM Spring AI 多 provider | L3073 | 复用 ChatModel interface · 切换走 `ai.split.provider` yml |
+| §6.2 Split Prompt 模板 + JSON Schema | master §6.2 单题 Spring AI QuestionAnalyzer prompt | L1857-L1934 | 本段在 master 4-step pipeline 前 加 1 个 RegionSplitter step · 单题 prompt 不变 |
+| §6.3 regions 归一化坐标 | satellite §4.15 wb_question.region_json | satellite L338 | DB 存归一化 · 前端 SVG viewBox 还原 · 后端按需 crop |
+| §6.4 置信度阈值 SLA | SC-19 分支 A (切割失败降级) + §4.14 ai_split_metadata | satellite L264 + L324 | 阈值 0.75/0.5/IoU 0.4 锁字面 · 配置化 yml 可调 |
 
 ---
 
@@ -475,6 +620,7 @@ Resp:    {
 | 5 | **拍考试整卷** | 沿默认 | 明确不支持 + N≥10 软引导 | satellite v1 默认 + §1.4 业务边界补充 (推荐"考前诊断") · 用户未明示反对 |
 | 6 | **保存后跳哪** | 沿默认 | P05 高亮新增 | satellite v1 默认 · 与 master SC-01 单题流心智一致 · 用户未明示反对 |
 | **新 7** | **P04 红圈标注 (用户 2026-05-16 加项)** | ✓ **已决** | **顶部 `<AnnotatedOriginPhoto>` 红圈标注 · 红/绿/灰 三态实时跟随 swiper choice + mastery decision** | 见 §1.2 本次做新加点 + §2A.4 P04 + SC-17 step 9-10a + SC-18 红圈过渡 + SC-19 分支 D 降级 + §15.4 cross-ref |
+| **新 8** | **AI Backend 实装详设 (用户 2026-05-16 v1.2 加项)** | ✓ **4 项已决 · 3 项 P1 spike 后定** | **§6.1 模型 Claude Sonnet 主 / GPT-4o 备 · §6.2 Split Prompt + JSON Schema 锁字面 · §6.3 regions 归一化 0-1 · §6.4 置信度阈值 0.75/0.5 + IoU 0.4 + 超时 8s/10s** · 留 §6.5: N 路并行编排具体实装 / Prometheus 监控规则 / Resilience4j 熔断完整配置 (P1 启动 backend Coder spike 20 样本后定) | 见 §6 全段新增 + §15.4 cross-ref 加 4 行 |
 
 ---
 
@@ -484,3 +630,4 @@ Resp:    {
 |---|---|---|---|
 | v1 | 2026-05-16 | user (gen-biz-doc 第 2 次实战) | 首版 · 侧重 "4 层 silent drift 治理 + 业内对齐" 改进角度 · 不是简单加新功能 · 跨 4 既有页 (P02-P05) 行为增强 · 3 SC (SC-17/18/19) · 2 新 DB 表/列 · 4 API 改造/新增 · §17 6 决策点开放等用户拍板 |
 | v1.1 | 2026-05-16 | user | 4/6 决策已定 + 新加 P04 `<AnnotatedOriginPhoto>` 红圈标注组件 · 主要回写: §0.2 加 1 行 UI 组件 + 1 行配置项 / §1.2 改 N=5→N_MAX 默认 20 + P04 红圈作为本次做 / §1.4 新增 N=20 设计后果段 (4 维度) / §2A.4 P02 异常 + P04 加 `<AnnotatedOriginPhoto>` + 数据绑定 + 异常 + 埋点 + 性能 / SC-17 step 9 改 10a 新加 红圈跳 swiper + 关键断言加红圈不变量 + TC-17.03 改 N=20 + 加 TC-17.04 (N>N_MAX) + 加 TC-17.05 (红圈跳) / SC-18 编排 3 步加红圈过渡 + 加 step 3a 静态视觉 + 关键断言加红圈优先级 / SC-19 分支 B 改 N_MAX + 加分支 D (regionJson null 降级) + 加 TC-19.05 / §10.15 SLA 改 N=20 / §15.4 加 3 行 cross-ref / §17 决策表整体重写 (4 已决 + 2 默认 + 新加红圈决策) |
+| v1.2 | 2026-05-16 | user | **AI Backend 实装详设 §6 全段新增 (补 v1.1 留白)** · 答用户问 "satellite 有没有设计 AI 后端实现一次拍照多题、出多个错题的解释" · 加: §6.1 模型选择 (Claude Sonnet 主 / GPT-4o 备 · 月 $300 预算粗估) / §6.2 Split Prompt 模板 (System 6 规则 + User + JSON Schema) / §6.3 regions 归一化 0-1 字段格式 + 为什么不用像素 / §6.4 置信度阈值 SLA (单题 0.75/0.5/丢弃 + region IoU 0.4 合并 + 超时 8s/10s) / §6.5 留 3 项 P1 spike (并行编排实装 / Prometheus 监控 / Resilience4j 熔断) / §6.6 端到端调用链 ASCII 一图看清。同步: Status v1.1→v1.2 / §15.4 cross-ref 加 4 行 (§6.1-6.4 各 1 行) / §17 加决策 #8 AI Backend (4 已决 + 3 P1 spike) |
