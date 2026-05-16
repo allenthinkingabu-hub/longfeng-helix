@@ -51,14 +51,12 @@
     <!-- Hero: question thumbnail + meta -->
     <view class="hero" data-test-id="p04-question-hero">
       <view class="thumb">
-        <text class="thumb-lbl">{{question.subjectLabel}} · 12</text>
-        <text class="thumb-qno">17</text>
-        <text class="thumb-h3">已知 f(x)=x²−4x+3</text>
+        <text class="thumb-lbl">{{question.subjectLabel}}</text>
+        <text class="thumb-h3" wx:if="{{stemSnippet}}">{{stemSnippet}}</text>
         <view class="thumb-strk"></view>
-        <text class="thumb-pen">B</text>
       </view>
       <view class="hero-meta">
-        <text class="hero-kicker">{{question.subjectLabel}} · 二次函数 · 顶点式</text>
+        <text class="hero-kicker">{{topicChain}}</text>
         <text class="hero-stem" data-test-id="result-hero-stem">{{question.stem}}</text>
         <text class="hero-formula" wx:if="{{question.formula}}">{{question.formula}}</text>
       </view>
@@ -71,8 +69,7 @@
           <van-icon name="cross" size="12px" color="#FF3B30" />
           <text>你的作答</text>
         </view>
-        <text class="ans-v" data-test-id="p04-answers-row-wrong-text">{{question.myAnswer}}</text>
-        <text class="ans-n">混淆顶点式符号</text>
+        <text class="ans-v" data-test-id="p04-answers-row-wrong-text">{{question.myAnswer || '—'}}</text>
         <view class="ans-deco ans-deco-wrong"></view>
       </view>
       <view class="ans ans-right" data-test-id="p04-answers-row-right">
@@ -81,7 +78,6 @@
           <text>正确答案</text>
         </view>
         <text class="ans-v" data-test-id="p04-answers-row-right-text">{{question.correctAnswer}}</text>
-        <text class="ans-n">顶点 (2, −1)，对称轴 x = 2</text>
         <view class="ans-deco ans-deco-right"></view>
       </view>
     </view>
