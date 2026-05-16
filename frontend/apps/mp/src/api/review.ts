@@ -112,39 +112,41 @@ export interface CreateSessionReq {
   date?: string;
 }
 
-export async function createSession(req?: CreateSessionReq): Promise<ApiEnvelope<CreateSessionResp>> {
-  return httpJSON<ApiEnvelope<CreateSessionResp>>(
+// NOTE: `httpJSON` 内置 unwrapApiResult · 自动剥外层 {code,message,data}
+// 所以所有返回类型 = inner data shape · 调用方直接读字段, 不要写 resp.data.X
+export async function createSession(req?: CreateSessionReq): Promise<CreateSessionResp> {
+  return httpJSON<CreateSessionResp>(
     `${BASE}/api/review/sessions`,
     { method: 'POST', body: req ?? {} },
   );
 }
 
 // ── SC-01-C05 #2 · getToday ─────────────────────────────────
-export async function getToday(tz?: string): Promise<ApiEnvelope<TodayResp>> {
+export async function getToday(tz?: string): Promise<TodayResp> {
   const query = tz ? `?tz=${encodeURIComponent(tz)}` : '';
-  return httpJSON<ApiEnvelope<TodayResp>>(
+  return httpJSON<TodayResp>(
     `${BASE}/api/review/today${query}`,
   );
 }
 
 // ── SC-01-C05 #3 · getNode ──────────────────────────────────
-export async function getNode(nid: number | string): Promise<ApiEnvelope<ReviewPlanDto>> {
-  return httpJSON<ApiEnvelope<ReviewPlanDto>>(
+export async function getNode(nid: number | string): Promise<ReviewPlanDto> {
+  return httpJSON<ReviewPlanDto>(
     `${BASE}/api/review/nodes/${nid}`,
   );
 }
 
 // ── SC-01-C05 #4 · openNode ─────────────────────────────────
-export async function openNode(nid: number | string): Promise<ApiEnvelope<null>> {
-  return httpJSON<ApiEnvelope<null>>(
+export async function openNode(nid: number | string): Promise<null> {
+  return httpJSON<null>(
     `${BASE}/api/review/nodes/${nid}/open`,
     { method: 'POST' },
   );
 }
 
 // ── SC-01-C05 #5 · revealNode ───────────────────────────────
-export async function revealNode(nid: number | string): Promise<ApiEnvelope<RevealResp>> {
-  return httpJSON<ApiEnvelope<RevealResp>>(
+export async function revealNode(nid: number | string): Promise<RevealResp> {
+  return httpJSON<RevealResp>(
     `${BASE}/api/review/nodes/${nid}/reveal`,
     { method: 'POST' },
   );
@@ -156,24 +158,24 @@ export interface GradeReq {
   timeSpentMs?: number;
 }
 
-export async function gradeNode(nid: number | string, req: GradeReq): Promise<ApiEnvelope<CompleteResult>> {
-  return httpJSON<ApiEnvelope<CompleteResult>>(
+export async function gradeNode(nid: number | string, req: GradeReq): Promise<CompleteResult> {
+  return httpJSON<CompleteResult>(
     `${BASE}/api/review/nodes/${nid}/grade`,
     { method: 'POST', body: req },
   );
 }
 
 // ── SC-01-C05 #7 · nextInSession ────────────────────────────
-export async function nextInSession(sid: string): Promise<ApiEnvelope<NextInSessionResp>> {
-  return httpJSON<ApiEnvelope<NextInSessionResp>>(
+export async function nextInSession(sid: string): Promise<NextInSessionResp> {
+  return httpJSON<NextInSessionResp>(
     `${BASE}/api/review/sessions/${sid}/next`,
     { method: 'POST' },
   );
 }
 
 // ── SC-01-C05 #8 · nodeResult ───────────────────────────────
-export async function nodeResult(nid: number | string): Promise<ApiEnvelope<NodeResultResp>> {
-  return httpJSON<ApiEnvelope<NodeResultResp>>(
+export async function nodeResult(nid: number | string): Promise<NodeResultResp> {
+  return httpJSON<NodeResultResp>(
     `${BASE}/api/review/nodes/${nid}/result`,
   );
 }

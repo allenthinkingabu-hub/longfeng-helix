@@ -119,8 +119,7 @@ Page({
 
   async _fetchTodayData() {
     try {
-      const resp = await getHomeTodayCount();
-      const data = resp.data;
+      const data = await getHomeTodayCount();
       // 后端 data.total / data.done 可能缺字段 · ?? 0 兜底 防 IDE Console:
       // "Setting data field 'todayDone' to undefined is invalid" (Fix-4b · 2026-05-16)
       const total = data.total ?? 0;

@@ -42,8 +42,8 @@ Page({
   async _fetchToday() {
     try {
       const resp = await getToday('Asia/Shanghai');
-      const items = resp.data.items;
-      const total = resp.data.total;
+      const items = resp.items;
+      const total = resp.total;
 
       if (total === 0) {
         this.setData({ pageState: 'today.EMPTY' as PageState, totalCount: 0 });
@@ -92,11 +92,12 @@ Page({
 
     try {
       const resp = await createSession({ tz: 'Asia/Shanghai' });
-      const sid = resp.data.sid;
+      const sid = resp.sid;
       wx.navigateTo({
         url: `/pages/review-exec/index?sid=${sid}`,
       });
-    } catch {
+    } catch (err) {
+      console.error('[P07] createSession failed:', err);
       wx.showToast({ title: '启动失败 · 请重试', icon: 'none' });
     }
   },
