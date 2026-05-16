@@ -15,11 +15,6 @@ import { apiBase, httpJSON } from './_http';
 const BASE = apiBase('review');
 
 // ── Types ────────────────────────────────────────────────────
-interface ApiEnvelope<T> {
-  code: number;
-  message: string;
-  data: T;
-}
 
 export interface HomeTodayData {
   total: number;
@@ -30,11 +25,12 @@ export interface HomeTodayData {
 
 /**
  * GET /api/review/today?tz=Asia/Shanghai
- * Returns today's review count + done count for P-HOME hero card
+ * Returns today's review count + done count for P-HOME hero card.
+ * httpJSON 自动 unwrapApiResult · 直接拿 inner shape · 不要再 .data
  */
-export async function getHomeTodayCount(tz = 'Asia/Shanghai'): Promise<ApiEnvelope<HomeTodayData>> {
+export async function getHomeTodayCount(tz = 'Asia/Shanghai'): Promise<HomeTodayData> {
   const query = `?tz=${encodeURIComponent(tz)}`;
-  return httpJSON<ApiEnvelope<HomeTodayData>>(
+  return httpJSON<HomeTodayData>(
     `${BASE}/api/review/today${query}`,
   );
 }

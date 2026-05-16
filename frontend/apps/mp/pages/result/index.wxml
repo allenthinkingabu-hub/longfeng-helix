@@ -28,7 +28,7 @@
 
   <!-- Error state -->
   <view class="content error-content" wx:elif="{{pageState === 'ERROR'}}">
-    <view class="error-box">
+    <view class="error-box" data-test-id="p04-error-banner">
       <van-icon name="warning-o" size="48px" color="#FF3B30" />
       <text class="error-title">加载失败</text>
       <text class="error-desc">请检查网络后重试</text>
@@ -106,6 +106,17 @@
       <text class="sec-tag sec-tag-gray">{{question.steps.length}} STEPS</text>
     </view>
     <view class="steps" data-test-id="p04-solution-stepper">
+      <!-- AI 失败 / 步骤空时显示 fallback 文案 · 用户看不到 "0 STEPS" 截图态 -->
+      <view
+        class="step step-fallback"
+        wx:if="{{aiFallback.stepsShown}}"
+        data-test-id="p04-solution-stepper-fallback"
+      >
+        <view class="step-num">·</view>
+        <view class="step-body">
+          <text class="step-exp">解答步骤生成中…可下拉刷新或点击下方手动修正。</text>
+        </view>
+      </view>
       <view
         class="step"
         wx:for="{{question.steps}}"

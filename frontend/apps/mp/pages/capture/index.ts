@@ -193,11 +193,4 @@ Page({
     }
   },
 
-  onTabHome() {
-    wx.reLaunch({ url: '/pages/home/index' });
-  },
-
-  onTabWrongbook() {
-    wx.navigateTo({ url: '/pages/wrongbook-list/index' });
-  },
 });

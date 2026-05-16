@@ -267,7 +267,7 @@
 /* ── Error banner ────────────────────────────────── */
 .error-banner {
   position: fixed;
-  bottom: 520rpx;
+  bottom: 352rpx;
   left: 36rpx;
   right: 36rpx;
   background: rgba(255,59,48,0.15);
@@ -290,7 +290,7 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 456rpx;
+  bottom: 288rpx;
   padding: 0 36rpx;
   display: flex;
   gap: 16rpx;
@@ -325,7 +325,7 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 380rpx;
+  bottom: 212rpx;
   display: flex;
   justify-content: center;
   gap: 44rpx;
@@ -359,8 +359,8 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 168rpx;
-  height: 288rpx;
+  bottom: 0;
+  height: 480rpx;
   background: linear-gradient(180deg, rgba(11,15,26,0) 0%, rgba(11,15,26,0.85) 35%, #0B0F1A 100%);
   z-index: 23;
   pointer-events: none;
@@ -371,7 +371,7 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 232rpx;
+  bottom: 64rpx;
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -425,31 +425,3 @@
   justify-content: center;
 }
 
-/* ── Tab bar ─────────────────────────────────────── */
-.tabbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 168rpx;
-  padding: 16rpx 0 env(safe-area-inset-bottom);
-  background: rgba(11,15,26,0.78);
-  border-top: 1rpx solid rgba(255,255,255,0.08);
-  display: flex;
-  z-index: 25;
-}
-
-.tab {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6rpx;
-  color: rgba(255,255,255,0.5);
-  font-size: 20rpx;
-}
-
-.tab-active {
-  color: #FFCC00;
-}

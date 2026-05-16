@@ -26,7 +26,8 @@ export const TEST_IDS = {
     gallery: 'p02-gallery-btn',
     modes: 'p02-mode-tabs',
     modePhoto: 'p02-mode-tabs-tab-1',
-    modeMulti: 'p02-mode-tabs-tab-2',
+    // modeMulti: 临时禁用 (drift 治理 · 2026-05-16) · M-MULTI satellite (P1) 落地时改为 multiHint: 'p02-multi-detect-hint' (取景器内浮 hint testid)
+    // modeMulti: 'p02-mode-tabs-tab-2',
     modeFile: 'p02-mode-tabs-tab-3',
     uploadProgress: 'p02-upload-progress',
     errorBanner: 'p02-error-banner',

@@ -42,8 +42,8 @@ Page({
   async _fetchToday() {
     try {
       const resp = await getToday('Asia/Shanghai');
-      const items = resp.data.items;
-      const total = resp.data.total;
+      const items = resp.items;
+      const total = resp.total;
 
       if (total === 0) {
         this.setData({ pageState: 'today.EMPTY' as PageState, totalCount: 0 });
@@ -78,10 +78,6 @@ Page({
     wx.navigateBack();
   },
 
-  onTabHome() {
-    wx.reLaunch({ url: '/pages/home/index' });
-  },
-
   onItemTap(e: WechatMiniprogram.TouchEvent) {
     const nid = e.currentTarget.dataset.nid;
     wx.navigateTo({
@@ -89,19 +85,32 @@ Page({
     });
   },
 
+  // In-flight guard for "全部开始" CTA · 防双击触发两次 createSession + navigateTo:
+  // 第二次会撞 BE / WeChat 导航 race · 弹 "启动失败" toast 让用户以为没生效。
+  _starting: false as boolean,
+
   async onStartAllTap() {
+    if (this._starting) return;
+    this._starting = true;
+
     try {
       wx.vibrateShort({ type: 'light' });
     } catch { /* noop */ }
 
     try {
       const resp = await createSession({ tz: 'Asia/Shanghai' });
-      const sid = resp.data.sid;
+      const sid = resp.sid;
+      if (!sid) {
+        throw new Error('createSession: empty sid');
+      }
       wx.navigateTo({
         url: `/pages/review-exec/index?sid=${sid}`,
+        complete: () => { this._starting = false; },
       });
-    } catch {
+    } catch (err) {
+      console.error('[P07] createSession failed:', err);
       wx.showToast({ title: '启动失败 · 请重试', icon: 'none' });
+      this._starting = false;
     }
   },
 });

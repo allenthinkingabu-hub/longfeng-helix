@@ -3174,6 +3174,7 @@ calendar-platform/
 | Satellite | 覆盖范围 | 优先级 | 创建日期 |
 |---|---|---|---|
 | [biz/features/P-WEEKLY-REVIEW__weekly-review.md](features/P-WEEKLY-REVIEW__weekly-review.md) | 学生周回顾详情页 P-WEEKLY-REVIEW + SC-16 + GET /api/home/weekly · 补 P-HOME 「本周」Bento「查看全部 ›」link 落地页缺口 | P1 | 2026-05-16 |
+| [biz/features/M-MULTI-QUESTION-CAPTURE__multi-question-capture.md](features/M-MULTI-QUESTION-CAPTURE__multi-question-capture.md) | 多题拍照支持 · 跨 4 既有页 (P02/P03/P04/P05) 行为增强 + SC-17/18/19 + 2 新 DB 表/列 + 4 API 改造/新增 · 治理 4 层 silent drift (biz 单题假设 / mockup 3-mode / testids modeMulti / H5 假按钮) · 对齐业内主流 (学而思/作业帮) | P1 | 2026-05-16 |
 
 ---
 

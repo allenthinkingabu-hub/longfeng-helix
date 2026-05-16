@@ -118,6 +118,43 @@ public class ReviewPlanController {
         return ApiResult.ok(result);
     }
 
+    /**
+     * P04 "保存并开启复习" · 同步创建 7 个 review_plan 节点 (EBBINGHAUS_SM2).
+     *
+     * <p>SC-01-MP 落地：本地 dev 无 RocketMQ 时，由 wrongbook-service 在 save 事务后
+     * 同步 HTTP 调用本端点直接生成 plan（消费者侧 createSevenNodes 仍保留作为 MQ 路径）。
+     * 幂等：底层 {@code planRepo.existsByWrongItemId} + 唯一索引兜底 (wrong_item_id, node_index)
+     * 保证同一 wrong_item 重复触发只生成一次 7 行。
+     *
+     * <p>Request body: {@code {wrongItemId: long, studentId: long, occurredAt?: ISO8601 string}}
+     * Response: {@code {nodeCount: int}} · 0 表示已存在（幂等跳过）。
+     */
+    @Operation(summary = "P04 保存并开启复习 · 同步创建 7 节点")
+    @PostMapping("/internal/plans/from-question")
+    public ApiResult<Map<String, Object>> createFromQuestion(@RequestBody Map<String, Object> body) {
+        Object wrongItemIdRaw = body.get("wrongItemId");
+        Object studentIdRaw = body.get("studentId");
+        if (wrongItemIdRaw == null || studentIdRaw == null) {
+            throw new IllegalArgumentException("wrongItemId and studentId are required");
+        }
+        Long wrongItemId = Long.valueOf(wrongItemIdRaw.toString());
+        Long studentId = Long.valueOf(studentIdRaw.toString());
+        Instant base = parseOccurredAt(body.get("occurredAt"));
+        List<ReviewPlan> created = planService.createSevenNodes(wrongItemId, studentId, base);
+        return ApiResult.ok(Map.of("nodeCount", created.size()));
+    }
+
+    private static Instant parseOccurredAt(Object raw) {
+        if (raw == null) return Instant.now();
+        String s = raw.toString();
+        if (s.isBlank()) return Instant.now();
+        try {
+            return Instant.parse(s);
+        } catch (Exception e) {
+            return Instant.now();
+        }
+    }
+
     /** admin 学期初清空 · POST /review-plans/batch-reset · X-Admin: true */
     @Operation(summary = "BE-13 admin batch reset")
     @PostMapping("/review-plans/batch-reset")

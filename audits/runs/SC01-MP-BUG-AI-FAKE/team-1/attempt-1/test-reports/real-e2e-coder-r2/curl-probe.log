@@ -1,0 +1,9 @@
+=== probe 1: /api/ai/result/__probe__ ===
+{"status":"NOT_FOUND"}
+--- HTTP 200 ---
+=== probe 2: /api/ai/__probe__/answer (this is the R1-introduced endpoint that triggered the bug) ===
+{"message":"No AI analysis result for qid __probe__","code":"AI_ANSWER_NOT_FOUND"}
+--- HTTP 404 ---
+=== probe 3: /analysis/provider (must say qianwen not stub) ===
+{"active":"qianwen","status":"healthy"}
+--- HTTP 200 ---

@@ -1,0 +1,38 @@
+=== R4 Assertions (Real Math Image · base64 data URI) ===
+Image: 500px Quadratic_formula.svg.png (base64 data URI · DashScope-fetch bypassed)
+Timestamp: Sat May 16 14:06:49 +04 2026
+
+--- Raw answer ---
+{"qid":"test-qid-r4-math-v5-data","taskId":"test-qid-r4-math-v5-data","provider":"qianwen","modelInfo":{"name":"qianwen","version":"qwen-plus"},"reasonMarkdown":"学生未识别该公式为一元二次方程求根公式，缺乏对变量a、b、c对应系数的辨析能力","steps":[{"stepNo":1,"text":"明确公式名称为求根公式，专用于解形如ax²+bx+c=0的一元二次方程"},{"stepNo":2,"text":"指出a、b、c必须分别对应方程中x²、x及常数项的系数，且a≠0"},{"stepNo":3,"text":"强调根的存在性取决于判别式b²−4ac的符号，需分大于、等于、小于零三种情况讨论"}],"confidence":0.0}
+
+--- A. reasonMarkdown contains math concept words ---
+reasonMarkdown: 学生未识别该公式为一元二次方程求根公式，缺乏对变量a、b、c对应系数的辨析能力
+Math concept words hit: 5
+二次
+公式
+方程
+求根
+系数
+A: PASS
+
+--- B. steps contain problem-solving action words ---
+steps text:
+明确公式名称为求根公式，专用于解形如ax²+bx+c=0的一元二次方程
+指出a、b、c必须分别对应方程中x²、x及常数项的系数，且a≠0
+强调根的存在性取决于判别式b²−4ac的符号，需分大于、等于、小于零三种情况讨论
+Action words hit: 5
+强调
+指出
+明确
+求
+讨论
+B: PASS
+
+--- C. usage_tokens (real billing) ---
+usage_tokens not in JSON response (FE shape · field in DB only)
+Will check DB next
+
+--- D. R3-style base assertions hold ---
+reasonMarkdown length: 111 (>= 10? PASS)
+steps count: 3 (>= 3? PASS)
+modelInfo.name: qianwen (== qianwen? PASS)

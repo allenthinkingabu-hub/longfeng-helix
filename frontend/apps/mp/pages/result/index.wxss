@@ -65,6 +65,9 @@ page {
 /* ── Content area ─────────────────────────────────── */
 .content {
   padding: 24rpx 32rpx 32rpx;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 /* ── Error state ─────────────────────────────────── */
@@ -201,6 +204,7 @@ page {
 }
 
 .hero-kicker {
+  display: block;
   font-size: 22rpx;
   color: #007AFF;
   font-weight: 700;
@@ -209,14 +213,17 @@ page {
 }
 
 .hero-stem {
+  display: block;
   font-size: 28rpx;
   line-height: 1.5;
   margin-top: 8rpx;
   font-weight: 500;
   letter-spacing: 0.2rpx;
+  word-break: break-word;
 }
 
 .hero-formula {
+  display: block;
   margin-top: 12rpx;
   font-family: "Times New Roman", serif;
   font-style: italic;
@@ -429,6 +436,7 @@ page {
 
 .kp-card {
   flex: 2;
+  min-width: 0;
   background: #FFFFFF;
   border-radius: 28rpx;
   padding: 24rpx 28rpx;
@@ -471,9 +479,10 @@ page {
 
 .diff-card {
   flex: 1;
+  min-width: 0;
   background: #FFFFFF;
   border-radius: 28rpx;
-  padding: 24rpx 28rpx;
+  padding: 24rpx 16rpx;
   box-shadow: 0 2rpx 0 rgba(0,0,0,.03);
   display: flex;
   flex-direction: column;
@@ -492,9 +501,9 @@ page {
 .stars {
   margin-top: 14rpx;
   display: flex;
-  gap: 6rpx;
+  gap: 4rpx;
   color: #FF9500;
-  font-size: 36rpx;
+  font-size: 28rpx;
 }
 
 .star-dim {

@@ -1,0 +1,21 @@
+12:24:06.722 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.longfeng.aianalysis.Application for test class com.longfeng.aianalysis.controller.AiAnswerControllerTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-05-16T12:24:07.865+04:00  INFO 65464 --- [ai-analysis-service] [           main] c.l.a.controller.AiAnswerControllerTest  : Starting AiAnswerControllerTest using Java 17.0.13 with PID 65464 (started by allen in /Users/allen/workspace/longfeng/.claude/worktrees/ai-bailian-integration/backend/ai-analysis-service)
+2026-05-16T12:24:07.868+04:00  INFO 65464 --- [ai-analysis-service] [           main] c.l.a.controller.AiAnswerControllerTest  : No active profile set, falling back to 1 default profile: "default"
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-05-16T12:24:13.657+04:00  INFO 65464 --- [ai-analysis-service] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-05-16T12:24:13.658+04:00  INFO 65464 --- [ai-analysis-service] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-05-16T12:24:13.673+04:00  INFO 65464 --- [ai-analysis-service] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 5 ms
+2026-05-16T12:24:13.749+04:00  INFO 65464 --- [ai-analysis-service] [           main] c.l.a.controller.AiAnswerControllerTest  : Started AiAnswerControllerTest in 6.844 seconds (process running for 10.356)
+2026-05-16T12:24:13.979+04:00  WARN 65464 --- [ai-analysis-service] [           main] c.l.a.controller.AiAnswerController      : AI answer steps parse failed: Unrecognized token 'not': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
+ at [Source: (String)"not-json"; line: 1, column: 4]
+2026-05-16T12:24:14.313+04:00  INFO 65464 --- [ai-analysis-service] [           main] c.l.a.controller.AiAnswerController      : AI answer 200 (degraded) · qid=Q-AI-FAILED-003 · task FAILED
+2026-05-16T12:24:14.377+04:00  INFO 65464 --- [ai-analysis-service] [           main] c.l.a.controller.AiAnswerController      : AI answer 404 · qid=Q-NO-ANSWER-002 · no analysis_result row

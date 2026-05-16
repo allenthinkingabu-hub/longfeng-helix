@@ -1,0 +1,3 @@
+Image URL: https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Quadratic_formula.svg/500px-Quadratic_formula.svg.png
+Reason: Wikipedia Commons public file · 500px standard thumb · PNG · shows the quadratic formula x=(-b±√(b²-4ac))/2a which qwen-vl-plus should OCR as math content with discriminant + coefficients
+Probe: HTTP 200 image/png 4873 bytes

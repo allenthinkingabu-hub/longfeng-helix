@@ -1,0 +1,9 @@
+=== try container: team-1-pg ===
+longfeng wrongbook
+psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: FATAL:  role "postgres" does not exist
+=== try container: team-3-pg ===
+longfeng wrongbook
+psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: FATAL:  role "postgres" does not exist
+=== try container: team-4-pg ===
+longfeng wrongbook
+psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: FATAL:  role "postgres" does not exist

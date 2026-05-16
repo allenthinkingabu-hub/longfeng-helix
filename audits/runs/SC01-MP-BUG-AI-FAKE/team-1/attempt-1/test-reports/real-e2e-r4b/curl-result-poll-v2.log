@@ -1,0 +1,12 @@
+--- poll 1 (14:22:49) ---
+{"status":"ANALYZING"}
+--- poll 2 (14:22:51) ---
+{"status":"ANALYZING"}
+--- poll 3 (14:22:54) ---
+{"status":"ANALYZING"}
+--- poll 4 (14:22:56) ---
+{"status":"ANALYZING"}
+--- poll 5 (14:22:58) ---
+{"status":"ANALYZING"}
+--- poll 6 (14:23:00) ---
+{"status":"DONE"}

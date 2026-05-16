@@ -43,11 +43,66 @@ export interface GetQuestionByIdResp {
   plannedNodes: PlannedNode[];
 }
 
+/**
+ * BE wire shape from QuestionDetailController.get — snake_case keys + `qid`
+ * (DB column). FE pages consume the camelCase {@link QuestionDetail} shape with
+ * `id`, so this client maps the wire response into the FE-facing form. Fields
+ * that BE doesn't supply today (myAnswer / correctAnswer / reasonMarkdown /
+ * steps / formula) default to empty values — the AI sidecar branch in P04
+ * fills `reasonMarkdown` + `steps` when the answer is available.
+ */
+interface QuestionDetailWire {
+  qid?: string;
+  id?: string;
+  subject?: string;
+  stem_text?: string | null;
+  stem?: string | null;
+  ocr_text?: string | null;
+  difficulty?: number | null;
+  mastery?: number | null;
+  formula?: string | null;
+  my_answer?: string | null;
+  correct_answer?: string | null;
+  reason_markdown?: string | null;
+  steps?: QuestionStep[] | null;
+  knowledge_points?: KnowledgePoint[] | null;
+  confidence?: number | null;
+  model_info?: { name: string; version: string } | null;
+}
+
+interface GetQuestionByIdRespWire {
+  question?: QuestionDetailWire | null;
+  planned_nodes?: PlannedNode[] | null;
+  plannedNodes?: PlannedNode[] | null;
+}
+
+function normalizeQuestion(w: QuestionDetailWire | null | undefined): QuestionDetail {
+  const src = w || {};
+  return {
+    id: src.id ?? src.qid ?? '',
+    subject: src.subject ?? '',
+    stem: src.stem ?? src.stem_text ?? src.ocr_text ?? '',
+    formula: src.formula ?? '',
+    myAnswer: src.my_answer ?? '',
+    correctAnswer: src.correct_answer ?? '',
+    reasonMarkdown: src.reason_markdown ?? '',
+    steps: src.steps ?? [],
+    knowledgePoints: src.knowledge_points ?? [],
+    difficulty: typeof src.difficulty === 'number' ? src.difficulty : 3,
+    confidence: typeof src.confidence === 'number' ? src.confidence : 0,
+    modelInfo: src.model_info ?? undefined,
+  };
+}
+
 /** GET /api/wb/questions/:qid */
-export function getQuestionById(qid: string): Promise<GetQuestionByIdResp> {
-  return httpJSON<GetQuestionByIdResp>(
+export async function getQuestionById(qid: string): Promise<GetQuestionByIdResp> {
+  const raw = await httpJSON<GetQuestionByIdRespWire>(
     `${apiBase('wb')}/api/wb/questions/${qid}`,
   );
+  return {
+    question: normalizeQuestion(raw.question),
+    plannedNodes: raw.plannedNodes ?? raw.planned_nodes ?? [],
+  };
 }
 
 // ── create question (used by P02 capture page) ──────────────────
@@ -90,6 +145,33 @@ export function createQuestion(req: CreateQuestionReq): Promise<CreateQuestionRe
       body,
       headers: { 'X-Idempotency-Key': req.idempotencyKey },
     },
+  );
+}
+
+// ── save / confirm question (P04 "保存并开启复习" button) ───────
+
+export interface SaveQuestionResp {
+  /** Echoed qid (DB primary key as string). */
+  qid: string;
+  /** wrong_item.status after save · 3 == CONFIRMED. */
+  status: number;
+  /** Optional msgkey for FE toast (e.g. "msgkey:wb.save.success"). */
+  message?: string;
+}
+
+/**
+ * POST /api/wb/questions/{qid}/save
+ *
+ * <p>Transitions wrong_item.status → 3 (CONFIRMED), writes question.created.topic
+ * outbox event, and (in local dev) synchronously triggers review-plan-service to
+ * create the 7 SM-2 / Ebbinghaus review nodes. Production path also publishes the
+ * event via RocketMQ for downstream consumers; review-plan-service de-dupes by
+ * wrongItemId so the sync + async paths can coexist.
+ */
+export function saveQuestion(qid: string): Promise<SaveQuestionResp> {
+  return httpJSON<SaveQuestionResp>(
+    `${apiBase('wb')}/api/wb/questions/${qid}/save`,
+    { method: 'POST', body: {} },
   );
 }
 

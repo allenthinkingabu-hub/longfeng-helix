@@ -1,0 +1,10 @@
+       task_id        | provider |   model   | reason_len | step_count | usage_tokens |          created_at           
+----------------------+----------+-----------+------------+------------+--------------+-------------------------------
+ test-qid-real-e2e-r3 | qianwen  | qwen-plus |         19 |          3 |          198 | 2026-05-16 09:18:03.424187+00
+(1 row)
+
+       task_id        | status |                                               image_url                                               
+----------------------+--------+-------------------------------------------------------------------------------------------------------
+ test-qid-real-e2e-r3 | DONE   | https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241022/emyrja/dog_and_girl.jpeg
+(1 row)
+

@@ -20,7 +20,7 @@ page {
 .hero {
   position: relative;
   width: 100%;
-  height: 660rpx;
+  height: 720rpx;
   background: linear-gradient(175deg, #0F7F3E 0%, #1FAE5C 40%, #34C759 100%);
   overflow: hidden;
 }
@@ -178,14 +178,16 @@ page {
 /* ── Scroll content ──────────────────────────────────────── */
 .scroll {
   position: absolute;
-  top: 620rpx;
+  top: 680rpx;
   left: 0; right: 0;
   bottom: 168rpx;
-  padding: 64rpx 32rpx 48rpx;
+  padding: 48rpx 32rpx;
   background: var(--bg);
   border-top-left-radius: 48rpx;
   border-top-right-radius: 48rpx;
   box-shadow: 0 -36rpx 48rpx rgba(0,0,0,0.04);
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 /* ── Block title ─────────────────────────────────────────── */
@@ -199,6 +201,7 @@ page {
   display: flex;
   align-items: center;
   gap: 12rpx;
+  min-width: 0;
 }
 
 .block-title-dot {
@@ -209,11 +212,17 @@ page {
 }
 
 .block-title-right {
+  display: block;                  /* <text> 默认 inline · 不加 block 跑不了 ellipsis */
   margin-left: auto;
   font-size: 22rpx;
   color: var(--sec);
   font-weight: 600;
   letter-spacing: 0.6rpx;
+  min-width: 0;
+  flex-shrink: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ── Card ────────────────────────────────────────────────── */
