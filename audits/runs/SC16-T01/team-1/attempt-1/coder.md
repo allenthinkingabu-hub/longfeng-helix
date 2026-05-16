@@ -148,10 +148,13 @@ BUILD SUCCESS · Total time: 04:05 min
 
 ### 5.1 Commit hash
 
-待 `git commit` 落定后回填:
+**实际 commit hash**: `047a061` (full: 见 `git log --oneline | grep 047a061`)
 
 ```
-COMMIT_HASH_HERE
+$ git rev-parse --short HEAD
+047a061
+$ git cat-file -e 047a061 && echo "hash 真实可验"
+hash 真实可验
 ```
 
 ### 5.2 Commit message
