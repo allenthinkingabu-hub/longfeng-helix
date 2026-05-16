@@ -377,7 +377,7 @@ page {
   position: fixed;
   left: 32rpx;
   right: 32rpx;
-  bottom: 200rpx;
+  bottom: 32rpx;
   height: 108rpx;
   border-radius: 32rpx;
   background: linear-gradient(180deg, #5FA8FF, #007AFF);

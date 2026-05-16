@@ -98,7 +98,7 @@
   top: 208rpx;
   left: 0;
   right: 0;
-  bottom: 480rpx;
+  bottom: 312rpx;
   background: radial-gradient(800px 400px at 50% 30%, #1d2433 0%, #0B0F1A 65%);
   overflow: hidden;
 }
@@ -267,7 +267,7 @@
 /* ── Error banner ────────────────────────────────── */
 .error-banner {
   position: fixed;
-  bottom: 520rpx;
+  bottom: 352rpx;
   left: 36rpx;
   right: 36rpx;
   background: rgba(255,59,48,0.15);
@@ -290,7 +290,7 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 456rpx;
+  bottom: 288rpx;
   padding: 0 36rpx;
   display: flex;
   gap: 16rpx;
@@ -325,7 +325,7 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 380rpx;
+  bottom: 212rpx;
   display: flex;
   justify-content: center;
   gap: 44rpx;
@@ -359,7 +359,7 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 168rpx;
+  bottom: 0;
   height: 288rpx;
   background: linear-gradient(180deg, rgba(11,15,26,0) 0%, rgba(11,15,26,0.85) 35%, #0B0F1A 100%);
   z-index: 23;
@@ -371,7 +371,7 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 232rpx;
+  bottom: 64rpx;
   display: flex;
   align-items: center;
   justify-content: space-around;
