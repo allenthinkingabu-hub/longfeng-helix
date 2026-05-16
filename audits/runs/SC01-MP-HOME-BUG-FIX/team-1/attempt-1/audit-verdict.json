@@ -1,0 +1,162 @@
+{
+  "task_id": "SC01-MP-HOME-BUG-FIX",
+  "attempt": 1,
+  "team_id": "team-1",
+  "audited_at": "2026-05-16T02:12:50.175Z",
+  "audited_by": "audit.js v2 (deterministic · 6 dims · +ide_smoke)",
+  "pass": false,
+  "checks": [
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_exists",
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/audits/runs/SC01-MP-HOME-BUG-FIX/team-1/attempt-1/coder.md"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_keyword_地形侦察",
+      "pass": true,
+      "evidence": "4×"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_keyword_编码",
+      "pass": true,
+      "evidence": "8×"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_keyword_自检",
+      "pass": true,
+      "evidence": "8×"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_keyword_提交",
+      "pass": true,
+      "evidence": "4×"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "bugs_found_md_exists",
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/audits/runs/SC01-MP-HOME-BUG-FIX/team-1/attempt-1/bugs-found.md"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "bugs_found_md_has_declaration",
+      "pass": true,
+      "evidence": "bug list found"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "tester_md_exists",
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/audits/runs/SC01-MP-HOME-BUG-FIX/team-1/attempt-1/tester.md"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "adversarial_md_exists",
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/audits/runs/SC01-MP-HOME-BUG-FIX/team-1/attempt-1/adversarial.md"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "test_reports_nonempty",
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/audits/runs/SC01-MP-HOME-BUG-FIX/team-1/attempt-1/test-reports"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "adversarial_has_reject_round",
+      "pass": true,
+      "evidence": "REJECT/驳回 keyword found"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "adversarial_has_fix_round",
+      "pass": true,
+      "evidence": "fix/修复 keyword found"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "mock_total_le_5",
+      "pass": false,
+      "evidence": "mock=11/5 OVER · {\"vi.mock\":2,\"page.route\":2,\"MockMvc\":2,\"wx.request.mock\":2,\"miniprogram-simulate\":1,\"wx.cloud.mock\":1,\"mockRequest\":1}"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "maxDiffPixels_le_500",
+      "pass": true,
+      "evidence": "max=500/500"
+    },
+    {
+      "dimension": "bug_reality",
+      "name": "all_git_commits_verified",
+      "pass": true,
+      "evidence": "1/1 hash(es) git cat-file -e PASS"
+    },
+    {
+      "dimension": "test_validity",
+      "name": "tester_md_testcase_count_matches_xml",
+      "pass": false,
+      "evidence": "claimed=4 but no <testcase> in XML — tester.md may inflate"
+    },
+    {
+      "dimension": "test_validity",
+      "name": "adversarial_has_exploratory_keywords",
+      "pass": false,
+      "evidence": "1/2 minimum (expected: 连点/DOM/注入/超长/阻断/race/SQL etc.)"
+    },
+    {
+      "dimension": "spec_alignment",
+      "name": "c2_playwright_index_html",
+      "pass": false,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/audits/runs/SC01-MP-HOME-BUG-FIX/team-1/attempt-1/test-reports/e2e/coder/playwright/index.html"
+    },
+    {
+      "dimension": "spec_alignment",
+      "name": "c2_playwright_results_xml",
+      "pass": false,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/audits/runs/SC01-MP-HOME-BUG-FIX/team-1/attempt-1/test-reports/e2e/coder/playwright/results.xml"
+    },
+    {
+      "dimension": "spec_alignment",
+      "name": "c2_playwright_run_log",
+      "pass": false,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/audits/runs/SC01-MP-HOME-BUG-FIX/team-1/attempt-1/test-reports/e2e/coder/playwright/run.log"
+    },
+    {
+      "dimension": "spec_alignment",
+      "name": "c3_verify_log_exists",
+      "pass": false,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/audits/runs/SC01-MP-HOME-BUG-FIX/team-1/attempt-1/test-reports/e2e/coder/backend-it/verify.log"
+    },
+    {
+      "dimension": "spec_alignment",
+      "name": "c4_screenshots_ge_12",
+      "pass": false,
+      "evidence": "screenshots dir missing: /Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/audits/runs/SC01-MP-HOME-BUG-FIX/team-1/attempt-1/test-reports/e2e/coder/screenshots"
+    },
+    {
+      "dimension": "spec_alignment",
+      "name": "c5_spec_trace_md_exists",
+      "pass": false,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/audits/runs/SC01-MP-HOME-BUG-FIX/team-1/attempt-1/test-reports/e2e/coder/spec-trace.md"
+    },
+    {
+      "dimension": "spec_alignment",
+      "name": "c6_env_snapshot_md_exists",
+      "pass": false,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/audits/runs/SC01-MP-HOME-BUG-FIX/team-1/attempt-1/test-reports/e2e/coder/env-snapshot.md"
+    },
+    {
+      "dimension": "ide_smoke",
+      "name": "ide_smoke_required_by_team",
+      "pass": true,
+      "evidence": "team_id=team-1 · not UI team · IDE smoke skipped"
+    }
+  ],
+  "redo_target": "coder",
+  "redo_reason": "[tester_compliance.mock_total_le_5] mock=11/5 OVER · {\"vi.mock\":2,\"page.route\":2,\"MockMvc\":2,\"wx.request.mock\":2,\"miniprogram-simulate\":1,\"wx.cloud.mock\":1,\"mockRequest\":1} · [test_validity.tester_md_testcase_count_matches_xml] claimed=4 but no <testcase> in XML — tester.md may inflate · [test_validity.adversarial_has_exploratory_keywords] 1/2 minimum (expected: 连点/DOM/注入/超长/阻断/race/SQL etc.) · [spec_alignment.c2_playwright_index_html] /Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/audits/runs/SC01-MP-HOME-BUG-FIX/team-1/attempt-1/test-reports/e2e/coder/playwright/index.html · [spec_alignment.c2_playwright_results_xml] /Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/audits/runs/SC01-MP-HOME-BUG-FIX/team-1/attempt-1/test-reports/e2e/coder/playwright/results.xml · [spec_alignment.c2_playwright_run_log] /Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/audits/runs/SC01-MP-HOME-BUG-FIX/team-1/attempt-1/test-reports/e2e/coder/playwright/run.log · [spec_alignment.c3_verify_log_exists] /Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/audits/runs/SC01-MP-HOME-BUG-FIX/team-1/attempt-1/test-reports/e2e/coder/backend-it/verify.log · [spec_alignment.c4_screenshots_ge_12] screenshots dir missing: /Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/audits/runs/SC01-MP-HOME-BUG-FIX/team-1/attempt-1/test-reports/e2e/coder/screenshots · [spec_alignment.c5_spec_trace_md_exists] /Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/audits/runs/SC01-MP-HOME-BUG-FIX/team-1/attempt-1/test-reports/e2e/coder/spec-trace.md · [spec_alignment.c6_env_snapshot_md_exists] /Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/audits/runs/SC01-MP-HOME-BUG-FIX/team-1/attempt-1/test-reports/e2e/coder/env-snapshot.md"
+}

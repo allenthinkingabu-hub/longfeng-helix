@@ -1,20 +1,18 @@
-// P-HOME 首页 · 1:1 mirror of design/mockups/wrongbook/01_home_ios_refined.html
-// trace: design/mockups/wrongbook/01_home_ios_refined.html · @longfeng/testids pHome
+// P-HOME 首页 · 1:1 mirror of design/mockups/wrongbook/01_home.html
+// trace: design/mockups/wrongbook/01_home.html · @longfeng/testids pHome
 // 状态机: LOADING → READY | EMPTY | ERROR
 // API: src/api/home.ts · getHomeTodayCount · 真 API · 0 mock
 
 import { TEST_IDS } from '@longfeng/testids';
 import { getHomeTodayCount } from '../../src/api/home';
-import { buildGreeting, computeCirclePct, derivePageState } from './helpers';
+import {
+  SUBJECT_COLORS,
+  buildCurrentWeekStrip,
+  buildGreeting,
+  computeCirclePct,
+  derivePageState,
+} from './helpers';
 import type { PageState } from './helpers';
-
-// ─── Subject palette ────────────────────────────────────────────
-const SUBJECT_COLORS: Record<string, string> = {
-  '数学': '#C41E3A',
-  '物理': '#0057B7',
-  '化学': '#1A6B3A',
-  '英语': '#9C4F00',
-};
 
 // ─── Mock/MVP data ──────────────────────────────────────────────
 const MVP_SUBJECTS = [
@@ -25,15 +23,8 @@ const MVP_SUBJECTS = [
 
 const MVP_WEEK_STATS = { mastered: 23, newItems: 8, forgotten: 2, masteryRate: 68 };
 
-const MVP_WEEK_DAYS = [
-  { w: '一', d: '20', dots: ['#C41E3A', '#0057B7'], today: false, num: 0 },
-  { w: '二', d: '22', dots: ['#C41E3A', '#0057B7', '#9C4F00', '#C41E3A', '#FF2D55'], today: true, num: 8 },
-  { w: '三', d: '22', dots: ['#1A6B3A', '#30B0C7'], today: false, num: 0 },
-  { w: '四', d: '23', dots: ['#C41E3A', '#1A6B3A', '#9C4F00'], today: false, num: 0 },
-  { w: '五', d: '24', dots: ['#0057B7', '#30B0C7'], today: false, num: 0 },
-  { w: '六', d: '25', dots: ['#9C4F00'], today: false, num: 0 },
-  { w: '日', d: '26', dots: ['#1A6B3A', '#30B0C7', '#C41E3A'], today: false, num: 0 },
-];
+// (B4 · B5) MVP_WEEK_DAYS / weekLabel 由 buildCurrentWeekStrip() 动态生成
+// 旧硬编码 (周二/周三 d=22 重复 · 4 月 20-26 日) 已删除
 
 const MVP_MESSAGES = [
   { title: '记忆曲线 T3 · 二次函数', subtitle: '今晚 20:30 · 3 题即将到期', time: '10 min', icon: 'bell', iconColor: '#5856D6', theme: 'ind' },
@@ -41,8 +32,26 @@ const MVP_MESSAGES = [
   { title: '本周免打扰时段已更新', subtitle: '23:00 – 07:30 · 记忆曲线节奏不变', time: '周日', icon: 'clock-o', iconColor: '#30B0C7', theme: 'tea' },
 ];
 
+// (B3) Sparkline SVG · trace 01_home.html L280-290
+// MP <view> 不能直接放 <svg> 标签 · 改成 data URI 给 <image> 用
+// path / circle 数值与 mockup 完全一致 (300×40 viewBox · 7 段折线)
+const SPARKLINE_SVG = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 40" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="sparkg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#34C759" stop-opacity=".35"/>
+      <stop offset="100%" stop-color="#34C759" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <path d="M0 28 L43 22 L86 24 L129 16 L172 12 L215 18 L258 8 L300 14 L300 40 L0 40 Z" fill="url(#sparkg)"/>
+  <path d="M0 28 L43 22 L86 24 L129 16 L172 12 L215 18 L258 8 L300 14" stroke="#34C759" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="258" cy="8" r="3.5" fill="#34C759" stroke="#fff" stroke-width="1.5"/>
+</svg>`;
+// 用 encodeURIComponent 比 base64 更轻量, MP <image src="data:image/svg+xml;utf8,..."> OK
+const SPARKLINE_SVG_URI = `data:image/svg+xml;utf8,${encodeURIComponent(SPARKLINE_SVG)}`;
+
 const QUICK_ENTRIES = [
-  { title: '错题本', subtitle: '128 题 · 未掌握 42', icon: 'description', theme: 'red', url: '/pages/capture/index' },
+  { title: '错题本', subtitle: '128 题 · 未掌握 42', icon: 'description', theme: 'red', url: '/pages/wrongbook-list/index' },
   { title: '拍一道新错题', subtitle: '自动识别 · 多学科', icon: 'photograph', theme: 'grn', url: '/pages/capture/index' },
   { title: '完整日历', subtitle: '月 / 周 / 日视图', icon: 'calendar-o', theme: 'blu', url: '' },
   { title: '偏好与提醒', subtitle: '免打扰 · 节奏 · 语言', icon: 'setting-o', theme: 'pur', url: '' },
@@ -70,10 +79,11 @@ Page({
 
     // weekly
     weekStats: MVP_WEEK_STATS,
+    sparklineSvgUri: SPARKLINE_SVG_URI,
 
-    // week schedule
-    weekLabel: '4 月 20–26 日',
-    weekDays: MVP_WEEK_DAYS,
+    // week schedule · 动态 (B4 + B5)
+    weekLabel: buildCurrentWeekStrip(new Date()).label,
+    weekDays: buildCurrentWeekStrip(new Date()).days,
 
     // messages
     messages: MVP_MESSAGES,
@@ -87,8 +97,24 @@ Page({
   },
 
   onShow() {
-    // Refresh greeting (time-dependent)
-    this.setData({ greeting: buildGreeting() });
+    // Refresh time-dependent data (greeting + 本周日程 · 跨日要切高亮)
+    const strip = buildCurrentWeekStrip(new Date());
+    this.setData({
+      greeting: buildGreeting(),
+      weekLabel: strip.label,
+      weekDays: strip.days,
+    });
+    // Sync 复习 tab badge to today's pending review count · mockup line 484 badge=8
+    this._syncReviewBadge();
+  },
+
+  _syncReviewBadge() {
+    const pending = Math.max(0, (this.data.todayTotal as number) - (this.data.todayDone as number));
+    if (pending > 0) {
+      wx.setTabBarBadge({ index: 3, text: String(pending), fail: () => { /* ignore in non-tab context */ } });
+    } else {
+      wx.removeTabBarBadge({ index: 3, fail: () => { /* ignore */ } });
+    }
   },
 
   async _fetchTodayData() {
@@ -107,7 +133,7 @@ Page({
         todayDone: done,
         circleProgress: pct / 100,
         circlePctText: `${pct}%`,
-      });
+      }, () => this._syncReviewBadge());
     } catch {
       // Degrade: show READY with MVP defaults (mockup placeholder data)
       this.setData({
@@ -116,7 +142,7 @@ Page({
         todayDone: 3,
         circleProgress: 0.38,
         circlePctText: '38%',
-      });
+      }, () => this._syncReviewBadge());
     }
   },
 

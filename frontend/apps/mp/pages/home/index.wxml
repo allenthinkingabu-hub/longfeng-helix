@@ -1,5 +1,5 @@
-<!-- P-HOME 首页 · 1:1 mirror of design/mockups/wrongbook/01_home_ios_refined.html -->
-<!-- trace: design/mockups/wrongbook/01_home_ios_refined.html · @longfeng/testids pHome -->
+<!-- P-HOME 首页 · 1:1 mirror of design/mockups/wrongbook/01_home.html -->
+<!-- trace: design/mockups/wrongbook/01_home.html · @longfeng/testids pHome -->
 <!-- 状态机: LOADING → READY | EMPTY | ERROR -->
 
 <view class="home-page" data-test-id="p-home-root">
@@ -26,8 +26,8 @@
     </view>
   </view>
 
-  <!-- ── Scroll area ──────────────────────────────────── -->
-  <scroll-view class="scroll" scroll-y="true">
+  <!-- ── Scroll area (B7 · view + page 整页滚动 · 原 scroll-view 无 height MP 不滚) ─ -->
+  <view class="scroll">
 
     <!-- ── LOADING skeleton ──────────────────────────── -->
     <view wx:if="{{pageState === 'LOADING'}}" class="skeleton">
@@ -95,7 +95,7 @@
     <!-- ── 始终渲染 sections (LOADING/READY/EMPTY/ERROR 共用 home framework) ─── -->
     <block>
 
-      <!-- ── Weekly summary ──────────────────────────── -->
+      <!-- ── Weekly summary (B3 · sparkline SVG + days bar) ──── -->
       <view class="sec">
         <text class="sec-t">本周回顾</text>
         <text class="sec-m">查看全部 ›</text>
@@ -122,6 +122,21 @@
             <text class="stat-l">掌握率</text>
           </view>
         </view>
+        <!-- (B3) sparkline SVG · 7 日趋势折线 + 今日端点 高亮 -->
+        <!-- MP 不支持原生 <svg> 标签 · 用 <image src="data:image/svg+xml;..."> 兜底 -->
+        <view class="spark" data-test-id="p-home-weekly-spark-svg">
+          <image class="spark-svg" src="{{sparklineSvgUri}}" mode="scaleToFill" />
+        </view>
+        <!-- (B3) days bar · 周一→周日 标签 + 今日高亮 -->
+        <view class="days" data-test-id="p-home-weekly-days">
+          <text class="day">周一</text>
+          <text class="day">周二</text>
+          <text class="day">周三</text>
+          <text class="day">周四</text>
+          <text class="day">周五</text>
+          <text class="day">周六</text>
+          <text class="day day-today">今天</text>
+        </view>
       </view>
 
       <!-- ── Week schedule ───────────────────────────── -->
@@ -141,7 +156,7 @@
           </view>
         </view>
         <view class="wc-row">
-          <view wx:for="{{weekDays}}" wx:key="d" class="wd {{item.today ? 'wd-today' : ''}}">
+          <view wx:for="{{weekDays}}" wx:key="w" class="wd {{item.today ? 'wd-today' : ''}}">
             <text class="wd-w">{{item.w}}</text>
             <text class="wd-d">{{item.d}}</text>
             <view class="wd-dots">
@@ -152,11 +167,11 @@
         </view>
         <view class="wc-foot">
           <view class="wc-legend">
-            <view class="wc-lg-item"><view class="wc-lg-dot" style="background: #C41E3A;"></view><text>数学</text></view>
-            <view class="wc-lg-item"><view class="wc-lg-dot" style="background: #0057B7;"></view><text>物理</text></view>
-            <view class="wc-lg-item"><view class="wc-lg-dot" style="background: #1A6B3A;"></view><text>化学</text></view>
-            <view class="wc-lg-item"><view class="wc-lg-dot" style="background: #9C4F00;"></view><text>英语</text></view>
+            <view class="wc-lg-item"><view class="wc-lg-dot" style="background: #FF3B30;"></view><text>复习 T1</text></view>
+            <view class="wc-lg-item"><view class="wc-lg-dot" style="background: #FF9500;"></view><text>T3</text></view>
+            <view class="wc-lg-item"><view class="wc-lg-dot" style="background: #34C759;"></view><text>T6</text></view>
             <view class="wc-lg-item"><view class="wc-lg-dot" style="background: #FF2D55;"></view><text>考试</text></view>
+            <view class="wc-lg-item"><view class="wc-lg-dot" style="background: #5856D6;"></view><text>家庭</text></view>
           </view>
         </view>
       </view>
@@ -220,6 +235,6 @@
 
     </block>
 
-  </scroll-view>
+  </view>
 
 </view>

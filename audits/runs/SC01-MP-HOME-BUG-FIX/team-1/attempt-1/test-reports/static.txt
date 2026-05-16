@@ -1,0 +1,12 @@
+
+> @longfeng/mp@0.1.0 lint /Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/frontend/apps/mp
+> node scripts/lint.mjs && tsc --noEmit
+
+✓ lint-mp: 0 errors
+EXIT=0
+--- typecheck ---
+
+> @longfeng/mp@0.1.0 typecheck /Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/frontend/apps/mp
+> tsc --noEmit
+
+TYPECHECK_EXIT=0

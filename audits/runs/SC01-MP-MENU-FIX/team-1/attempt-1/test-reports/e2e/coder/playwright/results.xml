@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="6" failures="6" errors="0" time="180.579">
+    <testsuite name="test/e2e/tabbar-visible-all-tabs.spec.ts" timestamp="2026-05-16T04:23:33.693Z" hostname="Wangs-MacBook-Pro.local" tests="6" failures="6" errors="0" skipped="0" time="180.067">
+        <testcase classname="test/e2e/tabbar-visible-all-tabs.spec.ts" name="SC01-MP-MENU-FIX · 全 tab 页底部 menu (tabBar) 可见性 &gt; tab=首页 · reLaunch pages/home/index · tabBar strip 非空 + view ≥ 15" time="30.015">
+            <failure message="Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with &quot;testTimeout&quot;." type="Error">
+Error: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with &quot;testTimeout&quot;.
+            </failure>
+        </testcase>
+        <testcase classname="test/e2e/tabbar-visible-all-tabs.spec.ts" name="SC01-MP-MENU-FIX · 全 tab 页底部 menu (tabBar) 可见性 &gt; tab=错题本 · reLaunch pages/wrongbook-list/index · tabBar strip 非空 + view ≥ 5" time="30.005">
+            <failure message="Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with &quot;testTimeout&quot;." type="Error">
+Error: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with &quot;testTimeout&quot;.
+            </failure>
+        </testcase>
+        <testcase classname="test/e2e/tabbar-visible-all-tabs.spec.ts" name="SC01-MP-MENU-FIX · 全 tab 页底部 menu (tabBar) 可见性 &gt; tab=拍题 · reLaunch pages/capture/index · tabBar strip 非空 + view ≥ 5" time="30.006">
+            <failure message="Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with &quot;testTimeout&quot;." type="Error">
+Error: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with &quot;testTimeout&quot;.
+            </failure>
+        </testcase>
+        <testcase classname="test/e2e/tabbar-visible-all-tabs.spec.ts" name="SC01-MP-MENU-FIX · 全 tab 页底部 menu (tabBar) 可见性 &gt; tab=复习 · reLaunch pages/review-today/index · tabBar strip 非空 + view ≥ 5" time="30.003">
+            <failure message="Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with &quot;testTimeout&quot;." type="Error">
+Error: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with &quot;testTimeout&quot;.
+            </failure>
+        </testcase>
+        <testcase classname="test/e2e/tabbar-visible-all-tabs.spec.ts" name="SC01-MP-MENU-FIX · 全 tab 页底部 menu (tabBar) 可见性 &gt; tab=我的 · reLaunch pages/me/index · tabBar strip 非空 + view ≥ 3" time="30.003">
+            <failure message="Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with &quot;testTimeout&quot;." type="Error">
+Error: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with &quot;testTimeout&quot;.
+            </failure>
+        </testcase>
+        <testcase classname="test/e2e/tabbar-visible-all-tabs.spec.ts" name="SC01-MP-MENU-FIX · 全 tab 页底部 menu (tabBar) 可见性 &gt; home 加载完成后 · 复习 tab (index=3) 应显示 badge 数字 (mockup line 484)" time="30.007">
+            <failure message="Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with &quot;testTimeout&quot;." type="Error">
+Error: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with &quot;testTimeout&quot;.
+            </failure>
+        </testcase>
+    </testsuite>
+</testsuites>

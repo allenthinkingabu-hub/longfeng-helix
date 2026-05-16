@@ -13,6 +13,8 @@
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFileSync, mkdirSync, writeFileSync, appendFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { setTimeout as sleep } from 'node:timers/promises';
 import automator from 'miniprogram-automator';
 import { PNG } from 'pngjs';
 import pixelmatch from 'pixelmatch';
@@ -105,6 +107,52 @@ export function artifactPath(filename: string): string {
  * Compare actual base64 PNG (from mp.screenshot()) against baseline PNG file.
  * Returns the pixel diff count. Also writes actual + diff PNG to ARTIFACT_DIR.
  */
+/**
+ * forceRecompileIDE · 强制重启 WeChat 开发者工具 IDE 让 TS 重新编译
+ *
+ * RC (SC01-MP-HOME-BUG-FIX attempt-1): home-data-probe.spec.ts 直连 ws://127.0.0.1:9420
+ * 拿 page.data() 时, IDE 实例可能仍跑未重编的旧 .js 编译产物 (project.config.json
+ * 用 useCompilerPlugins:["typescript"] 由 IDE 内部编译 TS, compileHotReLoad=true 不可靠).
+ * 结果即使源码已修, page.data() 仍返回旧硬编码 (B4 d=22 重复 / B5 4 月 20-26 / B6 #C41E3A).
+ *
+ * Fix: 在 probe 前 close IDE → sleep → start (open + auto-port 9420) → sleep.
+ * 适用: 任何依赖 page.data() 真值的 spec · home-data-probe 必须用 · 其他 spec 可选.
+ *
+ * @param timeoutSec 各阶段超时 (close=15s, start=120s, settle=5s extra)
+ */
+export async function forceRecompileIDE(): Promise<void> {
+  const CLI = process.env.WECHAT_CLI_PATH || '/Applications/wechatwebdevtools.app/Contents/MacOS/cli';
+  const PROJECT_DIR = resolve(__dirname, '../..');
+
+  // SC01-MP-MENU-FIX (2026-05-16): 'close' subcommand 只关项目, IDE HTTP server
+  // 仍 listen 28683 → 下次 open --port 9420 报 port conflict exit 255 → IDE 实际
+  // 没真重启 · app.json 改动不生效. 改用 'quit' 完全退出 IDE 再 open.
+  const quitRes = spawnSync(CLI, ['quit'], { stdio: 'inherit', timeout: 20_000 });
+  if (quitRes.error) {
+    console.error('[forceRecompileIDE] quit failed:', quitRes.error.message);
+  }
+  await sleep(5_000);
+
+  const openRes = spawnSync(CLI, ['open', '--project', PROJECT_DIR, '--port', '9420'], {
+    stdio: 'inherit',
+    timeout: 120_000,
+  });
+  if (openRes.status !== 0) {
+    console.error(`[forceRecompileIDE] open exited code=${openRes.status} (may need manual retry)`);
+  }
+  // settle for IDE to fully load + compile TS
+  await sleep(35_000);
+
+  const autoRes = spawnSync(CLI, ['auto', '--project', PROJECT_DIR, '--auto-port', '9420'], {
+    stdio: 'inherit',
+    timeout: 30_000,
+  });
+  if (autoRes.status !== 0) {
+    console.error(`[forceRecompileIDE] auto exited code=${autoRes.status} (websocket may still come up)`);
+  }
+  await sleep(5_000);
+}
+
 export function compareScreenshot(actualBase64: string, baselineFilename: string, outPrefix: string): {
   diffPixels: number;
   width: number;

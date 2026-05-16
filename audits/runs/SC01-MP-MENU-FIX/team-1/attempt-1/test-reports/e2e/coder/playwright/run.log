@@ -1,0 +1,63 @@
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v1.6.1 /Users/allen/workspace/longfeng/.claude/worktrees/ecstatic-villani-cbe9f0/frontend/apps/mp
+
+ ❯ test/e2e/tabbar-visible-all-tabs.spec.ts  (6 tests | 4 failed) 69552ms
+   ❯ test/e2e/tabbar-visible-all-tabs.spec.ts > SC01-MP-MENU-FIX · 全 tab 页底部 menu (tabBar) 可见性 > tab=首页 · reLaunch pages/home/index · tabBar strip 非空 + view ≥ 15
+     → expected 0.006 to be greater than 0.015
+   ❯ test/e2e/tabbar-visible-all-tabs.spec.ts > SC01-MP-MENU-FIX · 全 tab 页底部 menu (tabBar) 可见性 > tab=复习 · reLaunch pages/review-today/index · tabBar strip 非空 + view ≥ 5
+     → expected 0.002448717948717949 to be greater than 0.015
+   ❯ test/e2e/tabbar-visible-all-tabs.spec.ts > SC01-MP-MENU-FIX · 全 tab 页底部 menu (tabBar) 可见性 > tab=我的 · reLaunch pages/me/index · tabBar strip 非空 + view ≥ 3
+     → expected 0 to be greater than 0.015
+   ❯ test/e2e/tabbar-visible-all-tabs.spec.ts > SC01-MP-MENU-FIX · 全 tab 页底部 menu (tabBar) 可见性 > home 加载完成后 · 复习 tab (index=3) 应显示 badge 数字 (mockup line 484)
+     → Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  test/e2e/tabbar-visible-all-tabs.spec.ts > SC01-MP-MENU-FIX · 全 tab 页底部 menu (tabBar) 可见性 > tab=首页 · reLaunch pages/home/index · tabBar strip 非空 + view ≥ 15
+AssertionError: expected 0.006 to be greater than 0.015
+ ❯ test/e2e/tabbar-visible-all-tabs.spec.ts:124:38
+    122|       // 主断言: 底部 100px 条带必须有非背景色像素 · 至少 1.5% (tabBar…
+    123|       // 如果 tabBar 不渲染 · 该区域要么全透明 (0) 要么全 #F5F5F5 页面…
+    124|       expect(r1.analysis.nonBgRatio).toBeGreaterThan(0.015);
+       |                                      ^
+    125| 
+    126|       // 二次访问 · 验证 reLaunch 后 tabBar 保持
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  test/e2e/tabbar-visible-all-tabs.spec.ts > SC01-MP-MENU-FIX · 全 tab 页底部 menu (tabBar) 可见性 > tab=复习 · reLaunch pages/review-today/index · tabBar strip 非空 + view ≥ 5
+AssertionError: expected 0.002448717948717949 to be greater than 0.015
+ ❯ test/e2e/tabbar-visible-all-tabs.spec.ts:124:38
+    122|       // 主断言: 底部 100px 条带必须有非背景色像素 · 至少 1.5% (tabBar…
+    123|       // 如果 tabBar 不渲染 · 该区域要么全透明 (0) 要么全 #F5F5F5 页面…
+    124|       expect(r1.analysis.nonBgRatio).toBeGreaterThan(0.015);
+       |                                      ^
+    125| 
+    126|       // 二次访问 · 验证 reLaunch 后 tabBar 保持
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  test/e2e/tabbar-visible-all-tabs.spec.ts > SC01-MP-MENU-FIX · 全 tab 页底部 menu (tabBar) 可见性 > tab=我的 · reLaunch pages/me/index · tabBar strip 非空 + view ≥ 3
+AssertionError: expected 0 to be greater than 0.015
+ ❯ test/e2e/tabbar-visible-all-tabs.spec.ts:124:38
+    122|       // 主断言: 底部 100px 条带必须有非背景色像素 · 至少 1.5% (tabBar…
+    123|       // 如果 tabBar 不渲染 · 该区域要么全透明 (0) 要么全 #F5F5F5 页面…
+    124|       expect(r1.analysis.nonBgRatio).toBeGreaterThan(0.015);
+       |                                      ^
+    125| 
+    126|       // 二次访问 · 验证 reLaunch 后 tabBar 保持
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  test/e2e/tabbar-visible-all-tabs.spec.ts > SC01-MP-MENU-FIX · 全 tab 页底部 menu (tabBar) 可见性 > home 加载完成后 · 复习 tab (index=3) 应显示 badge 数字 (mockup line 484)
+Error: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 2 passed (6)
+   Start at  08:16:59
+   Duration  70.14s (transform 38ms, setup 0ms, collect 323ms, tests 69.55s, environment 0ms, prepare 67ms)
+
