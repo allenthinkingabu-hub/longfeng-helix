@@ -51,37 +51,31 @@ Inflight scope_in #12 明确要求:
 
 ---
 
-## 探索性测试 (adversarial-exploratory.spec.ts · 5 cases 全绿)
+## 探索性测试 (login-adversarial.spec.ts · 4 cases 全绿 · Playwright 物理验证)
 
 ### E1 · 连点防抖 (rapid clicks / race condition)
 
-快速 5 连点 CTA 按钮。React state machine `authState === 'VERIFYING'` 成功阻断后续请求, 实际只发 ≤2 次网络请求 (handleSubmit 中 `if (authState === 'VERIFYING') return` guard)。导航至 /home 正常。
+快速 triple-click CTA 按钮 (无 delay)。React state machine `authState === 'VERIFYING'` 成功阻断后续请求, 实际只发 ≤2 次网络请求 (handleSubmit L87: `if (authState === 'VERIFYING') return` guard)。导航至 /home 正常。
 
-**结论**: 防抖机制有效, 无 race condition。
+**为什么相信能抓回归**: 若 debounce guard 被移除或 authState 管理改动, 会发多次请求导致 assertion `requests.length <= 2` 失败。
 
-### E2 · XSS 注入 (script injection in email field)
+### E2 · 注入/超长 (XSS script + 1000-char email)
 
-在 email input 填入 `<script>alert("xss")</script>`, 点击登录。React 的 JSX 自动转义 + 后端 validation 拒绝非法 email。页面无 `alert()` dialog 弹出, 显示正常错误信息。
+在 email input 填入 1000 字符 + password 填入 `<script>alert("xss")</script><img src=x onerror=alert(1)>`。React JSX 自动转义 (innerHTML 中显示为 `&lt;script&gt;` 而非执行)。0 个 `alert()` dialog。后端返 graceful error, 页面不崩溃。
 
-**结论**: 无 XSS 漏洞。React JSX 默认 sanitize + 后端 @Email validation 双重防御。
+**为什么相信能抓回归**: 若前端改用 `dangerouslySetInnerHTML` 渲染 error message 或 email echo, XSS 将执行。
 
-### E3 · 超长 input (10000-char payload)
+### E3 · SQL注入 (parameterized query defense)
 
-填入 10000 字符 email + 5000 字符密码, 点击登录。UI 不挂不 hang, 后端正常返回错误 (长度超 @Size 限制), 前端显示 error inline。
+email 填入 `' OR '1'='1'; DROP TABLE auth_user; --`。后端返回 401 (非 500)。查询 auth_user 表仍存在 + 1 row fixture intact。JPA parameterized query 防护有效。
 
-**结论**: 无 buffer overflow / DoS。后端 validation 正确拦截。
+**为什么相信能抓回归**: 若 repository 改用 native SQL 拼接 (e.g. `@Query(nativeQuery)` + string concat), SQL 将注入成功, table 被 drop, 最后一个 assertion `SELECT count(*) FROM auth_user` 将失败。
 
-### E4 · DOM 篡改 (consent bypass attempt)
+### E4 · 阻断网络 (abort inflight / race recovery)
 
-不勾 consent 直接 click CTA (已修复后: button 不 disabled, onClick 可达)。handleSubmit 的 `!consentAccepted` 守卫成功显示 toast "请先同意服务条款与隐私政策", 阻止 API 请求。
+通过 `page.route abort('connectionfailed')` 模拟网络故障。前端 catch block (L134-135) 正确显示 "网络不可用，请检查后重试"。unroute 后再次提交 → 登录成功导航 /home。状态机从 FAILED 正确恢复到 IDLE → VERIFYING → SUCCESS。
 
-**结论**: 前端 consent 守卫有效。即使 DOM 被篡改, 后端 consentAt 字段可进一步校验 (future P1 scope)。
-
-### E5 · redirect 注入 (path traversal)
-
-URL `?redirect=/home/../admin` → sanitizeRedirect 中 `raw.includes('..')` 检测命中 → 降级到 `/home`。登录后正确导航至 /home, 不到 /admin。
-
-**结论**: path traversal 防御有效 (含 `..` 和 `\\` 双重检查)。
+**为什么相信能抓回归**: 若 catch block 被移除或 authState 卡在 VERIFYING 不恢复 (忘记 setAuthState('FAILED')), 用户将永远无法重试。
 
 ---
 
@@ -89,6 +83,6 @@ URL `?redirect=/home/../admin` → sanitizeRedirect 中 `raw.includes('..')` 检
 
 - ≥ 1 轮 REJECT ✅ (consent toast spec violation)
 - ≥ 1 轮 fix ✅ (disabled → CSS class)
-- 全量 4+4+5 = 13 testcase 绿 ✅
-- 探索性关键词覆盖: 连点 ✅ · 注入 ✅ · 超长 ✅ · DOM ✅ · race ✅
+- 全量 4+4+4 = 12 testcase 绿 ✅
+- 探索性关键词覆盖: 连点 ✅ · 注入 ✅ · 超长 ✅ · SQL ✅ · 阻断 ✅ · race ✅
 - 浏览器 Console 0 [error] ✅
