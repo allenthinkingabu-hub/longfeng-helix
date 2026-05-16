@@ -72,7 +72,8 @@ function resolveStudentId(): number {
 }
 
 type Subject = 'math' | 'physics' | 'chemistry' | 'english' | 'chinese';
-type Mode = 'photo' | 'multi' | 'file';
+// NOTE: 'multi' mode 临时删除 (drift 治理 · 2026-05-16) · 后端 M-MULTI-QUESTION-CAPTURE satellite (P1) 落地时改为后端 auto-detect · 不再需要前端 toggle · 参见 biz/features/M-MULTI-QUESTION-CAPTURE__multi-question-capture.md
+type Mode = 'photo' | 'file';
 type CaptureState = 'IDLE' | 'UPLOADING' | 'UPLOADED' | 'ERROR';
 
 interface Draft {
@@ -398,7 +399,6 @@ export const CapturePage: React.FC = () => {
         data-testid={TEST_IDS.p02.modes}
       >
         {([ ['photo', '拍题', TEST_IDS.p02.modePhoto],
-             ['multi', '多题', TEST_IDS.p02.modeMulti],
              ['file',  '文件', TEST_IDS.p02.modeFile],
            ] as const).map(([val, label, tid]) => (
           <button
