@@ -1,0 +1,25 @@
+# SC01-MP-HOME-BUG-FIX attempt-2 · real vitest e2e + unit raw output
+# Captured 2026-05-16T03:04 UTC · branch claude/ecstatic-villani-cbe9f0
+
+## run 1 · vitest e2e (test/e2e/home.spec.ts) · real WeChat IDE automator
+$ cd frontend/apps/mp && pnpm exec vitest run --config test/vitest.config.ts test/e2e/home.spec.ts --reporter=junit --reporter=verbose
++ vitest 1.6.1
+ RUN  v1.6.1 frontend/apps/mp
+ PASS  test/e2e/home.spec.ts > Home page E2E + testid (SC01-MP-T08-E2E) > currentPage path is pages/home/index 且 view 数 >= 15 (sections all mount)
+ PASS  test/e2e/home.spec.ts > Home page E2E + testid (SC01-MP-T08-E2E) > home page renders key DOM nodes with testids
+ PASS  test/e2e/home.spec.ts > Home page E2E + testid (SC01-MP-T08-E2E) > page data contains expected MVP values after load
+ PASS  test/e2e/home.spec.ts > Home page E2E + testid (SC01-MP-T08-E2E) > mp.screenshot artifact archived
+Test Files  1 passed (1)
+Tests       4 passed (4)
+Duration    836ms · Exit 0
+
+## run 2 · vitest unit (test/unit/home.spec.ts) · B4 B5 B6 regression
+$ cd frontend/apps/mp && pnpm exec vitest run --config test/vitest.config.ts test/unit/home.spec.ts --reporter=junit --reporter=verbose
+ PASS  test/unit/home.spec.ts (28 tests · 204ms)
+Test Files  1 passed (1)
+Tests       28 passed (28)
+Duration    204ms · Exit 0
+
+## aggregate
+Suites: 2 · Testcases: 32 · All green · 0 errors · 0 skipped
+JUnit XML written to results.xml (4 e2e + 28 unit = 32 <testcase> tags)
