@@ -1,0 +1,140 @@
+=== guest_session ===
+                           Table "public.guest_session"
+        Column         |           Type           | Collation | Nullable | Default 
+-----------------------+--------------------------+-----------+----------+---------
+ id                    | bigint                   |           | not null | 
+ device_fp             | character varying(128)   |           | not null | 
+ ip_hash               | character varying(64)    |           |          | 
+ ua                    | character varying(256)   |           |          | 
+ entry_source          | character varying(32)    |           |          | 
+ experiment_bucket     | character varying(32)    |           |          | 
+ image_tmp_url         | character varying(512)   |           |          | 
+ analysis_result_json  | jsonb                    |           |          | 
+ consent_at            | timestamp with time zone |           |          | 
+ consent_type          | smallint                 |           |          | 
+ status                | smallint                 |           | not null | 0
+ claimed_by_student_id | bigint                   |           |          | 
+ claimed_question_id   | bigint                   |           |          | 
+ created_at            | timestamp with time zone |           | not null | now()
+ expires_at            | timestamp with time zone |           | not null | 
+ claimed_at            | timestamp with time zone |           |          | 
+Indexes:
+    "guest_session_pkey" PRIMARY KEY, btree (id)
+    "idx_guest_session_expires" btree (expires_at) WHERE status = ANY (ARRAY[0, 1, 2])
+    "idx_guest_session_fp_day" btree (device_fp, created_at)
+    "uq_guest_claim" UNIQUE, btree (claimed_question_id) WHERE claimed_question_id IS NOT NULL
+
+
+=== guest_rate_bucket ===
+                    Table "public.guest_rate_bucket"
+   Column    |           Type           | Collation | Nullable | Default 
+-------------+--------------------------+-----------+----------+---------
+ id          | bigint                   |           | not null | 
+ device_fp   | character varying(128)   |           | not null | 
+ ip_hash     | character varying(64)    |           | not null | 
+ bucket_date | date                     |           | not null | 
+ count       | integer                  |           | not null | 0
+ created_at  | timestamp with time zone |           | not null | now()
+ updated_at  | timestamp with time zone |           | not null | now()
+Indexes:
+    "guest_rate_bucket_pkey" PRIMARY KEY, btree (id)
+    "uq_guest_rate_bucket_fp_ip_date" UNIQUE, btree (device_fp, ip_hash, bucket_date)
+Check constraints:
+    "ck_guest_rate_bucket_count_le_1" CHECK (count <= 1)
+
+
+=== share_token ===
+                          Table "public.share_token"
+      Column       |           Type           | Collation | Nullable | Default 
+-------------------+--------------------------+-----------+----------+---------
+ id                | bigint                   |           | not null | 
+ jti               | character varying(64)    |           | not null | 
+ sharer_student_id | bigint                   |           | not null | 
+ share_type        | character varying(16)    |           | not null | 
+ relation_id       | character varying(128)   |           | not null | 
+ allow_claim       | boolean                  |           | not null | false
+ usage_limit       | integer                  |           | not null | 1000
+ usage_count       | integer                  |           | not null | 0
+ status            | smallint                 |           | not null | 1
+ created_at        | timestamp with time zone |           | not null | now()
+ expires_at        | timestamp with time zone |           | not null | 
+Indexes:
+    "share_token_pkey" PRIMARY KEY, btree (id)
+    "idx_share_token_sharer" btree (sharer_student_id, created_at)
+    "share_token_jti_key" UNIQUE CONSTRAINT, btree (jti)
+
+
+=== share_token_audit ===
+                        Table "public.share_token_audit"
+       Column        |           Type           | Collation | Nullable | Default 
+---------------------+--------------------------+-----------+----------+---------
+ id                  | bigint                   |           | not null | 
+ jti                 | character varying(64)    |           | not null | 
+ viewer_device_fp    | character varying(128)   |           |          | 
+ viewer_ip_hash      | character varying(64)    |           |          | 
+ upgraded_student_id | bigint                   |           |          | 
+ viewed_at           | timestamp with time zone |           | not null | now()
+Indexes:
+    "share_token_audit_pkey" PRIMARY KEY, btree (id)
+    "idx_share_audit_jti" btree (jti, viewed_at)
+
+
+=== observer_invite ===
+                     Table "public.observer_invite"
+   Column    |           Type           | Collation | Nullable | Default 
+-------------+--------------------------+-----------+----------+---------
+ id          | bigint                   |           | not null | 
+ invite_code | character(6)             |           | not null | 
+ student_id  | bigint                   |           | not null | 
+ role        | character varying(16)    |           | not null | 
+ status      | smallint                 |           | not null | 1
+ expires_at  | timestamp with time zone |           | not null | 
+ created_at  | timestamp with time zone |           | not null | now()
+Indexes:
+    "observer_invite_pkey" PRIMARY KEY, btree (id)
+    "observer_invite_invite_code_key" UNIQUE CONSTRAINT, btree (invite_code)
+
+
+=== observer_session ===
+                          Table "public.observer_session"
+        Column         |           Type           | Collation | Nullable | Default 
+-----------------------+--------------------------+-----------+----------+---------
+ id                    | bigint                   |           | not null | 
+ jti                   | character varying(64)    |           | not null | 
+ student_id            | bigint                   |           | not null | 
+ role                  | character varying(16)    |           | not null | 
+ device_fp             | character varying(128)   |           |          | 
+ status                | smallint                 |           | not null | 1
+ issued_at             | timestamp with time zone |           | not null | now()
+ last_seen_at          | timestamp with time zone |           | not null | now()
+ expires_at            | timestamp with time zone |           | not null | 
+ revoked_by_student_at | timestamp with time zone |           |          | 
+Indexes:
+    "observer_session_pkey" PRIMARY KEY, btree (id)
+    "idx_observer_session_student" btree (student_id, status)
+    "observer_session_jti_key" UNIQUE CONSTRAINT, btree (jti)
+
+
+=== account_device ===
+                       Table "public.account_device"
+    Column     |           Type           | Collation | Nullable | Default 
+---------------+--------------------------+-----------+----------+---------
+ id            | bigint                   |           | not null | 
+ student_id    | bigint                   |           | not null | 
+ device_fp     | character varying(128)   |           | not null | 
+ platform      | character varying(16)    |           |          | 
+ first_seen_at | timestamp with time zone |           | not null | now()
+ last_seen_at  | timestamp with time zone |           | not null | now()
+ login_count   | integer                  |           | not null | 1
+Indexes:
+    "account_device_pkey" PRIMARY KEY, btree (id)
+    "idx_account_device_fp" btree (device_fp)
+    "uq_account_device" UNIQUE, btree (student_id, device_fp)
+
+
+=== flyway_schema_history_anonymous ===
+   version   |  description   |              script              | success 
+-------------+----------------+----------------------------------+---------
+ 20260421.02 | init anonymous | V20260421_02__init_anonymous.sql | t
+(1 row)
+
