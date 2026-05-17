@@ -505,6 +505,12 @@ export const TEST_IDS = {
     offlineBannerClose:    'offline-banner-close',
   },
 
+  // SC-12-STUB-T01 · P-GUEST-CAPTURE 占位 stub 页 (真页 SC-12 未实现)
+  sc12stub: {
+    guestCaptureStubRoot:  'guest-capture-stub-root',
+    guestCaptureStubCta:   'guest-capture-stub-cta',
+  },
+
   // SC-11-T01 · P-LANDING shell (replaces SC-00-T01 landing-placeholder-root)
   sc11t01: {
     root:                  'p-landing-root',

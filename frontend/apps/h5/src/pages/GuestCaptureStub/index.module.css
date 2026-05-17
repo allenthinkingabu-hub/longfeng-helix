@@ -1,0 +1,55 @@
+/* SC-12-STUB-T01 · P-GUEST-CAPTURE 占位 stub 仅必要差异 (主体走 stub-card 共享样式)
+ * 本模块只补匿名 Shell 顶端 nav (Logo 左上 + 登录胶囊右上 · biz §2A.3.2).
+ * stub-card.module.css 已含 page / card / icon / title / subtitle / cta · 不重复.
+ */
+
+.shellTop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 100;
+}
+
+.logo {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000D9;
+  cursor: pointer;
+  user-select: none;
+  background: none;
+  border: none;
+  padding: 8px 4px;
+  font-family: inherit;
+}
+
+.logo:hover,
+.logo:active {
+  opacity: 0.7;
+}
+
+.loginPill {
+  height: 32px;
+  padding: 0 16px;
+  background: #007AFF;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.loginPill:hover,
+.loginPill:active {
+  background: #0A84FF;
+}

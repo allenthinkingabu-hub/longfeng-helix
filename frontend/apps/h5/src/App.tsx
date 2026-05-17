@@ -13,6 +13,7 @@ import { LandingPage } from './pages/Landing/index';
 import { WelcomeBackPage } from './pages/WelcomeBack/index';
 import { SharedStubPage } from './pages/SharedStub/index';
 import { ObserverStubPage } from './pages/ObserverStub/index';
+import { GuestCaptureStubPage } from './pages/GuestCaptureStub/index';
 
 const ManualEntryStub: React.FC = () => (
   <div data-testid="manual-entry-root" style={{ padding: 20, color: '#333' }}>
@@ -41,6 +42,8 @@ export const App: React.FC = () => (
     <Route path="/welcome-back" element={<WelcomeBackPage />} />
     <Route path="/s/:token" element={<SharedStubPage />} />
     <Route path="/observer/:code" element={<ObserverStubPage />} />
+    {/* SC-12-STUB-T01 · /guest/capture 占位 stub · 真页 SC-12 (Try Before Signup) 未实现 */}
+    <Route path="/guest/capture" element={<GuestCaptureStubPage />} />
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 );
