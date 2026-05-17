@@ -61,6 +61,18 @@ public interface ReviewPlanRepository extends JpaRepository<ReviewPlan, Long> {
       @Param("end") Instant end);
 
   /**
+   * P07-TODAY-RENDER · 拿 wrong_item subject+stem · 供 today 卡渲染.
+   * 单库迁移后同库直接 SQL · 返 [wrong_item_id, subject, stem_text] · 数量 <= 50.
+   * Caller (controller) 把结果转 Map<Long, [subject, stem]> 再 enrich plans.
+   */
+  @Query(
+      value =
+          "SELECT id, subject, stem_text FROM wrong_item WHERE id IN (:ids) "
+              + "AND deleted_at IS NULL",
+      nativeQuery = true)
+  List<Object[]> findSubjectStemByIds(@Param("ids") List<Long> ids);
+
+  /**
    * SC-01-D01 · GET /api/home/today 聚合：统计今日已完成节点数.
    *
    * <p>语义：completed_at ∈ [start, end)（按用户 tz 切日）；不限制 status，allow 单次完成 (status=0) 与

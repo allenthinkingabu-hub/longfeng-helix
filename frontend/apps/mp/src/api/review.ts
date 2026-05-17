@@ -29,6 +29,9 @@ export interface ReviewPlanDto {
   nextDueAt: string;
   completedAt: string | null;
   mastered: boolean;
+  // P07 单库 enrich · BE today join wrong_item 注入 · 其他端点为 null
+  subject?: string | null;
+  stem?: string | null;
 }
 
 export interface CreateSessionResp {

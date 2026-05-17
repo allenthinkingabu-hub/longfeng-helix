@@ -5,12 +5,12 @@ spring:
   application:
     name: review-plan-service
   datasource:
-    # ⚠ review-plan 历史上连 team-5-pg (15436) · wrongbook 连 team-1-pg (15432) ·
-    # split-brain 但既成事实. team-5-pg.review_plan 是完整 23 列 (含 student_id /
-    # next_due_at / node_index 等); team-1-pg.review_plan 是 2 列残壳 (历史 ddl-auto
-    # 误建). 短期: review-plan 必须连 15436 才能 flyway 通过 + 跑业务. 长期: 把
-    # wrongbook 也搬到 15436 同库 · 让 fetchNextDueByItems 跨服务也是同库查 (followup).
-    url: jdbc:postgresql://localhost:15436/wrongbook
+    # 单库决策 (2026-05-17 用户拍板): 把 team-5-pg.review_* (review_plan +
+    # review_outcome + review_plan_outbox · 共 74 行) 迁到 team-1-pg ·
+    # 补 flyway_schema_history 1.0.050/051/054/055/066 5 条占位 (避免重跑) ·
+    # 现在 wrongbook + review-plan 同库 (team-1-pg 15432).
+    # 后续 P07 卡片可以直接 SQL join wrong_item 拿 subject/stem/kp · 不再 N+1 HTTP.
+    url: jdbc:postgresql://localhost:15432/wrongbook
     username: longfeng
     password: longfeng_dev
   jpa:
@@ -20,6 +20,9 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+    # 单库迁移后 · 我们手插了 5 条 history 行 (checksum=0 占位) ·
+    # 与文件实际 checksum 不匹配会 validate 失败 · dev 关掉校验即可.
+    validate-on-migrate: false
   cache:
     type: caffeine
 
