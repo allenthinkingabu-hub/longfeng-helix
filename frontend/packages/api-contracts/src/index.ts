@@ -7,3 +7,10 @@ export { questionsClient } from './clients/questions';
 export { homeClient } from './clients/home';
 export { reviewClient } from './clients/review';
 export { analyzeClient } from './clients/analyze';
+
+// ---------------------------------------------------------------------------
+// PHASE-A-ANON · anonymous-service zod contracts (additive re-exports)
+// Owner: backend/anonymous-service · biz §10.6 (session/resolve) + §10.7 (landing)
+// ---------------------------------------------------------------------------
+export * from './session-resolve';
+export * from './landing';
