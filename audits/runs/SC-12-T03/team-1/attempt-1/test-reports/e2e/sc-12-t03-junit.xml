@@ -1,0 +1,24 @@
+<testsuites id="" name="" tests="9" failures="0" skipped="0" errors="0" time="5.609451">
+<testsuite name="sc-12-t03/t03-guest-capture-adversarial.spec.ts" timestamp="2026-05-17T23:26:34.821Z" hostname="chromium" tests="3" failures="0" skipped="0" time="2.596" errors="0">
+<testcase name="SC-12-T03 · P-GUEST-CAPTURE 真页 adversarial (3 cases · 边界 + 降级) › ADV-T03 (a) mint_failure_shows_error_banner: POST /api/anon/session 500 → errorBanner visible + 文字含「初始化失败」" classname="sc-12-t03/t03-guest-capture-adversarial.spec.ts" time="0.49">
+</testcase>
+<testcase name="SC-12-T03 · P-GUEST-CAPTURE 真页 adversarial (3 cases · 边界 + 降级) › ADV-T03 (b) shutter_disabled_when_consent_unchecked: 不勾 consent · click shutter · 不触发 navigation + 0 calls /api/anon/file/presign" classname="sc-12-t03/t03-guest-capture-adversarial.spec.ts" time="0.878">
+</testcase>
+<testcase name="SC-12-T03 · P-GUEST-CAPTURE 真页 adversarial (3 cases · 边界 + 降级) › ADV-T03 (c) double_mount_strict_mode_single_call: React 多次 effect 触发 · /api/anon/session 真请求只 1 次 (useRef mintedRef 守门)" classname="sc-12-t03/t03-guest-capture-adversarial.spec.ts" time="1.228">
+</testcase>
+</testsuite>
+<testsuite name="sc-12-t03/t03-guest-capture-real-page.spec.ts" timestamp="2026-05-17T23:26:34.821Z" hostname="chromium" tests="6" failures="0" skipped="0" time="2.283" errors="0">
+<testcase name="SC-12-T03 · P-GUEST-CAPTURE 真页 主 spec (6 cases · 真 anonymous-service) › TC-12-T03 (a) page_mounts_and_calls_session_mint: mount → POST /api/anon/session 200 + UI 渲染 + sessionStorage 写入" classname="sc-12-t03/t03-guest-capture-real-page.spec.ts" time="0.221">
+</testcase>
+<testcase name="SC-12-T03 · P-GUEST-CAPTURE 真页 主 spec (6 cases · 真 anonymous-service) › TC-12-T03 (b) consent_check_unlocks_shutter: click checkbox → PATCH consent 200 → shutter not disabled" classname="sc-12-t03/t03-guest-capture-real-page.spec.ts" time="0.35">
+</testcase>
+<testcase name="SC-12-T03 · P-GUEST-CAPTURE 真页 主 spec (6 cases · 真 anonymous-service) › TC-12-T03 (c) anon_session_id_stored_after_mint: sessionStorage anon_session_id 非空 + 数字 + 与 response 一致" classname="sc-12-t03/t03-guest-capture-real-page.spec.ts" time="0.211">
+</testcase>
+<testcase name="SC-12-T03 · P-GUEST-CAPTURE 真页 主 spec (6 cases · 真 anonymous-service) › TC-12-T03 (d) login_cta_redirects_to_auth: click loginBtn → URL pathname === /auth/login" classname="sc-12-t03/t03-guest-capture-real-page.spec.ts" time="0.272">
+</testcase>
+<testcase name="SC-12-T03 · P-GUEST-CAPTURE 真页 主 spec (6 cases · 真 anonymous-service) › TC-12-T03 (e) deeplink_direct_works: 直接 goto /guest/capture (无 referer) · mint 仍成功 · root visible" classname="sc-12-t03/t03-guest-capture-real-page.spec.ts" time="0.215">
+</testcase>
+<testcase name="SC-12-T03 · P-GUEST-CAPTURE 真页 主 spec (6 cases · 真 anonymous-service) › TC-12-T03 (f) consent_recheck_idempotent: check / uncheck / check 触发 2 次 PATCH 都 200 (T02 last-writer-wins)" classname="sc-12-t03/t03-guest-capture-real-page.spec.ts" time="1.014">
+</testcase>
+</testsuite>
+</testsuites>
