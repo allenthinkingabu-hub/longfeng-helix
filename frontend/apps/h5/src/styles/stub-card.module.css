@@ -1,0 +1,73 @@
+/* SC-00-T04 · 共享 stub 卡片样式 · 3 个 stub 页 (SharedStub / WelcomeBack / ObserverStub)
+ * 与 PHASE-A-LOGIN-H5 Login.module.css 视觉语言保持一致:
+ *   - 柔和卡片 + 阴影 + 圆角 + iOS 蓝主 CTA
+ *   - 移动端竖屏 (393×852 visualport)
+ */
+
+.page {
+  --blue: #007AFF;
+  --blue2: #0A84FF;
+  --label: #000000D9;
+  --sublabel: #6C6C70;
+
+  min-height: 100vh;
+  background:
+    radial-gradient(120% 60% at 50% -10%, #E8F1FF 0%, transparent 60%),
+    linear-gradient(180deg, #FFFFFF 0%, #F7F7FB 100%);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
+  color: var(--label);
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 88px 24px 34px;
+  box-sizing: border-box;
+}
+
+.card {
+  width: 100%;
+  max-width: 360px;
+  background: #FFFFFF;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  padding: 32px 24px 28px;
+  text-align: center;
+}
+
+.icon {
+  font-size: 48px;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--label);
+}
+
+.subtitle {
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0 0 28px;
+  color: var(--sublabel);
+}
+
+.cta {
+  width: 100%;
+  height: 48px;
+  background: var(--blue);
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.cta:hover,
+.cta:active {
+  background: var(--blue2);
+}
