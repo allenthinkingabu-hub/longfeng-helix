@@ -1,0 +1,3 @@
+[info] T04 SC-00 E2E run — vite:5174 + anonymous:8090 + auth:8091 真服务
+[info] 9 Playwright cases all passed (see junit.xml)
+[info] 0 console.error captured in spec runs

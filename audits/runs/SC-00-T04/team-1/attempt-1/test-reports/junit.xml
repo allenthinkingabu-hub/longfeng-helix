@@ -1,0 +1,24 @@
+<testsuites id="" name="" tests="9" failures="0" skipped="0" errors="0" time="6.877656">
+<testsuite name="sc-00/t04-fallback-adversarial.spec.ts" timestamp="2026-05-17T14:20:31.104Z" hostname="chromium" tests="3" failures="0" skipped="0" time="2.296" errors="0">
+<testcase name="SC-00-T04 · Adversarial · 探索性边界 (3 cases) › TC-00-T04-ADV (a) timeout_800ms_triggers_degradation: 1500ms 延迟 · stale JWT · abort 后落 /home + banner" classname="sc-00/t04-fallback-adversarial.spec.ts" time="1.368">
+</testcase>
+<testcase name="SC-00-T04 · Adversarial · 探索性边界 (3 cases) › TC-00-T04-ADV (b) no_jwt_5xx_falls_to_welcome: 无 JWT + resolve 500 → /welcome (NOT /home, NOT /auth/login)" classname="sc-00/t04-fallback-adversarial.spec.ts" time="0.193">
+</testcase>
+<testcase name="SC-00-T04 · Adversarial · 探索性边界 (3 cases) › TC-00-T04-ADV (c) stub_token_path_param_in_telemetry: /s/abc123 → anon_stub_view 的 token_hash 是 djb2 hash 非明文" classname="sc-00/t04-fallback-adversarial.spec.ts" time="0.735">
+</testcase>
+</testsuite>
+<testsuite name="sc-00/t04-fallback-stubs.spec.ts" timestamp="2026-05-17T14:20:31.104Z" hostname="chromium" tests="6" failures="0" skipped="0" time="3.83" errors="0">
+<testcase name="SC-00-T04 · stub 兜底真页 + 离线降级真 UI (6 cases) › TC-00-T04 (a) shared_stub_renders: /s/abc123 → stub UI visible · /api/share/* count===0" classname="sc-00/t04-fallback-stubs.spec.ts" time="0.533">
+</testcase>
+<testcase name="SC-00-T04 · stub 兜底真页 + 离线降级真 UI (6 cases) › TC-00-T04 (b) welcomeback_stub_renders: /welcome-back → stub UI · device-refresh + 二次 resolve count===0" classname="sc-00/t04-fallback-stubs.spec.ts" time="0.516">
+</testcase>
+<testcase name="SC-00-T04 · stub 兜底真页 + 离线降级真 UI (6 cases) › TC-00-T04 (c) observer_stub_renders: /observer/ABC123 → stub UI · /api/observer/* count===0" classname="sc-00/t04-fallback-stubs.spec.ts" time="0.541">
+</testcase>
+<testcase name="SC-00-T04 · stub 兜底真页 + 离线降级真 UI (6 cases) › TC-00-T04 (d) stub_cta_redirects_to_login: shared stub CTA click → URL pathname === /auth/login" classname="sc-00/t04-fallback-stubs.spec.ts" time="0.269">
+</testcase>
+<testcase name="SC-00-T04 · stub 兜底真页 + 离线降级真 UI (6 cases) › TC-00-T04 (e) offline_banner_with_stale_jwt: resolve 5xx + stale JWT → /home + banner visible · 文字 &quot;离线模式&quot;" classname="sc-00/t04-fallback-stubs.spec.ts" time="0.224">
+</testcase>
+<testcase name="SC-00-T04 · stub 兜底真页 + 离线降级真 UI (6 cases) › TC-00-T04 (f) offline_banner_close_persists: close → hidden · reload + 仍 5xx → banner 不再出现" classname="sc-00/t04-fallback-stubs.spec.ts" time="1.747">
+</testcase>
+</testsuite>
+</testsuites>
