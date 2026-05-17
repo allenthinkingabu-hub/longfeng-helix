@@ -109,6 +109,32 @@ function readLocalJwt(): string | null {
 /** Local "is this JWT still good?" check — NO signature verify, just claims. */
 function isLocallyValid(jwt: string): boolean {
   try {
+    // SC-00 Tester ADV-4 fix: jose.decodeJwt only validates the payload segment.
+    // A tampered header (e.g. `GARBAGE!eyJhbGc...`) sneaks through and falsely
+    // grants HOME access. We add a header sanity check (alg=HS256 only) — still
+    // no signature verify (HS256 secret never leaves the back-end), but it
+    // forces the header to at least be base64-decodable JSON with the expected
+    // algorithm. Real signature rejection still happens server-side on every
+    // authenticated API call.
+    const parts = jwt.split('.');
+    if (parts.length !== 3) return false;
+    let header: Record<string, unknown>;
+    try {
+      const headerJson = Buffer.from(parts[0], 'base64').toString('utf-8');
+      header = JSON.parse(headerJson);
+    } catch {
+      try {
+        // Browser path: use atob with base64url → base64 fixup
+        const b64 = parts[0].replace(/-/g, '+').replace(/_/g, '/');
+        const pad = b64.length % 4;
+        const padded = pad ? b64 + '='.repeat(4 - pad) : b64;
+        header = JSON.parse(globalThis.atob(padded));
+      } catch {
+        return false;
+      }
+    }
+    if (header.alg !== 'HS256') return false;
+
     const payload = decodeJwt(jwt);
     if (typeof payload.exp !== 'number') return false;
     const nowSec = Math.floor(Date.now() / 1000);
