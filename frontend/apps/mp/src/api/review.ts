@@ -47,6 +47,9 @@ export interface TodayResp {
   items: ReviewPlanDto[];
   total: number;
   tz: string;
+  // P07 spec L98 · 0-100 · BE 算 latest ease_factor_after avg → mastery 映射 ·
+  // 0 = 今日所有题目全新没复习过 (诚实 · 不是 hard-code 假死值).
+  masteryPct?: number | null;
 }
 
 export interface CompleteResult {

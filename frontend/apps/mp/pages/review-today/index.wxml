@@ -10,7 +10,11 @@
         <van-icon name="arrow-left" color="#007AFF" size="20px" />
         <text>首页</text>
       </view>
-      <text class="nav-right">排序 · 时间</text>
+      <!-- P07-D · 排序 chip 可点 · ActionSheet 出 3 选项 (时间/T级/学科) ·
+           之前是死字符串 "排序 · 时间" 点了无反应 · 现 sortLabel 跟 mode 实时换 -->
+      <view class="nav-right" bind:tap="onSortTap" data-test-id="p07-sort-chip">
+        <text>排序 · {{sortLabel}}</text>
+      </view>
     </view>
     <text class="nav-title">今日复习</text>
   </view>

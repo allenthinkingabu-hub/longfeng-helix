@@ -74,7 +74,24 @@ const SUBJECT_COLOR_MAP: Record<string, string> = {
   math: 'red', physics: 'orange', chemistry: 'indigo', english: 'green', chinese: 'blue',
 };
 
-export function buildSlotsFromItems(items: ReviewPlanDto[], now: Date): SlotData[] {
+// P07-D · 桶内 sort 模式 · time = nextDueAt ASC (默认, 与 BE 返序一致) ·
+// tlevel = nodeIndex ASC · subject = subject 字母序.
+// 桶分组本身 (上午/下午/晚上) 不动 · 仅桶内排序变.
+export type SortMode = 'time' | 'tlevel' | 'subject';
+
+function compareItems(a: ItemData, b: ItemData, mode: SortMode): number {
+  if (mode === 'tlevel') {
+    // 'T1' < 'T2' < ... < 'T10' · slice(1) parseInt
+    return parseInt(a.tLevel.slice(1), 10) - parseInt(b.tLevel.slice(1), 10);
+  }
+  if (mode === 'subject') {
+    return a.subject.localeCompare(b.subject, 'zh-CN');
+  }
+  // time: hhmm 字面序就够 (HH:MM zero-padded · 24h)
+  return a.hhmm.localeCompare(b.hhmm);
+}
+
+export function buildSlotsFromItems(items: ReviewPlanDto[], now: Date, sortMode: SortMode = 'time'): SlotData[] {
   const buckets: Record<string, ItemData[]> = {};
 
   for (const item of items) {
@@ -131,11 +148,13 @@ export function buildSlotsFromItems(items: ReviewPlanDto[], now: Date): SlotData
   const slots: SlotData[] = [];
   for (const key of order) {
     if (buckets[key] && buckets[key].length > 0) {
+      // 桶内 sort · P07-D · time 模式时桶内 hhmm 已自然有序但仍跑一次稳定 sort
+      const sortedItems = [...buckets[key]].sort((a, b) => compareItems(a, b, sortMode));
       slots.push({
         key,
         title: getSlotTitle(key),
         iconClass: getSlotIconClass(key),
-        items: buckets[key],
+        items: sortedItems,
       });
     }
   }
