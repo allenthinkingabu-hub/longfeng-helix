@@ -2,7 +2,7 @@
   "task_id": "SC-13-SHARER",
   "attempt": 1,
   "team_id": "team-1",
-  "audited_at": "2026-05-17T21:12:04.103Z",
+  "audited_at": "2026-05-17T21:12:54.409Z",
   "audited_by": "audit.js v3 (deterministic · 7 dims · +test_cases_alignment)",
   "pass": true,
   "checks": [
@@ -94,7 +94,7 @@
       "dimension": "bug_reality",
       "name": "all_git_commits_verified",
       "pass": true,
-      "evidence": "2/2 hash(es) git cat-file -e PASS"
+      "evidence": "3/3 hash(es) git cat-file -e PASS"
     },
     {
       "dimension": "test_validity",
