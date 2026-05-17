@@ -129,6 +129,39 @@ public class ReviewPlanController {
      * <p>Request body: {@code {wrongItemId: long, studentId: long, occurredAt?: ISO8601 string}}
      * Response: {@code {nodeCount: int}} · 0 表示已存在（幂等跳过）。
      */
+    /**
+     * P05-LIST · 批量拿 wrongItemId 列表中每个 item 的"下一个未完成节点".
+     * wrongbook-service 在 listQuestions 时调本端点 · 把 nextDueAt + nodeStage
+     * 注入 P05 列表卡 (替代之前永远 "暂未安排" 的 UX 损失).
+     *
+     * <p>Request body: {@code {wrongItemIds: [long...]}}
+     * Response: {@code [{wrongItemId, nodeIndex, nextDueAt}, ...]} ·
+     *   只返有 active plan 的 item · 没 plan 的 item caller 自行降级.
+     */
+    @Operation(summary = "P05 批量拿 next-due 节点")
+    @PostMapping("/internal/plans/next-due-by-items")
+    public ApiResult<List<Map<String, Object>>> nextDueByItems(@RequestBody Map<String, Object> body) {
+        @SuppressWarnings("unchecked")
+        List<Object> rawIds = (List<Object>) body.getOrDefault("wrongItemIds", List.of());
+        if (rawIds == null || rawIds.isEmpty()) {
+            return ApiResult.ok(List.of());
+        }
+        List<Long> ids = rawIds.stream()
+                .map(o -> Long.valueOf(o.toString()))
+                .collect(Collectors.toList());
+        List<Object[]> rows = planRepo.findNextDueByWrongItemIds(ids);
+        List<Map<String, Object>> out = rows.stream()
+                .map(r -> {
+                    Map<String, Object> m = new java.util.HashMap<>();
+                    m.put("wrongItemId", ((Number) r[0]).longValue());
+                    m.put("nodeIndex", ((Number) r[1]).intValue());
+                    m.put("nextDueAt", r[2] == null ? null : r[2].toString());
+                    return m;
+                })
+                .collect(Collectors.toList());
+        return ApiResult.ok(out);
+    }
+
     @Operation(summary = "P04 保存并开启复习 · 同步创建 7 节点")
     @PostMapping("/internal/plans/from-question")
     public ApiResult<Map<String, Object>> createFromQuestion(@RequestBody Map<String, Object> body) {

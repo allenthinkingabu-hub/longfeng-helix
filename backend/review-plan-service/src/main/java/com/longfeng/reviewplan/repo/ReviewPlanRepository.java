@@ -107,6 +107,25 @@ public interface ReviewPlanRepository extends JpaRepository<ReviewPlan, Long> {
       @Param("limit") int limit);
 
   /**
+   * P05-LIST · 批量拿 wrongItemId 列表中每个 item 的"下一个未完成节点"
+   * (status=0 active · 按 next_due_at ASC 取首条) · 单条 SQL · O(N log N).
+   *
+   * <p>PostgreSQL DISTINCT ON 语法: 每个 wrong_item_id 只保留第 1 行
+   * (按 ORDER BY 排序后的). 比子查询 + JOIN 简单且快.
+   *
+   * <p>返回 Object[] tuple: [wrong_item_id Long, node_index Short, next_due_at Instant].
+   * Caller 自行 map 成 DTO · 此处不引入 DTO 依赖到 repo 层.
+   */
+  @Query(
+      value =
+          "SELECT DISTINCT ON (wrong_item_id) wrong_item_id, node_index, next_due_at "
+              + "FROM review_plan "
+              + "WHERE wrong_item_id IN (:ids) AND status = 0 AND deleted_at IS NULL "
+              + "ORDER BY wrong_item_id, next_due_at ASC",
+      nativeQuery = true)
+  List<Object[]> findNextDueByWrongItemIds(@Param("ids") List<Long> ids);
+
+  /**
    * BE-13 · POST /review-plans/batch-reset-by-ids · 按 plan_ids 批量软删 active plan.
    *
    * <p>只重置 status=0 (ACTIVE) · 已 mastered (status=1) 不动 · returns rowsAffected.
