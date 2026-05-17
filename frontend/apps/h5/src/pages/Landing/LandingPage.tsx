@@ -27,11 +27,14 @@ import { TEST_IDS } from '@longfeng/testids';
 import type {
   LandingSamplesResponse,
   LandingKpiResponse,
+  LandingSample,
 } from '@longfeng/api-contracts';
 import styles from './LandingPage.module.css';
 import { fetchSamples, fetchKpi } from './api';
 import { HeroDemo } from './HeroDemo';
 import { ThreeStepComic } from './ThreeStepComic';
+import { SampleChips } from './SampleChips';
+import { SampleOverlay } from './SampleOverlay';
 
 const ids = TEST_IDS.sc11t01;
 
@@ -71,6 +74,10 @@ export const LandingPage: React.FC = () => {
     samples: null,
     kpi: null,
   });
+
+  // SC-11-T03: which sample's overlay is open (null = closed). chip tap →
+  // setOpenSample(sample) · overlay close (× / mask / Android back) → null.
+  const [openSample, setOpenSample] = useState<LandingSample | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -156,6 +163,12 @@ export const LandingPage: React.FC = () => {
           className={styles.samplesSection}
         >
           <h2 className={styles.sectionHeading}>看看 AI 怎么帮你分析错题</h2>
+          {/* SC-11-T03 · 3 学科 chip · tap → 打开 SampleOverlay
+              · 复用上方 samples state · 不再独立 fetch */}
+          <SampleChips
+            samples={samples}
+            onChipClick={(sample) => setOpenSample(sample)}
+          />
           {samples.map((s, idx) => (
             <article
               key={`${s.subject}-${idx}`}
@@ -170,6 +183,16 @@ export const LandingPage: React.FC = () => {
             </article>
           ))}
         </section>
+      )}
+
+      {/* SC-11-T03 · SampleOverlay · Portal mount 到 document.body
+          · 3 close 触发器 (× / mask / Android back) · 静态读 sample 字段
+          · 严禁触发 /api/ai/* · /api/guest/* (biz 关键断言点) */}
+      {openSample && (
+        <SampleOverlay
+          sample={openSample}
+          onClose={() => setOpenSample(null)}
+        />
       )}
 
       {/* KPI bar · 任一字段成功就显示 (DEGRADED-kpi 时隐藏) */}

@@ -1,0 +1,54 @@
+/* ====================================================================
+ * SC-11-T03 · SampleChips · 3 学科 chip (数学/英语/物理)
+ * 圆角 pill · subject emoji + 文字 · tap 高亮态
+ * Budget: ≤ 1.5KB
+ * ==================================================================== */
+
+.row {
+  display: flex;
+  gap: 10px;
+  padding: 8px 16px 20px;
+  /* 防止过窄屏幕 chip 挤压 · 允许横向滚动避免破版 */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chip {
+  /* 按钮重置 */
+  appearance: none;
+  border: 1px solid #c7d2fe;
+  background: #eef2ff;
+  color: #3730a3;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  /* pill 形状 */
+  border-radius: 999px;
+  padding: 8px 14px;
+  /* 命中区不缩水 */
+  min-height: 36px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 120ms ease, transform 80ms ease;
+}
+
+.chip:hover {
+  background: #e0e7ff;
+}
+
+.chip:active {
+  background: #c7d2fe;
+  transform: scale(0.97);
+}
+
+.chip:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
+.emoji {
+  margin-right: 6px;
+  font-size: 16px;
+  /* 防 emoji 字号差异打乱 baseline */
+  vertical-align: -1px;
+}

@@ -525,6 +525,20 @@ export const TEST_IDS = {
     step2:                 'p-landing-step-2',
     step3:                 'p-landing-step-3',
   },
+
+  // SC-11-T03 · P-LANDING SampleChips + P-SAMPLE 半屏浮层 (inflight scope_in #5)
+  // chips 复用 SC-11-T01 已 fetch 的 samples state · 不再独立请求
+  // overlay 3 卡片 · 静态读 LandingSample 字段 · 严禁触发 /api/ai/* · /api/guest/*
+  sc11t03: {
+    chipMath:              'p-landing-sample-chip-math',
+    chipEnglish:           'p-landing-sample-chip-english',
+    chipPhysics:           'p-landing-sample-chip-physics',
+    overlayRoot:           'p-sample-overlay-root',
+    overlayClose:          'p-sample-overlay-close',
+    errorCard:             'p-sample-overlay-error-card',
+    correctionCard:        'p-sample-overlay-correction-card',
+    variantCard:           'p-sample-overlay-variant-card',
+  },
 } as const;
 
 // ── S8 FE-04 · Dynamic testid helpers (functions · not in const for type safety) ──
