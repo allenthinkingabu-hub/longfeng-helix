@@ -51,6 +51,18 @@ export interface GetQuestionByIdResp {
  * steps / formula) default to empty values — the AI sidecar branch in P04
  * fills `reasonMarkdown` + `steps` when the answer is available.
  */
+// BE analysis_result.steps jsonb 实际 shape · AI prompt 直出 ·
+// 之前误标 QuestionStep[] · 导致 normalizeQuestion 不映射字段 ·
+// FE wxml 渲染 {{item.idx}} / {{item.title}} 全 undefined → 圆点空 + 文字空.
+interface RawStepWire {
+  stepNo?: number;
+  step_no?: number;  // 兼容 snake_case
+  idx?: number;       // 兼容已经是 FE 形态
+  text?: string;
+  title?: string;
+  formula?: string;
+}
+
 interface QuestionDetailWire {
   qid?: string;
   id?: string;
@@ -64,7 +76,7 @@ interface QuestionDetailWire {
   my_answer?: string | null;
   correct_answer?: string | null;
   reason_markdown?: string | null;
-  steps?: QuestionStep[] | null;
+  steps?: RawStepWire[] | null;
   knowledge_points?: KnowledgePoint[] | null;
   confidence?: number | null;
   model_info?: { name: string; version: string } | null;
@@ -78,6 +90,17 @@ interface GetQuestionByIdRespWire {
 
 function normalizeQuestion(w: QuestionDetailWire | null | undefined): QuestionDetail {
   const src = w || {};
+  // BE 给的 step 是 {stepNo, text, formula?} (AI prompt 输出 jsonb 直存) ·
+  // FE wxml 渲染 {idx, title, formula?} · 这里做字段映射 · 之前漏映射 → 圆点空.
+  const stepsIn = src.steps ?? [];
+  const steps: QuestionStep[] = stepsIn.map((s, i) => ({
+    idx: typeof s.stepNo === 'number' ? s.stepNo
+       : typeof s.step_no === 'number' ? s.step_no
+       : typeof s.idx === 'number' ? s.idx
+       : i + 1,
+    title: (s.text ?? s.title ?? '').toString(),
+    formula: s.formula,
+  }));
   return {
     id: src.id ?? src.qid ?? '',
     subject: src.subject ?? '',
@@ -86,7 +109,7 @@ function normalizeQuestion(w: QuestionDetailWire | null | undefined): QuestionDe
     myAnswer: src.my_answer ?? '',
     correctAnswer: src.correct_answer ?? '',
     reasonMarkdown: src.reason_markdown ?? '',
-    steps: src.steps ?? [],
+    steps,
     knowledgePoints: src.knowledge_points ?? [],
     difficulty: typeof src.difficulty === 'number' ? src.difficulty : 3,
     confidence: typeof src.confidence === 'number' ? src.confidence : 0,
