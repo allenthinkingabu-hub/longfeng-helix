@@ -1,0 +1,193 @@
+{
+  "schema_version": "3.1",
+  "scenario_id": "SC-21",
+  "scenario_title": "AI 判错 · 学生 override · RLHF outbox 落数据",
+  "scenario_goal": "验证 A.1 学生主体性铁律 · AI 判 MASTERED 但学生认为没掌握 · Tap 底部 FORGOT override · 后端记 final_grade_source='ai_overridden' · 走 master §7 SM-2 FORGOT 整 plan 重排 · 数据进 RocketMQ ai-judge.overridden topic 用于后期 RLHF prompt 优化",
+  "generated_from": "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §2B.21 (5 user-action steps)",
+  "generated_at": "2026-05-18",
+  "owner": "user",
+  "scenario_biz_ref": "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §2B.21",
+  "scenario_spec_refs": [
+    "design/system/pages/P08-review-exec-ai-judge.spec.md (satellite 派生)",
+    "design/system/pages/P08-review-exec.spec.md (master sibling FORGOT 流复用)"
+  ],
+  "scenario_tc_ids": ["TC-21.01", "TC-21.02", "TC-21.03"],
+  "system_invariants": [
+    "final_grade_source='ai_overridden' 时必有 ai_judge_verdict != grade (两者必不同)",
+    "master §7 SM-2 FORGOT 路径完整执行 · wb_review_node T1-T6 全 CANCELLED + 重排 7 new node (master §7 case FORGOT 复用 · 不破坏)",
+    "override 上报埋点必含双 verdict (ai_verdict + user_verdict) · 用于后期 prompt 优化训练样本",
+    "RLHF 队列推送是异步 outbox 模式 · 不阻塞 user-facing grade 流 · 失败重试 (与 master §11 NFR 一致)"
+  ],
+  "work_log_dir_pattern": "audits/runs/<task_id_short>/<team>/attempt-<N>/",
+  "log_requirements_template": {
+    "coder": ["coder.md", "bugs-found.md"],
+    "tester": ["tester.md", "adversarial.md", "test-reports/"]
+  },
+  "audit_gate": "harness/audit.js 5 维度全过才真 PASS · 任一不过 REDO · audit_retries ≥ 3 触发熔断",
+  "id_convention": {
+    "long": "SC-${N}-T${MM}",
+    "short": "SC${N}-T${MM}",
+    "pascal": "T${MM}${PurposeShort}"
+  },
+  "total_tasks": 3,
+  "tasks": [
+    {
+      "task_id": "SC-21-T01",
+      "task_id_short": "SC21-T01",
+      "task_id_pascal": "T01RlhfOutboxInfra",
+      "task_title": "RLHF outbox 基建 · EVENT_AI_JUDGE_OVERRIDDEN + RocketMQ topic ai-judge.overridden + 5 min 重试",
+      "scenario": "TC-21.01 主路径基础设施 · 内嵌 TC-21.02 (outbox broker 不可用)",
+      "biz_step_range": "biz §2B.21 步 5 · §12 S5.6.5",
+      "page": "(无 · 纯后端基建)",
+      "page_state_machine": "n/a",
+      "branch": "feature/SC-21-T01-rlhf-outbox-infra",
+      "owner_team": "team-2",
+      "biz_refs": [
+        "biz §2B.21 步 5 (RLHF outbox 推 RocketMQ · 异步 · 5 min 重试)",
+        "biz §12 S5.6.5 RLHF 数据 outbox 配置",
+        "biz §4.16 新增 outbox event type EVENT_AI_JUDGE_OVERRIDDEN"
+      ],
+      "spec_refs": [
+        "design/system/pages/P08-review-exec-ai-judge.spec.md §4.2 涉及的后端 Entity (新增 outbox event type 段)",
+        "design/system/pages/P08-review-exec-ai-judge.spec.md §15 关联架构 (RLHF outbox 设计)"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": ["backend/review-plan-service"],
+      "primary_apis": [],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "扩展 review_plan_outbox 表 event_type enum 加 EVENT_AI_JUDGE_OVERRIDDEN (复用 master §10.X 现有 outbox 框架 · 不新表)" },
+        { "id": "AC2", "text": "新建 RocketMQ topic 'ai-judge.overridden' (单 partition 即可 · 本期仅落库不消费 · 后期 P2 启动 prompt 优化 pipeline 时消费)" },
+        { "id": "AC3", "text": "outbox 投递逻辑: 写库时同时插 outbox row · 后台 worker 5 min cycle 拉 outbox 未投递的 row · 调 RocketMQ producer 发消息 · 成功标 delivered=true · 失败 retry_count++ + 加重试标记 · 达 5 次失败触发监控告警 ai-judge.outbox.fail" },
+        { "id": "AC4", "text": "(TC-21.02) RocketMQ broker 不可用时: grade 接口流不阻塞 (学生体验 100% OK · 立即返 200 跳 P09) · outbox row 保留 · 5 min 内重试 · 最终一致性 (与 master §11 NFR 一致)" },
+        { "id": "AC5", "text": "消息 payload schema: {nid, qid, studentId, aiVerdict, userVerdict, aiConfidence, aiReason, userAnswerImageKey, imageBase64?: omit (仅落 image_key · OSS lifecycle 30 天后清), timestamp, modelUsed}" }
+      ],
+      "test_invariants": [
+        "TI1: outbox idempotency · 同 nid 重复 grade override 只推 1 条消息 (按 nid 去重)",
+        "TI2: broker 不可用时 grade 接口 P95 ≤ 500ms (不受 outbox 阻塞)",
+        "TI3: 重试退避: 1min / 2min / 5min / 10min / 30min (5 次后告警)",
+        "TI4: payload 不含 imageBase64 (仅 imageKey · OSS lifecycle 30 天自清 · 满足 satellite §17 决策 #2)"
+      ],
+      "key_invariants": [
+        "grade 流不被 outbox 阻塞 (master §11 NFR 最终一致性原则)",
+        "RLHF 数据完整性 (满足 satellite §17 决策 #3 closed-loop)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "(无 · 后端基建)",
+        "backend_e2e_it": "backend/review-plan-service/src/test/java/.../T01RlhfOutboxInfraE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC21-T01/team-2/attempt-1/"
+    },
+    {
+      "task_id": "SC-21-T02",
+      "task_id_short": "SC21-T02",
+      "task_id_pascal": "T02GradeWriteOverrideOutbox",
+      "task_title": "POST :grade 接口区分 'ai_overridden' 时同步写 outbox + frontend 双 verdict 埋点",
+      "scenario": "TC-21.01 主路径 · 内嵌 TC-21.03 (中间值 override)",
+      "biz_step_range": "biz §2B.21 步 2-5",
+      "page": "P08",
+      "page_state_machine": "JUDGED_DONE → GRADED (走 override 路径)",
+      "branch": "feature/SC-21-T02-grade-write-override-outbox",
+      "owner_team": "team-1",
+      "biz_refs": [
+        "biz §2B.21 步 2 (学生 Tap 与 AI 不同的按钮 · 双 verdict 埋点)",
+        "biz §2B.21 步 3 (POST :grade body{final_grade_source:'ai_overridden'} → 同步写 outbox)",
+        "biz §10.18 改 :grade 'ai_overridden' 时同步推 RocketMQ outbox",
+        "biz §2A.4 P08 差量卡 [埋点事件] wb_judge_user_override{nid, ai_verdict, user_verdict}"
+      ],
+      "spec_refs": [
+        "design/system/pages/P08-review-exec-ai-judge.spec.md §5 #2 (改 :grade 描述 ai_overridden 时同步推 outbox)",
+        "design/system/pages/P08-review-exec-ai-judge.spec.md §6.3 final_grade_source 计算规则",
+        "design/system/pages/P08-review-exec-ai-judge.spec.md §12 埋点事件 wb_judge_user_override"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": ["backend/review-plan-service", "frontend/apps/mp/src/pages/review-exec"],
+      "primary_apis": ["POST /api/review/nodes/{nid}/grade"],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "后端 GradeController POST :grade 在 final_grade_source='ai_overridden' 路径同步插 outbox row (EVENT_AI_JUDGE_OVERRIDDEN 类型 · payload 含 T01 AC5 全字段) · 同事务保证 grade + outbox 原子 (满足 master §11 NFR)" },
+        { "id": "AC2", "text": "frontend computeFinalGradeSource(grade, aiJudge) 函数实装 (spec §6.3): aiJudge=null/失败 → 'self' · aiJudge.verdict===grade → 'ai_accepted' · 否则 → 'ai_overridden'" },
+        { "id": "AC3", "text": "frontend 在 tap override 的自评按钮时 (任何与 AI 不同的按钮 · 含中间值 PARTIAL) 上报埋点 wb_judge_user_override{nid, ai_verdict, user_verdict} · 双 verdict 必填 · 不允许只报单 verdict" },
+        { "id": "AC4", "text": "(TC-21.03 中间值) AI 判 MASTERED · 学生 tap PARTIAL · 仍走 'ai_overridden' 分支 · RLHF outbox 仍推 (任何 ai_verdict != grade 都算 override)" },
+        { "id": "AC5", "text": "frontend banner 在学生 tap override 按钮时 CTA 文案变为 '你选择了 {grade} · 与 AI 不同 (这有助于我们改进 AI)' · 视觉调整为灰色提示而非紫色 (避免误导学生 AI 仍在被采纳)" }
+      ],
+      "test_invariants": [
+        "TI1: 同 nid 重复 override 5 次只推 1 条 outbox (按 X-Idempotency-Key 去重)",
+        "TI2: PARTIAL → MASTERED override + MASTERED → PARTIAL override · 两个方向都正确推 outbox",
+        "TI3: 埋点双 verdict 字段必填 · 缺一返 400 (frontend 守门 + backend 不接受)",
+        "TI4: VRT: banner override 后视觉 (灰色 CTA · 区别于采纳态紫色 CTA)"
+      ],
+      "key_invariants": [
+        "任何 ai_verdict != grade 都算 override (包括中间值) · 不分'完全相反' / '部分相反' (满足 SC-21 关键断言)",
+        "override 数据完整性 · 双 verdict 必落库 + 必上报埋点 (RLHF closed-loop 前提)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/mp/tests/e2e/sc-21/t02-grade-write-override-outbox.spec.ts",
+        "backend_e2e_it": "backend/review-plan-service/src/test/java/.../T02GradeWriteOverrideOutboxE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC21-T02/team-1/attempt-1/"
+    },
+    {
+      "task_id": "SC-21-T03",
+      "task_id_short": "SC21-T03",
+      "task_id_pascal": "T03Sc21E2EOverride",
+      "task_title": "E2E spec sc-21 override (TC-21.01 主路径 + TC-21.02 outbox 失败 + TC-21.03 中间值)",
+      "scenario": "TC-21.01 + TC-21.02 + TC-21.03 全覆盖",
+      "biz_step_range": "biz §2B.21 全 5 步",
+      "page": "P08",
+      "page_state_machine": "JUDGED_DONE → GRADED (override 全路径)",
+      "branch": "feature/SC-21-T03-e2e-override",
+      "owner_team": "team-1",
+      "biz_refs": [
+        "biz §2B.21 全 5 步编排 + 关键断言点 4 条",
+        "biz §2B.21 TC-21.01-03"
+      ],
+      "spec_refs": [
+        "design/system/pages/P08-review-exec-ai-judge.spec.md §10 验收点 (TC-21.01-03 行)"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": ["frontend/apps/mp", "backend/review-plan-service"],
+      "primary_apis": [
+        "POST /api/review/nodes/{nid}/grade (override 路径)",
+        "RocketMQ 'ai-judge.overridden' topic"
+      ],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "(TC-21.01) E2E override 主路径: SC-20 step 5 完成 · banner 显示 MASTERED 85% → 学生 tap FORGOT (完全相反 override) + 「确认提交」 → :grade body{grade:'FORGOT', final_grade_source:'ai_overridden'} → DB: final_grade_source='ai_overridden', ai_judge_verdict='MASTERED', grade='FORGOT' · master §7 SM-2 FORGOT 整 plan 重排 (T0-T6 重建) · RocketMQ 'ai-judge.overridden' topic 收到 1 条消息" },
+        { "id": "AC2", "text": "(TC-21.02 outbox 失败) RocketMQ broker mock 不可用 · grade 流不阻塞 (200 + 跳 P09 ≤ 500ms) · outbox row 保留 · 5 min 后重试成功 · 监控告警 ai-judge.outbox.fail 触发 (5 次失败后)" },
+        { "id": "AC3", "text": "(TC-21.03 中间值) AI 判 MASTERED · 学生 tap PARTIAL (中间值 override) · DB: final_grade_source='ai_overridden', ai_judge_verdict='MASTERED', grade='PARTIAL' · RLHF outbox 仍推" },
+        { "id": "AC4", "text": "system_invariants 4 条全断言 (双 verdict 必不同 + FORGOT 重排正确 + 双 verdict 埋点 + outbox 异步)" }
+      ],
+      "test_invariants": [
+        "TI1: master sibling FORGOT 流 (TC-01.06 / TC-04.01) 在 override 路径下 100% 复用 · 不破坏",
+        "TI2: outbox 异步性: grade resp 200 时 RocketMQ 消息可能还未投递 · 5 min 内最终到 (eventually consistent)",
+        "TI3: 埋点 wb_judge_user_override 必含 ai_verdict + user_verdict 两字段 · grep 埋点日志严格断言",
+        "TI4: VRT: override 后 banner 灰色态 (区别于采纳前紫色 CTA)"
+      ],
+      "key_invariants": [
+        "学生主体性铁律 (A.1): override 后 master §7 SM-2 完整执行 · 学生选 FORGOT 就走 FORGOT · 不被 AI MASTERED 建议绑架",
+        "RLHF closed-loop: override 数据必到 RocketMQ (最终一致 · 5 min 窗口)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/mp/tests/e2e/sc-21/t03-e2e-override.spec.ts",
+        "backend_e2e_it": "backend/review-plan-service/src/test/java/.../T03Sc21E2EOverrideE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC21-T03/team-1/attempt-1/"
+    }
+  ]
+}
