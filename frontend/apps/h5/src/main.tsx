@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { App } from './App';
 import { BootstrapGate } from './bootstrap/BootstrapGate';
+import { OfflineBanner } from './components/OfflineBanner';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,6 +21,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        {/* SC-00-T04: OfflineBanner sits inside BrowserRouter so it can be
+            anchored sticky-top across every route (including splash + /home);
+            it renders null until useOfflineMode reports visible=true. */}
+        <OfflineBanner />
         <BootstrapGate>
           <App />
         </BootstrapGate>

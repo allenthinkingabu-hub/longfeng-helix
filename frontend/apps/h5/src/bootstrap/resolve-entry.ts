@@ -34,8 +34,37 @@ const JWT_STORAGE_KEY = 'jwt';
 /** ms · 7d ·  offline tolerance window — biz §2A.3.1 patch (stale JWT 仍归 HOME) */
 const OFFLINE_STALE_TOLERANCE_MS = 7 * 24 * 60 * 60 * 1000;
 
-/** Fetch timeout (ms) for /api/session/resolve. */
-const RESOLVE_FETCH_TIMEOUT_MS = 5000;
+/** Fetch timeout (ms) for /api/session/resolve.
+ *  SC-00-T04: tightened from 5000ms to 800ms — beyond 800ms user already feels
+ *  the freeze. abort goes through the same stale-JWT fallback path. */
+const RESOLVE_FETCH_TIMEOUT_MS = 800;
+
+/** sessionStorage keys for offline-mode UI (read by useOfflineMode hook). */
+const SS_OFFLINE_MODE_KEY = 'offlineMode';
+const SS_OFFLINE_DISMISSED_KEY = 'offlineDismissed';
+/** DOM event the hook listens for in same-tab updates. */
+const OFFLINE_CHANGE_EVENT = 'offline-mode-change';
+
+/** Toggle the offline-mode flag and notify the hook (no-op if storage blocked). */
+function setOfflineMode(active: boolean): void {
+  try {
+    if (active) {
+      sessionStorage.setItem(SS_OFFLINE_MODE_KEY, 'true');
+    } else {
+      sessionStorage.removeItem(SS_OFFLINE_MODE_KEY);
+      // Reset dismissed flag too: a successful resolve clears the user's "don't
+      // bother me again" choice for the next outage cycle.
+      sessionStorage.removeItem(SS_OFFLINE_DISMISSED_KEY);
+    }
+  } catch {
+    /* sessionStorage blocked (private mode) — banner just won't show */
+  }
+  try {
+    window.dispatchEvent(new Event(OFFLINE_CHANGE_EVENT));
+  } catch {
+    /* SSR / non-browser env */
+  }
+}
 
 export interface ResolveOutcome {
   /** Decision from local pre-judge or backend response. */
@@ -83,15 +112,23 @@ export async function resolveEntry(): Promise<ResolveOutcome> {
       shareToken,
       observerCode,
     });
+    // Success → clear offline flag (banner auto-disappears).
+    setOfflineMode(false);
     return { verdict: resolved.decision, dispatchTo: dispatchPath(resolved.decision, { path, shareToken, observerCode }), raw: resolved };
   } catch (err) {
     // ── Step 4 · Offline degrade ──
+    // SC-00-T04: 5xx / timeout / network-fail → flip offline mode for the UI
+    // banner. AbortError counts too (caller wanted answer < 800ms).
     // eslint-disable-next-line no-console
     console.warn('[bootstrap] resolve failed, falling back', err);
+    setOfflineMode(true);
     const localJwt = readLocalJwt();
     if (localJwt && isWithinStaleTolerance(localJwt)) {
+      // Stale ≤ 7d → still treat device as known · stay on /home.
       return { verdict: 'HOME', dispatchTo: '/home' };
     }
+    // No JWT or > 7d expired → land on /welcome (NOT /home, NOT /auth/login)
+    // per inflight AC3: "no JWT + resolve 5xx → /welcome (避免空账号被强制 P00)"
     return { verdict: 'LANDING', dispatchTo: '/welcome' };
   }
 }

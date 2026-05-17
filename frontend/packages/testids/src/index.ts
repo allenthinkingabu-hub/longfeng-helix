@@ -492,6 +492,18 @@ export const TEST_IDS = {
     observerPlaceholderRoot:    'observer-placeholder-root',
     offlineBannerRoot:          'offline-banner-root',
   },
+
+  // SC-00-T04 · 3 stub 真页 + OfflineBanner 真 UI (T01-T02 reserved · T04 实装)
+  sc00t04: {
+    sharedStubRoot:        'shared-stub-root',
+    sharedStubCta:         'shared-stub-cta',
+    welcomebackStubRoot:   'welcomeback-stub-root',
+    welcomebackStubCta:    'welcomeback-stub-cta',
+    observerStubRoot:      'observer-stub-root',
+    observerStubCta:       'observer-stub-cta',
+    offlineBannerRoot:     'offline-banner-root',
+    offlineBannerClose:    'offline-banner-close',
+  },
 } as const;
 
 // ── S8 FE-04 · Dynamic testid helpers (functions · not in const for type safety) ──

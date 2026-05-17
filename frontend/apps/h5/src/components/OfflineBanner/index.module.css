@@ -1,0 +1,41 @@
+/* SC-00-T04 · OfflineBanner · sticky top-0 黄条 */
+
+.root {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #FEF3C7;
+  color: #92400E;
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.text {
+  flex: 1;
+  text-align: center;
+}
+
+.close {
+  flex: 0 0 auto;
+  background: transparent;
+  border: none;
+  color: #92400E;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.15s ease;
+}
+
+.close:hover,
+.close:active {
+  background: rgba(146, 64, 14, 0.1);
+}
