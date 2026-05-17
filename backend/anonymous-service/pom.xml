@@ -20,6 +20,7 @@
   <properties>
     <flyway.version>10.15.0</flyway.version>
     <testcontainers.version>1.20.1</testcontainers.version>
+    <jjwt.version>0.12.5</jjwt.version>
   </properties>
 
   <dependencies>
@@ -40,10 +41,39 @@
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
 
-    <!-- JDBC + JPA (skeleton only — entities will be added in SC-00 / SC-12) -->
+    <!-- JDBC + JPA (SC-00-T02 · account_device entity + ShareToken read-only) -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    <!-- Validation for @Valid request body -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+
+    <!-- JWT HS256 — same library/version as auth-service (signature compatibility) -->
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-api</artifactId>
+      <version>${jjwt.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-impl</artifactId>
+      <version>${jjwt.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-jackson</artifactId>
+      <version>${jjwt.version}</version>
+      <scope>runtime</scope>
     </dependency>
 
     <!-- Redis (for SC-12 guest_rate_bucket + SC-13 share:revoked Bloom filter later) -->

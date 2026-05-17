@@ -8,6 +8,16 @@ spring:
     url: jdbc:postgresql://127.0.0.1:15432/wrongbook
     username: longfeng
     password: longfeng_dev
+  jpa:
+    # Flyway owns DDL · Hibernate ddl-auto=none so we don't double-build schema.
+    # (auth-service uses validate because it owns auth_user only; we have 7 anon tables
+    # and only an AccountDevice entity, so validate would complain about un-mapped tables.)
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: public
   flyway:
     enabled: true
     # Namespaced under db/anonymous/ (NOT db/migration/) to avoid colliding with
@@ -45,3 +55,14 @@ info:
     name: anonymous-service
     description: PHASE-A skeleton — Flyway V20260421_02 (7 anonymous-state tables) + zod contracts owner
     version: 1.0.0-SNAPSHOT
+
+# SC-00-T02 · JWT verification — SHARED with auth-service for HS256 sig parity.
+# P0 OK to duplicate the literal here; P1 must source from Vault (TODO).
+# These three fields MUST match auth-service application.yml byte-for-byte, or
+# decision-tree node 1 (Authorization Bearer → HOME) will reject every login.
+anon:
+  jwt:
+    # TODO(P1): rotate to Vault-backed secret · keep auth-service in lockstep
+    secret: longfeng-auth-dev-jwt-secret-min-256-bits-do-not-use-in-prod-please-rotate
+    issuer: longfeng
+    audience: h5
