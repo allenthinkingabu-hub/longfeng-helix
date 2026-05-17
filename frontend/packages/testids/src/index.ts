@@ -504,6 +504,16 @@ export const TEST_IDS = {
     offlineBannerRoot:     'offline-banner-root',
     offlineBannerClose:    'offline-banner-close',
   },
+
+  // SC-11-T01 · P-LANDING shell (replaces SC-00-T01 landing-placeholder-root)
+  sc11t01: {
+    root:                  'p-landing-root',
+    hero:                  'p-landing-hero',
+    skeleton:              'p-landing-skeleton',
+    samplesSection:        'p-landing-samples-section',
+    kpiBar:                'p-landing-kpi-bar',
+    degradedBanner:        'p-landing-degraded-banner',
+  },
 } as const;
 
 // ── S8 FE-04 · Dynamic testid helpers (functions · not in const for type safety) ──

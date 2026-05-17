@@ -53,6 +53,15 @@ export default defineConfig({
         target: process.env.VITE_ANON_PROXY_TARGET || 'http://localhost:8090',
         changeOrigin: true,
       },
+      // SC-11-T01: /api/landing/* → anonymous-service :8090
+      // (same anonymous-service · LandingController side-car next to SessionResolveController)
+      '/api/landing': {
+        target:
+          process.env.VITE_LANDING_PROXY_TARGET ||
+          process.env.VITE_ANON_PROXY_TARGET ||
+          'http://localhost:8090',
+        changeOrigin: true,
+      },
       '/api/file': {
         target: process.env.VITE_FILE_PROXY_TARGET || 'http://localhost:8084',
         changeOrigin: true,

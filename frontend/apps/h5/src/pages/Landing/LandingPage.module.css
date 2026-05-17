@@ -1,0 +1,159 @@
+/* ====================================================================
+ * SC-11-T01 · P-LANDING shell styles
+ * 极光 hero 渐变 + skeleton 灰条 + DEGRADED banner 浅黄
+ * 设计真相: design/mockups/wrongbook/14_landing.html
+ * Budget: ≤ 3KB (gzipped)
+ * ==================================================================== */
+
+.root {
+  min-height: 100vh;
+  background: #fff;
+  color: #1f2937;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+  padding-bottom: 32px;
+}
+
+/* ── Hero (极光静态背景 · 不调动图 · SC-11-T02 才接动画) ──────────── */
+.hero {
+  position: relative;
+  padding: 48px 24px 36px;
+  background: linear-gradient(
+    135deg,
+    #7c3aed 0%,
+    #4f46e5 35%,
+    #06b6d4 70%,
+    #14b8a6 100%
+  );
+  color: #fff;
+  border-radius: 0 0 24px 24px;
+  overflow: hidden;
+}
+
+.heroTitle {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin: 0 0 8px;
+  line-height: 1.25;
+}
+
+.heroSub {
+  font-size: 15px;
+  opacity: 0.9;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Skeleton (LOADING 态) ────────────────────────────────────────── */
+.skeleton {
+  padding: 24px;
+}
+
+.skeletonBar {
+  height: 16px;
+  background: linear-gradient(90deg, #e5e7eb 0%, #f3f4f6 50%, #e5e7eb 100%);
+  background-size: 200% 100%;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeletonBar.wide {
+  width: 100%;
+}
+.skeletonBar.mid {
+  width: 70%;
+}
+.skeletonBar.short {
+  width: 40%;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── DEGRADED banner (浅黄 · 不挡 CTA) ────────────────────────────── */
+.degradedBanner {
+  margin: 12px 16px;
+  padding: 10px 14px;
+  background: #fef9c3;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  color: #854d0e;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ── Samples section ──────────────────────────────────────────────── */
+.samplesSection {
+  padding: 24px 16px 8px;
+}
+
+.sectionHeading {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 14px;
+  color: #111827;
+}
+
+.sampleCard {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+
+.sampleSubject {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-radius: 999px;
+  margin-bottom: 8px;
+}
+
+.sampleStem {
+  font-size: 14px;
+  color: #1f2937;
+  line-height: 1.55;
+  margin: 0 0 6px;
+}
+
+.sampleKpoints {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ── KPI bar (社区数据条) ─────────────────────────────────────────── */
+.kpiBar {
+  display: flex;
+  justify-content: space-around;
+  padding: 16px;
+  margin: 16px;
+  background: #f3f4f6;
+  border-radius: 12px;
+}
+
+.kpiCell {
+  text-align: center;
+  flex: 1;
+}
+
+.kpiValue {
+  display: block;
+  font-size: 18px;
+  font-weight: 700;
+  color: #4f46e5;
+}
+
+.kpiLabel {
+  display: block;
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 2px;
+}
