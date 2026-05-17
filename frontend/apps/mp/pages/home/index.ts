@@ -150,11 +150,19 @@ Page({
     // ── #1 today (hero + subjects + circle + allDone + weekStrip badge) ──
     if (todayData) {
       const total = todayData.total ?? 0;
-      // spec L94 严格口径 doneCount = GRADED (completedAt != null) · 任务完成度.
+      // done = "今日已 grade" (= completedAt 落在今日窗口) · review_plan cyclic 模型 ·
+      // 不能用 completedAt != null (= 累积曾经 grade · 昨晚 grade 的今晚 仍是历史标记).
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
       const itemsArr = Array.isArray(todayData.items) ? todayData.items : [];
       const done = typeof todayData.done === 'number'
         ? todayData.done
-        : itemsArr.filter(i => i && (i as { completedAt?: unknown }).completedAt).length;
+        : itemsArr.filter(i => {
+            const ca = (i as { completedAt?: string | null }).completedAt;
+            if (!ca) return false;
+            const t = new Date(ca).getTime();
+            return !isNaN(t) && t >= todayStart;
+          }).length;
       const pct = computeCirclePct(done, total);
       const subjects = buildSubjectsFromItems(itemsArr as Array<{ subject?: string | null }>);
       const pending = Math.max(0, total - done);
