@@ -267,11 +267,14 @@ Page({
       result,
       sessionStats,
       isForgot,
+      // FORGOT 路径 (spec §6.1 Q-C 规则): 当前 + 后续 CANCELLED · 重建 T0..T6 ·
+      // 用户视角是 "回到起点" · prevT = 原节点 · nextT = T0 (下一次从头开始).
+      // 非 FORGOT: 正常推进 nodeIndex → nodeIndex+1.
       prevT: `T${Math.max(0, result.nodeIndex)}`,
-      nextT: `T${result.nodeIndex + 1}`,
-      // P09-MASTERY: 优先用 BE review_plan.mastery_score 真值 · 没有时 (老节点 / 没复习过)
-      // 退到原 easeAfter*32 派生公式. 真做完一次 MASTERED 才会有 >0 值.
-      masteryPct: typeof r.masteryScore === 'number' && r.masteryScore > 0
+      nextT: isForgot ? 'T0' : `T${result.nodeIndex + 1}`,
+      // P09-MASTERY: 优先用 BE review_plan.mastery_score 真值 · 0 也用 (FORGOT 后真值就是 0,
+      // 不能因为 0 退到派生公式 80% 骗用户). 仅当 BE 字段 null 时退派生 (老服务版本兼容).
+      masteryPct: typeof r.masteryScore === 'number'
         ? r.masteryScore
         : Math.round(result.easeAfter * 32),
       nextDueFormatted: formatNextDue(result.nextDueAt),

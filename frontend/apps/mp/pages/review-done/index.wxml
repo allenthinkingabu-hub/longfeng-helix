@@ -28,6 +28,7 @@
   </view>
   <view class="hero-sub">
     <block wx:if="{{pageState === 'ALL_DONE'}}">共完成 {{sessionStats.total}} 题 · 掌握 {{sessionStats.mastered}} 题</block>
+    <block wx:elif="{{isForgot}}">记忆曲线回到起点 · 从 T0 重新开始</block>
     <block wx:else>记忆曲线向前推进一节点 · {{prevT}} → {{nextT}}</block>
   </view>
 
@@ -89,10 +90,13 @@
       </view>
     </view>
 
-    <!-- AI Advance Banner -->
+    <!-- AI Advance Banner · FORGOT 与 MASTERED variant 不同文案 (spec §6.1 Q-C 规则) -->
     <view class="advance" data-test-id="{{testIds.advanceBanner}}">
       <view class="advance-icon">★</view>
-      <view class="advance-text" data-test-id="{{testIds.advanceBannerText}}">
+      <view wx:if="{{isForgot}}" class="advance-text" data-test-id="{{testIds.advanceBannerText}}">
+        AI 已重排复习计划，ease 重置 · 当前 + 后续节点已 CANCELLED · 重建 T0..T6 共 7 个提醒。
+      </view>
+      <view wx:else class="advance-text" data-test-id="{{testIds.advanceBannerText}}">
         AI 已按艾宾浩斯模型推进节点，下次复习节点 <text class="advance-text-em">{{nextT}}</text>（{{result.intervalAfter}} 天后），未来 6 次提醒已自动更新。
       </view>
     </view>
