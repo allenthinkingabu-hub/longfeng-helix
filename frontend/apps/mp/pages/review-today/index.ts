@@ -10,6 +10,12 @@ import type { SlotData } from './helpers';
 
 // ─── Types ──────────────────────────────────────────────────────
 type PageState = 'LOADING' | 'today.LIST' | 'today.EMPTY' | 'today.ALL_DONE';
+// P07-D · 排序模式 · 桶内 (时段) sort 顺序 · 桶分组本身不变
+// 默认 time (按 nextDueAt ASC · BE 已经如此返回 · 不动)
+type SortMode = 'time' | 'tlevel' | 'subject';
+const SORT_LABEL: Record<SortMode, string> = {
+  time: '时间', tlevel: 'T 级', subject: '学科',
+};
 
 // ─── Page ──────────────────────────────────────────────────────
 Page({
@@ -30,6 +36,12 @@ Page({
 
     dateStr: '',
     weekday: '',
+
+    // P07-D · 排序状态 · onShow / onLoad 不重置 · onSortTap 改
+    sortMode: 'time' as SortMode,
+    sortLabel: SORT_LABEL.time,
+    // 缓存最近一次 getToday items · onSortTap 切换 mode 时不重发请求
+    _rawItems: [] as import('../../src/api/review').ReviewPlanDto[],
   },
 
   onLoad() {
@@ -70,12 +82,20 @@ Page({
       }
 
       const now = new Date();
-      const builtSlots = buildSlotsFromItems(items, now);
-      const completed = items.filter(i => i.mastered);
-      const doneCount = completed.length;
-      const waitCount = items.filter(i => !i.mastered && !i.completedAt).length;
+      const builtSlots = buildSlotsFromItems(items, now, this.data.sortMode);
+      // P07 spec L94 严格口径: doneCount = GRADED (= completedAt != null) ·
+      // 不再用 mastered (BE ReviewPlanDto 根本不返这个字段 → undefined → 永远 0%).
+      // 任务完成度 (progressPct) 与 掌握度 (masteryPct · BE 算 · ease 聚合) 是两个独立维度.
+      // 4 题都已 grade (含 PARTIAL/FORGOT) → 进度 100%, 掌握度由 ease 反映.
+      const doneCount = items.filter(i => i.completedAt).length;
+      const waitCount = items.filter(i => !i.completedAt).length;
+      // 进行中 = OPEN 未 grade · BE 现实不返该状态 → 永远 0 · 保留 hero label 占位
       const inProgressCount = total - doneCount - waitCount;
       const progressPct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+
+      // P07-A · masteryPct 直接用 BE 返值 (spec L98 · ease_factor 聚合).
+      // BE 未实现/历史接口字段缺失时回退 0% · 不假装有 mastery.
+      const masteryPct = typeof resp.masteryPct === 'number' ? resp.masteryPct : 0;
 
       this.setData({
         // 真 builtSlots 即使是空数组也用 · 之前 builtSlots.length>0 ? : MOCK_SLOTS
@@ -87,6 +107,8 @@ Page({
         waitCount,
         estMinutes: Math.max(1, total * 3),
         progressPct,
+        masteryPct,
+        _rawItems: items,
         pageState: (doneCount === total ? 'today.ALL_DONE' : 'today.LIST') as PageState,
       });
     } catch (err) {
@@ -105,6 +127,34 @@ Page({
 
   onBackTap() {
     wx.navigateBack();
+  },
+
+  // P07 ALL_DONE 态 CTA · spec §6 状态机 ALL_DONE → 跳 P-HOME ·
+  // P07 是 tabBar 页 · 不能 navigateBack · 用 switchTab.
+  onBackHome() {
+    wx.switchTab({ url: '/pages/home/index' });
+  },
+
+  // P07-D · 右上 "排序 · {mode}" tap · ActionSheet 3 选项
+  // 桶分组 (上午/下午/晚上) 不动 · 仅桶内 sort 顺序变.
+  // spec/biz 都没具体定义这个 chip · 这里就定一份 "时间/T级/学科" 作为初版.
+  onSortTap() {
+    const modes: SortMode[] = ['time', 'tlevel', 'subject'];
+    wx.showActionSheet({
+      itemList: modes.map(m => `按${SORT_LABEL[m]}排序`),
+      success: (res) => {
+        const picked = modes[res.tapIndex];
+        if (!picked || picked === this.data.sortMode) return;
+        const now = new Date();
+        const builtSlots = buildSlotsFromItems(this.data._rawItems, now, picked);
+        this.setData({
+          sortMode: picked,
+          sortLabel: SORT_LABEL[picked],
+          slots: builtSlots,
+        });
+      },
+      fail: () => { /* user cancel · noop */ },
+    });
   },
 
   onItemTap(e: WechatMiniprogram.TouchEvent) {

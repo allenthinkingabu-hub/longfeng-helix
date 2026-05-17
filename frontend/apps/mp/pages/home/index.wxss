@@ -603,6 +603,16 @@ page {
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
 }
 
+.msgs-empty {
+  padding: 36rpx 28rpx;
+  text-align: center;
+}
+
+.msgs-empty-tx {
+  font-size: 26rpx;
+  color: #8E8E93;
+}
+
 .msg {
   display: flex;
   align-items: center;

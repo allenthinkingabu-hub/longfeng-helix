@@ -28,10 +28,17 @@ export interface HomeTodayItem {
   nodeIndex: number;             // T0..T6
   status: 'ACTIVE' | 'MASTERED';
   nextDueAt: string;
-  completedAt: string | null;    // 非 null = 当日已复习完
+  completedAt: string | null;    // 非 null = 当日已 grade · spec L94 doneCount=GRADED 口径用这个
+  // ⚠️ BE ReviewPlanDto 不返 mastered 字段 (只返 status: ACTIVE|MASTERED) ·
+  // 进度/角标 done 口径走 completedAt · mastery 维度由 BE TodayResp.masteryPct 单独反映.
+  // 保留 optional 让前期 mastered=done 误用代码静默兼容 · 任何新代码都读 completedAt.
+  mastered?: boolean;
   easeFactor: number;
   totalReview: number;
   totalForget: number;
+  // BE today endpoint single-DB join wrong_item · 'math'/'physics'/'chemistry'/'english'/'chinese' ·
+  // FE 自己 i18n 映射 + chip 渲染 (替代之前 MVP_SUBJECTS 写死 3/2/3).
+  subject?: string | null;
 }
 
 export interface HomeTodayData {
@@ -101,5 +108,49 @@ export async function getHomeTodayAggregate(
   return httpJSON<HomeTodayAggregate>(
     `${BASE}/api/home/today${query}`,
     { method: 'GET', headers },
+  );
+}
+
+// ── 本周回顾 4 stat · 替代 MVP_WEEK_STATS ───────────────────────
+export interface WeeklyStatsResp {
+  mastered: number;
+  newItems: number;
+  forgotten: number;
+  masteryRate: number;
+}
+
+export async function getWeeklyStats(tz = 'Asia/Shanghai'): Promise<WeeklyStatsResp> {
+  return httpJSON<WeeklyStatsResp>(
+    `${BASE}/api/home/weekly-stats?tz=${encodeURIComponent(tz)}`,
+  );
+}
+
+// ── 本周日程 dots · 替代 PLACEHOLDER_DOTS_BY_WEEKDAY ──────────────
+export interface WeekDotsResp {
+  days: Array<{ date: string; dots: string[] }>;
+}
+
+export async function getWeekDots(tz = 'Asia/Shanghai'): Promise<WeekDotsResp> {
+  return httpJSON<WeekDotsResp>(
+    `${BASE}/api/home/week-dots?tz=${encodeURIComponent(tz)}`,
+  );
+}
+
+// ── 最近消息 (≤3 · 派生自现有数据) · 替代 MVP_MESSAGES ──────────
+export interface MessageItem {
+  title: string;
+  subtitle: string;
+  time: string;
+  icon: string;
+  iconColor: string;
+  theme: string;
+}
+export interface MessagesResp {
+  messages: MessageItem[];
+}
+
+export async function getRecentMessages(tz = 'Asia/Shanghai'): Promise<MessagesResp> {
+  return httpJSON<MessagesResp>(
+    `${BASE}/api/home/messages/recent?tz=${encodeURIComponent(tz)}`,
   );
 }

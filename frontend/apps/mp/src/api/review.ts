@@ -30,7 +30,12 @@ export interface ReviewPlanDto {
   intervalDays: number;
   nextDueAt: string;
   completedAt: string | null;
-  mastered: boolean;
+  // BE 真返 status 字符串 ("ACTIVE"|"MASTERED") · FE 想判 "真掌握" 时读这个 ·
+  // 进度/已完成走 completedAt 口径 (spec L94 GRADED · 任务完成度).
+  status?: 'ACTIVE' | 'MASTERED';
+  // ⚠️ BE ReviewPlanDto.java 不返 mastered 字段 (只返 status). FE 旧代码读这个永远 undefined.
+  // 保留 optional 让旧调用点静默兼容 · 任何新代码都应该读 completedAt 或 status === 'MASTERED'.
+  mastered?: boolean;
   // P07 单库 enrich · BE today join wrong_item 注入 · 其他端点为 null
   subject?: string | null;
   stem?: string | null;
@@ -47,6 +52,9 @@ export interface TodayResp {
   items: ReviewPlanDto[];
   total: number;
   tz: string;
+  // P07 spec L98 · 0-100 · BE 算 latest ease_factor_after avg → mastery 映射 ·
+  // 0 = 今日所有题目全新没复习过 (诚实 · 不是 hard-code 假死值).
+  masteryPct?: number | null;
 }
 
 export interface CompleteResult {

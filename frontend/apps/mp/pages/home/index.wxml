@@ -55,11 +55,20 @@
         <view class="rh-top">
           <view>
             <view class="rh-kicker">TODAY'S REVIEW</view>
+            <!-- allDone 态切庆祝文案 · 与 P07 hero ALL_DONE 同模型 · 撤掉"100% DONE+N 题待复习"内部打架 -->
             <view class="rh-title">
-              <text class="rh-title-em" data-test-id="today-review-card-total">{{todayTotal}} 题</text>
-              <text> 待复习</text>
+              <block wx:if="{{allDone}}">
+                <text class="rh-title-em" data-test-id="today-review-card-total">今日复习已完成 🎉</text>
+              </block>
+              <block wx:else>
+                <text class="rh-title-em" data-test-id="today-review-card-total">{{todayTotal}} 题</text>
+                <text> 待复习</text>
+              </block>
             </view>
-            <view class="rh-sub">预计 {{estMin}} 分钟 · 下一节点 10:15</view>
+            <view class="rh-sub">
+              <block wx:if="{{allDone}}">共 {{todayTotal}} 题 · 已全部完成</block>
+              <block wx:else>预计 {{estMin}} 分钟</block>
+            </view>
           </view>
           <view class="rh-circle" data-test-id="today-review-card-circle-progress">
             <view class="rh-circle-bg"></view>
@@ -197,12 +206,12 @@
         </view>
       </view>
 
-      <!-- ── Messages ────────────────────────────────── -->
+      <!-- ── Messages · BE 派生 ≤3 条 (替代 MVP_MESSAGES 写死) ── -->
       <view class="sec">
         <text class="sec-t">最近消息</text>
-        <text class="sec-m" data-test-id="p-home-messages-more-link">全部 2 ›</text>
+        <text wx:if="{{messages.length > 0}}" class="sec-m" data-test-id="p-home-messages-more-link">全部 {{messages.length}} ›</text>
       </view>
-      <view class="msgs" data-test-id="p-home-messages">
+      <view wx:if="{{messages.length > 0}}" class="msgs" data-test-id="p-home-messages">
         <view wx:for="{{messages}}" wx:key="title" class="msg">
           <view class="msg-ic msg-ic-{{item.theme}}">
             <van-icon name="{{item.icon}}" color="{{item.iconColor}}" size="16px" />
@@ -213,6 +222,10 @@
           </view>
           <text class="msg-tm">{{item.time}}</text>
         </view>
+      </view>
+      <!-- 空态 · 不假装有 3 条 "妈妈分享 / 免打扰" mock -->
+      <view wx:else class="msgs msgs-empty" data-test-id="p-home-messages-empty">
+        <text class="msgs-empty-tx">本周暂无消息</text>
       </view>
 
       <!-- ── AI Weak KP ──────────────────────────────── -->
