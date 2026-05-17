@@ -514,6 +514,17 @@ export const TEST_IDS = {
     kpiBar:                'p-landing-kpi-bar',
     degradedBanner:        'p-landing-degraded-banner',
   },
+
+  // SC-11-T02 · P-LANDING hero 30s 动图 + 三步漫画 (inflight scope_in #6)
+  sc11t02: {
+    heroDemo:              'p-landing-hero-demo',
+    heroImage:             'p-landing-hero-image',
+    heroPoster:            'p-landing-hero-poster',
+    threeStepComic:        'p-landing-three-step-comic',
+    step1:                 'p-landing-step-1',
+    step2:                 'p-landing-step-2',
+    step3:                 'p-landing-step-3',
+  },
 } as const;
 
 // ── S8 FE-04 · Dynamic testid helpers (functions · not in const for type safety) ──

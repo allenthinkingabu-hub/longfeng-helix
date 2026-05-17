@@ -1,0 +1,56 @@
+/* ====================================================================
+ * SC-11-T02 · ThreeStepComic styles · 错峰 fadeIn
+ * 纯 CSS @keyframes · 不引入大型动画库 (per scope_in #2(d))
+ * Budget: ≤ 1KB gzipped
+ * ==================================================================== */
+
+.threeStepComic {
+  display: flex;
+  gap: 12px;
+  padding: 20px 16px;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.step {
+  flex: 1;
+  text-align: center;
+  /* Begin invisible — fadeIn animation pushes us to opacity:1. The
+   * fill-mode 'both' makes sure we *stay* at the final keyframe state
+   * after the animation completes. */
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.stepIcon {
+  font-size: 32px;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+.stepTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  line-height: 1.4;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Respect users who request reduced motion · WCAG 2.3.3
+ * Show steps immediately at opacity=1 · skip translateY shimmy. */
+@media (prefers-reduced-motion: reduce) {
+  .step {
+    opacity: 1;
+    animation: none;
+  }
+}

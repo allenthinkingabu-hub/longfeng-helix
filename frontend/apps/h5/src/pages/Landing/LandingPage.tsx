@@ -30,6 +30,8 @@ import type {
 } from '@longfeng/api-contracts';
 import styles from './LandingPage.module.css';
 import { fetchSamples, fetchKpi } from './api';
+import { HeroDemo } from './HeroDemo';
+import { ThreeStepComic } from './ThreeStepComic';
 
 const ids = TEST_IDS.sc11t01;
 
@@ -111,11 +113,15 @@ export const LandingPage: React.FC = () => {
 
   return (
     <div data-testid={ids.root} className={styles.root}>
-      {/* Hero · 极光静态背景 · 不调动图 (SC-11-T02 才接动画) */}
+      {/* Hero · 极光渐变背景 + SC-11-T02 HeroDemo 前景 (30s 动图 · onError → poster) */}
       <header data-testid={ids.hero} className={styles.hero}>
         <h1 className={styles.heroTitle}>错题秒变复习计划</h1>
         <p className={styles.heroSub}>30 秒看明白</p>
+        <HeroDemo />
       </header>
+
+      {/* SC-11-T02 三步漫画 · 仅 READY 态显示 (LOADING/DEGRADED 隐藏 · 给主信息让位) */}
+      {state === 'READY' && <ThreeStepComic />}
 
       {/* LOADING skeleton */}
       {isLoading && (
