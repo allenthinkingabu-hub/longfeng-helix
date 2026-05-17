@@ -1,0 +1,4 @@
+
+> @longfeng/api-contracts@0.1.0 typecheck /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/frontend/packages/api-contracts
+> tsc --noEmit -p tsconfig.json
+

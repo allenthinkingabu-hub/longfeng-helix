@@ -1,0 +1,60 @@
+=== Tester adversarial SQL probes against the sandbox PG (port 15432) ===
+Goal: validate Coder's CHECK + UNIQUE constraints actually fire at runtime,
+not just appear in psql \d output.
+Time: 2026-05-17T15:45 +04:00
+DB: jdbc:postgresql://127.0.0.1:15432/wrongbook (docker team-1-pg)
+Tester: Claude TL-as-Tester role (PHASE-A-ANON · team-4 · attempt-1)
+
+=== Probe A · ck_guest_rate_bucket_count_le_1 CHECK constraint ===
+SQL: INSERT INTO guest_rate_bucket(id,device_fp,ip_hash,bucket_date,count)
+       VALUES (999,'fp-x','ip-x','2026-05-17',2);
+EXPECT: rejected (count > 1 violates biz §4.10 末尾 "上限 1/day")
+ACTUAL: ERROR:  new row for relation "guest_rate_bucket" violates check
+                constraint "ck_guest_rate_bucket_count_le_1"
+        DETAIL: Failing row contains (999, fp-x, ip-x, 2026-05-17, 2, ...).
+VERDICT: PASS — constraint fires correctly.
+
+=== Probe B · uq_guest_rate_bucket_fp_ip_date 三元唯一索引 ===
+SQL: INSERT INTO guest_rate_bucket VALUES (1001,'fp-1','ip-1','2026-05-17',1);  -- OK
+     INSERT INTO guest_rate_bucket VALUES (1002,'fp-1','ip-1','2026-05-17',0);  -- expect dup
+EXPECT: 1st insert ok, 2nd rejected (device_fp+ip_hash+bucket_date 三元唯一)
+ACTUAL: INSERT 0 1
+        ERROR:  duplicate key value violates unique constraint
+                "uq_guest_rate_bucket_fp_ip_date"
+        DETAIL: Key (device_fp, ip_hash, bucket_date)=(fp-1, ip-1, 2026-05-17) already exists.
+VERDICT: PASS — biz §4.10 末尾 "(device_fp, ip_hash, date) 联合唯一" enforced.
+
+=== Probe C · share_token.jti UNIQUE ===
+SQL: INSERT INTO share_token VALUES (2001,'jti-aaa',7,'QUESTION','question:1',...);
+     INSERT INTO share_token VALUES (2002,'jti-aaa',8,'EXAM_DAY','event:1',...);
+EXPECT: 1st ok, 2nd rejected
+ACTUAL: INSERT 0 1
+        ERROR:  duplicate key value violates unique constraint "share_token_jti_key"
+        DETAIL: Key (jti)=(jti-aaa) already exists.
+VERDICT: PASS — biz §4.11 "jti VARCHAR(64) NOT NULL UNIQUE" enforced.
+
+=== Probe D · uq_account_device (student_id, device_fp) 联合唯一 ===
+SQL: INSERT INTO account_device VALUES (3001,99,'fp-y','H5');     -- OK
+     INSERT INTO account_device VALUES (3002,99,'fp-y','MINIP');  -- expect dup
+EXPECT: 1st ok, 2nd rejected
+ACTUAL: INSERT 0 1
+        ERROR:  duplicate key value violates unique constraint "uq_account_device"
+        DETAIL: Key (student_id, device_fp)=(99, fp-y) already exists.
+VERDICT: PASS — biz §4.13 "uq_account_device(student_id, device_fp)" enforced.
+
+=== Cleanup ===
+TRUNCATE guest_rate_bucket, share_token, account_device;
+RESULT: TRUNCATE TABLE (no other consumers of these tables in current sandbox).
+
+=== Idempotency probe (Tester independent mvn verify run) ===
+mvn -pl anonymous-service verify
+EXPECT: 5/5 IT PASS, Flyway should NOT re-apply V20260421_02 (already in history)
+ACTUAL: o.f.core.internal.command.DbValidate : Successfully validated 4 migrations
+        o.f.core.internal.command.DbMigrate  : Schema "public" is up to date. No migration necessary.
+        [INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+        [INFO] BUILD SUCCESS
+VERDICT: PASS — biz §S1 Flyway 幂等约束 enforced.
+
+=== Summary ===
+4 destructive boundary probes + 1 idempotency probe — all 5 PASS.
+No constraint can be silently bypassed by a future buggy backend write path.

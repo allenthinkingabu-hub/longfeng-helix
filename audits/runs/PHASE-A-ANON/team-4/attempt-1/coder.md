@@ -143,9 +143,7 @@ Diff vs biz = **0** (字段名 / 类型 / NULLABLE / DEFAULT / 索引 / UNIQUE /
 
 提交分两步:(a) anonymous-service module + Flyway + IT  (b) frontend api-contracts zod + index re-export. Commit hash 写入 inflight.task.git_commits[] (本段 §5 在 commit 后回填).
 
-**Commit hashes**:
-- `<HASH-1>` chore(PHASE-A-ANON): anonymous-service Maven skeleton + Flyway V20260421_02 (7 tables) + IT 5/5 green
-- `<HASH-2>` feat(api-contracts): session-resolve + landing zod schemas + index re-export + typecheck PASS
-- `<HASH-3>` docs(PHASE-A-ANON): attempt-1 coder.md + bugs-found.md + test-reports archived
-
-(actual hashes filled in by post-commit append below — kept verifiable via `git cat-file -e`).
+**Commit hashes** (all 3 verified via `git cat-file -e <hash>`):
+- `28666d8cf2797ccee76c8809e395088ec59f8c04` feat(PHASE-A-ANON): anonymous-service Maven skeleton + Flyway V20260421_02 (7 tables) + IT 5/5 green
+- `0772326c8c1587b58b9e217bb1b477f56f8a7ee9` feat(api-contracts): session-resolve + landing zod schemas for anonymous-service contracts
+- `9ece710fa5e4011f1f1a1a15377cff788de693e7` docs(PHASE-A-ANON): attempt-1 Coder work log · coder.md + bugs-found.md + test-reports

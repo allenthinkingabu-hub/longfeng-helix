@@ -1,0 +1,83 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------< com.longfeng:anonymous-service >-------------------
+[INFO] Building anonymous-service 1.0.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:resources (default-resources) @ anonymous-service ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:compile (default-compile) @ anonymous-service ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:testResources (default-testResources) @ anonymous-service ---
+[INFO] skip non existing resourceDirectory /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/backend/anonymous-service/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:testCompile (default-testCompile) @ anonymous-service ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.1.2:test (default-test) @ anonymous-service ---
+[INFO] 
+[INFO] --- maven-jar-plugin:3.3.0:jar (default-jar) @ anonymous-service ---
+[INFO] 
+[INFO] --- spring-boot-maven-plugin:3.2.5:repackage (repackage) @ anonymous-service ---
+[INFO] Replacing main artifact /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/backend/anonymous-service/target/anonymous-service-1.0.0-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/backend/anonymous-service/target/anonymous-service-1.0.0-SNAPSHOT.jar.original
+[INFO] 
+[INFO] --- maven-failsafe-plugin:3.1.2:integration-test (default) @ anonymous-service ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.longfeng.anonymousservice.AnonymousServiceSkeletonE2EIT
+15:45:57.850 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.longfeng.anonymousservice.AnonymousServiceSkeletonE2EIT]: AnonymousServiceSkeletonE2EIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+15:45:58.038 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.longfeng.anonymousservice.AnonymousServiceApplication for test class com.longfeng.anonymousservice.AnonymousServiceSkeletonE2EIT
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-05-17T15:45:58.961+04:00  INFO 7711 --- [anonymous-service] [           main] c.l.a.AnonymousServiceSkeletonE2EIT      : Starting AnonymousServiceSkeletonE2EIT using Java 17.0.13 with PID 7711 (started by allen in /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/backend/anonymous-service)
+2026-05-17T15:45:58.962+04:00  INFO 7711 --- [anonymous-service] [           main] c.l.a.AnonymousServiceSkeletonE2EIT      : No active profile set, falling back to 1 default profile: "default"
+2026-05-17T15:46:00.796+04:00  INFO 7711 --- [anonymous-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-05-17T15:46:00.799+04:00  INFO 7711 --- [anonymous-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-05-17T15:46:00.843+04:00  INFO 7711 --- [anonymous-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 31 ms. Found 0 Redis repository interfaces.
+2026-05-17T15:46:01.888+04:00  INFO 7711 --- [anonymous-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+2026-05-17T15:46:01.900+04:00  INFO 7711 --- [anonymous-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-17T15:46:01.901+04:00  INFO 7711 --- [anonymous-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-05-17T15:46:01.980+04:00  INFO 7711 --- [anonymous-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-17T15:46:01.980+04:00  INFO 7711 --- [anonymous-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2927 ms
+2026-05-17T15:46:03.555+04:00  INFO 7711 --- [anonymous-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-17T15:46:03.770+04:00  INFO 7711 --- [anonymous-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@442310fd
+2026-05-17T15:46:03.771+04:00  INFO 7711 --- [anonymous-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-17T15:46:03.815+04:00  INFO 7711 --- [anonymous-service] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://127.0.0.1:15432/wrongbook (PostgreSQL 15.17)
+2026-05-17T15:46:03.893+04:00  INFO 7711 --- [anonymous-service] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 4 migrations (execution time 00:00.045s)
+2026-05-17T15:46:03.943+04:00  INFO 7711 --- [anonymous-service] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 20260421.02
+2026-05-17T15:46:03.947+04:00  INFO 7711 --- [anonymous-service] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-05-17T15:46:04.285+04:00  INFO 7711 --- [anonymous-service] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoint(s) beneath base path '/actuator'
+2026-05-17T15:46:04.459+04:00  INFO 7711 --- [anonymous-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 55002 (http) with context path ''
+2026-05-17T15:46:04.495+04:00  INFO 7711 --- [anonymous-service] [           main] c.l.a.AnonymousServiceSkeletonE2EIT      : Started AnonymousServiceSkeletonE2EIT in 6.014 seconds (process running for 7.805)
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-05-17T15:46:05.713+04:00  INFO 7711 --- [anonymous-service] [o-auto-1-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-17T15:46:05.715+04:00  INFO 7711 --- [anonymous-service] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-05-17T15:46:05.720+04:00  INFO 7711 --- [anonymous-service] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 5 ms
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.802 s -- in com.longfeng.anonymousservice.AnonymousServiceSkeletonE2EIT
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- maven-failsafe-plugin:3.1.2:verify (default) @ anonymous-service ---
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  15.978 s
+[INFO] Finished at: 2026-05-17T15:46:08+04:00
+[INFO] ------------------------------------------------------------------------
