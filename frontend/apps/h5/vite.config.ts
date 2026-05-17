@@ -72,6 +72,12 @@ export default defineConfig({
           'http://localhost:8090',
         changeOrigin: true,
       },
+      // SC-13: /api/share/:shareToken → anonymous-service :8090
+      // (ShareController · same package as Landing + SessionResolve)
+      '/api/share': {
+        target: process.env.VITE_ANON_PROXY_TARGET || 'http://localhost:8090',
+        changeOrigin: true,
+      },
       '/api/file': {
         target: process.env.VITE_FILE_PROXY_TARGET || 'http://localhost:8084',
         changeOrigin: true,

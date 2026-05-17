@@ -50,25 +50,26 @@ const nowSec = (): number => Math.floor(Date.now() / 1000);
 
 test.describe('SC-00-T04 · stub 兜底真页 + 离线降级真 UI (6 cases)', () => {
 
-  // ─── (a) shared_stub_renders ────────────────────────────────────────────────
-  test('TC-00-T04 (a) shared_stub_renders: /s/abc123 → stub UI visible · /api/share/* count===0', async ({ page }) => {
-    // Spy on /api/share/* — must remain 0 (stub 严禁触发真 share 接口)
-    let shareApiCalls = 0;
+  // ─── (a) shared_view_renders (SC-13 改造 · 替换原 shared_stub_renders) ──────
+  // 用户决策 (SC-13 inflight scope_in #11): SC-00-T04 SharedStub 退役 · 真 SharedView 接管.
+  // 旧 (a) 断言 '/api/share/* count===0' 已被本 task 显式取消 (stub 阶段不调 share API
+  // 的规则不再适用) · 现在期望 SharedView 真发出 GET /api/share/:token · 用 mock 返
+  // 404 来走 INVALID 挡板路径 · 验证页面挂载稳定.
+  test('TC-00-T04 (a) shared_view_renders: /s/abc123 → SharedView mount + invalid-screen on mock 404', async ({ page }) => {
+    // Mock /api/share/abc123 返 404 (token 不存在) · SharedView 进 INVALID 态
     await page.route('**/api/share/**', (route: Route) => {
-      shareApiCalls += 1;
-      route.fulfill({ status: 404, body: 'forbidden in stub phase' });
+      route.fulfill({
+        status: 404,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 'TOKEN_INVALID', message: '分享链接无效' }),
+      });
     });
 
     await page.goto('/s/abc123');
 
-    // Stub UI 必须 visible
-    await expect(page.getByTestId('shared-stub-root')).toBeVisible();
-    await expect(page.getByTestId('shared-stub-cta')).toBeVisible();
-    await expect(page.getByTestId('shared-stub-cta')).toContainText('登录');
-
-    // 给 useEffect 一点时间触发埋点 + 任何潜在的 fetch
-    await page.waitForTimeout(300);
-    expect(shareApiCalls).toBe(0);
+    // SharedView 真页 root + INVALID 挡板必现 (兼容 alias 'shared-stub-root' 也可见)
+    await expect(page.getByTestId('p-shared')).toBeVisible();
+    await expect(page.getByTestId('token-invalid-screen')).toBeVisible();
   });
 
   // ─── (b) welcomeback_stub_renders ───────────────────────────────────────────
@@ -121,16 +122,26 @@ test.describe('SC-00-T04 · stub 兜底真页 + 离线降级真 UI (6 cases)', (
     expect(observerApiCalls).toBe(0);
   });
 
-  // ─── (d) stub_cta_redirects_to_login ───────────────────────────────────────
-  test('TC-00-T04 (d) stub_cta_redirects_to_login: shared stub CTA click → URL pathname === /auth/login', async ({ page }) => {
+  // ─── (d) invalid_screen_cta_redirects_to_welcome (SC-13 改造) ──────────────
+  // 旧 stub CTA → /auth/login 行为已淘汰 · SharedView INVALID 挡板 CTA 走
+  // '返回看看新功能' → /welcome (符合 spec §7 INVALID/EXPIRED/REVOKED 出口).
+  test('TC-00-T04 (d) invalid_screen_cta_redirects_to_welcome: INVALID 挡板 CTA → /welcome', async ({ page }) => {
+    await page.route('**/api/share/**', (route: Route) => {
+      route.fulfill({
+        status: 404,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 'TOKEN_INVALID', message: '分享链接无效' }),
+      });
+    });
+
     await page.goto('/s/some-token-xyz');
-    await expect(page.getByTestId('shared-stub-root')).toBeVisible();
+    await expect(page.getByTestId('token-invalid-screen')).toBeVisible();
 
-    await page.getByTestId('shared-stub-cta').click();
+    // 点 INVALID 挡板的 '返回看看新功能' (button text · 不在 testid 表)
+    await page.getByRole('button', { name: '返回看看新功能' }).click();
 
-    // wait for navigation to settle (router.replace)
-    await page.waitForURL('**/auth/login', { timeout: 5000 });
-    expect(new URL(page.url()).pathname).toBe('/auth/login');
+    await page.waitForURL('**/welcome', { timeout: 5000 });
+    expect(new URL(page.url()).pathname).toBe('/welcome');
   });
 
   // ─── (e) offline_banner_with_stale_jwt ─────────────────────────────────────

@@ -114,53 +114,43 @@ test.describe('SC-00-T04 · Adversarial · 探索性边界 (3 cases)', () => {
     expect(new URL(page.url()).pathname).not.toBe('/auth/login');
   });
 
-  // ─── (c) stub_token_path_param_in_telemetry ────────────────────────────────
-  test('TC-00-T04-ADV (c) stub_token_path_param_in_telemetry: /s/abc123 → anon_stub_view 的 token_hash 是 djb2 hash 非明文', async ({ page }) => {
-    const captured: Array<{ type: string; payload: unknown }> = [];
+  // ─── (c) shared_view_telemetry_on_invalid (SC-13 改造 · 替换原 stub_token_hash 测试) ─
+  // 旧测期望 stub 发 anon_stub_view + djb2 token_hash. SC-13 真页改发
+  // anon_share_token_invalid (INVALID 态) · 不再走 djb2 hash. 改造视角:
+  // 真页路由必须发 SC-13 埋点而非 stub 埋点 (alignment failure regression).
+  test('TC-00-T04-ADV (c) shared_view_telemetry_emitted: /s/abc123 INVALID → anon_share_token_invalid event fired', async ({ page }) => {
+    const captured: string[] = [];
 
     page.on('console', (msg: ConsoleMessage) => {
       const text = msg.text();
-      if (text.includes('[telemetry]')) {
-        try {
-          // 形如 "[telemetry] anon_stub_view {object}"
-          // 取 console.log 的全部 args (Playwright API)
-          const args = msg.args();
-          if (args.length >= 2) {
-            // 第一个 arg 是 "[telemetry] anon_stub_view" · 第二个是 payload
-            args[1].jsonValue().then((value) => {
-              captured.push({ type: text, payload: value });
-            }).catch(() => {/* ignore */});
-          }
-        } catch {/* ignore */}
+      // trackLanding 镜像到 console.log 形如 "anon_share_token_invalid {payload...}"
+      if (text.startsWith('anon_share_')) {
+        captured.push(text);
       }
     });
 
-    // 也 spy /api/share/* 验证 stub 不打真接口 (探索 token_hash 不打明文同时)
+    // Mock 真路由 · INVALID 路径 (404)
     await page.route('**/api/share/**', (route: Route) => {
-      route.fulfill({ status: 404 });
+      route.fulfill({
+        status: 404,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 'TOKEN_INVALID', message: '分享链接无效' }),
+      });
     });
 
     await page.goto('/s/abc123');
-    await expect(page.getByTestId('shared-stub-root')).toBeVisible();
-
-    // 等 console 事件冲洗
+    await expect(page.getByTestId('token-invalid-screen')).toBeVisible();
     await page.waitForTimeout(500);
 
-    // 至少捕获到 1 个 anon_stub_view 事件
-    const views = captured.filter((c) => c.type.includes('anon_stub_view'));
-    expect(views.length).toBeGreaterThan(0);
+    // 至少捕获到 1 个 anon_share_token_invalid 事件 (SC-13 新埋点)
+    const invalidEvents = captured.filter((c) => c.includes('anon_share_token_invalid'));
+    expect(invalidEvents.length).toBeGreaterThan(0);
 
-    const payload = views[0].payload as { verdict_intended: string; token_hash: string };
-    expect(payload.verdict_intended).toBe('SHARED');
+    // 反向断言: 不应再发 SC-00-T04 旧 stub 埋点 anon_stub_view
+    const stubEvents = captured.filter((c) => c.includes('anon_stub_view'));
+    expect(stubEvents.length).toBe(0);
 
-    // token_hash 必须存在且不等于 'abc123' 原文 (PII 防泄漏红线)
-    expect(payload.token_hash).toBeTruthy();
-    expect(payload.token_hash).not.toBe('abc123');
-
-    // 进一步: token_hash 必须等于 djb2('abc123') 真实 hash 值 (algorithm intent 验证)
-    const expectedHash = refDjb2Hex('abc123');
-    expect(payload.token_hash).toBe(expectedHash);
-    // 同时 hash 形如 16 进制串 (≤ 8 字符)
-    expect(payload.token_hash).toMatch(/^[0-9a-f]+$/);
+    // refDjb2Hex 引用保留 (其他测试可能继续用) · 本测试不再用它
+    void refDjb2Hex;
   });
 });
