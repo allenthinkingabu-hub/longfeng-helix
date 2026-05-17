@@ -14,7 +14,7 @@ import { WelcomeBackPage } from './pages/WelcomeBack/index';
 // SC-00-T04 · SharedStub 已退役 · SC-13 真 SharedView 接管 /s/:token (源码保留作回滚备份 · 不再 import)
 import { SharedView } from './pages/Shared/index';
 import { ObserverStubPage } from './pages/ObserverStub/index';
-import { GuestCaptureStubPage } from './pages/GuestCaptureStub/index';
+import { GuestCapturePage } from './pages/GuestCapture/index';
 
 const ManualEntryStub: React.FC = () => (
   <div data-testid="manual-entry-root" style={{ padding: 20, color: '#333' }}>
@@ -45,8 +45,8 @@ export const App: React.FC = () => (
         SharedStub 源码保留 (本文件未删 import) 以便回滚 · 当前不挂任何 Route */}
     <Route path="/s/:token" element={<SharedView />} />
     <Route path="/observer/:code" element={<ObserverStubPage />} />
-    {/* SC-12-STUB-T01 · /guest/capture 占位 stub · 真页 SC-12 (Try Before Signup) 未实现 */}
-    <Route path="/guest/capture" element={<GuestCaptureStubPage />} />
+    {/* SC-12-T03 · /guest/capture 真页 (Try Before Signup · 替换 SC-12-STUB-T01) */}
+    <Route path="/guest/capture" element={<GuestCapturePage />} />
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 );

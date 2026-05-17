@@ -1,0 +1,195 @@
+/* SC-12-T03 · P-GUEST-CAPTURE 真页 · 暗色相机背景 + 顶部 Quota + 底部 ConsentBar
+ * 视觉参考 mockup 15_guest_capture.html · T03 只做基础 layout · 不追求像素完美 ·
+ * 相机真启 + 高保真 mockup match 留给 T04.
+ */
+
+.page {
+  position: relative;
+  min-height: 100vh;
+  background: #0a0a0a;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', system-ui,
+    'Helvetica Neue', sans-serif;
+}
+
+/* ── 顶部匿名 Shell nav (biz §2A.3.2) ───────────────────────────────────── */
+.shellNav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 100;
+}
+
+.shellLogo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffffd9;
+  background: none;
+  border: none;
+  padding: 8px 4px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.shellLogo:hover,
+.shellLogo:active {
+  opacity: 0.75;
+}
+
+.guestDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffd33d;
+  margin-right: 4px;
+  box-shadow: 0 0 8px rgba(255, 211, 61, 0.6);
+}
+
+.loginBtn {
+  height: 32px;
+  padding: 0 16px;
+  background: #007aff;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.loginBtn:hover,
+.loginBtn:active {
+  background: #0a84ff;
+}
+
+/* ── QuotaBanner (顶部 fixed 下方) ──────────────────────────────────────── */
+.quotaBanner {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
+  padding: 8px 16px;
+  background: rgba(255, 211, 61, 0.12);
+  color: #ffe89a;
+  font-size: 13px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 211, 61, 0.2);
+  z-index: 90;
+}
+
+.quotaRemaining {
+  font-weight: 700;
+  color: #ffd33d;
+  padding: 0 2px;
+}
+
+/* ── 相机预览占位 (T04 启用真相机) ─────────────────────────────────────── */
+.cameraPreview {
+  flex: 1;
+  margin: 96px 0 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #050505;
+  color: #4d4d4d;
+  font-size: 14px;
+  border-top: 1px solid #1a1a1a;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+/* ── ConsentCard ────────────────────────────────────────────────────────── */
+.consentCard {
+  position: relative;
+  background: #1a1a1a;
+  color: #ffffffcc;
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.consentCheckbox {
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  accent-color: #007aff;
+  cursor: pointer;
+}
+
+.consentCheckbox:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.consentLabel {
+  flex: 1;
+}
+
+/* ── Shutter (底部圆形按钮) ────────────────────────────────────────────── */
+.shutterWrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0 32px 0;
+  background: #0a0a0a;
+}
+
+.shutter {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #ff3b30;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  border: 4px solid #ffffff;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 120ms ease-out;
+}
+
+.shutter:disabled {
+  background: #4a4a4a;
+  border-color: #6a6a6a;
+  color: #aaaaaa;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.shutter:not(:disabled):hover,
+.shutter:not(:disabled):active {
+  background: #d62a20;
+}
+
+/* ── ErrorBanner (mint 失败) ─────────────────────────────────────────────── */
+.errorBanner {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  padding: 12px 16px;
+  background: #c81d11;
+  color: #ffffff;
+  font-size: 13px;
+  border-radius: 8px;
+  z-index: 200;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
