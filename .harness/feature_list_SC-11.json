@@ -1,0 +1,371 @@
+{
+  "schema_version": "3.1",
+  "scenario_id": "SC-11",
+  "scenario_title": "陌生访客 → 落地页 → 样例预览",
+  "scenario_goal": "验证冷启动漏斗第一环 —— 访客从任意广告 / 分享 / 搜索入口进入后，落地页能在 30 秒内让其理解产品价值并点入下一步（试试看 or 登录），跳出率 ≤ 65%。北极星: 访客 → 游客试用 ≥ 35%。",
+  "generated_from": "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.12 (7 user-action steps: F01-F07 含 F07A/B/C 三分支)",
+  "generated_at": "2026-05-16",
+  "owner": "user",
+  "scenario_biz_ref": "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.12",
+  "scenario_spec_refs": [
+    "design/system/pages/P-LANDING-landing.spec.md"
+  ],
+  "scenario_tc_ids": [
+    "TC-11.01",
+    "TC-11.02",
+    "TC-11.03",
+    "TC-11.04",
+    "TC-11.05"
+  ],
+  "system_invariants": [
+    "GET /api/landing/samples 必须可强缓存 ≥ 1 h · CDN 命中率 ≥ 95%",
+    "P-LANDING 首屏 TTI 预算 ≤ 1.0 s · 允许 hero 动图异步延迟 (不阻塞 CTA)",
+    "A/B 桶 hero_copy_v1/v2 必须在 anon_landing_view 埋点中透传 experiment_bucket",
+    "冷启动路径不得触发任何需要登录的接口（避免浪费 JWT 握手成本）",
+    "埋点统一前缀 anon_ · 携带 device_fp + entry_source + experiment_bucket 三个通用属性"
+  ],
+  "scenario_dependencies": [
+    "SC-00-T01 resolve-entry frontend 必须先行 · SC-11 F01 通过决策树落位 P-LANDING (verdict=LANDING)",
+    "SC-11-T04 双 CTA 跳 /guest/capture 依赖 SC-12 P-GUEST-CAPTURE 真页或 stub · 本 plan 不实现 SC-12 → stub 兜底 (占位文字 + 提示)"
+  ],
+  "work_log_dir_pattern": "audits/runs/<task_id_short>/<team>/attempt-<N>/",
+  "log_requirements_template": {
+    "coder": [
+      "coder.md",
+      "bugs-found.md"
+    ],
+    "tester": [
+      "tester.md",
+      "adversarial.md",
+      "test-reports/"
+    ]
+  },
+  "audit_gate": "harness/audit.js 5 维度全过才真 PASS · 任一不过 REDO · audit_retries ≥ 3 触发熔断",
+  "id_convention": {
+    "long_form": "SC-11-T<NN>",
+    "short_form": "SC11-T<NN>",
+    "pascal_form": "T<NN><PurposeShort>"
+  },
+  "total_tasks": 4,
+  "tasks": [
+    {
+      "task_id": "SC-11-T01",
+      "task_id_short": "SC11-T01",
+      "task_id_pascal": "T01LandingShellApi",
+      "task_title": "P-LANDING 路由 + shell · 并发 GET /api/landing/samples?bucket= + /api/landing/kpi · LOADING/READY/DEGRADED 状态机 · CDN 强缓存 ≥ 1h",
+      "scenario": "TC-11.01 主路径 (落地页 TTI ≤ 1.0s + 接口加载) + 内嵌 TC-11.03 (samples 500 降级 DEGRADED)",
+      "biz_step_range": "biz §2B.12 F01-F02",
+      "page": "P-LANDING",
+      "page_state_machine": "LOADING(<150ms) → READY · 或 → DEGRADED (samples/kpi 任一 5xx)",
+      "branch": "feature/SC-11-T01-landing-shell-api",
+      "owner_team": "team-1",
+      "biz_refs": [
+        "biz §2B.12 F01-F02 (决策树落位 + samples/kpi 并发加载)",
+        "biz §2A.3.2 P-LANDING 规格卡 (API 触点 + 状态集)",
+        "biz §10.7 GET /api/landing/samples + GET /api/landing/kpi 接口契约",
+        "biz §2B.12 关键断言点 (强缓存 ≥ 1h + TTI ≤ 1.0s + 不触发登录接口)",
+        "TC-11.01",
+        "TC-11.03"
+      ],
+      "spec_refs": [
+        "design/system/pages/P-LANDING-landing.spec.md §5 API 触点",
+        "design/system/pages/P-LANDING-landing.spec.md §6 状态机 (LOADING/READY/DEGRADED)",
+        "design/system/pages/P-LANDING-landing.spec.md §11 性能预算"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": [
+        "frontend/apps/h5",
+        "frontend/apps/mp",
+        "backend/anonymous-service (新建骨架 · LandingController 首次起)"
+      ],
+      "primary_apis": [
+        "GET /api/landing/samples?bucket=<ab_bucket> (实现方 + 调用方)",
+        "GET /api/landing/kpi (实现方 + 调用方)"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC1",
+          "text": "P-LANDING mount → 并发 fetch GET /api/landing/samples?bucket=<ab_bucket> + GET /api/landing/kpi · 两个 promise 一起 await · 任一 200 即可进入 READY (容忍另一个慢) · 接口都强缓存 ≥ 1h Cache-Control: public,max-age=3600"
+        },
+        {
+          "id": "AC2",
+          "text": "LOADING 状态 ≤ 150ms · 期间显示极光 hero 静态骨架（不调动图）· READY 状态展示完整布局 (hero / 三步漫画 / 样例 chips / 双 CTA / 家长入口)"
+        },
+        {
+          "id": "AC3",
+          "text": "samples 接口 5xx → 进入 DEGRADED · 仅露 hero + slogan + 双 CTA · 三步漫画 + 样例 chips 不显示 · 不卡整页 · 上报 Sentry warn (TC-11.03)"
+        },
+        {
+          "id": "AC4",
+          "text": "kpi 接口 5xx → 进入部分 DEGRADED · 隐藏「累计入库 X 万题 / 日均分析 Y 次」社区数据条 · 其他模块正常 · 不影响 CTA 可点"
+        },
+        {
+          "id": "AC5",
+          "text": "首屏 TTI ≤ 1.0s (P95 · Lighthouse 测) · samples 接口 P95 ≤ 200ms (静态 JSON · 走 CDN edge)"
+        },
+        {
+          "id": "AC6",
+          "text": "samples / kpi 接口冷启动期间不附 Authorization 头 · 不触发任何 /api/auth/* · 不触发 /api/session/resolve (系统不变量 4 + 关键断言点)"
+        }
+      ],
+      "test_invariants": [
+        "TI1: 接口并发 (Promise.allSettled) · 任一失败时仍能进入对应 DEGRADED 子态 · 不允许整页空白",
+        "TI2: GET /api/landing/samples 响应 header Cache-Control: public,max-age=3600 (1h) · Vary: bucket",
+        "TI3: P-LANDING mount 期间网络面板 fetch 计数 · /api/auth/* === 0 · /api/session/resolve === 0",
+        "TI4: 4 态 (LOADING / READY / DEGRADED-samples / DEGRADED-kpi) VRT screenshot 比对",
+        "TI5: bucket A/B 切换 (例 ?bucket=variant_b) · samples 响应应内容不同 · 后端按 bucket 路由静态文件"
+      ],
+      "key_invariants": [
+        "强缓存 ≥ 1h + CDN ≥ 95% (biz §2B.12 关键断言点)",
+        "TTI ≤ 1.0s (系统不变量 2)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-11/t01-landing-shell-api.spec.ts",
+        "backend_e2e_it": "backend/anonymous-service/src/test/java/.../T01LandingShellApiE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC11-T01/team-1/attempt-1/",
+      "test_case_first_required": true
+    },
+    {
+      "task_id": "SC-11-T02",
+      "task_id_short": "SC11-T02",
+      "task_id_pascal": "T02LandingHeroThreeStep",
+      "task_title": "Hero 30s 动图自动播放 + 三步漫画淡入 · WebP/APNG asset ≤ 300KB · 弱网不阻塞 CTA · 1.5s 内 CTA 可点",
+      "scenario": "TC-11.01 主路径 hero 部分 + 内嵌 TC-11.04 (弱网 3G hero 不阻塞 CTA)",
+      "biz_step_range": "biz §2B.12 F03",
+      "page": "P-LANDING hero 区",
+      "page_state_machine": "(UI only · 无业务状态机 · 复用 T01 LOADING→READY)",
+      "branch": "feature/SC-11-T02-landing-hero-three-step",
+      "owner_team": "team-1",
+      "biz_refs": [
+        "biz §2B.12 F03 (hero 自动播放 30s 动图 + 三步漫画淡入)",
+        "biz §2A.3.2 P-LANDING 规格卡 性能预算 (hero ≤ 300KB · 总包 ≤ 180KB)",
+        "biz §2B.12 关键断言点 (允许 hero 动图异步延迟)",
+        "TC-11.01",
+        "TC-11.04"
+      ],
+      "spec_refs": [
+        "design/system/pages/P-LANDING-landing.spec.md §3 核心组件 (HeroDemo + ThreeStepComic)",
+        "design/system/pages/P-LANDING-landing.spec.md §11 性能预算"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": [
+        "frontend/apps/h5",
+        "frontend/apps/mp",
+        "frontend/packages/ui-kit"
+      ],
+      "primary_apis": [],
+      "acceptance_criteria": [
+        {
+          "id": "AC1",
+          "text": "HeroDemo 组件 · 自动播放 30s WebP / APNG 动图 · asset ≤ 300 KB · 优先 WebP · 不支持时降级 APNG · 走 <picture> + <source type=image/webp>"
+        },
+        {
+          "id": "AC2",
+          "text": "ThreeStepComic · 三步漫画淡入 (拍 → 分析 → 排进日历) · 动效用 CSS transition / fadeIn keyframe · 不依赖大型动画库 (Lottie 等)"
+        },
+        {
+          "id": "AC3",
+          "text": "弱网 3G (Chrome DevTools throttle Slow 3G) 模拟 · hero 动图加载不阻塞 CTA · CTA 在 1.5 s 内可点 · 期间 hero 占位用静态海报 (poster attribute) (TC-11.04)"
+        },
+        {
+          "id": "AC4",
+          "text": "动图加载失败 (404 / timeout) · 降级展示静态 hero 海报 (HeroPoster · 同尺寸 PNG ≤ 60KB) · 不卡 hero 区"
+        },
+        {
+          "id": "AC5",
+          "text": "埋点 anon_landing_demo_play{sec} 在动图播放完成 (或用户停留 ≥ 30s) 时上报一次 · 不重复上报"
+        }
+      ],
+      "test_invariants": [
+        "TI1: WebP 动图实际大小 (bundle analyzer) ≤ 300 KB · CI 加 size-limit check",
+        "TI2: 弱网 3G Lighthouse audit · CTA 可点时间 ≤ 1.5s · TTI ≤ 3s (弱网降级目标)",
+        "TI3: 动图 fetch 失败 + Image 404 → HeroPoster 静态海报 DOM 节点存在性验证",
+        "TI4: 三步漫画 fadeIn 动画完成后 · 三个步骤 DOM 全部 visible (opacity=1)"
+      ],
+      "key_invariants": [
+        "性能预算 hero ≤ 300KB · 总包 ≤ 180KB (biz §2A.3.2 P-LANDING)",
+        "TTI ≤ 1.0s 不被动图阻塞 (系统不变量 2)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-11/t02-landing-hero-three-step.spec.ts",
+        "backend_e2e_it": null
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC11-T02/team-1/attempt-1/",
+      "test_case_first_required": true
+    },
+    {
+      "task_id": "SC-11-T03",
+      "task_id_short": "SC11-T03",
+      "task_id_pascal": "T03LandingSampleChipsOverlay",
+      "task_title": "3 组样例 Chips (数学/英语/物理) · P-SAMPLE 浮层展开 · 错因/正解/变式 3 卡片 · 静态 JSON 不调真模型",
+      "scenario": "TC-11.01 主路径 浮层开合部分 · 不涉及 TC 异常",
+      "biz_step_range": "biz §2B.12 F04-F05",
+      "page": "P-LANDING sample 区 + P-SAMPLE 浮层",
+      "page_state_machine": "sample_chip.IDLE → sample_overlay.OPEN (Tap chip) → sample_overlay.SCROLLING (用户滑动) → sample_overlay.CLOSED (Tap × / 背景)",
+      "branch": "feature/SC-11-T03-landing-sample-chips-overlay",
+      "owner_team": "team-1",
+      "biz_refs": [
+        "biz §2B.12 F04-F05 (Tap 样例 → 浮层 → 滑动看错因/正解/变式)",
+        "biz §2A.3.2 P-LANDING 规格卡 SampleChips 组件",
+        "biz §2B.12 关键断言点 (浮层直接读静态样本 JSON · 不调真实模型)",
+        "TC-11.01"
+      ],
+      "spec_refs": [
+        "design/system/pages/P-LANDING-landing.spec.md §3 核心组件 SampleChips",
+        "design/system/pages/P-LANDING-landing.spec.md §6 状态机 (sample_overlay 子态)",
+        "design/system/pages/P-LANDING-landing.spec.md §13 testid 表"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": [
+        "frontend/apps/h5",
+        "frontend/apps/mp",
+        "frontend/packages/ui-kit"
+      ],
+      "primary_apis": [],
+      "acceptance_criteria": [
+        {
+          "id": "AC1",
+          "text": "3 组样例 Chips 渲染 · 学科 ∈ {数学 · 英语 · 物理} · 数据源 SC-11-T01 的 /samples 响应 (静态 JSON) · 不再独立请求"
+        },
+        {
+          "id": "AC2",
+          "text": "Tap chip → SampleOverlay 半屏浮层从底部上滑 (transform: translateY) · 动效 ≤ 300ms · 浮层内 3 卡片 (错因 · 正解 · 变式) 可纵向滚动"
+        },
+        {
+          "id": "AC3",
+          "text": "浮层 close 触发器 · Tap 右上角 × · Tap 浮层外背景 (mask) · 系统返回键 (Android) / 微信小程序物理返回 · 任一触发都关闭浮层不退出 P-LANDING"
+        },
+        {
+          "id": "AC4",
+          "text": "浮层禁止调任何 AI 接口 · 不调 /api/ai/* · 不调 /api/guest/analyze · 全用 SC-11-T01 返回的预置静态数据 (关键断言点)"
+        },
+        {
+          "id": "AC5",
+          "text": "埋点 anon_landing_sample_open{subject} (打开浮层) + anon_landing_sample_close{subject,dwell_ms} (关闭浮层 · 含停留时长) · subject 标准化为 {math|english|physics}"
+        }
+      ],
+      "test_invariants": [
+        "TI1: 浮层开合期间 · /api/ai/* + /api/guest/* fetch 计数 === 0",
+        "TI2: 3 个 chip · 任一 Tap 都能打开浮层 + 关闭 (E2E 循环 3 次)",
+        "TI3: 浮层内滚动 · 不污染 P-LANDING 主页面滚动 (body overflow lock)",
+        "TI4: 浮层 open/closed VRT screenshot · 含每个学科 chip 命中的浮层"
+      ],
+      "key_invariants": [
+        "样例只读静态 JSON 不调真模型 (biz §2B.12 F04)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-11/t03-landing-sample-chips-overlay.spec.ts",
+        "backend_e2e_it": null
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC11-T03/team-1/attempt-1/",
+      "test_case_first_required": true
+    },
+    {
+      "task_id": "SC-11-T04",
+      "task_id_short": "SC11-T04",
+      "task_id_pascal": "T04LandingCtaExitsTracking",
+      "task_title": "双 CTA 吸底 (试试看 / 已有账号) + ConsentBar + ParentHint · F07A→/guest/capture (stub) · F07B→/auth · F07C bounce 埋点 · entry_source 白名单",
+      "scenario": "TC-11.02 试试看跳转 + TC-11.05 entry_source 篡改安全 + F07C bounce 漏斗",
+      "biz_step_range": "biz §2B.12 F06-F07 (含 F07A/B/C 三分支)",
+      "page": "P-LANDING CTA + 出口",
+      "page_state_machine": "READY → CTA_TRY (F07A · → SC-12 stub /guest/capture) · → CTA_LOGIN (F07B · /auth) · → BOUNCE (F07C · pagehide event 上报)",
+      "branch": "feature/SC-11-T04-landing-cta-exits-tracking",
+      "owner_team": "team-1",
+      "biz_refs": [
+        "biz §2B.12 F06-F07A/B/C (双 CTA + 三种出口)",
+        "biz §2A.3.2 P-LANDING 规格卡 DualCTA + ConsentBar + ParentHint",
+        "biz §2A.3.2 匿名 Shell 顶部规范 (登录/注册胶囊按钮 · 无 Tab Bar)",
+        "biz §2A.3.2 埋点字典 anon_landing_*",
+        "TC-11.02",
+        "TC-11.05"
+      ],
+      "spec_refs": [
+        "design/system/pages/P-LANDING-landing.spec.md §3 核心组件 DualCTA + ConsentBar + ParentHint",
+        "design/system/pages/P-LANDING-landing.spec.md §7 跳转 (CTA 出口)",
+        "design/system/pages/P-LANDING-landing.spec.md §12 埋点事件"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": [
+        "frontend/apps/h5",
+        "frontend/apps/mp",
+        "frontend/packages/telemetry"
+      ],
+      "primary_apis": [],
+      "acceptance_criteria": [
+        {
+          "id": "AC1",
+          "text": "双 CTA 吸底 · 主 CTA「试试看（无需注册）」+ 次 CTA「已有账号 → 登录」· position: sticky bottom · safe area inset 适配 · A/B 桶 cta_order_try_first / login_first 控制左右顺序"
+        },
+        {
+          "id": "AC2",
+          "text": "Tap「试试看」(F07A) → router.push('/guest/capture') · 跳到 SC-12 stub 页 (SC-12 未实现 · 占位文字「游客试用功能开发中 · 立即注册体验完整功能」+ CTA→/auth) · 不要求登录 · 埋点 anon_landing_cta_try (TC-11.02)"
+        },
+        {
+          "id": "AC3",
+          "text": "Tap「已有账号」(F07B) → router.push('/auth') · 埋点 anon_landing_cta_login"
+        },
+        {
+          "id": "AC4",
+          "text": "F07C 直接退出 · 监听 pagehide / visibilitychange (hidden) · 上报 anon_landing_bounce{dwell_ms,scroll_pct,sample_open_count} · 通过 sendBeacon 保证退出时也能上报"
+        },
+        {
+          "id": "AC5",
+          "text": "ConsentBar (未成年人信息保护提示) · 海外版 / GDPR 桶置顶展示 · 国内桶折叠到底部小字链接 · 不勾选不影响 P-LANDING 浏览 (不影响 CTA 可点)"
+        },
+        {
+          "id": "AC6",
+          "text": "ParentHint (家长 / 老师入口 · 小字) → 跳 P-OBSERVER 说明页 P1 · P0 期临时跳 /auth (告知「观察者功能开发中」) · 不影响主流"
+        },
+        {
+          "id": "AC7",
+          "text": "entry_source 安全 · 前端白名单 {ad|qr|share|push|icon|deeplink|unknown} · query 参数被篡改 (例 <script>) → 标 unknown · 不写入埋点原值 · 服务端二次校验 (TC-11.05)"
+        }
+      ],
+      "test_invariants": [
+        "TI1: 「试试看」点击 · navigation 目标 === '/guest/capture' · 不出现 auth 请求 (不要求登录)",
+        "TI2: 「已有账号」点击 · navigation 目标 === '/auth'",
+        "TI3: pagehide 事件触发 + sendBeacon 上报 anon_landing_bounce · 含 dwell_ms 字段非负数",
+        "TI4: entry_source=<script>alert(1)</script> → 埋点上报 entry_source === 'unknown' (XSS 防护 + 白名单)",
+        "TI5: anon_landing_view 埋点含 experiment_bucket 字段 · A/B 桶任一变体都不为空 (系统不变量 3)"
+      ],
+      "key_invariants": [
+        "埋点 anon_ 前缀 + device_fp/entry_source/experiment_bucket 三件套通用属性 (biz §2A.3.2)",
+        "entry_source 服务端白名单校验 (TC-11.05 + 关键断言点)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-11/t04-landing-cta-exits-tracking.spec.ts",
+        "backend_e2e_it": null
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC11-T04/team-1/attempt-1/",
+      "test_case_first_required": true
+    }
+  ],
+  "default_opt_ins": {
+    "test_case_first_required": true
+  }
+}

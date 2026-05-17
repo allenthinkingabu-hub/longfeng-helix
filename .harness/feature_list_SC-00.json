@@ -1,0 +1,373 @@
+{
+  "schema_version": "3.1",
+  "scenario_id": "SC-00",
+  "scenario_title": "冷启动 → 登录态决策 → 路由分发",
+  "scenario_goal": "用户每次打开 App / 小程序 / H5 / 点击深链时，前端 bootstrap/resolve-entry.ts + 后端 /api/session/resolve 协作完成「登录态决策树」三层判断，把用户路由到正确落位页（P-HOME / P00 / P-LANDING / P-SHARED / P-WELCOMEBACK）。这是 SC-01..SC-15 所有场景的隐性前置。",
+  "generated_from": "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.1a (9 user-action steps: 节点 1 happy path 4 + 节点 1 未命中 5)",
+  "generated_at": "2026-05-16",
+  "owner": "user",
+  "scenario_biz_ref": "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.1a",
+  "scenario_spec_refs": [
+    "design/system/pages/P-HOME.spec.md",
+    "design/system/pages/P00-login.spec.md",
+    "design/system/pages/P-LANDING-landing.spec.md",
+    "design/system/pages/P-SHARED-shared.spec.md",
+    "design/system/pages/P-WELCOMEBACK-welcomeback.spec.md"
+  ],
+  "scenario_tc_ids": [
+    "TC-00.01",
+    "TC-00.02",
+    "TC-00.03"
+  ],
+  "system_invariants": [
+    "节点 1（JWT 验签 + exp 检查）仅在前端 jose 本地判未命中时才调 /api/session/resolve；本地命中（已登录 + JWT 有效）的 happy path 不打 resolve 接口",
+    "verdict 5 种枚举值穷尽决策树所有出口（HOME / LOGIN_REQUIRED / SHARED / WELCOMEBACK / LANDING），不允许返回其他值（前端 zod / TS 联合类型守护）",
+    "JWT 过期时后端必须回 redirect_to（原始深链 URL），不丢失用户意图",
+    "device_fp 仅用于决策节点 3 + 风控，不写任何业务表（合规要求）；P0 期 account_device 仅 silent upsert 不读",
+    "决策树任一节点抛 5xx 或超时 ≥ 800 ms：有 stale JWT（≤ 7d）→ 接受 stale 进 P-HOME（顶部黄条「离线模式」）；无 JWT → 落 P-LANDING。禁止白屏 · 禁止默认全部打回 P-LANDING"
+  ],
+  "scenario_known_drifts": [
+    "biz drift · §10.6 接口契约写 POST /api/session/resolve · 但 §2A.3.1/§2B.1a/§S0 多处写 GET /api/session/resolve · 本 feature_list 按 §10.6 official 契约 POST 实施（body 含 deviceFp + entrySource + shareToken? + observerCode? · POST 更合理：不被 CDN 缓存 · 避免 URL 长度限制） · 实施完成后需统一回改 biz §2A.3.1/§2B.1a/§S0 表述"
+  ],
+  "work_log_dir_pattern": "audits/runs/<task_id_short>/<team>/attempt-<N>/",
+  "log_requirements_template": {
+    "coder": [
+      "coder.md",
+      "bugs-found.md"
+    ],
+    "tester": [
+      "tester.md",
+      "adversarial.md",
+      "test-reports/"
+    ]
+  },
+  "audit_gate": "harness/audit.js 5 维度全过才真 PASS · 任一不过 REDO · audit_retries ≥ 3 触发熔断",
+  "id_convention": {
+    "long_form": "SC-00-T<NN> (含连字符 · 用于 spec / git branch / commit message)",
+    "short_form": "SC00-T<NN> (无连字符 · 用于 .harness/inflight/<id>.json 文件名 · audits/runs/<id>/ 目录名)",
+    "pascal_form": "T<NN><PurposeShort> (PascalCase · 用于 *E2EIT.java 类名)"
+  },
+  "total_tasks": 4,
+  "tasks": [
+    {
+      "task_id": "SC-00-T01",
+      "task_id_short": "SC00-T01",
+      "task_id_pascal": "T01ResolveEntryFrontend",
+      "task_title": "冷启动 bootstrap/resolve-entry.ts · jose 本地 JWT 验签 · 未命中 POST /api/session/resolve · 按 verdict router.replace 5 分支",
+      "scenario": "TC-00.01 主路径（verdict=HOME）+ 内嵌 TC-00.02（verdict=LOGIN_REQUIRED 无 redirect）",
+      "biz_step_range": "biz §2B.1a 节点 1 happy path 步 2-3 + 节点 1 未命中分支 步 2'-3'",
+      "page": "(bootstrap)→P-HOME/P00",
+      "page_state_machine": "bootstrap.MOUNTED → JWT_LOCAL_VALID(已登录) → router.replace('/home') · 或 → JWT_MISSING_OR_EXPIRED → POST resolve → ROUTE_DISPATCH(verdict)",
+      "branch": "feature/SC-00-T01-resolve-entry-frontend",
+      "owner_team": "team-1",
+      "biz_refs": [
+        "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.1a 步 2-3 (节点 1 happy path)",
+        "biz §2B.1a 步 2'-3' (节点 1 未命中分支)",
+        "biz §2A.3.1 决策节点细则 + 回退与降级 (含节点 1 前端本地判 + 离线降级新规则)",
+        "biz §10.6 接口契约 (POST /api/session/resolve)",
+        "TC-00.01",
+        "TC-00.02"
+      ],
+      "spec_refs": [
+        "design/system/pages/P-HOME.spec.md §1 首屏目标 (HOME verdict 落位)",
+        "design/system/pages/P00-login.spec.md (LOGIN_REQUIRED verdict 落位 + redirect 接收)"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": [
+        "frontend/apps/h5",
+        "frontend/apps/mp",
+        "frontend/packages/api-contracts"
+      ],
+      "primary_apis": [
+        "POST /api/session/resolve (调用方 · 仅本地 JWT 未命中时)",
+        "jose 本地 JWT 验签 (非 HTTP)"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC1",
+          "text": "合法 JWT (本地 jose 解码 · 验签 + exp + iss + aud 全通过) → 直接 router.replace('/home') · console.assert(resolveApiCallCount === 0) · 不发起任何 /api/session/resolve 请求 (TC-00.01)"
+        },
+        {
+          "id": "AC2",
+          "text": "无 JWT / JWT 过期 / 验签失败 → POST /api/session/resolve · Body {deviceFp,entrySource,shareToken?,observerCode?} · 按 §10.6 契约 · 收 200 后按 verdict 调度 router.replace · HOME→/home · LOGIN_REQUIRED→/auth?redirect=... · SHARED→/s/:token · WELCOMEBACK→/welcome-back · LANDING→/welcome (TC-00.02)"
+        },
+        {
+          "id": "AC3",
+          "text": "zod schema 守护 · verdict ∈ {HOME, LOGIN_REQUIRED, SHARED, WELCOMEBACK, LANDING} · 非法值 throw + Sentry capture + fallback router.replace('/welcome') (系统不变量 2)"
+        },
+        {
+          "id": "AC4",
+          "text": "redirect_to 透传链路 · LOGIN_REQUIRED 时把 resolve 返回的 redirect_to URL encode 后注入 P00 URL query (?redirect=...) · 由 SC-00-T03 在 P00 侧消费 (TC-00.03 前置)"
+        },
+        {
+          "id": "AC5",
+          "text": "POST /api/session/resolve 5xx / 网络错误 / 超时 ≥ 800ms (AbortController) 降级 · 检测 localStorage.lastJWT exp · stale ≤ 7d → router.replace('/home') + 顶部黄条「离线模式 · 数据可能不是最新」 · 完全无 JWT → router.replace('/welcome') · 禁止把已登录用户打回 P-LANDING (系统不变量 5)"
+        },
+        {
+          "id": "AC6",
+          "text": "埋点三件套 · boot_launch{platform,entry_source} (mount 后) · boot_resolve_start (仅本地未命中时上报) · boot_resolve_done{verdict,latencyMs} · entry_source 走前端白名单 {ad/qr/share/push/icon/deeplink/unknown} 非法值标 unknown"
+        }
+      ],
+      "test_invariants": [
+        "TI1: 合法 JWT 本地命中时 · 整个冷启动到 P-HOME 首屏期间 · /api/session/resolve 调用次数 === 0 (E2E 用 page.route 监听)",
+        "TI2: verdict 非法值 (非 5 枚举之一) 必须 throw · 不允许 silent fallback 改写为 LANDING (否则定位 bug 困难)",
+        "TI3: resolve 5xx 降级时 · 已登录用户 (stale JWT ≤ 7d) 不得被 router.replace('/welcome') 命中 (用 spy 验证)",
+        "TI4: 冷启动 happy path TTI ≤ 1.5s (P95) · 节点 1 本地命中省去的 RTT ≥ 200ms (对比未优化基准)"
+      ],
+      "key_invariants": [
+        "决策树 5 verdict 穷尽 (biz §2B.1a 关键断言点 verdict 枚举守护)",
+        "节点 1 本地命中不打 resolve (biz §2B.1a 关键断言点 line 808 改写后)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-00/t01-resolve-entry.spec.ts",
+        "backend_e2e_it": null
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC00-T01/team-1/attempt-1/",
+      "test_case_first_required": true
+    },
+    {
+      "task_id": "SC-00-T02",
+      "task_id_short": "SC00-T02",
+      "task_id_pascal": "T02SessionResolveBackend",
+      "task_title": "POST /api/session/resolve 后端决策树 · JWT 解析 → shareToken/observerCode 签名校验 → 设备指纹回查 (P0 short-circuit) · account_device silent upsert",
+      "scenario": "TC-00.01 + TC-00.02 + TC-00.03 (服务端决策核心)",
+      "biz_step_range": "biz §2B.1a 节点 1 失败 → 节点 2/3 服务端决策",
+      "page": "(纯后端)",
+      "page_state_machine": "request → JWT_PARSE → SHARETOKEN_CHECK → DEVICE_FP_CHECK(P0 short-circuit miss) → response {verdict, redirect_to?}",
+      "branch": "feature/SC-00-T02-session-resolve-backend",
+      "owner_team": "team-2",
+      "biz_refs": [
+        "biz §2B.1a 关键断言点 (verdict 枚举 + redirect_to 透传 + account_device P0 写盘新条款)",
+        "biz §2A.3.1 决策节点细则表 (含节点 1 + deepLink 优先级例外 + 节点 1 本地判规则)",
+        "biz §10.6 POST /api/session/resolve 接口契约",
+        "biz §4.13 account_device 表 schema (P1 P-WELCOMEBACK 数据基础)",
+        "TC-00.01",
+        "TC-00.02",
+        "TC-00.03"
+      ],
+      "spec_refs": [
+        "biz §2A.3.1 决策节点细则表 (line 287-300) · 含 3 条 patch 后的完整规则",
+        "biz §10.6 接口契约 (line 2164-2175)",
+        "biz §4.13 account_device DDL"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": [
+        "backend/anonymous-service (新建骨架 · v1.2 §S0 已规划但未起)",
+        "backend/wrongbook-service (account_device silent upsert hook · 待 ownership 决定)"
+      ],
+      "primary_apis": [
+        "POST /api/session/resolve (实现方 · §10.6 契约)",
+        "account_device silent upsert (副作用 · SC-01..10 login 路径 hook)"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC1",
+          "text": "Authorization 头存在 + JWT 验签 + exp 未过 + URL path 不含 /s/:token 或 /observer/:code → verdict=HOME (无 redirect_to) · 有 deepLink (例 wb://review/exec?nid=12345) → verdict=HOME + redirect_to (TC-00.01)"
+        },
+        {
+          "id": "AC2",
+          "text": "JWT 缺失/过期/验签失败 → 走节点 2 · 检查 body.shareToken 或 URL path 含 /s/:token → HS256 验签 + exp ≤ 7d + jti 撤销黑名单 (Redis Bloom Filter) → verdict=SHARED · 节点 2 校验失败 (过期/签名错) → 降级 verdict=LANDING (避免「分享链被要求登录」二次放弃 · §2A.3.1 回退降级)"
+        },
+        {
+          "id": "AC3",
+          "text": "节点 2 未命中 → 节点 3 · P0 期 short-circuit 永远 miss · 不读 account_device 表 (按补丁 P0 期硬规) → verdict=LANDING · 同时 P0 期返回 fingerprint_matched=false 字段供 §10.6 契约完整"
+        },
+        {
+          "id": "AC4",
+          "text": "JWT 过期/缺失且 body 携带原 deepLink URL (前端从 location.href 提取传入) → verdict=LOGIN_REQUIRED + redirect_to=原 URL 完整透传 (含 query string · 例 wb://review/exec?nid=12345) (TC-00.03 · 系统不变量 3)"
+        },
+        {
+          "id": "AC5",
+          "text": "account_device silent upsert hook · SC-01..10 任一登录成功路径 (POST /api/auth/login / wechat-login / etc.) 返回 200 前 · upsert (device_fp, student_id, last_login_at, last_seen_ua) · 失败不抛错不影响主流程 · 走 Outbox 兜底 · TI 由 backend IT 验证 (biz §2B.1a 关键断言点 account_device P0 写盘)"
+        },
+        {
+          "id": "AC6",
+          "text": "响应 Cache-Control: no-store · ETag: 不设 · 决策含 device-specific 状态严禁被 CDN 缓存 (合规 + 安全)"
+        },
+        {
+          "id": "AC7",
+          "text": "接口 P95 ≤ 200ms (节点 2 Redis Bloom Filter 撤销列表查询 ≤ 5ms · DB share_token 校验 ≤ 50ms · JWT 验签 ≤ 10ms)"
+        }
+      ],
+      "test_invariants": [
+        "TI1: verdict 返回值仅 5 枚举之一 (HOME/LOGIN_REQUIRED/SHARED/WELCOMEBACK/LANDING) · 返回其他值视为 500 contract violation",
+        "TI2: JWT 过期/缺失 + body.deepLink 非空 时响应必含 redirect_to · 否则视为契约破坏 (系统不变量 3)",
+        "TI3: account_device upsert 失败 (DB 5xx 等) 不阻塞 login 主流程 · POST /api/auth/login 仍返 200",
+        "TI4: 重复同 (device_fp, student_id) upsert · 仅更新 last_login_at + last_seen_ua · 不产生新行 (DB count assert)",
+        "TI5: P0 期 verdict=WELCOMEBACK 不可能出现 (节点 3 short-circuit) · IT 用 mock account_device 表插数据验证仍返 LANDING"
+      ],
+      "key_invariants": [
+        "biz §2B.1a 关键断言点 5 条全数（含本次新增 account_device P0 写盘条款）",
+        "biz §2A.3.1 节点优先级例外 (URL path /s/ /observer/ 跳过节点 1 守护脱敏边界)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": null,
+        "backend_e2e_it": "backend/anonymous-service/src/test/java/.../T02SessionResolveE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC00-T02/team-2/attempt-1/",
+      "test_case_first_required": true
+    },
+    {
+      "task_id": "SC-00-T03",
+      "task_id_short": "SC00-T03",
+      "task_id_pascal": "T03DeeplinkRedirectRoundtrip",
+      "task_title": "P00 登录页接收 ?redirect= · login 成功后 router.replace(redirect_to) 直达深链目标 · open-redirect 白名单守护",
+      "scenario": "TC-00.03 主路径 (JWT 过期 + push deeplink)",
+      "biz_step_range": "biz §2B.1a 节点 1 未命中分支 步 3'-5'",
+      "page": "P00→deeplink-target (例如 P08)",
+      "page_state_machine": "login.IDLE → login.AUTHING → login.SUCCESS → router.replace(redirect_to)",
+      "branch": "feature/SC-00-T03-deeplink-redirect-roundtrip",
+      "owner_team": "team-1",
+      "biz_refs": [
+        "biz §2B.1a 步 3'-5' (P00 redirect 接收 + login 成功跳目标)",
+        "biz §2B.1a 关键断言点第 3 条 (JWT 过期时 redirect_to 不丢失用户意图)",
+        "TC-00.03"
+      ],
+      "spec_refs": [
+        "design/system/pages/P00-login.spec.md (redirect query 解析 + 登录成功跳转)"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": [
+        "frontend/apps/h5",
+        "frontend/apps/mp"
+      ],
+      "primary_apis": [
+        "POST /api/auth/login (已存在 · 本 task 仅前端透传 redirect)"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC1",
+          "text": "P00 mount 时解析 URL query ?redirect=<urlencoded> · 存在 → 顶部小字「登录后将自动打开你的复习」(或按 target page 名定制) · 不存在 → 不展示 (TC-00.02 case 不展示 / TC-00.03 case 展示)"
+        },
+        {
+          "id": "AC2",
+          "text": "login 成功 (POST /api/auth/login 返 200 + JWT) → router.replace(redirect_to) · 不经 P-HOME 中转 · 跳转 ≤ 500ms (TC-00.03)"
+        },
+        {
+          "id": "AC3",
+          "text": "redirect_to 白名单 (open-redirect 防护) · 允许 path: /home, /capture, /question/, /review/, /calendar, /s/, /observer/, /welcome, /welcome-back, /auth · 含其他 host / javascript: / data: / file: 一律拦截降级 P-HOME + console.warn (安全)"
+        },
+        {
+          "id": "AC4",
+          "text": "login 失败 (4xx/5xx) → 不消费 redirect · 留 P00 + error toast · 用户可重试 · redirect query 在 URL 中保留供下次 submit"
+        },
+        {
+          "id": "AC5",
+          "text": "埋点 login_view{from=boot,redirect=<target_path>|null} + login_submit{method=wechat|phone} + login_redirect{target=redirect_to} 三件套 · target path 脱敏只露 path 不露 query (避免 PII)"
+        }
+      ],
+      "test_invariants": [
+        "TI1: redirect_to 含 javascript: / data: / 跨 origin → router.replace 不发生 · console.warn 上报",
+        "TI2: redirect query 透传完整 (例 wb://review/exec?nid=12345 → URL encode 后 P00 解 → 跳转保留 nid=12345)",
+        "TI3: login 失败时 URL 上的 ?redirect= 不丢失",
+        "TI4: redirect 为空时 顶部小字 DOM 不渲染 (querySelector 验证)"
+      ],
+      "key_invariants": [
+        "JWT 过期不丢失用户意图 (biz §2B.1a 关键断言点 3)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-00/t03-deeplink-redirect.spec.ts",
+        "backend_e2e_it": null
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC00-T03/team-1/attempt-1/",
+      "test_case_first_required": true
+    },
+    {
+      "task_id": "SC-00-T04",
+      "task_id_short": "SC00-T04",
+      "task_id_pascal": "T04ResolveFallbackStubAnonRoutes",
+      "task_title": "verdict=SHARED/WELCOMEBACK 落 stub 兜底页 (路由 + 占位 + 登录 CTA) · resolve 5xx/timeout 离线降级 (stale JWT 进 P-HOME · 无 JWT 落 P-LANDING)",
+      "scenario": "TC-00 兜底 (异常路径 · 系统不变量第 5 条)",
+      "biz_step_range": "biz §2B.1a 关键断言点第 5 条 + §2A.3.1 回退与降级 (含补丁 3 离线降级新规则)",
+      "page": "stub P-SHARED / stub P-WELCOMEBACK / offline-fallback",
+      "page_state_machine": "stub.SHARED_VIEW / stub.WELCOMEBACK_VIEW (only · 无业务状态机)",
+      "branch": "feature/SC-00-T04-resolve-fallback-stub-anon-routes",
+      "owner_team": "team-1",
+      "biz_refs": [
+        "biz §2B.1a 关键断言点第 5 条 (5xx 兜底 P-LANDING)",
+        "biz §2A.3.1 回退与降级 (补丁 3 · 离线降级 stale JWT ≤7d 进 P-HOME · 否则 P-LANDING)",
+        "biz §2A.3.2 P-SHARED / P-WELCOMEBACK 规格卡 (stub 阶段不实现 · 真页等 SC-13/SC-14)"
+      ],
+      "spec_refs": [
+        "design/system/pages/P-SHARED-shared.spec.md (stub 阶段仅路由 · 真页交 SC-13)",
+        "design/system/pages/P-WELCOMEBACK-welcomeback.spec.md (stub 阶段仅路由 · 真页交 SC-14)"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": [
+        "frontend/apps/h5",
+        "frontend/apps/mp"
+      ],
+      "primary_apis": [],
+      "acceptance_criteria": [
+        {
+          "id": "AC1",
+          "text": "stub P-SHARED · 路由 /s/:token 存在 · mount 后展示占位文字「分享内容功能正在开发中 · 立即注册查看完整内容」+ 主 CTA → router.replace('/auth') · 禁止调任何 /api/share/* 真接口 (SC-13 未实现 · 调了会触发 500)"
+        },
+        {
+          "id": "AC2",
+          "text": "stub P-WELCOMEBACK · 路由 /welcome-back 存在 · 占位文字「回流唤起功能正在开发中」+ 主 CTA → router.replace('/auth') · 禁止调任何 /api/session/resolve 二次 (避免循环) / /api/auth/device-refresh (SC-14 未实现)"
+        },
+        {
+          "id": "AC3",
+          "text": "resolve 接口 5xx / fetch error 离线降级 · 读 localStorage.lastJWT · 解 exp · stale ≤ 7d → router.replace('/home') + 顶部 sticky 黄条「离线模式 · 数据可能不是最新」(可点关闭) · 显示直到下次 resolve 成功"
+        },
+        {
+          "id": "AC4",
+          "text": "resolve 接口超时 (AbortController · ≥ 800ms 触发 abort) · 走 AC3 同款降级路径 · abort 不算 5xx 不上报 Sentry error (只 info)"
+        },
+        {
+          "id": "AC5",
+          "text": "完全无 JWT (localStorage 空 或 JWT 过期 > 7d) + resolve 5xx → router.replace('/welcome') 落 P-LANDING (避免白屏 + 不强制走 P00 流程)"
+        },
+        {
+          "id": "AC6",
+          "text": "stub 页埋点独立 · anon_stub_view{verdict_intended=SHARED|WELCOMEBACK,token_or_code_hash} + anon_stub_cta_click{verdict_intended} · 不污染 SC-13/14 真页 anon_share_view / anon_welcomeback_view 埋点流"
+        }
+      ],
+      "test_invariants": [
+        "TI1: stub P-SHARED 页面 mount 期间 · /api/share/* 网络请求次数 === 0 (page.route 拦截 + spy)",
+        "TI2: stub P-WELCOMEBACK 页面 mount 期间 · /api/auth/device-refresh 网络请求次数 === 0",
+        "TI3: 5xx + stale JWT ≤ 7d 场景 · router.replace 目标 === '/home' (不是 '/welcome')",
+        "TI4: 5xx + stale JWT > 7d 场景 · router.replace 目标 === '/welcome'",
+        "TI5: 离线模式黄条 DOM 节点存在性 + 关闭按钮可点 + 关闭后下次 resolve 成功时自动消失 (VRT)"
+      ],
+      "key_invariants": [
+        "biz §2B.1a 关键断言点第 5 条 5xx 不白屏",
+        "biz §2A.3.1 回退降级补丁 3 · 已登录用户网络抖动不被打回 P-LANDING"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-00/t04-fallback-stubs.spec.ts",
+        "backend_e2e_it": null
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC00-T04/team-1/attempt-1/",
+      "test_case_first_required": true
+    }
+  ],
+  "default_opt_ins": {
+    "test_case_first_required": true
+  }
+}

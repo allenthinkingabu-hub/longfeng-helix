@@ -1,0 +1,133 @@
+{
+  "schema_version": "3.1",
+  "scenario_id": "PHASE-A-ANON",
+  "scenario_title": "PHASE-A · anonymous-service 骨架 + 6 张匿名态表 DDL + api-contracts zod schema",
+  "scenario_goal": "为 SC-00 决策树 + SC-11 P-LANDING + SC-12..15 匿名态系列 task 提供后端微服务骨架 + 数据库 schema + 前后端共用 zod 类型契约。沿用 SC-01 PHASE-A-CALENDAR 模式（Maven 模块 + Flyway + IT），但同时多产出 frontend/packages/api-contracts 的 2 份 zod schema（contract-first · 让 T01 frontend 与 T02 backend 不会 schema drift）。",
+  "generated_from": "biz/业务与技术解决方案_AI错题本_基于日历系统.md §S0 (anonymous-service 骨架) + §S1 (6 张匿名表 DDL) + §4.10-§4.13 + §10.6 + §10.7",
+  "generated_at": "2026-05-16",
+  "owner": "user",
+  "scenario_biz_ref": "biz §S0 + §S1 + §4.10-§4.13",
+  "scenario_spec_refs": [
+    "biz §4.10 guest_session 表",
+    "biz §4.11 share_token 表",
+    "biz §4.12 observer_invite / observer_session 表",
+    "biz §4.13 account_device 表",
+    "biz §10.6 POST /api/session/resolve 接口契约",
+    "biz §10.7 GET /api/landing/samples + /api/landing/kpi 接口契约"
+  ],
+  "scenario_tc_ids": [],
+  "system_invariants": [
+    "anonymous-service 微服务独立部署 · 端口 8090 · 不污染 SC-01 已稳定的 wrongbook/calendar/review-plan/file/ai-analysis 5 服务",
+    "Flyway V20260421_02 一次性迁移 6 张表 + 索引 + 外键约束 + 注释 · 失败回滚不留半状态",
+    "frontend/packages/api-contracts/session-resolve.ts + landing.ts zod schema 严格匹配 biz §10.6/§10.7 字段 · 前后端共用一份真相",
+    "本 task 不实现任何业务 endpoint · 仅 /actuator/health · /actuator/info · 让真业务 endpoint 在 SC-00-T02 / SC-11-T01 内增量加入",
+    "IT 必须用 Testcontainers 接 sandbox 容器 (PG/Redis/MinIO) · 禁止 H2 / embedded / Mock 后端 (沿用 SC-01 PHASE-A audit gate)"
+  ],
+  "default_opt_ins": {
+    "test_case_first_required": true
+  },
+  "work_log_dir_pattern": "audits/runs/<task_id_short>/<team>/attempt-<N>/",
+  "log_requirements_template": {
+    "coder": ["coder.md", "bugs-found.md"],
+    "tester": ["tester.md", "adversarial.md", "test-reports/"]
+  },
+  "audit_gate": "harness/audit.js 7 维度全过才真 PASS (含 dim_test_cases_alignment) · 任一不过 REDO · audit_retries ≥ 3 触发熔断",
+  "id_convention": {
+    "long_form": "PHASE-A-ANON (单 task 不含 -T<NN>)",
+    "short_form": "PHASE-A-ANON",
+    "pascal_form": "PhaseAAnonymousServiceSkeleton"
+  },
+  "total_tasks": 1,
+  "tasks": [
+    {
+      "task_id": "PHASE-A-ANON",
+      "task_id_short": "PHASE-A-ANON",
+      "task_id_pascal": "PhaseAAnonymousServiceSkeleton",
+      "task_title": "anonymous-service Maven 模块 + Spring Boot 骨架 · Flyway V20260421_02 (6 表) · session-resolve.ts + landing.ts zod schema · 健康检查 IT",
+      "scenario": "PHASE-A 前置 · 为 SC-00 + SC-11 + SC-12..15 后续匿名态 task 提供后端骨架 + DDL + contract 真相源",
+      "biz_step_range": "biz §S0 + §S1 (基础设施 phase · 无用户动作步)",
+      "page": "(纯后端 + 共享 packages)",
+      "page_state_machine": "(无 · 基础设施 task)",
+      "branch": "feature/PHASE-A-ANON-service-skeleton",
+      "owner_team": "team-4",
+      "test_case_first_required": true,
+      "biz_refs": [
+        "biz §S0 (仓库对齐 · anonymous-service 骨架 + 网关 AnonFilter/ObserverFilter 占位)",
+        "biz §S1 (6 张匿名态表 DDL + Flyway V20260421_02)",
+        "biz §4.10 guest_session 表 schema",
+        "biz §4.11 share_token + share_token_audit 表 schema",
+        "biz §4.12 observer_invite + observer_session 表 schema",
+        "biz §4.13 account_device 表 schema",
+        "biz §10.6 POST /api/session/resolve 接口契约 (body + 5 verdict response)",
+        "biz §10.7 GET /api/landing/samples + GET /api/landing/kpi 接口契约"
+      ],
+      "spec_refs": [
+        "backend/wrongbook-parent/pom.xml (Maven parent 继承样板)",
+        "backend/calendar-core/ (PHASE-A-CALENDAR 已落地的 Maven 模块结构样板)",
+        "frontend/packages/api-contracts/ (zod schema 现有约定 · 已存在 SC-01 类型可参考)"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": [
+        "backend/anonymous-service (新建)",
+        "frontend/packages/api-contracts"
+      ],
+      "primary_apis": [
+        "GET /actuator/health (实现方 · 仅健康检查)",
+        "GET /actuator/info (实现方 · 版本号 + 服务名)"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC1",
+          "text": "backend/anonymous-service/ Maven 模块创建 · pom.xml inherit wrongbook-parent (沿用 calendar-core / file-service 同款继承) · mvn -pl anonymous-service compile BUILD SUCCESS"
+        },
+        {
+          "id": "AC2",
+          "text": "AnonymousServiceApplication.java + application.yml (端口 8090 · 数据源指向 sandbox PG:15432 · Redis:16379) · mvn -pl anonymous-service spring-boot:run 启动后 curl localhost:8090/actuator/health → 200 {status:UP}"
+        },
+        {
+          "id": "AC3",
+          "text": "Flyway 迁移 V20260421_02__anonymous_tables.sql · 含 6 张表 (guest_session / guest_rate_bucket / share_token / share_token_audit / observer_invite / observer_session / account_device) + 索引 + 外键 + COMMENT · mvn flyway:migrate BUILD SUCCESS · psql 查询 information_schema.tables 含 7 张新表 (guest_rate_bucket 是 share_token_audit 的姊妹 · 与 share_token_audit 是同表共 7 张)"
+        },
+        {
+          "id": "AC4",
+          "text": "6 (或 7) 张表 schema 字段 100% 匹配 biz §4.10-§4.13 定义 · 字段类型 / NOT NULL / 默认值 / 索引 / 外键 用 psql \\d 逐表对照截图落盘到 work_log_dir · 任一字段不匹配 = REJECT"
+        },
+        {
+          "id": "AC5",
+          "text": "frontend/packages/api-contracts/session-resolve.ts · 含 zod schema ResolveRequest (deviceFp + entrySource + shareToken? + observerCode?) + ResolveResponse (decision 5 枚举联合 + maskedAccount? + shareContext? + observerContext?) · 字段名严格匹配 biz §10.6 接口契约 (camelCase) · tsc --noEmit pass"
+        },
+        {
+          "id": "AC6",
+          "text": "frontend/packages/api-contracts/landing.ts · 含 zod schema LandingSamplesResponse ([{subject, stemText, knowledgePoints[], errorReason, correction}]) + LandingKpiResponse ({cumulativeQuestions, dailyAnalyses, happyUsers}) · 严格匹配 biz §10.7 · tsc --noEmit pass"
+        },
+        {
+          "id": "AC7",
+          "text": "IT 测试 AnonymousServiceSkeletonE2EIT.java 用 Testcontainers 起 sandbox PG/Redis 容器 · 跑 flyway migrate · 断言 7 张表存在 + 健康检查 200 + zod schema TypeScript 编译通过 (跨语言断言 用 ProcessBuilder 跑 pnpm -F api-contracts typecheck) · mvn -pl anonymous-service verify BUILD SUCCESS"
+        }
+      ],
+      "test_invariants": [
+        "TI1: 7 张表全部存在且 schema 字段 100% 匹配 biz · psql \\d <table> 输出 vs biz §4.10-§4.13 表格逐字段 diff === 0",
+        "TI2: zod schema 解析 biz §10.6 / §10.7 示例 response payload 不报错 (用 schema.parse(sample) 验证)",
+        "TI3: 健康检查 /actuator/health · /actuator/info 返 200 · 应用版本号字段非空",
+        "TI4: 不污染 SC-01 已稳定 services (mvn -pl wrongbook-service test BUILD SUCCESS · 不因本 task 改动 fail · 用 git status 验证 SC-01 各 service src/ 文件未被修改)",
+        "TI5: Flyway 迁移幂等 · 重复跑 mvn flyway:migrate · 不重复建表 · schema_history 一行 V20260421_02"
+      ],
+      "key_invariants": [
+        "biz §S0 anonymous-service 独立服务原则 (不污染 SC-01 已稳定 services)",
+        "biz §S1 Flyway V20260421_02 一次性原子迁移",
+        "biz §10.6/§10.7 接口契约前后端共用 zod 真相源"
+      ],
+      "physical_verification": {
+        "frontend_e2e": null,
+        "backend_e2e_it": "backend/anonymous-service/src/test/java/.../AnonymousServiceSkeletonE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/PHASE-A-ANON/team-4/attempt-1/"
+    }
+  ]
+}

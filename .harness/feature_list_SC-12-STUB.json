@@ -1,0 +1,110 @@
+{
+  "schema_version": "3.1",
+  "scenario_id": "SC-12-STUB",
+  "scenario_title": "SC-12 P-GUEST-CAPTURE 占位 stub (SC-11 落地后到 SC-12 真页之间的桥)",
+  "scenario_goal": "为 SC-11 P-LANDING「试试看（无需注册）」CTA 跳 /guest/capture 提供占位页 · 避免 404 · 给用户「立即注册体验完整功能」的明确出口。本 stub 在未来 SC-12 真页 (P-GUEST-CAPTURE Try Before Signup) 落地时会被替换。",
+  "generated_from": "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2A.3.2 P-GUEST-CAPTURE 规格卡 (真页 spec) + §2B.12 SC-11 F07A (入口)",
+  "generated_at": "2026-05-16",
+  "owner": "user",
+  "scenario_biz_ref": "biz §2A.3.2 + §2B.12 F07A (stub 仅为 SC-11 入口兜底)",
+  "scenario_spec_refs": [
+    "design/system/pages/P-GUEST-CAPTURE-guest-capture.spec.md (真页 spec · stub 阶段仅取路由 + Shell 顶端规范)"
+  ],
+  "scenario_tc_ids": [],
+  "system_invariants": [
+    "stub 页禁止调任何 /api/guest/* + /api/ai/* + /api/file/* 真接口 (SC-12 未实现 · 调了立刻 500)",
+    "stub 页保留 P-GUEST-CAPTURE 路由 /guest/capture · 沿用匿名 Shell 顶端规范 (Logo 左上 · 登录/注册胶囊按钮右上 · 无 Tab Bar)",
+    "未来 SC-12 真页落地时 · 替换本 stub 页内容 · 路由 + 入口埋点保持兼容"
+  ],
+  "default_opt_ins": {
+    "test_case_first_required": true
+  },
+  "scenario_dependencies": [
+    "PHASE-A-ANON (Maven 骨架 + zod schema 已就位) · 本 task 不依赖 (纯前端 stub · 无后端调用)",
+    "SC-00-T01 resolve-entry 路由解析 (可独立 · 但用户从 SC-11-T04 跳过来才会走到本 stub)"
+  ],
+  "work_log_dir_pattern": "audits/runs/<task_id_short>/<team>/attempt-<N>/",
+  "log_requirements_template": {
+    "coder": ["coder.md", "bugs-found.md"],
+    "tester": ["tester.md", "adversarial.md", "test-reports/"]
+  },
+  "audit_gate": "harness/audit.js 7 维度全过才真 PASS · 任一不过 REDO · audit_retries ≥ 3 触发熔断",
+  "id_convention": {
+    "long_form": "SC-12-STUB-T01 (单 task)",
+    "short_form": "SC12-STUB-T01",
+    "pascal_form": "T01GuestCaptureStub"
+  },
+  "total_tasks": 1,
+  "tasks": [
+    {
+      "task_id": "SC-12-STUB-T01",
+      "task_id_short": "SC12-STUB-T01",
+      "task_id_pascal": "T01GuestCaptureStub",
+      "task_title": "P-GUEST-CAPTURE 占位 stub 页 · 路由 /guest/capture · 占位文字「游客试用功能开发中」+ 主 CTA → /auth · 禁止调任何后端真接口",
+      "scenario": "SC-11 F07A 跳转兜底 (避免 404) · 未来 SC-12 真页落地前的桥",
+      "biz_step_range": "biz §2B.12 F07A (P-LANDING 跳入口) + §2A.3.2 P-GUEST-CAPTURE 规格卡 (真页 spec · stub 阶段仅借路由 + Shell)",
+      "page": "P-GUEST-CAPTURE (stub)",
+      "page_state_machine": "stub.MOUNTED → stub.CTA_LOGIN (Tap 立即注册 → /auth) · 或 → stub.BACK (返回 P-LANDING)",
+      "branch": "feature/SC-12-STUB-T01-guest-capture-stub",
+      "owner_team": "team-1",
+      "test_case_first_required": true,
+      "biz_refs": [
+        "biz §2A.3.2 P-GUEST-CAPTURE 规格卡 (真页 spec · stub 阶段仅取路由 + Shell 顶端胶囊按钮)",
+        "biz §2B.12 F07A (P-LANDING「试试看」→ /guest/capture 入口)",
+        "biz §2A.3.2 匿名 Shell 顶端规范 (Logo 左上 · 登录/注册胶囊按钮右上 · 无 Tab Bar · 埋点 anon_ 前缀)"
+      ],
+      "spec_refs": [
+        "design/system/pages/P-GUEST-CAPTURE-guest-capture.spec.md (stub 阶段仅路由 + Shell · 真页 spec 未来 SC-12 实现)"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": [
+        "frontend/apps/h5",
+        "frontend/apps/mp"
+      ],
+      "primary_apis": [],
+      "acceptance_criteria": [
+        {
+          "id": "AC1",
+          "text": "路由 /guest/capture (h5) 或 pages/guest/capture (mp) 存在 · mount 后展示占位 hero「游客试用功能正在开发中」+ 副标题「立即注册体验完整 AI 错题分析 + 艾宾浩斯复习计划」+ 主 CTA「立即注册」"
+        },
+        {
+          "id": "AC2",
+          "text": "主 CTA「立即注册」点击 → router.push('/auth') · 不带 redirect 参数 (用户从 P-LANDING 来 · 注册后落 P-HOME 即可) · navigation 完成 ≤ 300ms"
+        },
+        {
+          "id": "AC3",
+          "text": "匿名 Shell 顶部规范 · Logo 左上 (Tap → /welcome) + 「登录」胶囊按钮右上 (Tap → /auth) · 不渲染 Tab Bar (按 §2A.3.2 匿名页统一规范)"
+        },
+        {
+          "id": "AC4",
+          "text": "stub 页禁止调任何 /api/guest/* + /api/ai/* + /api/file/* + /api/wb/* + /api/auth/* (除了用户 Tap 登录后跳 P00 触发的常规 auth flow) · 用 page.route 监听断言 fetch 计数 === 0"
+        },
+        {
+          "id": "AC5",
+          "text": "埋点 anon_stub_view{verdict_intended=GUEST_CAPTURE,entry_source} · anon_stub_cta_click{cta=register} · 共用 SC-00-T04 stub 埋点 schema (一致性) · 不污染未来 SC-12 真页埋点流 (anon_guest_capture_view 等)"
+        }
+      ],
+      "test_invariants": [
+        "TI1: stub 页 mount 期间 · 整个会话 /api/guest/* + /api/ai/* + /api/file/* fetch 计数 === 0 (Playwright page.route + spy)",
+        "TI2: 「立即注册」CTA · click 后 navigation 目标 === '/auth' · 不出现 redirect query",
+        "TI3: 路由 /guest/capture 直接打开 (deeplink) · 也能正常 mount stub · 不要求来自 P-LANDING (用户分享链类场景)",
+        "TI4: stub 页 VRT screenshot (mounted + cta_pressed 2 态) · 与 mockup 14_landing.html → 15_guest_capture.html 入口跳转视觉链路一致"
+      ],
+      "key_invariants": [
+        "不调真后端 (SC-12 未实现的 anonymous-service guest 链路)",
+        "未来 SC-12 真页落地时 · 路由 + 入口埋点保持兼容 (CTA 文字 / 视觉可换 · URL + 埋点 schema 不能换)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-12-stub/t01-guest-capture-stub.spec.ts",
+        "backend_e2e_it": null
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC12-STUB-T01/team-1/attempt-1/"
+    }
+  ]
+}
