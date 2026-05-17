@@ -200,6 +200,17 @@ interface DispatchCtx {
 }
 
 function dispatchPath(decision: ResolveDecision, ctx: DispatchCtx): string {
+  // SC-00-T03 (2026-05-17) regression guard:
+  //   When the user is ALREADY on /auth/login (P00 deep-link landing per
+  //   biz §2A.3.1 节点 3 patch · ?redirect= carries the original target),
+  //   resolveEntry must NOT navigate them away — that's how login.spec.ts
+  //   ran before SC-00-T01-T02 landed BootstrapGate. We short-circuit to
+  //   the same path so BootstrapGate's `dispatchTo !== location.pathname`
+  //   comparison evaluates false and stays put. The ?redirect= query is
+  //   preserved by Login.tsx itself (useSearchParams parses it independently).
+  if (ctx.path === '/auth/login') {
+    return '/auth/login';
+  }
   switch (decision) {
     case 'HOME':
       return '/home';
