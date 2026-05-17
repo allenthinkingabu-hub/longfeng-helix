@@ -22,7 +22,7 @@
 //   (d) 不触发 /api/auth/* · /api/session/resolve (匿名访问 · biz 关键断言点)
 // ============================================================================
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { TEST_IDS } from '@longfeng/testids';
 import type {
   LandingSamplesResponse,
@@ -35,6 +35,10 @@ import { HeroDemo } from './HeroDemo';
 import { ThreeStepComic } from './ThreeStepComic';
 import { SampleChips } from './SampleChips';
 import { SampleOverlay } from './SampleOverlay';
+import { DualCTA, type ExperimentBucket } from './DualCTA';
+import { ConsentBar, type Region } from './ConsentBar';
+import { ParentHint } from './ParentHint';
+import { trackLanding, getExperimentBucket } from './telemetry';
 
 const ids = TEST_IDS.sc11t01;
 
@@ -68,6 +72,21 @@ function pickBucket(): string {
   return 'default';
 }
 
+/**
+ * SC-11-T04: read region (cn / overseas) from URL ?region=. P0 默认 'cn'.
+ * P1 接 GeoIP / Cloudflare CF-IPCountry header 时替换此函数.
+ */
+function pickRegion(): Region {
+  try {
+    const url = new URL(window.location.href);
+    const region = url.searchParams.get('region');
+    if (region === 'overseas') return 'overseas';
+  } catch {
+    /* SSR · fall through */
+  }
+  return 'cn';
+}
+
 export const LandingPage: React.FC = () => {
   const [data, setData] = useState<LandingData>({
     state: 'LOADING',
@@ -78,6 +97,65 @@ export const LandingPage: React.FC = () => {
   // SC-11-T03: which sample's overlay is open (null = closed). chip tap →
   // setOpenSample(sample) · overlay close (× / mask / Android back) → null.
   const [openSample, setOpenSample] = useState<LandingSample | null>(null);
+
+  // SC-11-T04: A/B 桶 + region · 一次性读 URL · 不在 render 中重读
+  const experimentBucket = useRef<ExperimentBucket>(getExperimentBucket()).current;
+  const region = useRef<Region>(pickRegion()).current;
+
+  // SC-11-T04: dwell + scroll tracking (bounce 事件携带)
+  const mountedAtRef = useRef<number>(Date.now());
+  const maxScrollPctRef = useRef<number>(0);
+  const sampleOpenCountRef = useRef<number>(0);
+
+  // SC-11-T04: mount 即上报 anon_landing_view + 监听 pagehide 上报 bounce
+  useEffect(() => {
+    // 上报 view (mount 时立刻 · 含 device_fp + entry_source + experiment_bucket)
+    trackLanding('anon_landing_view', {
+      region,
+    });
+
+    // scroll progress (用于 bounce dwell 上报)
+    const updateScroll = (): void => {
+      try {
+        const doc = document.documentElement;
+        const scrollTop = window.scrollY || doc.scrollTop;
+        const denom = doc.scrollHeight - doc.clientHeight;
+        if (denom <= 0) return;
+        const pct = Math.min(100, Math.round((scrollTop / denom) * 100));
+        if (pct > maxScrollPctRef.current) maxScrollPctRef.current = pct;
+      } catch {
+        /* ignore */
+      }
+    };
+    window.addEventListener('scroll', updateScroll, { passive: true });
+
+    // pagehide bounce — 用 once flag 防 pagehide + visibilitychange 重复
+    let bounced = false;
+    const reportBounce = (): void => {
+      if (bounced) return;
+      bounced = true;
+      const dwell_ms = Date.now() - mountedAtRef.current;
+      trackLanding('anon_landing_bounce', {
+        dwell_ms,
+        scroll_pct: maxScrollPctRef.current,
+        sample_open_count: sampleOpenCountRef.current,
+      });
+    };
+    // iOS Safari pagehide 比 visibilitychange 更稳 · 但都监听 + 用 once flag
+    window.addEventListener('pagehide', reportBounce);
+    const onVisibility = (): void => {
+      if (document.visibilityState === 'hidden') reportBounce();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
+    return () => {
+      window.removeEventListener('scroll', updateScroll);
+      window.removeEventListener('pagehide', reportBounce);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+    // 仅 mount/unmount · region 是 ref 不会变
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -120,6 +198,9 @@ export const LandingPage: React.FC = () => {
 
   return (
     <div data-testid={ids.root} className={styles.root}>
+      {/* SC-11-T04 · 海外桶 ConsentBar 顶部横幅 (国内桶在底部) */}
+      {region === 'overseas' && <ConsentBar region="overseas" />}
+
       {/* Hero · 极光渐变背景 + SC-11-T02 HeroDemo 前景 (30s 动图 · onError → poster) */}
       <header data-testid={ids.hero} className={styles.hero}>
         <h1 className={styles.heroTitle}>错题秒变复习计划</h1>
@@ -167,7 +248,10 @@ export const LandingPage: React.FC = () => {
               · 复用上方 samples state · 不再独立 fetch */}
           <SampleChips
             samples={samples}
-            onChipClick={(sample) => setOpenSample(sample)}
+            onChipClick={(sample) => {
+              sampleOpenCountRef.current += 1;
+              setOpenSample(sample);
+            }}
           />
           {samples.map((s, idx) => (
             <article
@@ -218,6 +302,15 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* SC-11-T04 · ParentHint · 家长入口 · 在 CTA 上方 */}
+      <ParentHint />
+
+      {/* SC-11-T04 · 国内桶 ConsentBar 底部小字 (海外桶已在顶部) */}
+      {region === 'cn' && <ConsentBar region="cn" />}
+
+      {/* SC-11-T04 · DualCTA · sticky bottom · 永远可点 (即使 DEGRADED 也能 CTA) */}
+      <DualCTA experimentBucket={experimentBucket} />
     </div>
   );
 };

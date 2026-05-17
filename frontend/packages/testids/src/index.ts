@@ -539,6 +539,21 @@ export const TEST_IDS = {
     correctionCard:        'p-sample-overlay-correction-card',
     variantCard:           'p-sample-overlay-variant-card',
   },
+
+  // SC-11-T04 · P-LANDING DualCTA + ConsentBar + ParentHint + 埋点 (inflight scope_in #1-6)
+  // 双 CTA 吸底 (主蓝「试试看」/ 次灰「已有账号」) · A/B 桶 prop 控制顺序
+  // ConsentBar · 国内桶底部小字 · 海外桶顶部横幅 (不勾不阻塞 CTA)
+  // ParentHint · 「家长 / 老师查看孩子进度?」 · P0 跳 /auth/login (P1 改 P-OBSERVER)
+  // entry_source 白名单 · sanitizeEntrySource 严防 XSS · 非白名单标 'unknown'
+  sc11t04: {
+    ctaWrap:               'p-landing-cta-wrap',
+    ctaTry:                'p-landing-cta-try',
+    ctaLogin:              'p-landing-cta-login',
+    consentBar:            'p-landing-consent-bar',
+    consentCheckbox:       'p-landing-consent-checkbox',
+    parentHint:            'p-landing-parent-hint',
+    parentHintLink:        'p-landing-parent-hint-link',
+  },
 } as const;
 
 // ── S8 FE-04 · Dynamic testid helpers (functions · not in const for type safety) ──
