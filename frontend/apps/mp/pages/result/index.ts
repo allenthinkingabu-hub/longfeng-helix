@@ -273,12 +273,20 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
       // to review-plan-service to create 7 EBBINGHAUS_SM2 nodes (T0..T6) so the
       // "保存后将按《艾宾浩斯》自动生成 T1-T6 共 6 个日历提醒" promise actually holds.
       await saveQuestion(qid);
-      wx.showToast({ title: '保存成功', icon: 'success' });
+
+      // spec P04-result.spec.md §6 L157 + §7 L191 + TC-01.01:
+      // SAVED → navigate('/wrongbook?highlight={qid}') → P05 错题列表 + 高亮新题
+      // wrongbook-list 是 tabBar 页 (app.json L33), 必须 switchTab; navigateTo
+      // 会被微信静默拒绝 ("can not navigateTo a tabbar page" · 用户层无感),
+      // 这是之前 "点保存后页面不跳" 的根因.
+      // switchTab 不支持 query, 用 storage 把 highlight qid 传给 P05 onShow.
+      try { wx.vibrateShort({ type: 'medium' }); } catch { /* noop */ }
+      wx.setStorageSync('p05.highlightQid', qid);
+      wx.showToast({ title: '保存成功', icon: 'success', duration: 600, mask: true });
+      // spec L244: 保存成功 → 跳 P05 ≤ 800ms (含 200ms 跳转动画) · 给 toast 600ms 视觉
       setTimeout(() => {
-        wx.navigateTo({
-          url: `/pages/wrongbook-list/index?highlight=${qid}`,
-        });
-      }, 1500);
+        wx.switchTab({ url: '/pages/wrongbook-list/index' });
+      }, 600);
     } catch (err) {
       console.error('[P04] save error:', err);
       wx.showToast({ title: '保存失败，请重试', icon: 'none' });

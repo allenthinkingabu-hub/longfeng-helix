@@ -39,8 +39,25 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
   },
 
   onLoad(options: Record<string, string | undefined>) {
+    // tabBar 页 onLoad 只在首次创建时触发 · query (?highlight=) 路径仅
+    // navigateTo 才可达 (非 tabBar 入口 · 例如未来从 P-HOME 直接 push).
+    // 从 P04 switchTab 回来时, highlight qid 通过 storage 传递 (见 onShow).
     const highlightQid = options.highlight || '';
     this.setData({ highlightQid });
+    this._fetchList();
+  },
+
+  // tabBar 页第 2 次起只触发 onShow · 必须刷新列表 +
+  // 接 P04 switchTab 写入的 highlight qid (switchTab 吃不下 query).
+  // 一次性消费 storage · 避免下次切 tab 误触发高亮.
+  onShow() {
+    const highlightQid = wx.getStorageSync('p05.highlightQid') as string;
+    if (highlightQid) {
+      wx.removeStorageSync('p05.highlightQid');
+      this.setData({ highlightQid });
+    }
+    // 总刷新 · 保证从 P04 / P06 回来新题/状态变化立刻反映.
+    // pageState=LOADING 仅首次, 后续 onShow 复用现有 items 直到 fetch 返回.
     this._fetchList();
   },
 
