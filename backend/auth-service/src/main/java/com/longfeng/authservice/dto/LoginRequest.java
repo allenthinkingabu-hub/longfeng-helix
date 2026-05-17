@@ -26,6 +26,13 @@ public class LoginRequest {
     private Boolean rememberMe = Boolean.TRUE;
     private String consentAt;      // ISO-8601 timestamp string · not validated server-side this task
 
+    // SC-00-T02 · optional · forwarded to anonymous-service account_device upsert (P0 silent · P1 SC-14 reads).
+    @Size(max = 128)
+    private String deviceFp;
+
+    @Size(max = 16)
+    private String platform;       // H5 / MINIP / IOS / ANDROID
+
     public String getProvider() { return provider; }
     public void setProvider(String provider) { this.provider = provider; }
     public String getEmail() { return email; }
@@ -36,4 +43,8 @@ public class LoginRequest {
     public void setRememberMe(Boolean rememberMe) { this.rememberMe = rememberMe; }
     public String getConsentAt() { return consentAt; }
     public void setConsentAt(String consentAt) { this.consentAt = consentAt; }
+    public String getDeviceFp() { return deviceFp; }
+    public void setDeviceFp(String deviceFp) { this.deviceFp = deviceFp; }
+    public String getPlatform() { return platform; }
+    public void setPlatform(String platform) { this.platform = platform; }
 }

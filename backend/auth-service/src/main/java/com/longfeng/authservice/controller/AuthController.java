@@ -5,11 +5,13 @@ import com.longfeng.authservice.dto.LoginRequest;
 import com.longfeng.authservice.dto.LoginResponse;
 import com.longfeng.authservice.dto.RefreshResponse;
 import com.longfeng.authservice.entity.AuthUser;
+import com.longfeng.authservice.facade.AccountDeviceFacade;
 import com.longfeng.authservice.service.JwtService;
 import com.longfeng.authservice.service.LoginService;
 import com.longfeng.authservice.service.LoginService.AccountLockedException;
 import com.longfeng.authservice.service.LoginService.InvalidCredentialsException;
 import com.longfeng.authservice.service.RefreshTokenService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,17 +45,21 @@ public class AuthController {
     private final LoginService loginService;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
+    private final AccountDeviceFacade accountDeviceFacade;
 
     public AuthController(LoginService loginService,
                           JwtService jwtService,
-                          RefreshTokenService refreshTokenService) {
+                          RefreshTokenService refreshTokenService,
+                          AccountDeviceFacade accountDeviceFacade) {
         this.loginService = loginService;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
+        this.accountDeviceFacade = accountDeviceFacade;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest req) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest req,
+                                               HttpServletRequest httpReq) {
         // provider currently only supports EMAIL — others SC-12 / iOS scope_out.
         String provider = req.getProvider() == null ? "EMAIL" : req.getProvider();
         if (!"EMAIL".equalsIgnoreCase(provider)) {
@@ -66,6 +72,17 @@ public class AuthController {
         String jwt = jwtService.signAccessToken(user.getId());
         String refresh = refreshTokenService.issue(user.getId());
         long expiresIn = jwtService.getAccessTokenTtlSeconds();
+
+        // SC-00-T02 silent hook · upsert account_device for SC-14 future welcomeback.
+        // Never blocks login response — facade swallows all exceptions internally.
+        String deviceFp = req.getDeviceFp();
+        if (deviceFp != null && !deviceFp.isBlank()) {
+            String platform = req.getPlatform() == null ? "H5" : req.getPlatform();
+            String ua = httpReq.getHeader("User-Agent");
+            accountDeviceFacade.silentUpsert(user.getId(), deviceFp, platform, ua);
+        } else {
+            LOG.debug("account_device_hook_skip deviceFp_blank sid={}", user.getId());
+        }
 
         LoginResponse.Student student = new LoginResponse.Student(
                 user.getId(),
