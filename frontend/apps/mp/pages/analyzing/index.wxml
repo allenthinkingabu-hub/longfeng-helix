@@ -5,7 +5,9 @@
 <view class="nav">
   <view class="nav-row">
     <view class="back" bind:tap="onBackTap">
-      <text class="back-chevron">&lt;</text>
+      <!-- MP <text> 不解析 HTML entity (之前 &lt; 渲染成字面 "&lt;") · 改 van-icon
+           与 P07 nav-back 统一 ("arrow-left" + #007AFF 蓝) -->
+      <van-icon name="arrow-left" color="#007AFF" size="20px" />
       <text>拍题</text>
     </view>
     <view class="nav-cancel" bind:tap="onCancelTap">
@@ -86,17 +88,31 @@
     </view>
   </view>
 
-  <!-- Streaming JSON terminal (mockup: .stream) -->
-  <view class="stream" data-test-id="analyzing-pipeline-json-stream">
-    <view class="stream-hdr">
-      <text class="stream-hdr-text">SSE · /api/ai/stream · {{ currentModel }}</text>
-      <view class="stream-dots">
-        <view class="dot dot-red"></view>
-        <view class="dot dot-yellow"></view>
-        <view class="dot dot-green"></view>
-      </view>
+  <!-- 完成后将看到 · 引导卡 · 替换原 .stream SSE 终端 mockup ·
+       原 SSE JSON 终端 (深 #0F1422) 是 mockup 开发者风, 对学生无用 ·
+       且 STREAM_PLACEHOLDER 永远显示假 "顶点 (2,−1) 配方" 数据 (跟 P04 旧 bug 同根) ·
+       改成 "完成后将看到" 预览 · 解释 4 步分析后会得到什么 · 把空白区利用起来 -->
+  <view class="afterview" data-test-id="analyzing-pipeline-afterview">
+    <view class="afterview-hdr">
+      <van-icon name="eye-o" color="#5856D6" size="18px" />
+      <text class="afterview-title">分析完成后将看到</text>
     </view>
-    <text class="stream-pre">{{ streamOutput }}</text>
+    <view class="afterview-row">
+      <view class="afterview-bullet"></view>
+      <text class="afterview-text">错因诊断 · 错在哪 · 为什么</text>
+    </view>
+    <view class="afterview-row">
+      <view class="afterview-bullet"></view>
+      <text class="afterview-text">详细解答步骤 · 含公式 LaTeX</text>
+    </view>
+    <view class="afterview-row">
+      <view class="afterview-bullet"></view>
+      <text class="afterview-text">涉及知识点 + 难度评级</text>
+    </view>
+    <view class="afterview-row">
+      <view class="afterview-bullet"></view>
+      <text class="afterview-text">艾宾浩斯 T1–T6 共 6 个日历提醒</text>
+    </view>
   </view>
 
 </view>
