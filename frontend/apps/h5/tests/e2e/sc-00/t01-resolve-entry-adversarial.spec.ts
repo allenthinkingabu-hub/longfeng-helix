@@ -27,11 +27,14 @@ const nowSec = () => Math.floor(Date.now() / 1000);
 
 test.describe('SC-00-T01 · ADVERSARIAL · 破坏性边界', () => {
 
-  test('ADV-1 · /s/<deeplink> + valid local JWT → 占位页直接渲染 · BootstrapGate 跳过 (T04 占位页负责调后端)', async ({ page }) => {
+  test('ADV-1 · /s/<deeplink> + valid local JWT → stub 页直接渲染 · BootstrapGate 跳过', async ({ page }) => {
     // 攻击场景: 用户已登录 (有 valid JWT) 但点开了 share-token deeplink
     // 设计: BootstrapGate.BOOTSTRAP_PATHS 仅含 ['/','/home','/auth/login'] · /s/* 不拦截
-    //       SharedStub 占位页 onMount 自己调后端 (T04 实现 · 本 task 占位)
-    // 期望: 占位页渲染 + 保留 /s/:token URL · 不被 valid JWT 偷偷打回 /home
+    //       SharedStub 真 stub 页 (SC-00-T04 实装 · 占位文字 + CTA → /auth/login)
+    // 期望: stub 页渲染 + 保留 /s/:token URL · 不被 valid JWT 偷偷打回 /home
+    //
+    // 注: SC-00-T04 (2026-05-17) 把 'shared-placeholder-root' 升级成 'shared-stub-root'
+    //     (占位 div → 真 stub UI · 卡片 + CTA · inflight scope_in 1)
     const validJwt = makeJwt({ sub: 'u-1', exp: nowSec() + 3600, iss: 'longfeng', aud: 'h5' });
     await page.addInitScript((jwt: string) => {
       window.localStorage.setItem('jwt', jwt);
@@ -41,8 +44,8 @@ test.describe('SC-00-T01 · ADVERSARIAL · 破坏性边界', () => {
 
     // 关键断言: 即使有 valid JWT · URL 必须仍是 /s/:token (BootstrapGate 不抢)
     expect(page.url(), 'BootstrapGate must NOT hijack share-deeplink to /home').toMatch(/\/s\/ABC-SHARE-TOKEN-123/);
-    // 占位页 testid 渲染 (P-SHARED 占位)
-    await expect(page.getByTestId('shared-placeholder-root')).toBeVisible();
+    // T04 真 stub 页 testid (SharedStub)
+    await expect(page.getByTestId('shared-stub-root')).toBeVisible();
   });
 
   test('ADV-2 · resolve schema 篡改 (decision="WTF") → zod reject + fallback /welcome', async ({ page }) => {
