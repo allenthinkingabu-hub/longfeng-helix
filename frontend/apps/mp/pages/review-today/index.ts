@@ -83,9 +83,13 @@ Page({
 
       const now = new Date();
       const builtSlots = buildSlotsFromItems(items, now, this.data.sortMode);
-      const completed = items.filter(i => i.mastered);
-      const doneCount = completed.length;
-      const waitCount = items.filter(i => !i.mastered && !i.completedAt).length;
+      // P07 spec L94 严格口径: doneCount = GRADED (= completedAt != null) ·
+      // 不再用 mastered (BE ReviewPlanDto 根本不返这个字段 → undefined → 永远 0%).
+      // 任务完成度 (progressPct) 与 掌握度 (masteryPct · BE 算 · ease 聚合) 是两个独立维度.
+      // 4 题都已 grade (含 PARTIAL/FORGOT) → 进度 100%, 掌握度由 ease 反映.
+      const doneCount = items.filter(i => i.completedAt).length;
+      const waitCount = items.filter(i => !i.completedAt).length;
+      // 进行中 = OPEN 未 grade · BE 现实不返该状态 → 永远 0 · 保留 hero label 占位
       const inProgressCount = total - doneCount - waitCount;
       const progressPct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
 

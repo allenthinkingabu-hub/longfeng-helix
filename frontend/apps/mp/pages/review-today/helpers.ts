@@ -110,18 +110,16 @@ export function buildSlotsFromItems(items: ReviewPlanDto[], now: Date, sortMode:
     const color = SUBJECT_COLOR_MAP[subjectKey] || 'blue';
     const stem = (item.stem && item.stem.trim()) || '题干暂未识别 · OCR 待补';
 
-    // Progress 与 hero 计数同口径 (index.ts: doneCount/waitCount/inProgressCount)
+    // Progress 与 hero 计数同口径 (spec L94 GRADED · index.ts: doneCount=completedAt!=null).
+    // 'inprogress' 路径保留在类型里 (BE 未来加 OPEN 状态时可用) · 当前 BE 不返 OPEN · 现实仅二态.
     let progress: 'done' | 'inprogress' | 'wait';
     let progressLabel: string;
-    if (item.mastered) {
+    if (item.completedAt) {
       progress = 'done';
       progressLabel = '已完成';
-    } else if (!item.completedAt) {
+    } else {
       progress = 'wait';
       progressLabel = '未开始';
-    } else {
-      progress = 'inprogress';
-      progressLabel = '进行中';
     }
 
     const itemData: ItemData = {

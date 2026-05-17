@@ -123,13 +123,15 @@ Page({
       const data = await getHomeTodayCount();
       const total = data.total ?? 0;
       // BE TodayResp 不返 done 字段 · FE 必须从 items 派生.
-      // 口径: mastered=true 才算 done · 与 P07 hero "已完成" 一致.
-      // 之前用 completedAt!=null 派生 (= 答过) · PARTIAL/FORGOT 也算 done ·
-      // 4 都进行中时 done=4 → pending=0 → tabBar 角标消失 · 但用户实际还没掌握.
+      // 口径: spec L94 严格 doneCount = GRADED (= completedAt != null) ·
+      // 与 P07 hero "已完成" 同口径 · 进度 = 任务完成度 (不是 mastery 进度).
+      // mastered 维度由 BE 新加的 masteryPct 字段 (ease 聚合) 单独反映 ·
+      // 撤掉之前 mastered=done 的口径 (因为 BE ReviewPlanDto 不返 mastered 字段 →
+      // FE filter 永远 0 → 角标永远显总数 · 跟"今天还有几题没做" 语义不符).
       const itemsArr = Array.isArray(data.items) ? data.items : [];
       const done = typeof data.done === 'number'
         ? data.done
-        : itemsArr.filter(i => i && (i as { mastered?: unknown }).mastered === true).length;
+        : itemsArr.filter(i => i && (i as { completedAt?: unknown }).completedAt).length;
       const pct = computeCirclePct(done, total);
 
       this.setData({

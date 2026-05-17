@@ -191,27 +191,28 @@ describe('buildSlotsFromItems (pure · integration of all helpers)', () => {
     expect(slots[0].items[0].hhmm).toBe('09:05');
   });
 
-  // 用户反馈: hero 显 "1 进行中 / 1 未开始" 但卡片无标识 · 用户分不清是哪条 ·
-  // 这组测试锁住卡片 progress 与 hero 计数同口径 (index.ts 内同 if-else 分支)
-  it('progress: mastered=true → 已完成', () => {
-    const item = { ...makeItem(1, 1, '2026-04-21T09:45:00'), mastered: true, completedAt: '2026-04-21T09:30:00' };
+  // spec L94 严格口径: progress 与 hero 同口径 doneCount = GRADED = completedAt!=null.
+  // BE ReviewPlanDto 不返 mastered 字段 · 旧 mastered 判定永远 false · 进度永远 0% (用户截图问的就是这个).
+  // 任何 grade (含 PARTIAL/FORGOT/MASTERED) 都算 "已完成本节点" · mastery 维度由 BE masteryPct 单独反映.
+  it('progress: completedAt set → 已完成 (GRADED 任意 grade)', () => {
+    const item = { ...makeItem(1, 1, '2026-04-21T09:45:00'), completedAt: '2026-04-21T09:30:00' };
     const slots = buildSlotsFromItems([item], now);
     expect(slots[0].items[0].progress).toBe('done');
     expect(slots[0].items[0].progressLabel).toBe('已完成');
   });
 
-  it('progress: !mastered && !completedAt → 未开始', () => {
-    const item = { ...makeItem(1, 1, '2026-04-21T09:45:00'), mastered: false, completedAt: null };
+  it('progress: !completedAt → 未开始', () => {
+    const item = { ...makeItem(1, 1, '2026-04-21T09:45:00'), completedAt: null };
     const slots = buildSlotsFromItems([item], now);
     expect(slots[0].items[0].progress).toBe('wait');
     expect(slots[0].items[0].progressLabel).toBe('未开始');
   });
 
-  it('progress: !mastered && completedAt → 进行中 (PARTIAL/FORGOT 已答但未掌握)', () => {
+  it('progress: 即使 mastered=false 只要 completedAt set 也是 已完成 (撤回旧 mastered 口径)', () => {
     const item = { ...makeItem(1, 1, '2026-04-21T09:45:00'), mastered: false, completedAt: '2026-04-21T09:30:00' };
     const slots = buildSlotsFromItems([item], now);
-    expect(slots[0].items[0].progress).toBe('inprogress');
-    expect(slots[0].items[0].progressLabel).toBe('进行中');
+    expect(slots[0].items[0].progress).toBe('done');
+    expect(slots[0].items[0].progressLabel).toBe('已完成');
   });
 
   // P07-D · sortMode 桶内排序锁住 · 不同 mode 出不同顺序
