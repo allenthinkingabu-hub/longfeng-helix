@@ -28,7 +28,9 @@ const SUBJECT_LABEL: Record<string, string> = {
 
 const DIFF_LABELS = ['', '简单', '偏易', '中等', '偏难', '困难'];
 
-const TIMELINE_LABELS = ['15:28', '明日', '4/24', '4/28', '5/6', '5/21'];
+// 6 节点 (T1..T6) 真日期预览 · 抽到 timeline-helpers.ts 让 vitest 不依赖 Page() runtime.
+// 之前在此文件写死 TIMELINE_LABELS = ['15:28','4/24','4/28',...] mockup mock · 2026-05 还显 4 月穿帮.
+import { buildTimelinePreview, formatTimelineLabel } from './timeline-helpers';
 
 interface PageData {
   pageState: 'LOADING' | 'DRAFT' | 'ERROR' | 'EMPTY';
@@ -79,14 +81,8 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
     diffStars: [true, true, true, false, false],
     diffLabel: '中等',
     analysisDuration: '4.2s',
-    timelineNodes: [
-      { tLevel: 'T1', label: '15:28' },
-      { tLevel: 'T2', label: '明日' },
-      { tLevel: 'T3', label: '4/24' },
-      { tLevel: 'T4', label: '4/28' },
-      { tLevel: 'T5', label: '5/6' },
-      { tLevel: 'T6', label: '5/21' },
-    ],
+    // 真预览 · LOADING 初值时按当前时间算 T1..T6 · _fetchQuestion 完成后会重算 (或用 BE plannedNodes 真值).
+    timelineNodes: buildTimelinePreview(new Date()),
     isSaving: false,
     aiFallback: { reasonShown: false, stepsShown: false, text: '' },
     topicChain: '',
@@ -237,11 +233,20 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
   _lastAi: null as AiAnswer | null,
 
   _buildTimeline(nodes: PlannedNode[]) {
-    const levels = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'];
-    return levels.map((lv, i) => ({
-      tLevel: lv,
-      label: TIMELINE_LABELS[i] || '',
-    }));
+    // post-save BE 返 plannedNodes (next_due_at 真值) · 用 BE 真值 ·
+    // pre-save BE 还没建节点 · 用 now + NODE_OFFSETS_MS 预测 (近似不超过几秒).
+    // 之前忽略 nodes 参数永远走假 TIMELINE_LABELS (mockup 4 月日期 · 2026-05 穿帮).
+    if (nodes && nodes.length > 0) {
+      const now = new Date();
+      return nodes.slice(0, 6).map((n, i) => {
+        const due = new Date(n.dueAt);
+        return {
+          tLevel: n.tLevel || `T${i + 1}`,
+          label: formatTimelineLabel(now, due),
+        };
+      });
+    }
+    return buildTimelinePreview(new Date());
   },
 
   onBackTap() {
