@@ -1,0 +1,24 @@
+<testsuites id="" name="" tests="9" failures="0" skipped="0" errors="0" time="10.189544">
+<testsuite name="sc-13/t01-shared-view-adversarial.spec.ts" timestamp="2026-05-17T20:45:15.985Z" hostname="chromium" tests="3" failures="0" skipped="0" time="3.039" errors="0">
+<testcase name="SC-13 · P-SHARED 对抗探索 (3 cases · 脱敏铁律守门员) › TC-13-ADV (a) response_no_pii_fields: 真后端响应 body 不含 relation_id / student_email / original_image_url / sharer_student_id" classname="sc-13/t01-shared-view-adversarial.spec.ts" time="1.239">
+</testcase>
+<testcase name="SC-13 · P-SHARED 对抗探索 (3 cases · 脱敏铁律守门员) › TC-13-ADV (b) cache_control_no_store_header: response Cache-Control: no-store · CDN 严禁缓存" classname="sc-13/t01-shared-view-adversarial.spec.ts" time="1.206">
+</testcase>
+<testcase name="SC-13 · P-SHARED 对抗探索 (3 cases · 脱敏铁律守门员) › TC-13-ADV (c) ai_teaser_lock_not_unlocked: AI teaser 锁层渲染 + lock icon · 真分析内容不显示" classname="sc-13/t01-shared-view-adversarial.spec.ts" time="0.594">
+</testcase>
+</testsuite>
+<testsuite name="sc-13/t01-shared-view.spec.ts" timestamp="2026-05-17T20:45:15.985Z" hostname="chromium" tests="6" failures="0" skipped="0" time="6.284" errors="0">
+<testcase name="SC-13 · P-SHARED SharedView (6 main cases) › TC-13.01 (a) valid_token_renders_shared_view: 真 PG + 真 JWT → READY · sharer-banner + DualCtaDock" classname="sc-13/t01-shared-view.spec.ts" time="1.766">
+</testcase>
+<testcase name="SC-13 · P-SHARED SharedView (6 main cases) › TC-13.01 (b) loading_skeleton_first: mock fetch 延迟 1.5s · skeleton 先现再过渡 READY" classname="sc-13/t01-shared-view.spec.ts" time="2.439">
+</testcase>
+<testcase name="SC-13 · P-SHARED SharedView (6 main cases) › TC-13.03 (c) expired_token_shows_expired_screen: mock 410 → token-expired-screen" classname="sc-13/t01-shared-view.spec.ts" time="0.514">
+</testcase>
+<testcase name="SC-13 · P-SHARED SharedView (6 main cases) › TC-13.03 (d) invalid_token_shows_invalid_screen: mock 404 → token-invalid-screen" classname="sc-13/t01-shared-view.spec.ts" time="0.473">
+</testcase>
+<testcase name="SC-13 · P-SHARED SharedView (6 main cases) › TC-13.03 (e) revoked_token_shows_revoked_screen: mock 403 → token-revoked-screen" classname="sc-13/t01-shared-view.spec.ts" time="0.491">
+</testcase>
+<testcase name="SC-13 · P-SHARED SharedView (6 main cases) › TC-13.01 (f) cta_join_navigates_to_login_with_returnTo: click upgrade-cta-fixed → /auth/login?returnTo=%2Fs%2F&lt;token&gt;" classname="sc-13/t01-shared-view.spec.ts" time="0.601">
+</testcase>
+</testsuite>
+</testsuites>

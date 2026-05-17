@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "SC-13",
+    "team_id": "team-1",
+    "title": "P-SHARED 分享脱敏真页全栈 · GET /api/share/:shareToken HS256 验签 + Redis 撤销列表 + ShareDto 字段白名单 · 替换 SC-00-T04 SharedStub · QUESTION type 主流程 + 3 挡板态 (expired/invalid/revoked) + 双 CTA dock",
+    "attempt": 1,
+    "phase": "done",
+    "dev_done": true,
+    "passes": true,
+    "retries": 0,
+    "audit_retries": 0,
+    "git_commits": ["3827c38", "070c5c2", "9fd486d"]
+  },
+  "work_log_dir": "audits/runs/SC-13/team-1/attempt-1",
+  "log_requirements": {
+    "must_write": ["coder.md", "bugs-found.md", "tester.md", "adversarial.md", "test-reports/"]
+  },
+  "audit_gate": "audit.js v3 7 dims · 同前 || 红线: Playwright ≥ 6 testcase 全绿 + Maven IT ≥ 4 testcase 全绿 · 脱敏边界 wire shape 严格断言 (response body 不含 relation_id / student_email / original_image_url) · HS256 验签真测 · 3 挡板态全验",
+  "previous_audit_verdict": null,
+  "context": {
+    "scenario": "P-SHARED 真页全栈 (SC-13)。从 SC-11 / SC-00 完工的状态继续 · 替换 SC-00-T04 落的 SharedStub 占位为真 P-SHARED 分享脱敏预览页。后端加 anonymous-service ShareController · 校验 HS256 token (复用 SC-00-T01-T02 落的 jwt secret) · 查 share_token 表 · Redis 撤销列表 · 返 ShareDto 字段白名单严格控制脱敏边界。前端真页含 SharedBanner + MaskedContentCard + AI teaser 锁层 + 双 CTA + 3 挡板态。**严禁回传 relation_id / student_email / original_image_url** (脱敏铁律)。",
+    "target_page": "P-SHARED (h5 · /s/:shareToken · 替换 SC-00-T04 stub)",
+    "mockup_path": "design/mockups/wrongbook/16_shared.html",
+    "spec_path": "design/system/pages/P-SHARED-shared.spec.md",
+    "biz_refs": [
+      "biz §2A.3.2 P-SHARED 规格卡 (L404 · 脱敏字段 + Shell 顶端 + CTA 设计)",
+      "biz §2A.3.1 决策树 shareToken 节点 (L251)",
+      "biz §2B.14 SC-13 F01-F07 (L1290 · 完整流程编排 + 关键断言点)",
+      "biz §4.11 share_token DDL (L1636 · 表 schema)",
+      "biz §10.9 分享令牌接口契约 (L2206)",
+      "TC-13.01 EXAM_DAY + TC-13.02 QUESTION + TC-13.03 expired + TC-13.04 安全 (write 403) + TC-13.05 合规"
+    ],
+    "api_contracts_in_scope": [
+      "GET /api/share/:shareToken (实现方 · anonymous-service:8090 · 返 ShareDto · 3 挡板错误)",
+      "前端 fetch GET /api/share/:shareToken (调用方 · 路由 /s/:token 解析 token)"
+    ],
+    "api_contracts_out_of_scope": [
+      "POST /api/share/tokens 分享者签发 (SC-09 范围 · 不在本 task)",
+      "POST /api/share/:token/claim 一键加入错题本 (SC-13 F06 · 留下个 task 或 SC-09 + SC-12 真页协同)",
+      "DELETE /api/share/:token 撤销 (P1 · 本 task 仅读取 Redis 撤销列表 · 不实现写)",
+      "EXAM_DAY + REVIEW_NODE detail variant (P0 仅做 QUESTION variant · 其他 fallback to QUESTION 视觉)",
+      "AI 完整分析真模型接入 (P0 仅锁层 + 升级 CTA · 不接真 AI)",
+      "TestDesigner test-cases.md (沿用 opt-out)"
+    ],
+    "scope_in": [
+      "1. backend/anonymous-service 加 ShareController (controller package):",
+      "   (a) GET /api/share/{shareToken} · @PathVariable String shareToken (HS256 JWT 字面量)",
+      "   (b) 流程: ① HS256 验签 (复用 JwtVerifier · secret 同 SC-00-T01-T02 落的 anon.jwt.secret) ② 解 jti + exp + payload (sharer_student_id, share_type, relation_id) ③ Redis SET 'share:revoked' SISMEMBER 检查 jti 撤销 ④ DB share_token 表 WHERE jti AND status=ACTIVE AND expires_at > now() ⑤ 任一失败返对应 4xx",
+      "   (c) 错误码: 410 TOKEN_EXPIRED (exp 过 / DB status=EXPIRED) · 404 TOKEN_INVALID (签名错 / jti 不存在) · 403 TOKEN_REVOKED (Redis SET 命中 / DB status=REVOKED)",
+      "   (d) 成功返 ShareDto: {type, sharerNickMasked, ttlSec, signatureValid, maskedPayload:{stemSnippet:string(前12字 · 后面 mask), kpVisible:string[](前2个), kpLockedCount:int, imgThumbBlurred:bool}} · **不含 relation_id / student_email / original_image_url** (脱敏铁律 · 字段白名单 硬编码 DTO)",
+      "   (e) Cache-Control: no-store · 严禁 CDN 缓存 (含敏感访问审计 PII)",
+      "   (f) P95 ≤ 100ms · DB query + Redis SISMEMBER 都很快",
+      "2. anonymous-service 加 ShareTokenRepository (JPA · 复合查询 jti+status) + ShareTokenService (decision logic 抽出)",
+      "3. anonymous-service 加 ShareDto + MaskedPayloadDto · 字段白名单严格 · @JsonInclude(Include.NON_NULL) · 单元测试断言序列化结果不含 relation_id 等",
+      "4. 前端 frontend/apps/h5/src/pages/Shared/SharedView.tsx 新建 · 替换 SC-00-T04 SharedStub:",
+      "   (a) useParams 取 :shareToken · mount 时 fetch GET /api/share/:token",
+      "   (b) 4 态机: LOADING (骨架屏) → READY (内容) · 或 → ERROR_EXPIRED (410 挡板) · ERROR_INVALID (404 挡板) · ERROR_REVOKED (403 挡板)",
+      "   (c) READY 态布局 (按 spec §2.1 mockup 16_shared.html):",
+      "       - <AnonShell> 顶端 (Logo 左 · 登录胶囊右 · 无 Tab Bar)",
+      "       - <SharedBanner> sharer-banner (脱敏昵称 · '来自 Z*** 的分享')",
+      "       - <MaskedQuestionCard> qcard (题干前 12 字 + mask · 题图 blur · kp 露 2 锁 N)",
+      "       - <AiTeaserLock> AI 完整分析 teaser (磨砂遮罩 · 4 bullet · 底部 lock icon + CTA · 不接真 AI)",
+      "       - <ShareAuditMeta> 令牌 + 有效期剩余 + 'IP 已记录' 审计文案",
+      "       - <DualCtaDock> 吸底 · 主 CTA '一键加入我的错题本' + 次 CTA '先看看就好 · 不登录'",
+      "   (d) 主 CTA 点击 → 跳 /auth/login?returnTo=/s/:token · 不真 claim (claim 留下个 task)",
+      "   (e) 次 CTA → 关闭页 (history.back) 或留在 P-SHARED",
+      "   (f) testid: p-shared / sharer-banner / masked-question / upgrade-cta-fixed / token-expired-screen / token-invalid-screen / token-revoked-screen",
+      "5. 前端 frontend/apps/h5/src/pages/Shared/SharedView.module.css · 视觉对齐 mockup 16_shared.html · 总 ≤ 5KB",
+      "6. App.tsx /s/:token 路由 mount SharedView 代替 SC-00-T04 SharedStub · 即 SC-00-T04 stub 退役 (但不删源码 · 留为 fallback · App.tsx 中改 Route element 即可)",
+      "7. testids append: pShared root + sharerBanner + maskedQuestion + upgradeCtaFixed + tokenExpiredScreen + tokenInvalidScreen + tokenRevokedScreen + dualCtaDock + ctaJoin + ctaLater 共 ~10 个",
+      "8. Backend IT backend/anonymous-service/src/test/java/.../SC13ShareE2EIT.java ≥ 4 case:",
+      "   (a) valid_share_token_returns_ShareDto_with_masked_fields · 插一行 share_token (status=ACTIVE, exp+2d) → GET 返 200 + masked_payload 不含 relation_id (响应 JSON 字段白名单严格断言 · objectMapper.readTree 验证)",
+      "   (b) expired_token_returns_410 · 插一行 share_token (expires_at = now()-1h) → GET 返 410 + code=TOKEN_EXPIRED",
+      "   (c) revoked_token_in_redis_returns_403 · 插一行 ACTIVE token + 把 jti 写 Redis SET share:revoked → GET 返 403 + code=TOKEN_REVOKED",
+      "   (d) invalid_signature_returns_404 · 给非法 JWT 字面量 (HS256 sig 错) → GET 返 404 + code=TOKEN_INVALID",
+      "9. Playwright spec frontend/apps/h5/tests/e2e/sc-13/t01-shared-view.spec.ts ≥ 6 testcase:",
+      "   (a) valid_token_renders_shared_view · 真后端打一个 share_token 行 + 设 JWT · page.goto('/s/:token') · expect masked-question visible + sharer-banner 含 '来自 Z***' + DualCtaDock 渲染",
+      "   (b) loading_skeleton_first · mock fetch 延迟 1.5s · expect skeleton DOM 然后过渡到 READY",
+      "   (c) expired_token_shows_expired_screen · mock fetch 返 410 · expect token-expired-screen visible + masked-question 不渲染",
+      "   (d) invalid_token_shows_invalid_screen · mock fetch 返 404 · expect token-invalid-screen visible",
+      "   (e) revoked_token_shows_revoked_screen · mock fetch 返 403 · expect token-revoked-screen visible",
+      "   (f) cta_join_navigates_to_login_with_returnTo · click upgrade-cta-fixed · expect URL /auth/login?returnTo=%2Fs%2F<token>",
+      "10. Playwright adversarial spec t01-shared-view-adversarial.spec.ts ≥ 3 case:",
+      "    (a) response_no_pii_fields · 真 fetch + expect response body 不含 'relation_id' / 'student_email' / 'original_image_url' 等敏感字段名 (objectMapper.readTree + 反向断言)",
+      "    (b) cache_control_no_store_header · fetch 后 inspect response header 含 'Cache-Control: no-store'",
+      "    (c) ai_teaser_lock_layer_not_unlocked · expect aiTeaserLock div 含 lock icon + 不显示真分析内容 (P0 仅锁层)",
+      "11. Regression 不破 · 既有 SC-00/T03/T04 + SC-11 + SC-12-STUB 系列 ~50 e2e 全绿 · 特别是 SC-00-T04 SharedStub spec 现在用真 SharedView · 应该兼容 (testid 旧 'shared-placeholder-root' → 新 'p-shared' · 如 SC-00-T04 spec 测过 placeholder · 需要迁移测试或保留 fallback)",
+      "12. work_log audits/runs/SC-13/team-1/attempt-1/ 全件齐 · adversarial.md ≥ 1 REJECT + ≥ 1 fix · 探索性 [JWT 篡改 / jti 边界 / cache poisoning / 脱敏字段泄漏 / Redis SET 不命中真 Bloom Filter]",
+      "13. 强制 git commit 拆 4-5 个 · hash 入 inflight · 跑 audit.js v3 PASS"
+    ],
+    "scope_out": [
+      "POST /api/share/:token/claim 一键加入 (留下个 task · 需 SC-12 真页 claim 配合)",
+      "POST /api/share/tokens 签发 (SC-09 范围)",
+      "EXAM_DAY + REVIEW_NODE 完整 variant (P0 只做 QUESTION variant)",
+      "真 AI 完整分析接入 (P0 仅锁层)",
+      "Redis Bloom Filter 真实现 (P0 用 Redis SET SISMEMBER · 效果等价 · 真 Bloom 留 P1 性能优化)",
+      "MP 端 P-SHARED (留 SC-13-MP)",
+      "TestDesigner test-cases.md"
+    ],
+    "sandbox": {
+      "team_env_file": ".harness/docker/team-1.env",
+      "pg_port": 15432,
+      "redis_port": 16379,
+      "compose_project_name": "team-1",
+      "note": "anonymous-service:8090 (SessionResolveController + LandingController 已落 · 加 ShareController) 必须 up · vite dev · auth-service 8091 可选 (CTA 跳 /auth/login 仅验 URL 不真登)"
+    },
+    "mockup_chain": "design/mockups/wrongbook/16_shared.html",
+    "test_case_first_required": false,
+    "opt_out_reason": "沿用所有 12 个前任 task 同款 · TC-13.01/02/03/04/05 嵌入 IT 和 Playwright testcase 名"
+  },
+  "isolation": {
+    "worktree_disabled": false,
+    "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c",
+    "branch_name": "claude/nifty-kepler-3deb2c"
+  },
+  "physical_verification": {
+    "dor_c1_to_c6_required": false,
+    "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-13/t01-shared-view.spec.ts + t01-shared-view-adversarial.spec.ts",
+    "backend_e2e_it": "backend/anonymous-service/src/test/java/com/longfeng/anonymousservice/SC13ShareE2EIT.java"
+  },
+  "permissions": {"writable_fields": ["task.passes"]},
+  "deliverables_definition_of_done": [
+    "1. anonymous-service ShareController + ShareTokenService + ShareTokenRepository + ShareDto + MaskedPayloadDto 全建 · JSON 字段白名单严格 · Cache-Control: no-store",
+    "2. GET /api/share/:shareToken 3 错误码 + 1 成功 · 4 分支完整 · HS256 验签 + Redis SET 撤销 + DB share_token 查询",
+    "3. 前端 SharedView 4 态机 (LOADING/READY/EXPIRED/INVALID/REVOKED) 全实现 · 替换 App.tsx /s/:token 路由",
+    "4. AnonShell + SharedBanner + MaskedQuestionCard + AiTeaserLock + ShareAuditMeta + DualCtaDock 6 子组件落地",
+    "5. 主 CTA → /auth/login?returnTo=/s/:token · 次 CTA → history.back",
+    "6. testids append ~10 个",
+    "7. Backend IT 4 case 全绿 (valid / expired_410 / revoked_403 / invalid_404)",
+    "8. Playwright 主 6 case + adversarial 3 case 全绿 (含脱敏 PII 反向断言)",
+    "9. Regression 既有 e2e 全绿 (尤其 SC-00-T04 shared stub 路径)",
+    "10. work_log 5 件齐 · ≥1 REJECT + ≥1 fix",
+    "11. git commit 4-5 个 · hash 入 inflight · audit.js v3 PASS"
+  ],
+  "rule_6_tool_budget_guidance": "全栈大 task (1 backend endpoint + 1 frontend page + 4 IT + 9 Playwright + 6 sub-component) · 预计 ~90-120 tool use · 软线 50/70 · 硬线 85 强制 compaction summary + spawn 续场 agent · 如超 75 主动 surface",
+  "written_at": "2026-05-18T08:00:00Z",
+  "written_by": "TL agent (claude · 本会话 · 12 task 完工后接 SC-13 全栈)"
+}
