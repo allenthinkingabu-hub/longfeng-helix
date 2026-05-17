@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.longfeng.anonymousservice.SC12T02AnonConsentE2EIT
+-------------------------------------------------------------------------------
+Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 20.99 s -- in com.longfeng.anonymousservice.SC12T02AnonConsentE2EIT
