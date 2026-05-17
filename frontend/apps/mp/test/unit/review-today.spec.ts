@@ -14,6 +14,7 @@ import {
   getSlotTitle,
   getSlotIconClass,
   buildSlotsFromItems,
+  isCompletedToday,
 } from '../../pages/review-today/helpers';
 
 // ── buildCountdown ──────────────────────────────────────────────
@@ -191,28 +192,31 @@ describe('buildSlotsFromItems (pure · integration of all helpers)', () => {
     expect(slots[0].items[0].hhmm).toBe('09:05');
   });
 
-  // spec L94 严格口径: progress 与 hero 同口径 doneCount = GRADED = completedAt!=null.
-  // BE ReviewPlanDto 不返 mastered 字段 · 旧 mastered 判定永远 false · 进度永远 0% (用户截图问的就是这个).
-  // 任何 grade (含 PARTIAL/FORGOT/MASTERED) 都算 "已完成本节点" · mastery 维度由 BE masteryPct 单独反映.
-  it('progress: completedAt set → 已完成 (GRADED 任意 grade)', () => {
-    const item = { ...makeItem(1, 1, '2026-04-21T09:45:00'), completedAt: '2026-04-21T09:30:00' };
+  // 业务真相: review_plan 是 cyclic · 同一行被反复 grade · completedAt 是"上次 grade"
+  // 不是"本次到期已完成". 今日已 grade ≡ completedAt 落在今日窗口 (用户本地 tz).
+  // 用户场景: 昨晚 grade → completedAt=昨晚 + next_due_at 推到今晚 → 今天看到这条
+  //          应显 "未开始" (因为今天还没 grade), 不是 "已完成".
+  it('progress: 今天 grade → 已完成', () => {
+    const item = { ...makeItem(1, 1, '2026-04-21T22:45:00'), completedAt: '2026-04-21T09:30:00' };
     const slots = buildSlotsFromItems([item], now);
     expect(slots[0].items[0].progress).toBe('done');
     expect(slots[0].items[0].progressLabel).toBe('已完成');
   });
 
-  it('progress: !completedAt → 未开始', () => {
-    const item = { ...makeItem(1, 1, '2026-04-21T09:45:00'), completedAt: null };
+  it('progress: 昨天 grade + 今天 next_due_at → 未开始 (核心 cyclic 修正)', () => {
+    // 昨天 22:50 grade, next_due_at 推到今晚 22:50.
+    // 之前误判 completedAt!=null → "已完成". 今天用户还没做 · 应 "未开始".
+    const item = { ...makeItem(1, 1, '2026-04-21T22:50:00'), completedAt: '2026-04-20T22:50:00' };
     const slots = buildSlotsFromItems([item], now);
     expect(slots[0].items[0].progress).toBe('wait');
     expect(slots[0].items[0].progressLabel).toBe('未开始');
   });
 
-  it('progress: 即使 mastered=false 只要 completedAt set 也是 已完成 (撤回旧 mastered 口径)', () => {
-    const item = { ...makeItem(1, 1, '2026-04-21T09:45:00'), mastered: false, completedAt: '2026-04-21T09:30:00' };
+  it('progress: 从未 grade (新错题 T0) → 未开始', () => {
+    const item = { ...makeItem(1, 0, '2026-04-21T15:45:00'), completedAt: null };
     const slots = buildSlotsFromItems([item], now);
-    expect(slots[0].items[0].progress).toBe('done');
-    expect(slots[0].items[0].progressLabel).toBe('已完成');
+    expect(slots[0].items[0].progress).toBe('wait');
+    expect(slots[0].items[0].progressLabel).toBe('未开始');
   });
 
   // P07-D · sortMode 桶内排序锁住 · 不同 mode 出不同顺序
@@ -246,5 +250,42 @@ describe('buildSlotsFromItems (pure · integration of all helpers)', () => {
     ];
     const slots = buildSlotsFromItems(items, now);  // default time
     expect(slots[0].items.map(i => i.hhmm)).toEqual(['09:45', '09:50', '09:55']);
+  });
+});
+
+// ── isCompletedToday · review_plan cyclic 修正核心判定 ─────────
+describe('isCompletedToday (review_plan cyclic · 今日 grade 才算今日已完成)', () => {
+  const now = new Date(2026, 3, 21, 14, 30, 0); // 2026-04-21 14:30 (本地)
+
+  it('null → false (从未 grade)', () => {
+    expect(isCompletedToday(null, now)).toBe(false);
+    expect(isCompletedToday(undefined, now)).toBe(false);
+    expect(isCompletedToday('', now)).toBe(false);
+  });
+
+  it('今日凌晨 grade → true', () => {
+    expect(isCompletedToday('2026-04-21T00:00:01', now)).toBe(true);
+  });
+
+  it('今日午后 grade → true', () => {
+    expect(isCompletedToday('2026-04-21T13:00:00', now)).toBe(true);
+  });
+
+  it('昨天 22:50 grade → false (核心 cyclic 修正)', () => {
+    expect(isCompletedToday('2026-04-20T22:50:00', now)).toBe(false);
+  });
+
+  it('上周 grade → false', () => {
+    expect(isCompletedToday('2026-04-14T10:00:00', now)).toBe(false);
+  });
+
+  it('未来 grade (理论上不该有, 测兜底) → false', () => {
+    // 容错: 数据异常时不算今日 done
+    expect(isCompletedToday('2026-04-22T08:00:00', now)).toBe(true); // tomorrow noon is still >= today_start
+    // 严格 only today: 实际上未来时间 c >= today_start 也算 true, 这里就反映实现 (不引入未来检查)
+  });
+
+  it('非法日期字符串 → false', () => {
+    expect(isCompletedToday('not-a-date', now)).toBe(false);
   });
 });

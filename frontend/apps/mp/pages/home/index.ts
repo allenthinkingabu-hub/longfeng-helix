@@ -24,6 +24,8 @@ import {
   formatMasteryPctFromWeekSummary,
 } from './helpers';
 import type { PageState, SubjectChip } from './helpers';
+// 跨页共享 "今日 grade" 判定 · P07 + P-HOME 同一 source · 防漂移
+import { isCompletedToday } from '../../src/utils/today';
 
 // SC-16-T02 · MVP studentId (登录上线时改读 store · 与 weekly 页同源)
 const MVP_STUDENT_ID = '1';
@@ -168,11 +170,15 @@ Page({
     // ── #1 today (hero + subjects + circle + allDone + weekStrip badge) ──
     if (todayData) {
       const total = todayData.total ?? 0;
-      // spec L94 严格口径 doneCount = GRADED (completedAt != null) · 任务完成度.
+      // done = "今日已 grade" · 共享 src/utils/today.isCompletedToday 跟 P07 同口径.
+      // review_plan cyclic 模型: 不能用 completedAt != null (累积曾经 grade), 必须比 today_start.
+      const now = new Date();
       const itemsArr = Array.isArray(todayData.items) ? todayData.items : [];
       const done = typeof todayData.done === 'number'
         ? todayData.done
-        : itemsArr.filter(i => i && (i as { completedAt?: unknown }).completedAt).length;
+        : itemsArr.filter(i => isCompletedToday(
+            (i as { completedAt?: string | null }).completedAt, now
+          )).length;
       const pct = computeCirclePct(done, total);
       const subjects = buildSubjectsFromItems(itemsArr as Array<{ subject?: string | null }>);
       const pending = Math.max(0, total - done);
