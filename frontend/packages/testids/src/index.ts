@@ -257,6 +257,10 @@ export const TEST_IDS = {
     loginSubmitBtn:    'p00-login-submit-btn',
     appleCtaBtn:       'p00-apple-cta-btn',
     redirectBanner:    'p00-redirect-banner',
+    // SC-00-T03 (2026-05-17): alias of redirectBanner. inflight scope_in #1 spec'd
+    // 'p00-redirect-hint' as the testid (smaller-scope wording); we keep both ids
+    // on the same DOM node so PHASE-A-LOGIN-H5 e2e queries still pass.
+    redirectHint:      'p00-redirect-hint',
     errorInline:       'p00-error-inline',         // 行内 error (邮箱或密码错误 / 账号已锁定)
     toast:             'p00-toast',                // 通用 toast (OAuth 未实装 / consent 未勾)
   },
