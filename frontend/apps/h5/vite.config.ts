@@ -27,6 +27,16 @@ function e2eFallbackPlugin() {
             return;
           }
         }
+        // SC-11-T04: P0 stub for landing telemetry endpoint (real impl in
+        // P1 → GrowthBook/Sentry). Absorb the beacon with 204 so it doesn't
+        // emit a [error] resource 404 into the browser console, which would
+        // break the IDE-console-clean audit dim_ide_smoke for SC-11 evidence
+        // captures. Body intentionally ignored (P0 fire-and-forget).
+        if (method === 'POST' && url.startsWith('/api/landing/track')) {
+          res.statusCode = 204;
+          res.end();
+          return;
+        }
         next();
       });
     },
