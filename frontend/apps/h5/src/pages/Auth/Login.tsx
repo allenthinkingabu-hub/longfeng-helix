@@ -6,47 +6,15 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { TEST_IDS } from '@longfeng/testids';
 import s from './Login.module.css';
+import { sanitizeRedirect, bannerTarget } from './sanitizeRedirect';
 
 type AuthState = 'IDLE' | 'VERIFYING' | 'SUCCESS' | 'FAILED';
 
-// §7.1 redirect whitelist — internal-path only · cross-origin / unknown prefixes
-// downgraded to /home per spec §9 异常表.
-const REDIRECT_WHITELIST_PREFIXES = [
-  '/home',
-  '/capture',
-  '/question/',
-  '/result/',
-  '/review/',
-  '/calendar',
-  '/s/',
-  '/observer/',
-  '/welcome',
-  '/welcome-back',
-  '/auth',
-  '/wrongbook',
-];
-
-// inflight scope_in #10/#11 + spec §7.2: default redirect = /home · whitelist applies
-// to non-default ?redirect= values · cross-origin / non-whitelist → downgrade to /home
-//
-// 2026-05-17 Tester adversarial T1 fix · path-traversal hardening:
-//   ?redirect=/home/../admin previously passed startsWith('/home') and was returned
-//   verbatim · react-router then resolved it to /admin (open-redirect vuln). We now
-//   reject any input containing '..' segment OR backslash before whitelist check.
-function sanitizeRedirect(raw: string | null): string {
-  if (!raw) return '/home';
-  if (!raw.startsWith('/')) return '/home'; // strip absolute http://… / //evil
-  if (raw.startsWith('//')) return '/home';
-  // Reject any path-traversal payload — '..' segment or backslash-escaped traversal.
-  // The whole raw value (path + query + hash) is the corpus since it's fed verbatim
-  // into navigate(); '..' anywhere is suspicious for an internal-path-only redirect.
-  if (raw.includes('..') || raw.includes('\\')) return '/home';
-  const path = raw.split('?')[0].split('#')[0];
-  for (const prefix of REDIRECT_WHITELIST_PREFIXES) {
-    if (path === prefix || path.startsWith(prefix)) return raw;
-  }
-  return '/home';
-}
+// SC-00-T03 (2026-05-17): sanitizeRedirect + bannerTarget extracted to
+// ./sanitizeRedirect.ts (separate file · easier unit-test + reuse from SC-13 share
+// / SC-14 welcome-back later). Behavior unchanged from PHASE-A-LOGIN-H5 attempt-1
+// (path-traversal '..' + backslash hardened) — new in this task is the explicit
+// console.warn('[P00] redirect blocked: ...') so DevOps can trace open-redirect probes.
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -163,8 +131,17 @@ export const LoginPage: React.FC = () => {
       </div>
 
       {showRedirectBanner && (
-        <div className={s.banner} data-testid={TEST_IDS.p00.redirectBanner}>
-          登录后将自动打开 {redirect}
+        // SC-00-T03: double-testid (banner + hint). banner kept for PHASE-A-LOGIN-H5
+        // backward compat; hint added per inflight scope_in #1. We render the path-only
+        // form via bannerTarget() so query/fragment PII is not leaked into the DOM.
+        <div
+          className={s.banner}
+          data-testid={TEST_IDS.p00.redirectBanner}
+          data-testid-hint={TEST_IDS.p00.redirectHint}
+        >
+          <span data-testid={TEST_IDS.p00.redirectHint}>
+            登录后将自动打开 {bannerTarget(rawRedirect)}
+          </span>
         </div>
       )}
 
