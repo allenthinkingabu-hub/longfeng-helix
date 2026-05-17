@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.longfeng.anonymousservice.AnonymousServiceSkeletonE2EIT
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 19.72 s -- in com.longfeng.anonymousservice.AnonymousServiceSkeletonE2EIT

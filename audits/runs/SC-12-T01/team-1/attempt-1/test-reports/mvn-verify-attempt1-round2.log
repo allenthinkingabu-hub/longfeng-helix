@@ -1,0 +1,148 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------< com.longfeng:anonymous-service >-------------------
+[INFO] Building anonymous-service 1.0.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:resources (default-resources) @ anonymous-service ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 3 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:compile (default-compile) @ anonymous-service ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:testResources (default-testResources) @ anonymous-service ---
+[INFO] skip non existing resourceDirectory /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/backend/anonymous-service/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:testCompile (default-testCompile) @ anonymous-service ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 7 source files with javac [debug release 17] to target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.1.2:test (default-test) @ anonymous-service ---
+[INFO] 
+[INFO] --- maven-jar-plugin:3.3.0:jar (default-jar) @ anonymous-service ---
+[INFO] 
+[INFO] --- spring-boot-maven-plugin:3.2.5:repackage (repackage) @ anonymous-service ---
+[INFO] Replacing main artifact /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/backend/anonymous-service/target/anonymous-service-1.0.0-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/backend/anonymous-service/target/anonymous-service-1.0.0-SNAPSHOT.jar.original
+[INFO] 
+[INFO] --- maven-failsafe-plugin:3.1.2:integration-test (default) @ anonymous-service ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.longfeng.anonymousservice.AnonymousServiceSkeletonE2EIT
+01:40:47.030 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.longfeng.anonymousservice.AnonymousServiceSkeletonE2EIT]: AnonymousServiceSkeletonE2EIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+01:40:47.399 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.longfeng.anonymousservice.AnonymousServiceApplication for test class com.longfeng.anonymousservice.AnonymousServiceSkeletonE2EIT
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-05-18T01:40:48.773+04:00  INFO 17716 --- [anonymous-service] [           main] c.l.a.AnonymousServiceSkeletonE2EIT      : Starting AnonymousServiceSkeletonE2EIT using Java 17.0.13 with PID 17716 (started by allen in /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/backend/anonymous-service)
+2026-05-18T01:40:48.775+04:00  INFO 17716 --- [anonymous-service] [           main] c.l.a.AnonymousServiceSkeletonE2EIT      : No active profile set, falling back to 1 default profile: "default"
+2026-05-18T01:40:51.630+04:00  INFO 17716 --- [anonymous-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-05-18T01:40:51.633+04:00  INFO 17716 --- [anonymous-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-18T01:40:51.993+04:00  INFO 17716 --- [anonymous-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 352 ms. Found 4 JPA repository interfaces.
+2026-05-18T01:40:52.088+04:00  INFO 17716 --- [anonymous-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-05-18T01:40:52.090+04:00  INFO 17716 --- [anonymous-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-05-18T01:40:52.130+04:00  INFO 17716 --- [anonymous-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.anonymousservice.repo.AccountDeviceRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-18T01:40:52.131+04:00  INFO 17716 --- [anonymous-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.anonymousservice.repo.GuestRateBucketRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-18T01:40:52.132+04:00  INFO 17716 --- [anonymous-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.anonymousservice.repo.GuestSessionRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-18T01:40:52.132+04:00  INFO 17716 --- [anonymous-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.longfeng.anonymousservice.repo.ShareTokenRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-05-18T01:40:52.133+04:00  INFO 17716 --- [anonymous-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 33 ms. Found 0 Redis repository interfaces.
+2026-05-18T01:40:53.854+04:00  INFO 17716 --- [anonymous-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+2026-05-18T01:40:53.872+04:00  INFO 17716 --- [anonymous-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-18T01:40:53.873+04:00  INFO 17716 --- [anonymous-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-05-18T01:40:53.983+04:00  INFO 17716 --- [anonymous-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-18T01:40:53.983+04:00  INFO 17716 --- [anonymous-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 5061 ms
+2026-05-18T01:40:55.289+04:00  INFO 17716 --- [anonymous-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-18T01:40:55.593+04:00  INFO 17716 --- [anonymous-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@53e166ad
+2026-05-18T01:40:55.596+04:00  INFO 17716 --- [anonymous-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-18T01:40:55.716+04:00  INFO 17716 --- [anonymous-service] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://127.0.0.1:15432/wrongbook (PostgreSQL 15.17)
+2026-05-18T01:40:55.849+04:00  INFO 17716 --- [anonymous-service] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 4 migrations (execution time 00:00.084s)
+2026-05-18T01:40:55.902+04:00  INFO 17716 --- [anonymous-service] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 20260421.02
+2026-05-18T01:40:55.911+04:00  INFO 17716 --- [anonymous-service] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-05-18T01:40:56.231+04:00  INFO 17716 --- [anonymous-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-18T01:40:56.309+04:00  INFO 17716 --- [anonymous-service] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-05-18T01:40:56.356+04:00  INFO 17716 --- [anonymous-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-18T01:40:56.622+04:00  INFO 17716 --- [anonymous-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-18T01:40:58.501+04:00  INFO 17716 --- [anonymous-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-18T01:40:58.508+04:00  INFO 17716 --- [anonymous-service] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-18T01:40:59.465+04:00  INFO 17716 --- [anonymous-service] [           main] c.l.a.controller.LandingController       : landing_samples_loaded buckets=[variant_b, default] default_count=3 variant_b_count=3
+2026-05-18T01:41:02.679+04:00  INFO 17716 --- [anonymous-service] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoint(s) beneath base path '/actuator'
+2026-05-18T01:41:02.933+04:00  INFO 17716 --- [anonymous-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 58470 (http) with context path ''
+2026-05-18T01:41:02.970+04:00  INFO 17716 --- [anonymous-service] [           main] c.l.a.AnonymousServiceSkeletonE2EIT      : Started AnonymousServiceSkeletonE2EIT in 14.906 seconds (process running for 17.69)
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-05-18T01:41:04.157+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-18T01:41:04.159+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-05-18T01:41:04.162+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 19.72 s -- in com.longfeng.anonymousservice.AnonymousServiceSkeletonE2EIT
+[INFO] Running com.longfeng.anonymousservice.SC13ShareE2EIT
+2026-05-18T01:41:06.392+04:00  INFO 17716 --- [anonymous-service] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.longfeng.anonymousservice.SC13ShareE2EIT]: SC13ShareE2EIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-05-18T01:41:06.410+04:00  INFO 17716 --- [anonymous-service] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.longfeng.anonymousservice.AnonymousServiceApplication for test class com.longfeng.anonymousservice.SC13ShareE2EIT
+2026-05-18T01:41:07.365+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-3] c.l.a.controller.ShareController         : share_lookup outcome=SUCCESS
+2026-05-18T01:41:07.569+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-4] c.l.a.controller.ShareController         : share_lookup outcome=EXPIRED
+2026-05-18T01:41:07.621+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-5] c.l.a.controller.ShareController         : share_lookup outcome=INVALID
+2026-05-18T01:41:07.743+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-6] c.l.a.controller.ShareController         : share_lookup outcome=REVOKED
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.390 s -- in com.longfeng.anonymousservice.SC13ShareE2EIT
+[INFO] Running com.longfeng.anonymousservice.T01LandingShellApiE2EIT
+2026-05-18T01:41:07.790+04:00  INFO 17716 --- [anonymous-service] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.longfeng.anonymousservice.T01LandingShellApiE2EIT]: T01LandingShellApiE2EIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-05-18T01:41:07.822+04:00  INFO 17716 --- [anonymous-service] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.longfeng.anonymousservice.AnonymousServiceApplication for test class com.longfeng.anonymousservice.T01LandingShellApiE2EIT
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.410 s -- in com.longfeng.anonymousservice.T01LandingShellApiE2EIT
+[INFO] Running com.longfeng.anonymousservice.SC12T01AnonSessionE2EIT
+2026-05-18T01:41:08.249+04:00  INFO 17716 --- [anonymous-service] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.longfeng.anonymousservice.SC12T01AnonSessionE2EIT]: SC12T01AnonSessionE2EIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-05-18T01:41:08.330+04:00  INFO 17716 --- [anonymous-service] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.longfeng.anonymousservice.AnonymousServiceApplication for test class com.longfeng.anonymousservice.SC12T01AnonSessionE2EIT
+2026-05-18T01:41:09.000+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-6] c.l.a.service.AnonSessionService         : anon_session_mint id=50680072708967 ttlSec=86400 entrySource=unknown
+2026-05-18T01:41:09.081+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-7] c.l.a.service.AnonSessionService         : anon_session_mint id=50680363932512 ttlSec=86400 entrySource=null
+2026-05-18T01:41:09.130+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-8] c.l.a.service.AnonSessionService         : anon_session_mint id=50680414384494 ttlSec=86400 entrySource=null
+2026-05-18T01:41:09.215+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-9] c.l.a.service.AnonSessionService         : anon_session_mint id=50680492979311 ttlSec=86400 entrySource=ad
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.078 s -- in com.longfeng.anonymousservice.SC12T01AnonSessionE2EIT
+[INFO] Running com.longfeng.anonymousservice.T01T02SessionResolveE2EIT
+2026-05-18T01:41:09.280+04:00  INFO 17716 --- [anonymous-service] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.longfeng.anonymousservice.T01T02SessionResolveE2EIT]: T01T02SessionResolveE2EIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-05-18T01:41:09.284+04:00  INFO 17716 --- [anonymous-service] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.longfeng.anonymousservice.AnonymousServiceApplication for test class com.longfeng.anonymousservice.T01T02SessionResolveE2EIT
+2026-05-18T01:41:09.379+04:00  INFO 17716 --- [anonymous-service] [-auto-1-exec-10] c.l.a.c.SessionResolveController         : resolve_decision decision=LANDING hasShare=false hasObserver=false
+2026-05-18T01:41:09.459+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-1] c.l.a.c.SessionResolveController         : resolve_decision decision=LANDING hasShare=false hasObserver=false
+2026-05-18T01:41:09.507+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-2] c.l.a.c.SessionResolveController         : resolve_decision decision=HOME hasShare=false hasObserver=false
+2026-05-18T01:41:09.570+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-3] c.l.a.c.SessionResolveController         : resolve_decision decision=SHARED hasShare=true hasObserver=false
+2026-05-18T01:41:09.619+04:00  WARN 17716 --- [anonymous-service] [o-auto-1-exec-4] c.l.a.service.DecisionTreeService        : share_token_lookup_failed jti=t01t***893a reason=java.lang.NullPointerException
+2026-05-18T01:41:09.620+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-4] c.l.a.c.SessionResolveController         : resolve_decision decision=LANDING hasShare=true hasObserver=false
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.355 s -- in com.longfeng.anonymousservice.T01T02SessionResolveE2EIT
+[INFO] Running com.longfeng.anonymousservice.SC13SharerE2EIT
+2026-05-18T01:41:09.638+04:00  INFO 17716 --- [anonymous-service] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.longfeng.anonymousservice.SC13SharerE2EIT]: SC13SharerE2EIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-05-18T01:41:09.647+04:00  INFO 17716 --- [anonymous-service] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.longfeng.anonymousservice.AnonymousServiceApplication for test class com.longfeng.anonymousservice.SC13SharerE2EIT
+2026-05-18T01:41:09.843+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-6] c.l.a.service.ShareTokenService          : share_issue jti=c034***5786 sharer=4242 type=QUESTION ttlSec=86400
+2026-05-18T01:41:09.918+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-7] c.l.a.service.ShareTokenService          : share_revoke success jti=c034***5786 sharer=4242
+2026-05-18T01:41:09.950+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-8] c.l.a.service.ShareTokenService          : share_revoke already_revoked jti=c034***5786 sharer=4242
+2026-05-18T01:41:10.039+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-9] c.l.a.service.ShareTokenService          : share_issue jti=d626***dc74 sharer=4242 type=QUESTION ttlSec=86400
+2026-05-18T01:41:10.084+04:00  INFO 17716 --- [anonymous-service] [-auto-1-exec-10] c.l.a.controller.ShareController         : share_lookup outcome=SUCCESS
+2026-05-18T01:41:10.151+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-1] c.l.a.service.ShareTokenService          : share_revoke success jti=d626***dc74 sharer=4242
+2026-05-18T01:41:10.169+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-2] c.l.a.controller.ShareController         : share_lookup outcome=REVOKED
+2026-05-18T01:41:10.204+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-3] c.l.a.controller.ShareIssueController    : share_issue unauthenticated
+2026-05-18T01:41:10.263+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-4] c.l.a.service.ShareTokenService          : share_issue jti=6af3***9922 sharer=4242 type=REVIEW_NODE ttlSec=604800
+2026-05-18T01:41:10.309+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-5] c.l.a.service.ShareTokenService          : share_issue jti=84e5***9627 sharer=4242 type=EXAM_DAY ttlSec=86400
+2026-05-18T01:41:10.336+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-6] c.l.a.service.ShareTokenService          : share_revoke success jti=84e5***9627 sharer=4242
+2026-05-18T01:41:10.452+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-7] c.l.a.service.ShareTokenService          : share_revoke not_found jti=none***908f
+2026-05-18T01:41:10.509+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-9] c.l.a.service.ShareTokenService          : share_issue jti=513f***d295 sharer=4242 type=QUESTION ttlSec=86400
+2026-05-18T01:41:10.540+04:00  INFO 17716 --- [anonymous-service] [-auto-1-exec-10] c.l.a.controller.ShareController         : share_lookup outcome=SUCCESS
+2026-05-18T01:41:10.586+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-1] c.l.a.service.ShareTokenService          : share_issue jti=4da3***fcb3 sharer=4242 type=QUESTION ttlSec=86400
+2026-05-18T01:41:10.602+04:00  INFO 17716 --- [anonymous-service] [o-auto-1-exec-3] c.l.a.service.ShareTokenService          : share_revoke not_owner jti=4da3***fcb3 caller=4343
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.985 s -- in com.longfeng.anonymousservice.SC13SharerE2EIT
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 33, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- maven-failsafe-plugin:3.1.2:verify (default) @ anonymous-service ---
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  39.086 s
+[INFO] Finished at: 2026-05-18T01:41:11+04:00
+[INFO] ------------------------------------------------------------------------
