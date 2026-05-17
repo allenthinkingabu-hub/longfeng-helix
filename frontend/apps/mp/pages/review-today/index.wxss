@@ -406,37 +406,6 @@ page {
 
 .arrow { color: #C7C7CC; }
 
-/* ── ALL_DONE 庆祝 banner ───────────────────────────── */
-.all-done-banner {
-  margin-top: 32rpx;
-  padding: 32rpx 28rpx;
-  background: linear-gradient(135deg, #E6FFFA 0%, #F0FFF4 100%);
-  border: 1rpx solid rgba(52,199,89,0.24);
-  border-radius: 28rpx;
-  display: flex;
-  align-items: center;
-  gap: 24rpx;
-}
-
-.all-done-emoji {
-  font-size: 64rpx;
-  line-height: 1;
-}
-
-.all-done-title {
-  font-size: 32rpx;
-  font-weight: 700;
-  color: #1C1C1E;
-  letter-spacing: 0.2rpx;
-}
-
-.all-done-sub {
-  font-size: 24rpx;
-  color: #34C759;
-  margin-top: 6rpx;
-  font-weight: 600;
-}
-
 /* ── Floating CTA ───────────────────────────────────── */
 .cta {
   position: fixed;

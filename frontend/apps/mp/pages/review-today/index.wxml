@@ -32,9 +32,17 @@
         <text>{{dateStr}} · {{weekday}} · GMT+8</text>
       </view>
 
+      <!-- hero h2 · LIST 显 "N 题待复习" · ALL_DONE 显 "今日复习已完成 🎉"
+           文案借 P09 spec L48 跨页统一 · spec P07 L193 "Hero 切换庆祝升级态" -->
       <view class="hero-h2">
-        <text class="hero-total" data-test-id="today-review-card-total">{{totalCount}} 题待复习</text>
-        <text class="hero-sz" data-test-id="today-review-card-est-min">预计 {{estMinutes}} 分钟</text>
+        <block wx:if="{{pageState === 'today.ALL_DONE'}}">
+          <text class="hero-total" data-test-id="today-review-card-total">今日复习已完成 🎉</text>
+          <text class="hero-sz" data-test-id="today-review-card-est-min">共 {{totalCount}} 题</text>
+        </block>
+        <block wx:else>
+          <text class="hero-total" data-test-id="today-review-card-total">{{totalCount}} 题待复习</text>
+          <text class="hero-sz" data-test-id="today-review-card-est-min">预计 {{estMinutes}} 分钟</text>
+        </block>
       </view>
 
       <view class="stats-row">
@@ -65,16 +73,6 @@
     <view wx:if="{{pageState === 'today.EMPTY'}}" class="empty" data-test-id="p07-empty-state">
       <text class="empty-title">今日无题 · 拍一道试试</text>
       <text class="empty-sub">还没有待复习的题目</text>
-    </view>
-
-    <!-- ── ALL_DONE 庆祝 banner (spec §6 状态机 "庆祝升级态") ──
-         今日 N 题全部 GRADED → 出庆祝 + 卡片仍渲染 (用户能复看哪几道) -->
-    <view wx:if="{{pageState === 'today.ALL_DONE'}}" class="all-done-banner" data-test-id="p07-all-done-banner">
-      <text class="all-done-emoji">🎉</text>
-      <view>
-        <view class="all-done-title">今日复习全部完成</view>
-        <view class="all-done-sub">{{totalCount}} 题 · 掌握度 {{masteryPct}}%</view>
-      </view>
     </view>
 
     <!-- ── Slot groups (LIST + ALL_DONE 都渲染 · 之前仅 LIST · ALL_DONE 态卡片消失变白屏) -->
