@@ -190,4 +190,27 @@ describe('buildSlotsFromItems (pure · integration of all helpers)', () => {
     const slots = buildSlotsFromItems(items, now);
     expect(slots[0].items[0].hhmm).toBe('09:05');
   });
+
+  // 用户反馈: hero 显 "1 进行中 / 1 未开始" 但卡片无标识 · 用户分不清是哪条 ·
+  // 这组测试锁住卡片 progress 与 hero 计数同口径 (index.ts 内同 if-else 分支)
+  it('progress: mastered=true → 已完成', () => {
+    const item = { ...makeItem(1, 1, '2026-04-21T09:45:00'), mastered: true, completedAt: '2026-04-21T09:30:00' };
+    const slots = buildSlotsFromItems([item], now);
+    expect(slots[0].items[0].progress).toBe('done');
+    expect(slots[0].items[0].progressLabel).toBe('已完成');
+  });
+
+  it('progress: !mastered && !completedAt → 未开始', () => {
+    const item = { ...makeItem(1, 1, '2026-04-21T09:45:00'), mastered: false, completedAt: null };
+    const slots = buildSlotsFromItems([item], now);
+    expect(slots[0].items[0].progress).toBe('wait');
+    expect(slots[0].items[0].progressLabel).toBe('未开始');
+  });
+
+  it('progress: !mastered && completedAt → 进行中 (PARTIAL/FORGOT 已答但未掌握)', () => {
+    const item = { ...makeItem(1, 1, '2026-04-21T09:45:00'), mastered: false, completedAt: '2026-04-21T09:30:00' };
+    const slots = buildSlotsFromItems([item], now);
+    expect(slots[0].items[0].progress).toBe('inprogress');
+    expect(slots[0].items[0].progressLabel).toBe('进行中');
+  });
 });

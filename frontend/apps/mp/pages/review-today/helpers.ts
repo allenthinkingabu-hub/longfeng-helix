@@ -23,6 +23,11 @@ export interface ItemData {
   countdownState: 'now' | 'soon' | 'wait';
   countdownLabel: string;
   sideColor: string;
+  // P07 卡片状态徽章 · 与 hero 计数同口径 (mastered/!mastered+completedAt/!mastered+!completedAt)
+  // 之前卡片无 progress 标识 · hero 显 "1 进行中 / 1 未开始" 但用户分不清是哪条 ·
+  // 现加 progress + progressLabel 标到每张卡 · 一眼对齐 hero 计数.
+  progress: 'done' | 'inprogress' | 'wait';
+  progressLabel: string;
 }
 
 // ─── Pure helpers ───────────────────────────────────────────────
@@ -88,6 +93,20 @@ export function buildSlotsFromItems(items: ReviewPlanDto[], now: Date): SlotData
     const color = SUBJECT_COLOR_MAP[subjectKey] || 'blue';
     const stem = (item.stem && item.stem.trim()) || '题干暂未识别 · OCR 待补';
 
+    // Progress 与 hero 计数同口径 (index.ts: doneCount/waitCount/inProgressCount)
+    let progress: 'done' | 'inprogress' | 'wait';
+    let progressLabel: string;
+    if (item.mastered) {
+      progress = 'done';
+      progressLabel = '已完成';
+    } else if (!item.completedAt) {
+      progress = 'wait';
+      progressLabel = '未开始';
+    } else {
+      progress = 'inprogress';
+      progressLabel = '进行中';
+    }
+
     const itemData: ItemData = {
       nid: String(item.id),
       tLevel: `T${item.nodeIndex}`,
@@ -99,6 +118,8 @@ export function buildSlotsFromItems(items: ReviewPlanDto[], now: Date): SlotData
       countdownState: cd.state,
       countdownLabel: cd.label,
       sideColor: color,
+      progress,
+      progressLabel,
     };
 
     const slotKey = getSlotKey(hh);
@@ -128,25 +149,25 @@ export const MOCK_ITEMS: ItemData[] = [
     nid: '1001', tLevel: 'T1', hhmm: '09:45', subject: '数学', kp: '二次函数 · 顶点式',
     stem: '已知 f(x)=x²−4x+3，求顶点坐标与对称轴。错因：h k 混淆。',
     tags: ['顶点式', '配方法', '★★★'], countdownState: 'now', countdownLabel: '4 分钟',
-    sideColor: 'red',
+    sideColor: 'red', progress: 'inprogress', progressLabel: '进行中',
   },
   {
     nid: '1002', tLevel: 'T3', hhmm: '11:00', subject: '物理', kp: '欧姆定律 · 并联',
     stem: 'R₁=4Ω, R₂=6Ω 并联接 12V，求总电流。公式错误。',
     tags: ['并联电路', '★★'], countdownState: 'soon', countdownLabel: '1 h',
-    sideColor: 'orange',
+    sideColor: 'orange', progress: 'wait', progressLabel: '未开始',
   },
   {
     nid: '1003', tLevel: 'T4', hhmm: '14:30', subject: '化学', kp: '方程配平',
     stem: 'Al + HCl → AlCl₃ + H₂，系数 2:6:2:3。',
     tags: ['化学方程', '★★★'], countdownState: 'wait', countdownLabel: '5 h',
-    sideColor: 'indigo',
+    sideColor: 'indigo', progress: 'wait', progressLabel: '未开始',
   },
   {
     nid: '1004', tLevel: 'T2', hhmm: '16:00', subject: '英语', kp: 'past perfect',
     stem: 'By the time he arrived, the meeting ___ already started.',
     tags: ['时态一致', '★★'], countdownState: 'wait', countdownLabel: '6 h 15 m',
-    sideColor: 'green',
+    sideColor: 'green', progress: 'wait', progressLabel: '未开始',
   },
 ];
 

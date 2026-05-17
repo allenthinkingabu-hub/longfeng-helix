@@ -89,6 +89,8 @@
           </view>
           <text class="stem">{{card.stem}}</text>
           <view class="tags">
+            <!-- Progress chip · 与 hero "已完成/进行中/未开始" 计数对齐 · 一眼分清哪条是哪条 -->
+            <text class="tg-prog tg-prog-{{card.progress}}">{{card.progressLabel}}</text>
             <text wx:for="{{card.tags}}" wx:for-item="tag" wx:key="*this" class="tg {{tag[0] === '★' ? 'tg-m' : ''}}">{{tag}}</text>
           </view>
         </view>
