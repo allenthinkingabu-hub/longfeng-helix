@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "SC-12-T01",
+    "team_id": "team-1",
+    "title": "SC-12 真页 backend skeleton · guest_session + guest_rate_bucket Entity/Repo + AnonTokenService (HS256 24h JWT mint) + POST /api/anon/session · 6 IT testcase · 复用 anon.jwt.secret · 为 SC-12-T02 (presign/analyze) 奠基",
+    "attempt": 1,
+    "phase": "done",
+    "dev_done": true,
+    "passes": true,
+    "retries": 0,
+    "audit_retries": 0,
+    "git_commits": ["0c18bb8", "2f06044"]
+  },
+  "work_log_dir": "audits/runs/SC-12-T01/team-1/attempt-1",
+  "log_requirements": {
+    "must_write": ["coder.md", "bugs-found.md", "tester.md", "adversarial.md", "test-reports/"]
+  },
+  "audit_gate": "audit.js v3 7 dims · 同前 || 红线: Backend IT ≥ 5 testcase 全绿 · POST /api/anon/session 真签发 anonToken (HS256) + DB guest_session 行 + Redis rate bucket 未启 (T01 不限流) · expiresAt = now+24h 严格验证",
+  "previous_audit_verdict": null,
+  "context": {
+    "scenario": "SC-12 (P-GUEST-CAPTURE · Try Before Signup) 真页落地的第一片 · 后端骨架. P-LANDING F07A '试试看' CTA 现在跳 /guest/capture stub (SC-12-STUB-T01) · 本任务把 stub 背后的 backend 起脚 · 但 frontend 仍维持 stub 不动 (留 SC-12-T03 落真页). 本 task 范围:\n  - guest_session + guest_rate_bucket JPA Entity + Repository (DDL 已 migrate 在 V20260421_02__init_anonymous.sql)\n  - AnonTokenService: HS256 mint 24h TTL JWT (sub='anon:{guestSessionId}' · 复用 anon.jwt.secret · 同 iss/aud)\n  - POST /api/anon/session: body {device_fp, ip_hash?, ua?, entry_source?, experiment_bucket?} → 创 guest_session 行 (status=0 INIT) + 返 {anonToken, anonSessionId, expiresAt}\n\n关键复用: 同一 anon.jwt.secret (与 auth-service + SC-13/SC-13-SHARER 完全一致) · sub claim 用 'anon:{id}' 前缀以区分 student JWT (sub='${student_id}'). 后续 task (presign/analyze/result/claim) 都验证此前缀.\n\n本 task **不含 frontend** · 不含 OSS presign · 不含 AI 分析 · 不含 claim · 仅 backend session-mint 端点 + 实体 + IT.",
+    "target_page": "(backend-only · anonymous-service · 1 endpoint + 2 entity + 1 service)",
+    "spec_path": "design/system/pages/P-GUEST-CAPTURE-guest-capture.spec.md §4-§5 + biz §4.10 guest_session DDL + biz §10 (推断 /api/anon/session)",
+    "biz_refs": [
+      "biz §4.10 guest_session DDL + guest_rate_bucket 关联表 (24h TTL · device_fp + ip_hash + status 0..9)",
+      "biz §2B.13 SC-12 F01 (POST /api/anon/session 入口 · 200 ms 预算 · 返 anonSessionId)",
+      "biz §2A.3.2 P-GUEST-CAPTURE API 触点 (anon_token 由前端 bootstrap 在 P-LANDING 进入时一次申请)",
+      "P-GUEST-CAPTURE spec.md §5 (X-Anon-Token 用于后续 /api/anon/file/presign /questions /analyze /result) · §15 Spec drift surface #1 (新规格 /api/anon/* 替代旧 /api/guest/*)"
+    ],
+    "api_contracts_in_scope": [
+      "POST /api/anon/session (NEW) · 无鉴权 (anon 入口) · body {deviceFp (required, max 128), ipHash?, ua?, entrySource? (whitelist {ad,qr,share,push,icon,deeplink,unknown}), experimentBucket?} → 200 {anonToken, anonSessionId, expiresAt} · 201 OK 也可 (沿 SC-13-SHARER pattern 返 200)"
+    ],
+    "api_contracts_out_of_scope": [
+      "POST /api/anon/file/presign (T02 范围 · 临时 OSS presign)",
+      "POST /api/anon/questions + POST /api/anon/analyze-by-url + GET /api/anon/result (T02-T04 范围)",
+      "POST /api/auth/anonymous-claim (T05 范围)",
+      "Quota / rate limit 429 QUOTA_EXHAUSTED (T06 范围 · Redis bucket + IP limit · 本 T01 不限流)",
+      "前端 P-GUEST-CAPTURE 真页 (T03 范围 · 本 T01 stub 不动)",
+      "AnonFilter (Spring WebFilter 校验 X-Anon-Token · T02 范围)",
+      "TestDesigner test-cases.md (沿用 opt-out)"
+    ],
+    "scope_in": [
+      "1. backend/anonymous-service/src/main/java/com/longfeng/anonymousservice/entity/GuestSession.java 新建 JPA Entity:",
+      "   (a) @Table(name='guest_session') 字段映射 V20260421_02 DDL: id (Long PK · 不用 @GeneratedValue · client-assigned 与 ShareToken 同模式) · deviceFp (VARCHAR 128 NotNull) · ipHash · ua · entrySource · experimentBucket · imageTmpUrl · analysisResultJson (String 存 JSONB · @Column columnDefinition='jsonb' 暂用 String) · consentAt · consentType (Short) · status (Short NotNull default 0) · claimedByStudentId · claimedQuestionId · createdAt · expiresAt · claimedAt",
+      "   (b) status enum 注释: 0 INIT · 1 CONSENTED · 2 UPLOADING · 3 UPLOADED · 4 ANALYZING · 5 ANALYZED · 6 FAILED · 7 EXPIRED · 8 CLAIMED · 9 ABANDONED",
+      "   (c) 与 ShareToken 类似 · getters/setters 全 · 不用 Lombok",
+      "2. backend/anonymous-service/src/main/java/com/longfeng/anonymousservice/entity/GuestRateBucket.java 新建 JPA Entity:",
+      "   (a) @Table(name='guest_rate_bucket') 字段: id (Long PK) · deviceFp · ipHash · date (LocalDate or OffsetDateTime · 看 DDL · 应该是 DATE 类型) · count (int default 0) · createdAt · updatedAt",
+      "   (b) **本 task 不写入此表** · 仅建实体 + repo 为 T06 备料",
+      "3. backend/anonymous-service/src/main/java/com/longfeng/anonymousservice/repo/GuestSessionRepository.java 新建:",
+      "   (a) extends JpaRepository<GuestSession, Long>",
+      "   (b) findByIdAndStatusNot(Long id, short status) → for 后续 task 校验",
+      "   (c) save / findById JpaRepository 默认提供",
+      "4. backend/anonymous-service/src/main/java/com/longfeng/anonymousservice/repo/GuestRateBucketRepository.java 新建:",
+      "   (a) extends JpaRepository<GuestRateBucket, Long>",
+      "   (b) findByDeviceFpAndDate(String deviceFp, LocalDate date) → Optional",
+      "5. backend/anonymous-service/src/main/java/com/longfeng/anonymousservice/service/AnonTokenService.java 新建:",
+      "   (a) constructor: 注入 @Value('${anon.jwt.secret}') + issuer + audience + @Value('${anon.guest-session-ttl-sec:86400}') (24h default · 可配置)",
+      "   (b) public String mintAnonToken(long guestSessionId): Jwts.builder() · sub='anon:'+guestSessionId · iss/aud 同 anon.jwt · jti=UUID · exp=now+ttl · 签 HS256 (复用 ShareTokenService.signingKey pattern · 不重复实例化 SecretKey)",
+      "   (c) public long getGuestSessionTtlSeconds(): return configured ttl (T02 后续 controller 算 expiresAt 用)",
+      "   (d) 不需 verify · verifyAnonToken 留 T02 加 (因为 T01 唯一 endpoint 不需 X-Anon-Token)",
+      "6. backend/anonymous-service/src/main/java/com/longfeng/anonymousservice/service/AnonSessionService.java 新建:",
+      "   (a) constructor: 注入 GuestSessionRepository + AnonTokenService",
+      "   (b) public AnonSessionMintResult mint(AnonSessionRequest req):",
+      "       - id = System.nanoTime() (与 SC13ShareE2EIT seed 模式一致 · 不用 @GeneratedValue)",
+      "       - now = OffsetDateTime.now() · expiresAt = now + 24h",
+      "       - GuestSession g = new GuestSession() · g.id=id · g.deviceFp=req.deviceFp · g.ipHash=req.ipHash · g.ua=req.ua · g.entrySource=sanitize(req.entrySource) · g.experimentBucket=req.experimentBucket · g.status=0 · g.createdAt=now · g.expiresAt=expiresAt",
+      "       - repo.save(g)",
+      "       - anonToken = anonTokenService.mintAnonToken(id)",
+      "       - return new AnonSessionMintResult(anonToken, id, expiresAt)",
+      "   (c) sanitize(entrySource): 复用 ResolveRequest 或 telemetry 已有的 whitelist (ad/qr/share/push/icon/deeplink/unknown) · 非白名单返 'unknown'",
+      "7. backend/anonymous-service/src/main/java/com/longfeng/anonymousservice/dto/AnonSessionRequest.java 新建:",
+      "   (a) 字段: deviceFp (@NotBlank @Size(max=128)) · ipHash? · ua? · entrySource? · experimentBucket?",
+      "8. backend/anonymous-service/src/main/java/com/longfeng/anonymousservice/dto/AnonSessionResponse.java 新建:",
+      "   (a) 字段: anonToken (String) · anonSessionId (Long) · expiresAt (OffsetDateTime)",
+      "9. backend/anonymous-service/src/main/java/com/longfeng/anonymousservice/controller/AnonSessionController.java 新建:",
+      "   (a) @PostMapping('/api/anon/session') · @Valid @RequestBody AnonSessionRequest",
+      "   (b) → 调 anonSessionService.mint(req) → return ResponseEntity.ok(AnonSessionResponse{...})",
+      "   (c) @ExceptionHandler(MethodArgumentNotValidException.class) → 400 + AnonErrorResponse (沿 SC-13 ShareErrorResponse pattern)",
+      "10. backend/anonymous-service/src/main/java/com/longfeng/anonymousservice/dto/AnonErrorResponse.java 新建 (或复用 ShareErrorResponse · 看 SC-13 实际类名):",
+      "    (a) 字段 code + message (沿 SC-13 SHARE_TOKEN_INVALID 等 pattern)",
+      "11. backend/anonymous-service/src/main/resources/application.yml 加配置:",
+      "    (a) anon.guest-session-ttl-sec: 86400 (24h · default)",
+      "12. backend/anonymous-service/src/test/java/com/longfeng/anonymousservice/SC12T01AnonSessionE2EIT.java 新建 IT (沿 IntegrationTestBase):",
+      "    (a) mint_returns_200_with_anonToken_and_sessionId_and_db_row → POST 含 deviceFp='fp-001' · response (i) 200 (ii) anonToken 非空 (iii) anonSessionId 非空 (iv) expiresAt 与 now+24h 差 ≤ 5s (v) DB guest_session 行存在 (vi) Jwts.parser() 用 anon.jwt.secret 能验签 anonToken · sub='anon:'+anonSessionId (vii) g.status=0 INIT",
+      "    (b) mint_without_device_fp_returns_400 → body={} 或 deviceFp 缺失 · 验 @NotBlank · 400 VALIDATION_FAILED",
+      "    (c) mint_long_device_fp_returns_400 → deviceFp = 'x'*200 (超 128) · @Size 触发 · 400",
+      "    (d) mint_invalid_entry_source_sanitized_to_unknown → entrySource='<script>alert(1)</script>' · DB 行 entrySource='unknown' (sanitize 生效)",
+      "    (e) mint_persists_optional_fields_correctly → 含 ipHash + ua + experimentBucket · DB 行字段一一比对",
+      "    (f) mint_token_sub_prefix_is_anon → 验 JWT decode 后 sub = 'anon:' + anonSessionId (不是裸 student id)",
+      "13. Regression 不破 · 既有所有 anonymous-service IT 全绿 (SC-13 4 + SC-13-SHARER 9 + SC-00-T01-T02 + SC-11-T01 等)",
+      "14. work_log 5 件齐 · adversarial.md ≥ 1 REJECT + ≥ 1 fix · 探索性 [device_fp 越界 · sub prefix · sanitize XSS · expiresAt clock drift · concurrent mint]",
+      "15. git commit 2-3 个:",
+      "   (a) feat(SC-12-T01 backend): GuestSession + GuestRateBucket entity/repo + AnonTokenService + AnonSessionService + AnonSessionController + DTOs",
+      "   (b) test(SC-12-T01): SC12T01AnonSessionE2EIT ≥ 5 testcase 全绿 + regression 既有 IT 仍绿",
+      "   (c) chore(SC-12-T01): work_log + audit.js v3 PASS + inflight finalize"
+    ],
+    "scope_out": [
+      "OSS presign (T02)",
+      "AI 分析 + 轮询 + result endpoint (T02-T04)",
+      "Anonymous claim (T05)",
+      "Quota / rate limit (T06)",
+      "前端 P-GUEST-CAPTURE 真页 (T03 · 本 task 不动 stub)",
+      "AnonFilter (T02)",
+      "TestDesigner test-cases.md (沿用 opt-out)"
+    ],
+    "sandbox": {
+      "team_env_file": ".harness/docker/team-1.env",
+      "pg_port": 15432,
+      "redis_port": 16379,
+      "compose_project_name": "team-1",
+      "note": "anonymous-service:8090 必须 up (本 task 改其源码 · 需重启) · auth-service:8091 可选 (本 task 不依赖)"
+    },
+    "test_case_first_required": false,
+    "opt_out_reason": "沿用所有前任 task 同款 · BE-only 1 endpoint · IT 6 case 覆盖所有红线"
+  },
+  "isolation": {
+    "worktree_disabled": false,
+    "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c",
+    "branch_name": "claude/nifty-kepler-3deb2c"
+  },
+  "physical_verification": {
+    "dor_c1_to_c6_required": false,
+    "frontend_e2e": null,
+    "backend_e2e_it": "backend/anonymous-service/src/test/java/com/longfeng/anonymousservice/SC12T01AnonSessionE2EIT.java"
+  },
+  "permissions": {"writable_fields": ["task.passes"]},
+  "deliverables_definition_of_done": [
+    "1. GuestSession + GuestRateBucket JPA Entity 新建 · 字段一一对应 V20260421_02 DDL",
+    "2. GuestSessionRepository + GuestRateBucketRepository 新建 · extends JpaRepository",
+    "3. AnonTokenService + AnonSessionService 新建 · 复用 anon.jwt.secret 签 HS256 · sub='anon:'+sessionId 前缀严格",
+    "4. POST /api/anon/session endpoint 新建 · @Valid 校验 · 200 返 anonToken + anonSessionId + expiresAt",
+    "5. expiresAt = now + 24h (anon.guest-session-ttl-sec 可配置)",
+    "6. entrySource sanitize 白名单 (XSS 防)",
+    "7. SC12T01AnonSessionE2EIT ≥ 5 IT testcase 全绿 (本 task 实际写 6 case)",
+    "8. Regression 既有 SC-13 / SC-13-SHARER / SC-00 / SC-11 IT 全绿",
+    "9. work_log 5 件齐 · ≥1 REJECT + ≥1 fix · git commit 2-3 个 · audit.js v3 PASS"
+  ],
+  "rule_6_tool_budget_guidance": "BE-only 1 endpoint + 2 entity + 2 service + 6 IT · 预计 ~70-90 tool use · 软线 50 surface 70 硬线 85 · 比 SC-13-SHARER 略大但同型",
+  "written_at": "2026-05-18T01:20:00Z",
+  "written_by": "TL agent (claude · 本会话 · SC-12 真页 backend skeleton · 6-slice arc 第 1/6)"
+}

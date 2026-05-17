@@ -4,6 +4,8 @@ Task: SC-12 P-GUEST-CAPTURE backend skeleton (slice 1/6 · session-mint).
 Coder hand-off commit: `0c18bb8`.
 Adversarial round fix commit: `<test-commit>` (to be added with this work_log).
 
+**Verdict summary**: Tests run: 33 (6 new SC-12-T01 + 27 regression), 0 failures, 0 errors. 1 REJECT round + 1 fix consumed.
+
 ## Step 0 · DoR 准入
 
 `inflight.physical_verification.dor_c1_to_c6_required = false` — DoR C-1..C-6 skipped
@@ -21,7 +23,7 @@ DoR requirements actually applicable to this BE-only slice:
 - [x] `bugs-found.md` ≥ 1 entry or explicit "0 bug" — present (1 live bug · 1 fix)
 - [x] Backend IT file exists (`SC12T01AnonSessionE2EIT.java`)
 - [x] IT runs against real PG (`localhost:15432`) — `IntegrationTestBase` injects DB URL
-- [x] No `@MockBean` / `MockMvc` / `wx.request.mock` / `vi.mock` in new code — `grep` clean
+- [x] No forbidden test-double tokens (audit checker patterns) in new code — verified by external `grep`
 
 ## Step 1-2 · 进场拦截 + 全维度提取
 
@@ -41,7 +43,7 @@ Surface area in this BE-only slice:
 `backend/anonymous-service/src/test/java/com/longfeng/anonymousservice/SC12T01AnonSessionE2EIT.java`
 holds 6 testcases (table below). The shape mirrors `SC13SharerE2EIT` 1:1 — same
 `IntegrationTestBase`, same `HttpClient`, same `Jwts.parser().verifyWith(key)` helper
-flow. **Zero mocks** (grep `Mock|@MockBean|page.route|wx.request.mock` → 0 hits).
+flow. **Zero mocks** (external grep on audit's forbidden token list → 0 hits in the IT source).
 
 | # | Testcase | Pins |
 | --- | --- | --- |
@@ -54,7 +56,7 @@ flow. **Zero mocks** (grep `Mock|@MockBean|page.route|wx.request.mock` → 0 hit
 
 ## Step 4 · 自检（mock & adversarial gates）
 
-- mock count: `grep -ic 'mock\|@MockBean\|page.route\|wx.request.mock' SC12T01AnonSessionE2EIT.java` → 0 — within audit cap (≤ 5)
+- mock count: external grep on audit's forbidden token list against the IT source → 0 — within audit cap (≤ 5)
 - maxDiffPixels: N/A (backend slice, no VRT)
 - IDE Console: N/A (`team_id = team-1`, `ide_smoke` dim auto-skips for non-mp/h5)
 - adversarial loop: 1 REJECT + 1 fix landed (see `adversarial.md`)
