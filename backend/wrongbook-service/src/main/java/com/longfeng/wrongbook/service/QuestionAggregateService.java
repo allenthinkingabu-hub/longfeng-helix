@@ -5,12 +5,23 @@ import com.longfeng.common.exception.ErrCode;
 import com.longfeng.wrongbook.dto.*;
 import com.longfeng.wrongbook.entity.WrongItem;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * 聚合服务 · 组装 QuestionDetailResp / QuestionListResp
@@ -19,8 +30,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class QuestionAggregateService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(QuestionAggregateService.class);
+
     private final WrongItemService wrongItemService;
     private final IdempotencyService idempotencyService;
+    private final RestTemplate http = new RestTemplate();
+
+    /**
+     * review-plan-service · 批量取 next-due 节点 · P05 列表渲染时间标签用.
+     * 空值或 5xx 时整页降级 (item.nextDueAt = null), FE 显示 "T1 · 暂未安排" ·
+     * 不让一条 review-plan-service 错杀整张列表.
+     */
+    @Value("${review.plan.next-due-url:http://localhost:8085/internal/plans/next-due-by-items}")
+    private String reviewPlanNextDueUrl;
 
     public QuestionAggregateService(WrongItemService wrongItemService,
                                     IdempotencyService idempotencyService) {
@@ -85,6 +107,16 @@ public class QuestionAggregateService {
         return toListItem(item);
     }
 
+    /**
+     * wrong_item.status 枚举 (entity 实测):
+     *   0 = PENDING (P02 拍题占位 · OCR/AI 还没跑完 · 不算"已确认错题")
+     *   3 = CONFIRMED (P04 "保存并开启复习" 后 · 此时 review-plan 建 7 节点)
+     *   8 = ARCHIVED (P05 归档)
+     * P05 列表 root cause: 之前不过滤 status · 把 PENDING 占位 一起列 ·
+     * 用户看到 37 道"错题" 实际仅 ~1 道真错题 · P07 复习页空也是真相 (PENDING 不进 plan).
+     */
+    private static final short STATUS_CONFIRMED = 3;
+
     public QuestionListResp listQuestions(Long studentId, String subject, Short mastery,
                                           int page, int size, String sort) {
         Sort s = Sort.by(Sort.Direction.DESC, "created_at");
@@ -92,10 +124,65 @@ public class QuestionAggregateService {
             s = Sort.by(Sort.Direction.ASC, "created_at");
         }
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), size, s);
-        Page<WrongItem> result = wrongItemService.list(studentId, subject, mastery, null, pageable);
+        // 默认 status=CONFIRMED · 只列学生已"保存并开启复习"的题 ·
+        // PENDING (0) 是 OCR 中途的占位 · 没建复习计划 · 列出来误导.
+        // 后续如果要管理后台看 PENDING/ARCHIVED · 走另一个 admin 接口.
+        Page<WrongItem> result = wrongItemService.list(studentId, subject, mastery, STATUS_CONFIRMED, pageable);
+
+        // P05-LIST: 批量取每个 wrong_item 的 next-due active plan ·
+        // 单条 HTTP POST · review-plan-service down 时降级 (空 map) 不 hang.
+        Map<Long, NextDueInfo> nextDueMap = fetchNextDueByItems(
+                result.getContent().stream().map(WrongItem::getId).toList());
+
         return new QuestionListResp(
-                result.getContent().stream().map(this::toListItem).toList(),
+                result.getContent().stream()
+                        .map(it -> toListItem(it, nextDueMap.get(it.getId())))
+                        .toList(),
                 page, size, result.getTotalElements());
+    }
+
+    /** 内部 holder · 不暴露给外面 · review-plan response shape. */
+    private record NextDueInfo(String nextDueAt, int nodeIndex) {}
+
+    /**
+     * HTTP POST review-plan /internal/plans/next-due-by-items · 整页失败兜底返空 map ·
+     * FE 显示 "暂未安排" 比整张列表 ERROR 体验好.
+     */
+    @SuppressWarnings("unchecked")
+    private Map<Long, NextDueInfo> fetchNextDueByItems(List<Long> wrongItemIds) {
+        if (wrongItemIds == null || wrongItemIds.isEmpty() || reviewPlanNextDueUrl == null
+                || reviewPlanNextDueUrl.isBlank()) {
+            return Map.of();
+        }
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            Map<String, Object> body = Map.of("wrongItemIds", wrongItemIds);
+            ResponseEntity<Map> resp = http.postForEntity(
+                    reviewPlanNextDueUrl, new HttpEntity<>(body, headers), Map.class);
+            if (!resp.getStatusCode().is2xxSuccessful() || resp.getBody() == null) {
+                return Map.of();
+            }
+            Object dataRaw = resp.getBody().get("data");
+            if (!(dataRaw instanceof List<?> data)) {
+                return Map.of();
+            }
+            Map<Long, NextDueInfo> out = new HashMap<>();
+            for (Object row : data) {
+                if (!(row instanceof Map<?, ?> m)) continue;
+                Object wid = m.get("wrongItemId");
+                Object nidx = m.get("nodeIndex");
+                Object due = m.get("nextDueAt");
+                if (wid == null || nidx == null) continue;
+                out.put(Long.valueOf(wid.toString()),
+                        new NextDueInfo(due == null ? null : due.toString(),
+                                Integer.parseInt(nidx.toString())));
+            }
+            return out;
+        } catch (Exception e) {
+            LOG.warn("review-plan next-due-by-items fetch failed (列表降级 '暂未安排'): {}", e.toString());
+            return Map.of();
+        }
     }
 
     private QuestionDetailResp toDetailResp(WrongItem item) {
@@ -109,9 +196,23 @@ public class QuestionAggregateService {
     }
 
     private QuestionListItem toListItem(WrongItem item) {
+        return toListItem(item, null);
+    }
+
+    /**
+     * Overload: 注入 review-plan next-due 字段.
+     * info=null (没 active plan / review-plan-service down) 走 null 字段 ·
+     * FE WrongQuestionListItem.nextDueAt='' + helpers.formatDueLabel 输出 "暂未安排".
+     */
+    private QuestionListItem toListItem(WrongItem item, NextDueInfo info) {
+        String nextDueAt = info == null ? null : info.nextDueAt();
+        // nodeIndex 0-based (T0..T6) · FE 习惯 T1.. 标签 · +1 落到 nodeStage.
+        // info=null 时 nodeStage=null (FE 落 default 1 = "T1 · 暂未安排" 不显怪).
+        Integer nodeStage = info == null ? null : info.nodeIndex() + 1;
         return new QuestionListItem(
                 toQid(item.getId()), item.getSubject(), item.getSourceType(),
                 item.getStatus(), item.getMastery(), item.getDifficulty(),
-                item.getStemText(), item.getOriginImageKey(), item.getCreatedAt());
+                item.getStemText(), item.getOriginImageKey(), item.getCreatedAt(),
+                nextDueAt, nodeStage);
     }
 }
