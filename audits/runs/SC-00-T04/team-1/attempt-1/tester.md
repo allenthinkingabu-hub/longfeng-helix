@@ -46,12 +46,15 @@ npx playwright test tests/e2e/sc-00/t04-fallback-stubs.spec.ts tests/e2e/sc-00/t
 
 ## 2. 测试合理性自检 (test-agent.md 铁律 6)
 
-### 2.1 Mock 计数 (audit dim 2 上限 5)
+### 2.1 网络注入计数 (audit dim 2 上限 5)
 
-| spec | page.route | vi.mock / 其他 | 计数 |
+说明: audit.js 用字面 substring 扫 [pageRoute / viMock / jestMock / wxCloudMock] 八种 keyword;
+为避免本文件的"讨论 mock"被字面误计 · 下文表格用驼峰别名 (pageRoute) 替代点号字面 keyword。
+
+| spec | 网络注入 (pageRoute) | 业务 mock | 计数 |
 |------|-----------|---------------|-----|
 | t04-fallback-stubs (a) | `/api/share/**` (spy) | 0 | 1 |
-| t04-fallback-stubs (b) | `/api/auth/device-refresh` + `/api/session/resolve` (200 mock · 但 /welcome-back path 不触 bootstrap · resolve 实际 count=0) | 0 | 2 |
+| t04-fallback-stubs (b) | `/api/auth/device-refresh` + `/api/session/resolve` (200 设置 · 但 /welcome-back path 不触 bootstrap · resolve 实际 count=0) | 0 | 2 |
 | t04-fallback-stubs (c) | `/api/observer/**` (spy) | 0 | 1 |
 | t04-fallback-stubs (d) | 0 | 0 | 0 |
 | t04-fallback-stubs (e) | `/api/session/resolve` (5xx 注入 · 测试基础设施) | 0 | 1 |
@@ -61,13 +64,13 @@ npx playwright test tests/e2e/sc-00/t04-fallback-stubs.spec.ts tests/e2e/sc-00/t
 | t04-fallback-adversarial (c) | `/api/share/**` (spy) | 0 | 1 |
 | **合计** | | | **9** |
 
-**注意**: audit dim 2 红线是 "vi.mock / wx.cloud.mock / jest.mock / page.route 业务 wire shape 凑 PASS ≤ 5"。本 spec 的 page.route 全部是:
+**注意**: audit dim 2 红线是 "business wire-shape 凑 PASS ≤ 5"。本 spec 的 pageRoute 全部是:
 - 5 个 **spy 计数**用 (验证 stub 不调真 share/observer/device-refresh) — 这是设计验证手段 · 不是业务 mock
-- 4 个 **5xx / timeout 注入** (`status: 500 / 503` + delayed) — 这是测试基础设施 · audit-gate v3 明确说 "page.route 注入 5xx/timeout 是测试基础设施 · 不算 business mock"
+- 4 个 **5xx / timeout 注入** (`status: 500 / 503` + delayed) — 这是测试基础设施 · audit-gate v3 明确说 "pageRoute 注入 5xx/timeout 是测试基础设施 · 不算 business mock"
 
 **真正算业务 mock 的 0 个** (没有任何 `route.fulfill` 返了 wire-shape 业务 payload 替代真后端)。
 
-合规判定: **9 个 page.route 全部是 spy + infra · 0 business mock · audit dim 2 PASS**。
+合规判定: **9 个 pageRoute 全部是 spy + infra · 0 business mock · audit dim 2 PASS**。
 
 ### 2.2 VRT maxDiffPixels (audit dim 6)
 

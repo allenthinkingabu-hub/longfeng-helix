@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "SC-00-T04",
+    "team_id": "team-1",
+    "title": "verdict=SHARED/WELCOMEBACK/OBSERVER stub 兜底真页（占位文字 + 主 CTA → /auth/login）· resolve 5xx/timeout 离线降级真 UI（黄条 + 关闭 + stale JWT ≤7d 进 /home）· 完全无 JWT 落 /welcome",
+    "attempt": 1,
+    "phase": "tester",
+    "dev_done": true,
+    "passes": true,
+    "retries": 0,
+    "audit_retries": 0,
+    "git_commits": [
+      "bc1564d",
+      "28fe27d",
+      "671ffa0",
+      "f7b0eb7"
+    ]
+  },
+  "work_log_dir": "audits/runs/SC-00-T04/team-1/attempt-1",
+  "log_requirements": {
+    "must_write": [
+      "coder.md",
+      "bugs-found.md",
+      "tester.md",
+      "adversarial.md",
+      "test-reports/"
+    ]
+  },
+  "audit_gate": "audit.js v3 (deterministic · 7 dims) || dim 1 coder_compliance: coder.md 5 段 + bugs-found.md || dim 2 tester_compliance: tester.md + adversarial.md ≥1 REJECT + ≥1 fix · mock ≤ 5 || dim 3 bug_reality: git_commits[] git cat-file -e || dim 4 test_validity: claimed == Playwright XML <testcase> · 含 'timeout' / '5xx' exploratory keyword || dim 5 spec_alignment: 不需后端 IT · Playwright 跑 Vite dev + anonymous-service:8090 真起 · 禁 fetch mock 业务 · 允许 page.route 注入 5xx/timeout 模拟（这是测试基础设施 · 不算 business mock） || dim 6 ide_smoke: team-1 UI team · IDE Console 0 [error] || dim 7 test_cases_alignment: test_case_first_required=false · 跳过 || 红线: Playwright e2e ≥ 6 testcase 全绿（3 stub + 3 fallback 路径）+ 离线黄条 VRT screenshot",
+  "previous_audit_verdict": null,
+  "context": {
+    "scenario": "SC-00-T01-T02 落地的 4 个占位页（Landing/SharedStub/WelcomeBack/ObserverStub）是 `<div data-testid='${verdict}-placeholder-root'>T04 fleshes out</div>` 占位 · 本 task 把 SharedStub/WelcomeBack/ObserverStub 三个占位**替换成 stub 真页**（占位文字 + 主 CTA），并把 resolve-entry.ts 的离线降级路径升级成**真 UI**（顶部 sticky 黄条 + 关闭按钮 + 自动消失逻辑）· /welcome (LANDING) 路由的真页留给 SC-11-T01 不动",
+    "target_page": "P-SHARED-STUB / P-WELCOMEBACK-STUB / P-OBSERVER-STUB + offline-banner UI",
+    "mockup_path": null,
+    "spec_path": "design/system/pages/P-SHARED-shared.spec.md (P0 stub · 真页 SC-13) + design/system/pages/P-WELCOMEBACK-welcomeback.spec.md (P0 stub · 真页 SC-14)",
+    "biz_refs": [
+      "biz §2B.1a 关键断言点第 5 条 (resolve 5xx 不白屏 · stale JWT 进 P-HOME · 无 JWT 落 P-LANDING)",
+      "biz §2A.3.1 回退与降级 (补丁 3 · 离线降级新规则)",
+      "biz §2A.3.2 P-SHARED / P-WELCOMEBACK 规格卡 (stub 阶段约束)"
+    ],
+    "api_contracts_in_scope": [
+      "(无新接口 · 纯前端 stub UI + 离线降级 UI)"
+    ],
+    "api_contracts_out_of_scope": [
+      "/api/share/* (SC-13 范围 · 本 task 严禁触发)",
+      "/api/auth/device-refresh (SC-14 范围 · 本 task 严禁触发)",
+      "/api/observer/exchange (P1 · SC-15)",
+      "TestDesigner test-cases.md (沿用 opt-out)"
+    ],
+    "scope_in": [
+      "1. frontend/apps/h5/src/pages/SharedStub/index.tsx 替换占位 div · 真 stub UI:",
+      "   (a) 居中卡片 · 顶部图标（信封 emoji 或 ↗ icon）· 标题「分享内容功能正在开发中」· 副标题「我们正在搭建分享预览页 · 现在去登录账号查看完整错题本」",
+      "   (b) 主 CTA <button data-testid='shared-stub-cta'>立即注册 / 登录</button> · onClick → router.replace('/auth/login')",
+      "   (c) testid root: shared-stub-root · 严禁调任何 /api/share/* 真接口 (Playwright spy 验证 count === 0)",
+      "   (d) URL 取 :token 参数（虽然 stub 不消费 token · 但记进埋点 token_hash · 用 simple djb2 hash 避免明文 PII）",
+      "   (e) 埋点 anon_stub_view{verdict_intended:'SHARED', token_hash} (mount 时) + anon_stub_cta_click{verdict_intended:'SHARED'} (CTA tap 时)",
+      "2. frontend/apps/h5/src/pages/WelcomeBack/index.tsx 替换占位 div · 真 stub UI:",
+      "   (a) 同款卡片布局 · 标题「回流唤起功能正在开发中」· 副标题「正在开发中 · 现在去登录账号」",
+      "   (b) 主 CTA <button data-testid='welcomeback-stub-cta'>登录账号</button> · onClick → router.replace('/auth/login')",
+      "   (c) testid root: welcomeback-stub-root · 严禁调 /api/auth/device-refresh / /api/session/resolve 二次（避免循环）",
+      "   (d) 埋点 anon_stub_view{verdict_intended:'WELCOME_BACK', token_hash:null} + anon_stub_cta_click{verdict_intended:'WELCOME_BACK'}",
+      "3. frontend/apps/h5/src/pages/ObserverStub/index.tsx 替换占位 div · 真 stub UI:",
+      "   (a) 同款卡片 · 标题「观察者邀请功能正在开发中」· 副标题「家长/老师查看孩子进度功能 P1 上线」",
+      "   (b) 主 CTA → router.replace('/auth/login')",
+      "   (c) testid root: observer-stub-root · 严禁调 /api/observer/* 真接口",
+      "   (d) 埋点 anon_stub_view{verdict_intended:'OBSERVER', token_hash}",
+      "4. frontend/apps/h5/src/components/OfflineBanner/index.tsx 新建组件 · sticky top-0 顶部黄条:",
+      "   (a) 文案「离线模式 · 数据可能不是最新」+ 右上角关闭按钮 testid='offline-banner-close'",
+      "   (b) 主 testid 'offline-banner-root' (SC-00-T01-T02 已 reserve · 本 task 真实现)",
+      "   (c) 黄条出现条件由 hook `useOfflineMode()` 控制（新建 frontend/apps/h5/src/hooks/useOfflineMode.ts · 读全局 store/Context 状态）",
+      "   (d) 关闭按钮 click → 隐藏当前 session · 但下次 resolve 仍 5xx 时不再自动出现（用 sessionStorage.offlineDismissed 标记 · 关页刷新清空）",
+      "   (e) 下次 resolve 成功 → 全局状态切回 online → banner 自动消失",
+      "5. frontend/apps/h5/src/bootstrap/resolve-entry.ts 升级:",
+      "   (a) 现有 offline degradation 仅 console.warn · 本 task 加：发 5xx/timeout 时写 sessionStorage.offlineMode='true' · 由 useOfflineMode() 读",
+      "   (b) AbortController timeout 现在已是 5s（SC-00-T01-T02 落） · 本 task 改成 800ms 触发 abort（per inflight AC4）· 因 800ms 后再等更长不合理（用户已经感觉卡）· abort 走同款 stale JWT 路径",
+      "   (c) stale JWT > 7d + 5xx 的兜底 → 明确 router.replace('/welcome') 不打 P00（避免空账号被强制 P00 流程）",
+      "6. frontend/apps/h5/src/main.tsx · 在 BootstrapGate 外部加 <OfflineBanner /> 组件 mount · 让所有 route 都能看到黄条（包括 P-HOME）",
+      "7. frontend/packages/testids/src/index.ts 加 testid（按需 append）:",
+      "   - shared.stubRoot = 'shared-stub-root' · shared.stubCta = 'shared-stub-cta'",
+      "   - welcomeback.stubRoot = 'welcomeback-stub-root' · welcomeback.stubCta = 'welcomeback-stub-cta'",
+      "   - observer.stubRoot = 'observer-stub-root' · observer.stubCta = 'observer-stub-cta'",
+      "   - offline.bannerRoot = 'offline-banner-root' · offline.bannerClose = 'offline-banner-close'",
+      "8. CSS · frontend/apps/h5/src/pages/{SharedStub,WelcomeBack,ObserverStub}/index.module.css 各一个（共享样式提到 frontend/apps/h5/src/styles/stub-card.module.css · 卡片视觉一致）· frontend/apps/h5/src/components/OfflineBanner/index.module.css （黄背景 #FEF3C7 + 文字色 #92400E + 关闭按钮 hover 态）",
+      "9. Playwright spec frontend/apps/h5/tests/e2e/sc-00/t04-fallback-stubs.spec.ts ≥ 6 testcase:",
+      "   (a) shared_stub_renders → page.goto('/s/abc123') · expect shared-stub-root visible + shared-stub-cta visible + page.route spy /api/share/* count === 0",
+      "   (b) welcomeback_stub_renders → page.goto('/welcome-back') · 同款断言 · page.route spy /api/auth/device-refresh count === 0 + /api/session/resolve count === 0",
+      "   (c) observer_stub_renders → page.goto('/observer/ABC123') · 同款 · /api/observer/* count === 0",
+      "   (d) stub_cta_redirects_to_login → 在 shared stub 上 click CTA · expect URL pathname === '/auth/login'",
+      "   (e) offline_banner_with_stale_jwt → mock resolve 500 + localStorage 设过期 ≤ 7d 的 JWT · page.goto('/') · expect 最终 /home + offline-banner-root visible + 文字 '离线模式'",
+      "   (f) offline_banner_close_persists → 在 (e) 状态点 offline-banner-close · expect banner 消失 · reload + mock 仍 5xx · banner 不再出现（sessionStorage 标记起作用）",
+      "10. Playwright spec 探索性 case（独立文件 t04-fallback-adversarial.spec.ts ≥ 3 testcase）:",
+      "   (a) timeout_800ms_triggers_degradation → mock /api/session/resolve 延 1500ms · 设过期 stale JWT · expect 800ms 后 router.replace('/home') + banner",
+      "   (b) no_jwt_5xx_falls_to_welcome → localStorage 清空 + mock resolve 500 · expect /welcome（不去 /home）",
+      "   (c) stub_token_path_param_in_telemetry → /s/abc123 mount · expect anon_stub_view 事件 token_hash 字段非空且不等于 'abc123' 原文（djb2 hash 验证）",
+      "11. 不污染 SC-01 5 服务 + auth-service + anonymous-service · git diff --stat 验证",
+      "12. work_log audits/runs/SC-00-T04/team-1/attempt-1/ 全件齐",
+      "13. 强制 git commit 拆 3-4 个 · hash 入 inflight"
+    ],
+    "scope_out": [
+      "/welcome (LANDING) 路由真页（SC-11-T01 范围 · 本 task 不动 LandingPage.tsx）",
+      "SC-13 P-SHARED 真页（真分享 token 校验 + 脱敏 wire shape）",
+      "SC-14 P-WELCOMEBACK 真页（device-refresh 双因子）",
+      "SC-15 P-OBSERVER 真页（exchange + READ JWT）",
+      "VRT screenshot 完整 4 态比对（P0 仅断言 DOM 节点存在 · 真 VRT 留 P1）",
+      "埋点真上报到 GrowthBook/Sentry（P0 仅 console.log + page.route spy 验证）",
+      "TestDesigner test-cases.md"
+    ],
+    "sandbox": {
+      "team_env_file": ".harness/docker/team-1.env",
+      "pg_port": 15432,
+      "redis_port": 16379,
+      "compose_project_name": "team-1",
+      "note": "Vite dev:5173 + anonymous-service:8090 真起（resolve 接口要打真后端 · case (b) 走真 LANDING 路径）· auth-service 8091 起（CTA 跳 /auth/login 要 P00 mount 不报错）"
+    },
+    "mockup_chain": null,
+    "test_case_first_required": false,
+    "opt_out_reason": "沿用 LOGIN + ANON + T01-T02 + T03 同款 · TC-00-D / TC-00 兜底 / 系统不变量 5 嵌入 Playwright testcase 名"
+  },
+  "isolation": {
+    "worktree_disabled": false,
+    "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c",
+    "branch_name": "claude/nifty-kepler-3deb2c"
+  },
+  "physical_verification": {
+    "dor_c1_to_c6_required": false,
+    "frontend_e2e": "frontend/apps/h5/tests/e2e/sc-00/t04-fallback-stubs.spec.ts + t04-fallback-adversarial.spec.ts",
+    "backend_e2e_it": null
+  },
+  "permissions": {
+    "writable_fields": [
+      "task.passes"
+    ]
+  },
+  "deliverables_definition_of_done": [
+    "1. SharedStub / WelcomeBack / ObserverStub 三个 index.tsx 替换占位 div · 真 stub UI（卡片 + CTA → /auth/login）",
+    "2. OfflineBanner 组件 + useOfflineMode hook · sticky 黄条 + 关闭 + sessionStorage 标记",
+    "3. resolve-entry.ts AbortController timeout 改 800ms · 5xx/timeout 时 sessionStorage 写 offlineMode='true' · stale > 7d + 5xx → /welcome",
+    "4. main.tsx 加 <OfflineBanner /> mount（全局）",
+    "5. testids 加 8 个新 id（shared/welcomeback/observer stub × 2 + offline × 2）",
+    "6. Playwright spec t04-fallback-stubs.spec.ts ≥ 6 case + t04-fallback-adversarial.spec.ts ≥ 3 case · 全绿",
+    "7. work_log: coder.md (5 段) + bugs-found.md + tester.md + adversarial.md (≥1 REJECT + ≥1 fix) + test-reports/",
+    "8. git commit 拆 3-4 个 · hash 入 inflight",
+    "9. audit.js v3 7 dim PASS · inflight phase=audit dev_done=true passes=true"
+  ],
+  "rule_6_tool_budget_guidance": "纯前端 3 stub + 1 banner 组件 + 1 hook + Playwright 9 case · 预计 ~60-80 tool use · 软线 50 self-checkpoint · 70 surface · 85 强制 Rule 6.5",
+  "written_at": "2026-05-17T17:30:00Z",
+  "written_by": "TL agent (claude · 本会话 · 接续 SC-00-T03 spawned · 用户要求 1-3 都干 · 三 task 顺序 spawn)"
+}
