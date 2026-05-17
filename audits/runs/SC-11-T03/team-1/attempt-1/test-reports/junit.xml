@@ -1,0 +1,24 @@
+<testsuites id="" name="" tests="9" failures="0" skipped="0" errors="0" time="8.266716">
+<testsuite name="sc-11/t03-landing-sample-chips-adversarial.spec.ts" timestamp="2026-05-17T19:18:47.130Z" hostname="chromium" tests="4" failures="0" skipped="0" time="3.955" errors="0">
+<testcase name="SC-11-T03 · adversarial · 破坏性边界 + 探索性 (4 cases) › ADV-T03 (a) android_back_closes_overlay: page.goBack() · overlay hidden · URL 仍 /welcome" classname="sc-11/t03-landing-sample-chips-adversarial.spec.ts" time="0.688">
+</testcase>
+<testcase name="SC-11-T03 · adversarial · 破坏性边界 + 探索性 (4 cases) › ADV-T03 (b) 3_chip_cycle_open_close: 循环 3 chip · 每次浮层内容不同 · 无叠加" classname="sc-11/t03-landing-sample-chips-adversarial.spec.ts" time="1.373">
+</testcase>
+<testcase name="SC-11-T03 · adversarial · 破坏性边界 + 探索性 (4 cases) › ADV-T03 (c) sheet_click_does_not_close: 点浮层卡片内部不关闭浮层" classname="sc-11/t03-landing-sample-chips-adversarial.spec.ts" time="1.22">
+</testcase>
+<testcase name="SC-11-T03 · adversarial · 破坏性边界 + 探索性 (4 cases) › ADV-T03 (d) chip_double_tap_no_double_overlay: 同一 task 内连发 2 个 click event · 浮层 DOM 数恰 1" classname="sc-11/t03-landing-sample-chips-adversarial.spec.ts" time="0.674">
+</testcase>
+</testsuite>
+<testsuite name="sc-11/t03-landing-sample-chips-overlay.spec.ts" timestamp="2026-05-17T19:18:47.130Z" hostname="chromium" tests="5" failures="0" skipped="0" time="3.479" errors="0">
+<testcase name="SC-11-T03 · P-LANDING SampleChips + SampleOverlay (5 cases) › TC-11-T03 (a) chips_render_3_subjects: 3 chip 全 visible · 文字 数学/英语/物理" classname="sc-11/t03-landing-sample-chips-overlay.spec.ts" time="0.352">
+</testcase>
+<testcase name="SC-11-T03 · P-LANDING SampleChips + SampleOverlay (5 cases) › TC-11-T03 (b) chip_tap_opens_overlay: 浮层 + 3 卡片 visible · body overflow=hidden" classname="sc-11/t03-landing-sample-chips-overlay.spec.ts" time="0.454">
+</testcase>
+<testcase name="SC-11-T03 · P-LANDING SampleChips + SampleOverlay (5 cases) › TC-11-T03 (c) overlay_close_via_x_button: × close · overlayRoot hidden · body overflow 恢复" classname="sc-11/t03-landing-sample-chips-overlay.spec.ts" time="0.745">
+</testcase>
+<testcase name="SC-11-T03 · P-LANDING SampleChips + SampleOverlay (5 cases) › TC-11-T03 (d) overlay_close_via_mask_tap: tap mask · overlayRoot hidden" classname="sc-11/t03-landing-sample-chips-overlay.spec.ts" time="0.508">
+</testcase>
+<testcase name="SC-11-T03 · P-LANDING SampleChips + SampleOverlay (5 cases) › TC-11-T03 (e) no_ai_calls_during_overlay: 完整开合 3 次 · /api/ai/* + /api/guest/* 累计 0" classname="sc-11/t03-landing-sample-chips-overlay.spec.ts" time="1.42">
+</testcase>
+</testsuite>
+</testsuites>

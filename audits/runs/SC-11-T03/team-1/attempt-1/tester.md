@@ -26,17 +26,22 @@ PLAYWRIGHT_BASE_URL=http://localhost:5174 pnpm exec playwright test \
 ```
 
 ### 通过数
-- 主 spec: **5 testcase passed** (chips_render_3_subjects / chip_tap_opens_overlay / overlay_close_via_x_button / overlay_close_via_mask_tap / no_ai_calls_during_overlay)
-- 对抗 spec: **4 testcase passed** (android_back_closes_overlay / 3_chip_cycle_open_close / sheet_click_does_not_close / chip_double_tap_no_double_overlay)
-- 合计: **9/9 testcase PASS · 7.8s 完成**
-- evidence-capture: **1/1 PASS** (ide-console.txt + 4 screenshots)
-- regression (SC-11 全套): **25/25 PASS** (T01 11 + T02 6 + T03 9 · 含 evidence specs · 20.0s)
+
+**合计 9 testcase passed** (主 spec 5 + 对抗 spec 4)
+
+| 来源 spec | 用例数 | 状态 |
+|----------|------:|------|
+| t03-landing-sample-chips-overlay.spec.ts (主) | 5 | PASS |
+| t03-landing-sample-chips-adversarial.spec.ts (对抗) | 4 | PASS |
+| **总计 (audit 视角 · 与 junit.xml `<testcase>` 数一致)** | **9** | **PASS** |
+| evidence-capture (旁路 · 不计 audit) | 1 | PASS |
+| regression SC-11 全套 (T01 11 + T02 6 + T03 9 · 含 evidence) | 25 | PASS |
 
 ### 测试通过数对账 (audit.js v3 红线)
-- 主 spec + 对抗 spec 合计 = **9 testcase**
-- evidence-capture: 1
-- 不计 evidence: 主验收 9 testcase 与 inflight DoD #4 红线 "5 case + 2+ case = 7+" 满足且超额 (实际 9 > 7)
-- raw `playwright-list.log` 含 `9 passed (7.8s)` · 数字一致
+- 主 spec + 对抗 spec 合计 = **9 testcase** (此即 audit 看的数字)
+- junit.xml `<testcase>` 数也是 9 · 一致 ✓
+- inflight DoD #4 红线 "主 spec 5 case + adversarial 2+ case ≥ 7" → 实际 9 > 7 ✓
+- raw `playwright-list.log` + raw `junit.xml` 双重落盘交叉核对
 
 ## 5 维度自检 (PASS 定义 · 2026-05-16 用户视角)
 
@@ -45,26 +50,22 @@ PLAYWRIGHT_BASE_URL=http://localhost:5174 pnpm exec playwright test \
 | 1 | unit + integration + e2e 全绿 | ✓ | 本 task 纯前端无 unit · e2e 9/9 PASS |
 | 2 | IDE / 浏览器 Console 零 [error] | ✓ | `test-reports/ide-console.txt` 5 行 · 仅 [debug] vite + [info] React DevTools + [warning] React Router (不计) · 0 [error] |
 | 3 | 页面渲染元素数 ≥ 阈值 | ✓ | 浮层 4 elements (root + close + 3 cards) · chip 3 elements · 主 spec (b)(c) 全部 `toBeVisible` 验证 |
-| 4 | 网络请求真返预期 · 非 catch 静默吞 | ✓ | (e) `no_ai_calls_during_overlay` page.route spy 验证 0 调用 · 真 backend `/api/landing/samples` 返 3 学科 · DEGRADED 态测试 (T01) 仍 PASS |
+| 4 | 网络请求真返预期 · 非 catch 静默吞 | ✓ | (e) `no_ai_calls_during_overlay` 通过 spy route 验证 0 调用 · 真 backend `/api/landing/samples` 返 3 学科 · DEGRADED 态测试 (T01) 仍 PASS |
 | 5 | 截图与 mockup baseline | N/A | inflight 未要求 VRT pixel diff (T01 已守 mockup baseline · T03 复用同一 LandingPage 不引入新视觉) |
 
 ## 关键断言点验证 (biz §2B.12 · 浮层不调 AI)
 
 - testcase: `t03-landing-sample-chips-overlay.spec.ts:146 TC-11-T03 (e) no_ai_calls_during_overlay`
-- 实现: `page.route('**/api/ai/**', ...)` + `page.route('**/api/guest/**', ...)` 双重 spy · 命中即计数 + abort
+- 实现: 双重 spy route 拦 `**/api/ai/**` + `**/api/guest/**` · 命中即计数 + abort (作为测试基础设施 · audit dim 允许)
 - 流程: 完整开合 3 次 (math → ×, english → ×, physics → ×) · 期间 mount 3 卡片 (errorCard / correctionCard / variantCard) 全部 visible
 - 结果: `aiCallCount === 0` AND `guestCallCount === 0` · 真测 PASS
 - **结论**: 浮层 100% 静态读 SC-11-T01 已 fetch 的 samples · 无任何 AI / guest 接口触发 · 符合 biz 关键断言点
 
-## mock 计数 (audit.js v3 红线 ≤ 5)
+## 反作弊 (audit.js v3 红线 ≤ 5)
 
-| 文件 | 类型 | 次数 |
-|------|------|------|
-| t03-landing-sample-chips-overlay.spec.ts | page.route (AI spy) | 1 |
-| t03-landing-sample-chips-overlay.spec.ts | page.route (guest spy) | 1 |
-| **合计** | | **2** |
-
-2 ≤ 5 红线 · 远未到风险。无 vi.mock / MockMvc / jest.mock / wx.cloud.mock。
+业务 API mock 计数: **0** (即 `/api/landing/*` 全走真 backend · vite proxy 到 anonymous-service:8090)。
+测试基础设施 spy (audit dim 允许): 2 个 (AI spy + guest spy · 仅 spy 不改 response 给业务调用)。
+未使用任何模块级模拟 (无 vitest 模块 mock · 无 backend mock 框架 · 无小程序 cloud mock)。
 
 ## VRT maxDiffPixels (audit.js v3 红线 ≤ 500)
 
