@@ -58,14 +58,15 @@
   <view class="block-title">
     <view class="block-title-dot" />
     <text>记忆曲线进度</text>
-    <text class="block-title-right">题目 #{{result.wrongItemId}} · {{questionSubject}} · {{questionTopic}}</text>
+    <text class="block-title-right">题目 #{{result.wrongItemId}}{{questionSubject ? ' · ' + questionSubject : ''}}{{questionTopic ? ' · ' + questionTopic : ''}}</text>
   </view>
 
   <view class="card" data-test-id="memory-curve">
     <view class="mc-head">
       <view>
-        <view class="mc-title">{{questionTitle}}</view>
-        <view class="mc-sub">知识点 · {{questionKpSummary}}</view>
+        <view class="mc-title">{{questionTitle || '题干暂未识别'}}</view>
+        <view wx:if="{{questionKpSummary}}" class="mc-sub">知识点 · {{questionKpSummary}}</view>
+        <view wx:else class="mc-sub">—</view>
       </view>
       <view class="mc-right">
         <view class="mc-mastery">{{masteryPct}}%</view>
@@ -137,21 +138,24 @@
     </view>
   </view>
 
-  <!-- KP Chart -->
-  <view class="block-title" style="margin-top:32rpx;">
-    <view class="block-title-dot" style="background:#5856D6;" />
-    <text>知识点掌握变化</text>
-  </view>
-  <view class="kp-list" data-test-id="{{testIds.kpChart}}">
-    <view wx:for="{{kpDelta}}" wx:key="kp" class="kp-row">
-      <view class="kp-square" style="background:{{kpColors[index]}};" />
-      <text class="kp-name">{{item.kp}}</text>
-      <view class="kp-bar">
-        <view class="kp-bar-fill" style="width:{{item.newPct}}%;background:{{kpGradients[index]}};" />
-      </view>
-      <text class="kp-pct">{{item.newPct}}%</text>
+  <!-- KP Chart · spec §3 <KpChart> · 但 §5 API 没对应端点 · BE review_outcome 没存
+       KP 维度 ease 历史 · 短期出不来真值. kpDelta 为空时整块 hide · 等 BE 加端点再开. -->
+  <block wx:if="{{kpDelta && kpDelta.length > 0}}">
+    <view class="block-title" style="margin-top:32rpx;">
+      <view class="block-title-dot" style="background:#5856D6;" />
+      <text>知识点掌握变化</text>
     </view>
-  </view>
+    <view class="kp-list" data-test-id="{{testIds.kpChart}}">
+      <view wx:for="{{kpDelta}}" wx:key="kp" class="kp-row">
+        <view class="kp-square" style="background:{{kpColors[index]}};" />
+        <text class="kp-name">{{item.kp}}</text>
+        <view class="kp-bar">
+          <view class="kp-bar-fill" style="width:{{item.newPct}}%;background:{{kpGradients[index]}};" />
+        </view>
+        <text class="kp-pct">{{item.newPct}}%</text>
+      </view>
+    </view>
+  </block>
 
 </scroll-view>
 

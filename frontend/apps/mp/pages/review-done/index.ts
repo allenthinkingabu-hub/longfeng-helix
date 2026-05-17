@@ -56,12 +56,10 @@ const MOCK_NODE_RESULT: NodeResult = {
   nextDueAt: new Date(Date.now() + 3 * 86400000).toISOString(),
 };
 
-const MOCK_KP_DELTA: KpDelta[] = [
-  { kp: '顶点式 · 配方法', oldPct: 72, newPct: 86 },
-  { kp: '对称轴方程', oldPct: 60, newPct: 74 },
-  { kp: '判别式 Δ 应用', oldPct: 45, newPct: 58 },
-  { kp: '韦达定理', oldPct: 30, newPct: 42 },
-];
+// spec §3 <KpChart> 组件接 rows[{kp,oldPct,newPct}] · 但 §5 API 触点 没对应端点 ·
+// review_outcome 表没存 KP 维度的 ease 历史 · BE 短期内出不来真值.
+// 不再硬塞 4 行假 KP · 留空 · wxml wx:if 隐藏整块 · 等 BE 加端点再开 (followup).
+const MOCK_KP_DELTA: KpDelta[] = [];
 
 const KP_COLORS = ['#34C759', '#007AFF', '#FF9500', '#FF3B30'];
 const KP_GRADIENTS = [
@@ -147,10 +145,12 @@ Page({
     masteryPct: 83,
     nextDueFormatted: '',
     durationFormatted: '',
-    questionTitle: 'f(x) = x² − 4x + 3',
-    questionSubject: '数学',
-    questionTopic: '二次函数',
-    questionKpSummary: '顶点式 / 配方法 / 对称轴',
+    // 初值留空 · _fetchAndRender 拉真数据填. wxml wx:if 兜底空态展示 "—" 或 hide.
+    // 之前 mock "f(x)=x²−4x+3 / 顶点式 / 配方法 / 对称轴" 是用户红圈反复出现的"假数据"根因.
+    questionTitle: '',
+    questionSubject: '',
+    questionTopic: '',
+    questionKpSummary: '',
     calendarSubscribed: false,
     toast: '',
   },
@@ -231,14 +231,21 @@ Page({
     }
 
     // 题干元信息 (Subject / KP 名) · 失败不阻塞主流程
+    // ❗去掉 mock fallback (|| this.data.questionTitle 等) · 真数据空就显空态 ·
+    //   spec 没要 mock 假数据 · 之前混进 "f(x)=x²−4x+3" 误导用户
     const qPatch: Record<string, unknown> = {};
     try {
       const q = await getQuestionById(String(result.wrongItemId));
-      qPatch.questionTitle = q.question.stem || this.data.questionTitle;
-      qPatch.questionSubject = q.question.subject || this.data.questionSubject;
+      qPatch.questionTitle = q.question.stem || '';
+      // BE wrong_item.subject 是 'math'/'physics'/... 小写 · 映射中文标签
+      const subjectKey = (q.question.subject ?? '').toLowerCase();
+      const SUBJECT_LABEL: Record<string, string> = {
+        math: '数学', physics: '物理', chemistry: '化学', english: '英语', chinese: '语文',
+      };
+      qPatch.questionSubject = SUBJECT_LABEL[subjectKey] || q.question.subject || '';
       const kpNames = (q.question.knowledgePoints ?? []).map(k => k.name).filter(Boolean);
-      qPatch.questionKpSummary = kpNames.length > 0 ? kpNames.join(' / ') : this.data.questionKpSummary;
-      qPatch.questionTopic = kpNames[0] ?? this.data.questionTopic;
+      qPatch.questionKpSummary = kpNames.length > 0 ? kpNames.join(' / ') : '';
+      qPatch.questionTopic = kpNames[0] ?? '';
     } catch (e) {
       console.warn('[P09] getQuestionById failed:', e);
     }
