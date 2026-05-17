@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "SC-12-T02",
+    "team_id": "team-1",
+    "title": "SC-12 真页 backend · AnonFilter (HandlerInterceptor) + AnonTokenService.verifyAnonToken + PATCH /api/anon/session/{id}/consent · 把 T01 mint 的 anonToken 真正在网关验签 + biz F02 consent 步落地 · 7 IT testcase",
+    "attempt": 1,
+    "phase": "done",
+    "dev_done": true,
+    "passes": true,
+    "retries": 0,
+    "audit_retries": 0,
+    "git_commits": ["6fc6570", "47f9866", "aff2b62"]
+  },
+  "work_log_dir": "audits/runs/SC-12-T02/team-1/attempt-1",
+  "log_requirements": {
+    "must_write": ["coder.md", "bugs-found.md", "tester.md", "adversarial.md", "test-reports/"]
+  },
+  "audit_gate": "audit.js v3 7 dims · 同前 || 红线: Backend IT ≥ 5 testcase 全绿 · AnonFilter 真拦截缺/伪 X-Anon-Token + PATCH consent 真写 DB consent_at/consent_type",
+  "previous_audit_verdict": null,
+  "context": {
+    "scenario": "SC-12 真页 backend 第 2/N 片 · T01 已落 POST /api/anon/session mint + GuestSession entity. 本 task 把 anonToken 的认证层闭环 + 落 biz F02 'consent 勾选' 这一步真接口.\n\n本 task 范围:\n  - AnonTokenService.verifyAnonToken(authValue): Optional<Long> — 验签 HS256 + iss/aud + 校验 sub 前缀必须 'anon:' + 返回 guestSessionId\n  - AnonFilter (Spring HandlerInterceptor · 注册到 WebMvcConfigurer): 拦截 /api/anon/** · 白名单跳过 POST /api/anon/session (mint 入口本身不能要 token) · 提取 X-Anon-Token + verify · 失败 401 ANON_TOKEN_INVALID · 成功把 guestSessionId 写 HttpServletRequest attribute 'anonGuestSessionId'\n  - PATCH /api/anon/session/{id}/consent: 验 path id == request.attribute.anonGuestSessionId (防越权) · body {consentType ∈ 1/2/3} · 更新 DB consent_at=now + consent_type + status=1 CONSENTED (T01 注释里写 INIT=0/CONSENTED=1 · 但 DDL 实际 enum 是 0 CREATED → 1 ANALYZING · 看 SC-12-T01 spec drift surface · 本 task 复核 DDL 后选最贴近的)\n\n关键复用: T01 落的 AnonTokenService.signingKey (constructor 注入) + GuestSessionRepository · 不重写.",
+    "target_page": "(backend-only · anonymous-service · 1 endpoint + 1 filter + 1 service method)",
+    "spec_path": "design/system/pages/P-GUEST-CAPTURE-guest-capture.spec.md §5 (X-Anon-Token 用法) + §6 状态机 (CONSENT_PENDING → UPLOADING transition) + biz §2B.13 F02 (consent 写库)",
+    "biz_refs": [
+      "biz §2B.13 SC-12 F02 (consent 勾选 → consent_at 写库 · consent_type 必填 · 不勾选不进 UPLOADING)",
+      "biz §4.10 guest_session.consent_at + consent_type SMALLINT (1 ADULT / 2 MINOR_WITH_GUARDIAN / 3 MINOR_NO_GUARDIAN)",
+      "biz §2A.3.2 P-GUEST-CAPTURE Consent Card (勾选前 Shutter disabled)",
+      "P-GUEST-CAPTURE spec.md §5 #1-#5 (X-Anon-Token 用于所有非 mint 端点 · 401 ANON_TOKEN_EXPIRED 标准错误码)"
+    ],
+    "api_contracts_in_scope": [
+      "PATCH /api/anon/session/{id}/consent (NEW) · header X-Anon-Token (Bearer NOT required · 直接 token 值) · body {consentType: 1|2|3} → 200 {consentAt, consentType} · 401 token 无效 · 403 session_id 不匹配 · 404 session 不存在",
+      "AnonFilter (Spring HandlerInterceptor) 拦截 /api/anon/** · 白名单 POST /api/anon/session"
+    ],
+    "api_contracts_out_of_scope": [
+      "POST /api/anon/file/presign (T03 范围)",
+      "POST /api/anon/questions + POST /api/anon/analyze-by-url + GET /api/anon/result (T03-T04 范围)",
+      "POST /api/auth/anonymous-claim (T05 范围)",
+      "Quota / rate limit 429 QUOTA_EXHAUSTED (T06 范围)",
+      "前端 P-GUEST-CAPTURE 真页 (T05 范围)",
+      "TestDesigner test-cases.md (沿用 opt-out)"
+    ],
+    "scope_in": [
+      "0. 复核 V20260421_02__init_anonymous.sql guest_session.status enum 实际定义 (T01 spec drift surface 提到 DDL 0 CREATED / 1 ANALYZING / 2 RESULT_READY / 3 FAILED / 4 CLAIMED / 9 EXPIRED) · 决策: 本 task PATCH consent 不动 status (因为 ANALYZING 与 CONSENTED 概念冲突 · 状态机由 T03 presign + T04 analyze 推进) · 只写 consent_at + consent_type",
+      "1. backend/anonymous-service/src/main/java/com/longfeng/anonymousservice/service/AnonTokenService.java 扩展:",
+      "   (a) 新增 public Optional<Long> verifyAnonToken(String anonTokenHeaderValue): 验签 HS256 + iss/aud · 检查 sub 必须以 'anon:' 开头 · 返回 sub 后的 Long(guestSessionId) · 任何失败 (null/blank/expired/wrong-issuer/wrong-prefix) 返 Optional.empty() · 与 JwtVerifier 同模式 (debug 日志不抛)",
+      "   (b) 复用现有 signingKey + expectedIssuer + expectedAudience · 不重新构造",
+      "2. backend/anonymous-service/src/main/java/com/longfeng/anonymousservice/filter/AnonFilter.java 新建 (HandlerInterceptor):",
+      "   (a) implements HandlerInterceptor · @Component",
+      "   (b) preHandle(req, resp, handler):",
+      "       - path = req.getRequestURI()",
+      "       - 白名单 skip (return true): path == '/api/anon/session' AND method == POST",
+      "       - 否则: header = req.getHeader('X-Anon-Token')",
+      "       - opt = anonTokenService.verifyAnonToken(header)",
+      "       - opt.empty → 写 401 response body {code:'ANON_TOKEN_INVALID', message:'Invalid or missing X-Anon-Token'} (application/json · 用 ObjectMapper · 沿 AuthController ExceptionHandler pattern)",
+      "       - opt.present → req.setAttribute('anonGuestSessionId', opt.get()) · return true",
+      "3. backend/anonymous-service/src/main/java/com/longfeng/anonymousservice/config/WebMvcConfig.java 新建 (如不存在):",
+      "   (a) implements WebMvcConfigurer · @Configuration",
+      "   (b) addInterceptors(registry): registry.addInterceptor(anonFilter).addPathPatterns('/api/anon/**') · (注意: spring 会调白名单 skip 在 preHandle 内 · 不在路径配置)",
+      "4. backend/anonymous-service/src/main/java/com/longfeng/anonymousservice/controller/AnonSessionConsentController.java 新建 (或加到 AnonSessionController · 优先后者保持组织清晰 · 但本 task 用独立 controller 更明确):",
+      "   (a) @PatchMapping('/api/anon/session/{id}/consent') · @PathVariable Long id · @Valid @RequestBody AnonConsentRequest · HttpServletRequest req",
+      "   (b) attrId = (Long) req.getAttribute('anonGuestSessionId') · attrId == null → 500 (Filter 未生效 · sanity)",
+      "   (c) attrId != id → 403 + AnonErrorResponse(code='ANON_SESSION_MISMATCH', message='token session_id does not match path')",
+      "   (d) 调 anonSessionConsentService.applyConsent(id, req.consentType) → outcome:",
+      "       NOT_FOUND → 404 ANON_SESSION_NOT_FOUND",
+      "       SUCCESS → 200 AnonConsentResponse{consentAt, consentType}",
+      "5. backend/anonymous-service/src/main/java/com/longfeng/anonymousservice/service/AnonSessionConsentService.java 新建:",
+      "   (a) constructor: GuestSessionRepository",
+      "   (b) public ConsentOutcome applyConsent(long id, short consentType):",
+      "       - opt = repo.findById(id)",
+      "       - empty → return NOT_FOUND",
+      "       - g.consentAt = OffsetDateTime.now() · g.consentType = consentType · 不动 status (T01 spec drift · 由后续 task 推进)",
+      "       - repo.save(g)",
+      "       - return SUCCESS",
+      "   (c) ConsentOutcome enum: NOT_FOUND / SUCCESS",
+      "6. backend/anonymous-service/src/main/java/com/longfeng/anonymousservice/dto/AnonConsentRequest.java 新建:",
+      "   (a) @NotNull @Min(1) @Max(3) Short consentType",
+      "7. backend/anonymous-service/src/main/java/com/longfeng/anonymousservice/dto/AnonConsentResponse.java 新建:",
+      "   (a) 字段: consentAt (OffsetDateTime) · consentType (Short)",
+      "8. backend/anonymous-service/src/test/java/com/longfeng/anonymousservice/SC12T02AnonConsentE2EIT.java 新建 IT (沿 IntegrationTestBase · 6+1=7 testcase):",
+      "   (a) consent_with_valid_token_returns_200_and_db_updated → 先 POST /api/anon/session 拿 anonToken + id · PATCH /api/anon/session/{id}/consent header X-Anon-Token=anonToken body {consentType:1} → 200 + DB g.consentAt 非空 · g.consentType=1",
+      "   (b) consent_without_header_returns_401_anon_token_invalid → PATCH 无 X-Anon-Token · 401 + code='ANON_TOKEN_INVALID'",
+      "   (c) consent_with_garbage_token_returns_401 → header='garbage.invalid.jwt' · 401",
+      "   (d) consent_with_student_jwt_returns_401_wrong_prefix → 用 auth-service style JWT (sub=42 不带 'anon:' 前缀 · 但用 anon.jwt.secret 签) → 401 (验 sub prefix 校验生效)",
+      "   (e) consent_with_token_for_different_session_returns_403 → mint session A 拿 tokenA · mint session B 拿 id B · PATCH /api/anon/session/{idB}/consent header X-Anon-Token=tokenA → 403 ANON_SESSION_MISMATCH",
+      "   (f) consent_for_nonexistent_session_returns_404 → mint session A 拿 tokenA · 手动构造一个 sub='anon:99999999' 的 token (但 99999999 没 DB 行) → 404",
+      "   (g) consent_invalid_consent_type_returns_400 → body {consentType:0} or {consentType:4} → 400 VALIDATION_FAILED (@Min/@Max)",
+      "   (h) filter_lets_session_mint_pass → POST /api/anon/session 不带 X-Anon-Token · 仍 200 (验白名单)",
+      "9. Regression 不破 · 既有 33 IT 全绿 (SC-13/SC-13-SHARER/SC-00/SC-11/SC-12-T01)",
+      "10. work_log 5 件齐 · adversarial.md ≥ 1 REJECT + ≥ 1 fix · 探索性 [sub prefix collision · filter 白名单 path matching · concurrent consent overwrite · clock drift · header case sensitivity]",
+      "11. git commit 2-3 个:",
+      "   (a) feat(SC-12-T02 backend): AnonFilter + AnonTokenService.verifyAnonToken + PATCH consent endpoint + AnonSessionConsentService + DTOs",
+      "   (b) test(SC-12-T02): SC12T02AnonConsentE2EIT ≥ 7 testcase 全绿 + regression 33 IT 仍绿",
+      "   (c) chore(SC-12-T02): work_log + audit.js v3 PASS + inflight finalize"
+    ],
+    "scope_out": [
+      "POST /api/anon/file/presign (T03)",
+      "POST /api/anon/questions + analyze + result (T03-T04)",
+      "POST /api/auth/anonymous-claim (T05)",
+      "Quota / rate limit (T06)",
+      "前端 P-GUEST-CAPTURE 真页 (T05)",
+      "guest_session.status 状态推进 (本 task 不动 · 状态机由后续 task 完成)",
+      "TestDesigner test-cases.md (沿用 opt-out)"
+    ],
+    "sandbox": {
+      "team_env_file": ".harness/docker/team-1.env",
+      "pg_port": 15432,
+      "redis_port": 16379,
+      "compose_project_name": "team-1",
+      "note": "anonymous-service:8090 必须 up (本 task 改其源码 · 需重启)"
+    },
+    "test_case_first_required": false,
+    "opt_out_reason": "沿用所有前任 task 同款 · BE-only 1 endpoint + 1 filter + 1 service · IT 8 case 覆盖红线"
+  },
+  "isolation": {
+    "worktree_disabled": false,
+    "working_dir": "/Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c",
+    "branch_name": "claude/nifty-kepler-3deb2c"
+  },
+  "physical_verification": {
+    "dor_c1_to_c6_required": false,
+    "frontend_e2e": null,
+    "backend_e2e_it": "backend/anonymous-service/src/test/java/com/longfeng/anonymousservice/SC12T02AnonConsentE2EIT.java"
+  },
+  "permissions": {"writable_fields": ["task.passes"]},
+  "deliverables_definition_of_done": [
+    "1. AnonTokenService.verifyAnonToken(String) → Optional<Long> · sub 前缀 'anon:' 严格校验",
+    "2. AnonFilter (HandlerInterceptor) 注册 /api/anon/** · 白名单 POST /api/anon/session · 401 ANON_TOKEN_INVALID 标准",
+    "3. PATCH /api/anon/session/{id}/consent endpoint · 验 path id == filter attribute (403 if mismatch)",
+    "4. AnonSessionConsentService.applyConsent 写 consent_at + consent_type · 不动 status",
+    "5. SC12T02AnonConsentE2EIT ≥ 7 IT testcase 全绿 (含 401/403/404/400 全错误码 · 含 student JWT 反例)",
+    "6. Regression 既有 33 IT 全绿",
+    "7. work_log 5 件齐 · ≥1 REJECT + ≥1 fix",
+    "8. git commit 2-3 个 · hash 入 inflight · audit.js v3 PASS",
+    "9. 不动 guest_session.status (T01 spec drift surface)"
+  ],
+  "rule_6_tool_budget_guidance": "BE-only 1 endpoint + 1 filter + 1 service + 7-8 IT · 预计 ~70-90 tool use · 软线 50 surface 70 硬线 85 · 同 T01 体量",
+  "written_at": "2026-05-18T01:50:00Z",
+  "written_by": "TL agent (claude · 本会话 · SC-12 真页 第 2/N 片 · 认证层闭环 + F02 consent)"
+}
