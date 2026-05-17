@@ -39,15 +39,16 @@ public interface WrongItemRepository extends JpaRepository<WrongItem, Long> {
      * (一次重新分析会写入新行 · 我们要最新). task_id = wrong_item.id::text.
      * 返 String[] {ai_stem, error_reason, steps_json} · null 表示没有 AI 数据.
      */
-    // PostgreSQL ::text 跟 JPA :param 占位符冲突 (parser 误以为 :text 是参数) ·
-    // 改 cast(... as text). 也简化 · 现在只需要 stem · 不返 error_reason/steps.
+    // PostgreSQL ::text 跟 JPA :param 占位符冲突 · 用 cast(... as text).
+    // 不要求 analysis_task.status='DONE' · 因为 OCR 步成功但后续诊断/解答失败时
+    // task 整体 FAILED 但 analysis_result.stem 已有真题干 · 该用就用.
+    // 直接 JOIN analysis_result · 用 task_id = wrong_item.id (varchar 比较).
     @Query(
         value = "SELECT ar.stem "
               + "FROM analysis_result ar "
-              + "JOIN analysis_task at ON at.task_id = ar.task_id "
-              + "WHERE at.task_id = cast(:wrongItemId as varchar) "
+              + "WHERE ar.task_id = cast(:wrongItemId as varchar) "
               + "AND ar.deleted_at IS NULL "
-              + "AND at.status = 'DONE' "
+              + "AND ar.stem IS NOT NULL AND length(ar.stem) > 0 "
               + "ORDER BY ar.created_at DESC LIMIT 1",
         nativeQuery = true)
     String findLatestAnalysisStemByWrongItemId(@Param("wrongItemId") Long wrongItemId);
