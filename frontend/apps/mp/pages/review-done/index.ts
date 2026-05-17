@@ -13,8 +13,9 @@ import { getQuestionById } from '../../src/api/wrongbook';
 
 // ── Types ───────────────────────────────────────────────────
 interface NodeResult {
-  planId: number;
-  wrongItemId: number;
+  // Snowflake ID 走字符串 · 否则 JS 精度截尾 184→200 (FE 拿错 qid 调 getQuestionById 404)
+  planId: string;
+  wrongItemId: string;
   nodeIndex: number;
   nodeState: string;
   mastered: boolean;
@@ -43,8 +44,8 @@ type PageState = 'LOADING' | 'RESULT' | 'ALL_DONE' | 'ERROR';
 
 // ── Mock data (matching H5 sibling) ─────────────────────────
 const MOCK_NODE_RESULT: NodeResult = {
-  planId: 1001,
-  wrongItemId: 2001,
+  planId: '1001',
+  wrongItemId: '2001',
   nodeIndex: 2,
   nodeState: 'MASTERED',
   mastered: true,
@@ -55,12 +56,10 @@ const MOCK_NODE_RESULT: NodeResult = {
   nextDueAt: new Date(Date.now() + 3 * 86400000).toISOString(),
 };
 
-const MOCK_KP_DELTA: KpDelta[] = [
-  { kp: '顶点式 · 配方法', oldPct: 72, newPct: 86 },
-  { kp: '对称轴方程', oldPct: 60, newPct: 74 },
-  { kp: '判别式 Δ 应用', oldPct: 45, newPct: 58 },
-  { kp: '韦达定理', oldPct: 30, newPct: 42 },
-];
+// spec §3 <KpChart> 组件接 rows[{kp,oldPct,newPct}] · 但 §5 API 触点 没对应端点 ·
+// review_outcome 表没存 KP 维度的 ease 历史 · BE 短期内出不来真值.
+// 不再硬塞 4 行假 KP · 留空 · wxml wx:if 隐藏整块 · 等 BE 加端点再开 (followup).
+const MOCK_KP_DELTA: KpDelta[] = [];
 
 const KP_COLORS = ['#34C759', '#007AFF', '#FF9500', '#FF3B30'];
 const KP_GRADIENTS = [
@@ -146,10 +145,12 @@ Page({
     masteryPct: 83,
     nextDueFormatted: '',
     durationFormatted: '',
-    questionTitle: 'f(x) = x² − 4x + 3',
-    questionSubject: '数学',
-    questionTopic: '二次函数',
-    questionKpSummary: '顶点式 / 配方法 / 对称轴',
+    // 初值留空 · _fetchAndRender 拉真数据填. wxml wx:if 兜底空态展示 "—" 或 hide.
+    // 之前 mock "f(x)=x²−4x+3 / 顶点式 / 配方法 / 对称轴" 是用户红圈反复出现的"假数据"根因.
+    questionTitle: '',
+    questionSubject: '',
+    questionTopic: '',
+    questionKpSummary: '',
     calendarSubscribed: false,
     toast: '',
   },
@@ -179,7 +180,7 @@ Page({
     // #1 nodeResult — Hero / 曲线 / nextDueAt 主数据
     const r = await nodeResult(nid);
     const result: NodeResult = {
-      planId: 0,                                              // NodeResultResp 不含 planId · 模板未使用 · 安全置 0
+      planId: r.planId || '0',                                // NodeResultResp.planId 字符串 · 老 mock fallback '0'
       wrongItemId: r.wrongItemId,
       nodeIndex: r.nodeIndex,
       nodeState: r.nodeState,
@@ -230,16 +231,35 @@ Page({
     }
 
     // 题干元信息 (Subject / KP 名) · 失败不阻塞主流程
+    // ❗去掉 mock fallback (|| this.data.questionTitle 等) · 真数据空就显空态 ·
+    //   spec 没要 mock 假数据 · 之前混进 "f(x)=x²−4x+3" 误导用户
     const qPatch: Record<string, unknown> = {};
+    let realKpNames: string[] = [];
     try {
       const q = await getQuestionById(String(result.wrongItemId));
-      qPatch.questionTitle = q.question.stem || this.data.questionTitle;
-      qPatch.questionSubject = q.question.subject || this.data.questionSubject;
-      const kpNames = (q.question.knowledgePoints ?? []).map(k => k.name).filter(Boolean);
-      qPatch.questionKpSummary = kpNames.length > 0 ? kpNames.join(' / ') : this.data.questionKpSummary;
-      qPatch.questionTopic = kpNames[0] ?? this.data.questionTopic;
+      qPatch.questionTitle = q.question.stem || '';
+      // BE wrong_item.subject 是 'math'/'physics'/... 小写 · 映射中文标签
+      const subjectKey = (q.question.subject ?? '').toLowerCase();
+      const SUBJECT_LABEL: Record<string, string> = {
+        math: '数学', physics: '物理', chemistry: '化学', english: '英语', chinese: '语文',
+      };
+      qPatch.questionSubject = SUBJECT_LABEL[subjectKey] || q.question.subject || '';
+      realKpNames = (q.question.knowledgePoints ?? []).map(k => k.name).filter(Boolean);
+      qPatch.questionKpSummary = realKpNames.length > 0 ? realKpNames.join(' / ') : '';
+      qPatch.questionTopic = realKpNames[0] ?? '';
     } catch (e) {
       console.warn('[P09] getQuestionById failed:', e);
+    }
+
+    // P09-FOLLOWUP-#3 · KpChart 真 delta · 用 review_outcome ease before/after 派生 ·
+    // 同一道题的每个 KP 都套同 delta (BE 没存 KP 维度 ease 历史 · 短期最诚实可行方案).
+    // ease 1.3→0%, 3.0→100% 线性映射 · 没 outcome (没复习过) 则 KpChart 空.
+    let computedKpDelta: KpDelta[] = [];
+    if (r.easeFactorBefore != null && r.easeFactorAfter != null && realKpNames.length > 0) {
+      const easeToPct = (e: number) => Math.max(0, Math.min(100, Math.round((e - 1.3) / 1.7 * 100)));
+      const oldPct = easeToPct(r.easeFactorBefore);
+      const newPct = easeToPct(r.easeFactorAfter);
+      computedKpDelta = realKpNames.slice(0, 4).map(kp => ({ kp, oldPct, newPct }));
     }
 
     this.setData({
@@ -247,12 +267,20 @@ Page({
       result,
       sessionStats,
       isForgot,
+      // FORGOT 路径 (spec §6.1 Q-C 规则): 当前 + 后续 CANCELLED · 重建 T0..T6 ·
+      // 用户视角是 "回到起点" · prevT = 原节点 · nextT = T0 (下一次从头开始).
+      // 非 FORGOT: 正常推进 nodeIndex → nodeIndex+1.
       prevT: `T${Math.max(0, result.nodeIndex)}`,
-      nextT: `T${result.nodeIndex + 1}`,
-      masteryPct: Math.round(result.easeAfter * 32),
+      nextT: isForgot ? 'T0' : `T${result.nodeIndex + 1}`,
+      // P09-MASTERY: 优先用 BE review_plan.mastery_score 真值 · 0 也用 (FORGOT 后真值就是 0,
+      // 不能因为 0 退到派生公式 80% 骗用户). 仅当 BE 字段 null 时退派生 (老服务版本兼容).
+      masteryPct: typeof r.masteryScore === 'number'
+        ? r.masteryScore
+        : Math.round(result.easeAfter * 32),
       nextDueFormatted: formatNextDue(result.nextDueAt),
       durationFormatted: formatDuration(result.durationMs),
       tLevels: buildTLevels(result.nodeIndex),
+      kpDelta: computedKpDelta,
       ...qPatch,
     });
   },

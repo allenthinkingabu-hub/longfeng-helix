@@ -88,14 +88,9 @@ const STEP_DESCS: Record<number, { wait: string; now: string; done: (f: StepFact
   },
 };
 
-const STREAM_PLACEHOLDER = `{
-  "stem": "已知函数 f(x)=x²−4x+3，求其顶点坐标与对称轴方程。",
-  "studentAnswer": "B. (2, −1)",
-  "correctAnswer": "A. (1, −2)",
-  "errorType": "CONCEPT",
-  "errorReason": "对顶点式 (x−h)²+k 的 h, k 含义混淆",
-  "solutionSteps": [
-    { "step": 1, "explain": "配方：f(x)=(x−2)²−1" }█`;
+// STREAM_PLACEHOLDER 已删 · 配套 wxml/wxss 的 .stream SSE 终端卡 已删除 ·
+// 原 placeholder 永远显示假 "顶点 (2,−1) 配方" 数据 · 跟 P04 旧 mockup 同根 ·
+// 改成 .afterview "完成后将看到" 引导卡 · 不再需要 stream 文本
 
 function buildSteps(currentStep: number, pageState: PageState, facts: StepFacts = {}): StepData[] {
   return [1, 2, 3, 4].map((n) => {
@@ -138,7 +133,6 @@ Page({
     showBanner: false,
     errorMsg: '',
     steps: buildSteps(0, 'init'),
-    streamOutput: STREAM_PLACEHOLDER,
     taskId: '',
     // 红框预览卡 · 用户视角 "OCR 还没跑就显示题号 17" 反 bug ·
     // 这些字段按 pageState/currentStep 动态滚 · 不再写死 mockup 文案
@@ -273,7 +267,7 @@ Page({
           statusText: 'AI 分析完成',
           doneCount: 4,
           steps: buildSteps(5, 'analyzing', facts),
-          streamOutput: resp.result ? JSON.stringify(resp.result, null, 2) : this.data.streamOutput,
+          // streamOutput 已删 · 配套 .stream SSE 终端卡已替换成 .afterview 引导卡
           previewTitle,
           previewSubtitle,
         });

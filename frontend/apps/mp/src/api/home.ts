@@ -16,11 +16,30 @@ const BASE = apiBase('review');
 
 // ── Types ────────────────────────────────────────────────────
 
+/**
+ * BE wire shape · trace: review-plan-service ReviewPlanController L226
+ * `TodayResp(items, items.size(), tz)` · 注意 BE 不返 `done` 字段 ·
+ * FE 必须从 items.filter(completedAt!=null) 自己派生 (Fix-2026-05-16)
+ */
+export interface HomeTodayItem {
+  id: number;                    // = nid · 节点 id
+  wrongItemId: number;           // 关联 wb_question.id · 用于反查学科
+  studentId: number;
+  nodeIndex: number;             // T0..T6
+  status: 'ACTIVE' | 'MASTERED';
+  nextDueAt: string;
+  completedAt: string | null;    // 非 null = 当日已复习完
+  easeFactor: number;
+  totalReview: number;
+  totalForget: number;
+}
+
 export interface HomeTodayData {
+  items: HomeTodayItem[];
   total: number;
-  done: number;
-  items: unknown[];
   tz: string;
+  /** BE 当前不返 · 见 FE 兼容: 缺失时 ?? 0 兜底 + 由 items.completedAt 派生 */
+  done?: number;
 }
 
 /**

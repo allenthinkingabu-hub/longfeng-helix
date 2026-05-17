@@ -157,10 +157,26 @@ public class ReviewPlanService {
     SM2Result r = SM2Algorithm.compute(easeBefore, intervalBeforeDays, quality, cfg);
 
     Instant now = Instant.now();
-    Instant nextDueAt = now.plus(Duration.ofDays(r.nextIntervalDays()));
 
-    plan.setEaseFactor(r.nextEaseFactor());
-    plan.setIntervalIndex((short) Math.min(6, plan.getIntervalIndex() + 1));
+    // P08 spec §6.1 Q-C 规则: FORGOT (quality=0) 强制 ease 重置 easeInit (2.5) ·
+    // intervalDays=1 · 跟 SM-2 自然下降不同 (SM-2 让 ease 走 1.7) · spec 优先.
+    // (commit 888e20f 加 mastery_score 时已有 totalForget++ · 这里补 ease/interval reset)
+    BigDecimal nextEase;
+    int nextIntervalDays;
+    if (quality == 0) {
+      nextEase = cfg.easeInit();      // 2.5
+      nextIntervalDays = 1;
+    } else {
+      nextEase = r.nextEaseFactor();
+      nextIntervalDays = r.nextIntervalDays();
+    }
+    Instant nextDueAt = now.plus(Duration.ofDays(nextIntervalDays));
+
+    plan.setEaseFactor(nextEase);
+    // FORGOT 时 interval_index reset 到 0 · 跟"回到 T0"语义对齐 ·
+    // 否则 SM-2 推进会让 "曾经做错 6 次" 的 plan 留在 T6 难看.
+    plan.setIntervalIndex(quality == 0 ? (short) 0
+        : (short) Math.min(6, plan.getIntervalIndex() + 1));
     plan.setCurrentLevel(plan.getIntervalIndex());
     plan.setNextDueAt(nextDueAt);
     plan.setCompletedAt(now);
@@ -176,6 +192,22 @@ public class ReviewPlanService {
                   : 0);
       plan.setConsecutiveGoodCount(next);
     }
+
+    // P09-MASTERY · 更新 mastery_score (0-100) · 之前 SM-2 不管这字段, 永远 0,
+    // 导致 P09 "Mastery %" 长期靠 FE 派生 easeAfter×32 假数据.
+    // 简化口径: review 一次正确 +25 · 错一次 -15 · clamp · MASTERED 直接 100.
+    int newMastery;
+    if (plan.isMastered()) {
+      newMastery = 100;
+    } else {
+      int total = plan.getTotalReview();
+      int forget = plan.getTotalForget();
+      // (total-forget) 是净正确次数 · *25 给个有意义梯度 (1 次→25 / 2 次→50 / 3 次→75 / 4 次→95 cap)
+      int gross = (total - forget) * 25 - forget * 15;
+      newMastery = Math.max(0, Math.min(95, gross));
+    }
+    plan.setMasteryScore(newMastery);
+
     planRepo.save(plan);
 
     // 审计
@@ -186,9 +218,9 @@ public class ReviewPlanService {
     outcome.setUserId(plan.getStudentId());
     outcome.setQuality((short) quality);
     outcome.setEaseFactorBefore(easeBefore);
-    outcome.setEaseFactorAfter(r.nextEaseFactor());
+    outcome.setEaseFactorAfter(nextEase);   // FORGOT 走 reset 值 · 跟 plan.ease_factor 一致
     outcome.setIntervalDaysBefore(intervalBeforeDays);
-    outcome.setIntervalDaysAfter(r.nextIntervalDays());
+    outcome.setIntervalDaysAfter(nextIntervalDays);
     outcome.setCompletedAt(now);
     outcomeRepo.save(outcome);
 
@@ -203,7 +235,7 @@ public class ReviewPlanService {
             "quality", quality,
             "nodeIndex", plan.getNodeIndex(),
             "nextReviewAt", nextDueAt.toString(),
-            "easeFactorAfter", r.nextEaseFactor().toPlainString(),
+            "easeFactorAfter", nextEase.toPlainString(),
             "mastered", false));
 
     // Q-G · 检查 mastered 触发（聚合根原子性）
@@ -220,7 +252,7 @@ public class ReviewPlanService {
               "masteredAt", now.toString()));
     }
 
-    return new CompleteResult(plan.getId(), nextDueAt, r.nextEaseFactor(), masteredTriggered);
+    return new CompleteResult(plan.getId(), nextDueAt, nextEase, masteredTriggered);
   }
 
   private void writeOutbox(Long planId, String eventType, Map<String, Object> payload) {
@@ -267,8 +299,10 @@ public class ReviewPlanService {
     return planRepo.findDueOnDate(studentId, startOfDayUtc, endOfDayUtc);
   }
 
-  /** complete 返回值 · 用于 Controller Response. */
+  /** complete 返回值 · 用于 Controller Response. planId Snowflake 走字符串. */
   public record CompleteResult(
+      @com.fasterxml.jackson.databind.annotation.JsonSerialize(
+          using = com.fasterxml.jackson.databind.ser.std.ToStringSerializer.class)
       Long planId, Instant nextReviewAt, BigDecimal easeFactorAfter, boolean mastered) {}
 
   // =======================================================================

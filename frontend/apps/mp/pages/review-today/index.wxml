@@ -63,8 +63,8 @@
       <text class="empty-sub">还没有待复习的题目</text>
     </view>
 
-    <!-- ── Slot groups ─────────────────────────────── -->
-    <block wx:for="{{slots}}" wx:key="key">
+    <!-- ── Slot groups (仅 LIST 态 · 否则 EMPTY/ALL_DONE 会和 mock cards 同屏渲染) ── -->
+    <block wx:if="{{pageState === 'today.LIST'}}" wx:for="{{slots}}" wx:key="key">
       <view class="slot">
         <view class="slot-icon {{item.iconClass}}">
           <van-icon wx:if="{{item.key === 'now'}}" name="clock-o" size="12px" />

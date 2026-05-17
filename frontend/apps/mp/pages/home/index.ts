@@ -122,8 +122,9 @@ Page({
       weekLabel: strip.label,
       weekDays: strip.days,
     });
-    // Sync 复习 tab badge to today's pending review count · mockup line 484 badge=8
-    this._syncReviewBadge();
+    // 从 P04 保存新题回来 · 必须重新拉今日复习 · 否则 hero "X 题待复习" 永远不更新
+    this._fetchTodayData();
+    // _syncReviewBadge 已在 _fetchTodayData 完成回调里调过 · 不重复
   },
 
   _syncReviewBadge() {
@@ -138,10 +139,13 @@ Page({
   async _fetchTodayData() {
     try {
       const data = await getHomeTodayCount();
-      // 后端 data.total / data.done 可能缺字段 · ?? 0 兜底 防 IDE Console:
-      // "Setting data field 'todayDone' to undefined is invalid" (Fix-4b · 2026-05-16)
       const total = data.total ?? 0;
-      const done = data.done ?? 0;
+      // BE TodayResp 不返 done 字段 · FE 必须从 items.completedAt 派生真 done count
+      // (之前 data.done 永远 undefined · ?? 0 兜底 · 圆圈进度永远 0%)
+      const itemsArr = Array.isArray(data.items) ? data.items : [];
+      const done = typeof data.done === 'number'
+        ? data.done
+        : itemsArr.filter(i => i && (i as { completedAt?: unknown }).completedAt).length;
       const pct = computeCirclePct(done, total);
 
       this.setData({
@@ -151,14 +155,15 @@ Page({
         circleProgress: pct / 100,
         circlePctText: `${pct}%`,
       }, () => this._syncReviewBadge());
-    } catch {
-      // Degrade: show READY with MVP defaults (mockup placeholder data)
+    } catch (err) {
+      // §9 降级: 真失败时露白 · 不假装有 8/3/38% mock 数据骗用户
+      console.error('[P-HOME] getHomeTodayCount failed:', err);
       this.setData({
         pageState: 'READY' as PageState,
-        todayTotal: 8,
-        todayDone: 3,
-        circleProgress: 0.38,
-        circlePctText: '38%',
+        todayTotal: 0,
+        todayDone: 0,
+        circleProgress: 0,
+        circlePctText: '0%',
       }, () => this._syncReviewBadge());
     }
   },

@@ -20,20 +20,26 @@ interface ApiEnvelope<T> {
 // ── Types ────────────────────────────────────────────────────
 
 export interface ReviewPlanDto {
-  id: number;
-  wrongItemId: number;
-  studentId: number;
+  // Snowflake ID 19 位 > 2^53 · BE 用 @JsonSerialize(ToStringSerializer)
+  // 把 Long 序列化成字符串发出来 · 不然 JS Number 精度只到 9e15 · 后 3 位被截.
+  id: string;
+  wrongItemId: string;
+  studentId: string;
   nodeIndex: number;
   easeFactor: number;
   intervalDays: number;
   nextDueAt: string;
   completedAt: string | null;
   mastered: boolean;
+  // P07 单库 enrich · BE today join wrong_item 注入 · 其他端点为 null
+  subject?: string | null;
+  stem?: string | null;
 }
 
 export interface CreateSessionResp {
   sid: string;
-  nids: number[];
+  // BE @JsonSerialize(contentUsing=ToStringSerializer) · 每个 Long nid 是字符串
+  nids: string[];
   total: number;
 }
 
@@ -44,7 +50,8 @@ export interface TodayResp {
 }
 
 export interface CompleteResult {
-  planId: number;
+  // Snowflake ID 19 位 → BE ToStringSerializer 输出字符串 · 避免 JS 精度截尾
+  planId: string;
   quality: number;
   oldEF: number;
   newEF: number;
@@ -55,15 +62,17 @@ export interface CompleteResult {
 }
 
 export interface NextInSessionResp {
-  nextNid: number | null;
+  nextNid: string | null;
   completed: number;
   total: number;
   done: boolean;
 }
 
 export interface NodeResultResp {
-  nid: number;
-  wrongItemId: number;
+  // Snowflake ID 走 ToStringSerializer · FE 必须 string · 否则精度截尾 184 → 200
+  nid?: string;
+  planId?: string;
+  wrongItemId: string;
   nodeIndex: number;
   nodeState: string;
   quality: number | null;
@@ -74,6 +83,8 @@ export interface NodeResultResp {
   nextDueAt: string | null;
   durationMs: number | null;
   mastered: boolean;
+  // P09-MASTERY · BE review_plan.mastery_score · 真值 0..100 · 没复习过 = 0 (诚实).
+  masteryScore?: number | null;
 }
 
 export interface RevealResp {

@@ -61,6 +61,32 @@ public interface ReviewPlanRepository extends JpaRepository<ReviewPlan, Long> {
       @Param("end") Instant end);
 
   /**
+   * P07-TODAY-RENDER · 拿 wrong_item subject+stem · 供 today 卡渲染.
+   * 单库迁移后 (2026-05-17 用户拍板 C+B 方案) wrong_item + analysis_result 同库.
+   * wrong_item.stem_text 可能为 null (AI 写到 analysis_result 不回写) ·
+   * LEFT JOIN analysis_result + COALESCE 兜底 AI OCR 真题干.
+   *
+   * <p>取 analysis_result 时按 created_at DESC 拿最新 · 子查询展开 · 同 wrongbook
+   * GET 那侧 (commit 9dbaf45) 的逻辑对齐.
+   *
+   * <p>返 [wrong_item.id, subject, effective_stem] · 数量 <= 50.
+   */
+  @Query(
+      value =
+          "SELECT wi.id, wi.subject, COALESCE(NULLIF(wi.stem_text, ''), ar_latest.stem) "
+              + "FROM wrong_item wi "
+              + "LEFT JOIN LATERAL ("
+              + "  SELECT stem FROM analysis_result "
+              + "  WHERE task_id = cast(wi.id as varchar) "
+              + "    AND deleted_at IS NULL "
+              + "    AND stem IS NOT NULL AND length(stem) > 0 "
+              + "  ORDER BY created_at DESC LIMIT 1"
+              + ") ar_latest ON true "
+              + "WHERE wi.id IN (:ids) AND wi.deleted_at IS NULL",
+      nativeQuery = true)
+  List<Object[]> findSubjectStemByIds(@Param("ids") List<Long> ids);
+
+  /**
    * SC-01-D01 · GET /api/home/today 聚合：统计今日已完成节点数.
    *
    * <p>语义：completed_at ∈ [start, end)（按用户 tz 切日）；不限制 status，allow 单次完成 (status=0) 与
@@ -105,6 +131,25 @@ public interface ReviewPlanRepository extends JpaRepository<ReviewPlan, Long> {
       @Param("statusOpt") int statusOpt,
       @Param("cursorId") Long cursorId,
       @Param("limit") int limit);
+
+  /**
+   * P05-LIST · 批量拿 wrongItemId 列表中每个 item 的"下一个未完成节点"
+   * (status=0 active · 按 next_due_at ASC 取首条) · 单条 SQL · O(N log N).
+   *
+   * <p>PostgreSQL DISTINCT ON 语法: 每个 wrong_item_id 只保留第 1 行
+   * (按 ORDER BY 排序后的). 比子查询 + JOIN 简单且快.
+   *
+   * <p>返回 Object[] tuple: [wrong_item_id Long, node_index Short, next_due_at Instant].
+   * Caller 自行 map 成 DTO · 此处不引入 DTO 依赖到 repo 层.
+   */
+  @Query(
+      value =
+          "SELECT DISTINCT ON (wrong_item_id) wrong_item_id, node_index, next_due_at "
+              + "FROM review_plan "
+              + "WHERE wrong_item_id IN (:ids) AND status = 0 AND deleted_at IS NULL "
+              + "ORDER BY wrong_item_id, next_due_at ASC",
+      nativeQuery = true)
+  List<Object[]> findNextDueByWrongItemIds(@Param("ids") List<Long> ids);
 
   /**
    * BE-13 · POST /review-plans/batch-reset-by-ids · 按 plan_ids 批量软删 active plan.

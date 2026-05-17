@@ -124,4 +124,6 @@ public class ReviewPlan {
     public void setDeletedAt(Instant deletedAt) { this.deletedAt = deletedAt; }
     public Long getDispatchVersion() { return dispatchVersion; }
     public void setDispatchVersion(Long dispatchVersion) { this.dispatchVersion = dispatchVersion; }
+    public Integer getMasteryScore() { return masteryScore; }
+    public void setMasteryScore(Integer masteryScore) { this.masteryScore = masteryScore; }
 }

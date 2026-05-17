@@ -29,4 +29,43 @@ public interface WrongItemRepository extends JpaRepository<WrongItem, Long> {
             Pageable pageable);
 
     List<WrongItem> findByStudentIdAndSubject(Long studentId, String subject);
+
+    /**
+     * P08-RENDER · 单库迁移后 (2026-05-17 用户拍板) analysis_task + analysis_result 同库.
+     * AI OCR 输出 stem 落 analysis_result.stem · 从来没回写 wrong_item.stem_text ·
+     * 导致 wrongbook GET 返空. 这里 LEFT JOIN 拿最新 analysis_result.stem 兜底.
+     *
+     * <p>多条 analysis_result 对同一 task_id 时取 created_at DESC 第 1 条
+     * (一次重新分析会写入新行 · 我们要最新). task_id = wrong_item.id::text.
+     * 返 String[] {ai_stem, error_reason, steps_json} · null 表示没有 AI 数据.
+     */
+    // PostgreSQL ::text 跟 JPA :param 占位符冲突 · 用 cast(... as text).
+    // 不要求 analysis_task.status='DONE' · 因为 OCR 步成功但后续诊断/解答失败时
+    // task 整体 FAILED 但 analysis_result.stem 已有真题干 · 该用就用.
+    // 直接 JOIN analysis_result · 用 task_id = wrong_item.id (varchar 比较).
+    @Query(
+        value = "SELECT ar.stem "
+              + "FROM analysis_result ar "
+              + "WHERE ar.task_id = cast(:wrongItemId as varchar) "
+              + "AND ar.deleted_at IS NULL "
+              + "AND ar.stem IS NOT NULL AND length(ar.stem) > 0 "
+              + "ORDER BY ar.created_at DESC LIMIT 1",
+        nativeQuery = true)
+    String findLatestAnalysisStemByWrongItemId(@Param("wrongItemId") Long wrongItemId);
+
+    /**
+     * P08/P09-RENDER · 拿 analysis_result 的完整 AI 输出 ·
+     * 返 [stem, steps_jsonb_str, error_reason, knowledge_points_jsonb_str].
+     * P09-FOLLOWUP-#2 加 knowledge_points 字段 (AI 提示词 V1.0.083 起输出).
+     */
+    @Query(
+        value = "SELECT ar.stem, cast(ar.steps as text) AS steps_json, ar.error_reason, "
+              + "cast(ar.knowledge_points as text) AS kp_json "
+              + "FROM analysis_result ar "
+              + "WHERE ar.task_id = cast(:wrongItemId as varchar) "
+              + "AND ar.deleted_at IS NULL "
+              + "AND ar.stem IS NOT NULL AND length(ar.stem) > 0 "
+              + "ORDER BY ar.created_at DESC LIMIT 1",
+        nativeQuery = true)
+    List<Object[]> findLatestAnalysisFullByWrongItemId(@Param("wrongItemId") Long wrongItemId);
 }

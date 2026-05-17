@@ -129,6 +129,39 @@ public class ReviewPlanController {
      * <p>Request body: {@code {wrongItemId: long, studentId: long, occurredAt?: ISO8601 string}}
      * Response: {@code {nodeCount: int}} · 0 表示已存在（幂等跳过）。
      */
+    /**
+     * P05-LIST · 批量拿 wrongItemId 列表中每个 item 的"下一个未完成节点".
+     * wrongbook-service 在 listQuestions 时调本端点 · 把 nextDueAt + nodeStage
+     * 注入 P05 列表卡 (替代之前永远 "暂未安排" 的 UX 损失).
+     *
+     * <p>Request body: {@code {wrongItemIds: [long...]}}
+     * Response: {@code [{wrongItemId, nodeIndex, nextDueAt}, ...]} ·
+     *   只返有 active plan 的 item · 没 plan 的 item caller 自行降级.
+     */
+    @Operation(summary = "P05 批量拿 next-due 节点")
+    @PostMapping("/internal/plans/next-due-by-items")
+    public ApiResult<List<Map<String, Object>>> nextDueByItems(@RequestBody Map<String, Object> body) {
+        @SuppressWarnings("unchecked")
+        List<Object> rawIds = (List<Object>) body.getOrDefault("wrongItemIds", List.of());
+        if (rawIds == null || rawIds.isEmpty()) {
+            return ApiResult.ok(List.of());
+        }
+        List<Long> ids = rawIds.stream()
+                .map(o -> Long.valueOf(o.toString()))
+                .collect(Collectors.toList());
+        List<Object[]> rows = planRepo.findNextDueByWrongItemIds(ids);
+        List<Map<String, Object>> out = rows.stream()
+                .map(r -> {
+                    Map<String, Object> m = new java.util.HashMap<>();
+                    m.put("wrongItemId", ((Number) r[0]).longValue());
+                    m.put("nodeIndex", ((Number) r[1]).intValue());
+                    m.put("nextDueAt", r[2] == null ? null : r[2].toString());
+                    return m;
+                })
+                .collect(Collectors.toList());
+        return ApiResult.ok(out);
+    }
+
     @Operation(summary = "P04 保存并开启复习 · 同步创建 7 节点")
     @PostMapping("/internal/plans/from-question")
     public ApiResult<Map<String, Object>> createFromQuestion(@RequestBody Map<String, Object> body) {
@@ -222,7 +255,16 @@ public class ReviewPlanController {
         return ApiResult.ok(new CreateSessionResp(session.sid, session.nids, session.nids.size()));
     }
 
-    /** SC-01-C05 #2 · GET /api/review/today?tz= · 今日待复习. */
+    /**
+     * SC-01-C05 #2 · GET /api/review/today?tz= · 今日待复习.
+     *
+     * <p>窗口语义: [today_start, today_end + LATE_NIGHT_LOOKAHEAD_HOURS) ·
+     * lookahead 4h 解决"晚上保存的题 T0=+2h 落入次日凌晨, 永远进不来今日窗口"问题
+     * (NODE_OFFSETS[0] = Duration.ofHours(2) · spec §SC-01.10 Q-D 起点不动)。
+     * UX 语义: "今天能做的复习" 而非死板的日历日切。
+     */
+    private static final java.time.Duration LATE_NIGHT_LOOKAHEAD = java.time.Duration.ofHours(4);
+
     @Operation(summary = "SC-01-C05 today due nodes")
     @GetMapping("/api/review/today")
     public ApiResult<TodayResp> today(
@@ -231,9 +273,26 @@ public class ReviewPlanController {
         ZoneId zone = resolveZone(tz);
         LocalDate today = LocalDate.now(zone);
         Instant start = today.atStartOfDay(zone).toInstant();
-        Instant end = today.plusDays(1).atStartOfDay(zone).toInstant();
+        Instant end = today.plusDays(1).atStartOfDay(zone).toInstant().plus(LATE_NIGHT_LOOKAHEAD);
         List<ReviewPlan> plans = planService.getDayPlans(userId, start, end);
-        List<ReviewPlanDto> items = plans.stream().map(ReviewPlanDto::from).collect(Collectors.toList());
+
+        // P07-RENDER · 单库迁移后 (2026-05-17 用户拍板 C 方案) 同库 join wrong_item ·
+        // 一次性拿所有 plan 的 subject+stem · 内存 enrich · 比 FE N+1 调用快得多.
+        // 没 wrong_item (FK miss / 已删) 的 plan 走 null 字段 · FE 降级渲染.
+        java.util.Map<Long, String[]> wiMap = new java.util.HashMap<>();
+        if (!plans.isEmpty()) {
+            List<Long> wiIds = plans.stream().map(ReviewPlan::getWrongItemId).distinct().toList();
+            List<Object[]> rows = planRepo.findSubjectStemByIds(wiIds);
+            for (Object[] r : rows) {
+                wiMap.put(((Number) r[0]).longValue(),
+                        new String[] { r[1] == null ? null : r[1].toString(),
+                                       r[2] == null ? null : r[2].toString() });
+            }
+        }
+        List<ReviewPlanDto> items = plans.stream().map(p -> {
+            String[] sx = wiMap.get(p.getWrongItemId());
+            return ReviewPlanDto.from(p, sx == null ? null : sx[0], sx == null ? null : sx[1]);
+        }).collect(Collectors.toList());
         String useTz = tz != null && !tz.isBlank() ? tz : DEFAULT_TZ;
         return ApiResult.ok(new TodayResp(items, items.size(), useTz));
     }
@@ -329,7 +388,8 @@ public class ReviewPlanController {
             outcome != null ? outcome.getIntervalDaysAfter() : null,
             plan.getNextDueAt(),
             durationMs,
-            plan.isMastered()));
+            plan.isMastered(),
+            plan.getMasteryScore()));
     }
 
     // =======================================================================

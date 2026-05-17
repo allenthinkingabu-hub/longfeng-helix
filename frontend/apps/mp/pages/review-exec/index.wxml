@@ -32,7 +32,8 @@
         <text>{{node.tLevel}} · 第 {{node.nodeIndex + 1}} 次复习</text>
       </view>
       <view class="chip chip-indigo">
-        <text>{{question.subject}} · {{question.kpName}}</text>
+        <!-- kpName 空时不带 "· " 尾巴 · 之前 "数学 · " 难看 -->
+        <text>{{question.subject}}{{question.kpName ? ' · ' + question.kpName : ''}}</text>
       </view>
       <view class="chip chip-orange">
         <text>{{difficultyLabel}} {{starsLabel}}</text>
@@ -46,7 +47,9 @@
         <text>{{question.stem}}</text>
       </view>
       <view class="qmeta">
-        <text>知识点 · 顶点式 · 配方法</text>
+        <!-- kpName 来自 BE knowledge_points join · 没 KP 时整行 hide · 之前死写 "顶点式·配方法" -->
+        <text wx:if="{{question.kpName}}">知识点 · {{question.kpName}}</text>
+        <text wx:else>—</text>
         <text class="stars">{{starsLabel}}</text>
       </view>
     </view>
@@ -57,10 +60,15 @@
       <text>你的解答 · 手写</text>
     </view>
     <view class="work" data-test-id="p08-answer-area" bind:touchstart="onCanvasTouch">
-      <!-- ── Mode: handwrite (paper · 手写笔迹 demo · canvas 后续接入) ── -->
+      <!-- ── Mode: handwrite ──
+           原 mockup 在这里写死 "f(x)=x²−4x+3 = (x−2)²−1 顶点(2,−1)" 假装是学生笔迹 ·
+           跟当前真题完全无关 · 是 mockup 透传 bug. spec §3 这是 AnswerArea ·
+           学生先输出再揭示, 初始必须空 (canvas/paper 空白). 真 canvas 后续接入,
+           暂用空 paper + 提示文案. -->
       <view wx:if="{{answerMode === 'handwrite'}}" class="paper">
         <view class="handwritten">
-          <text>f(x) = x² − 4x + 3\n      = (x² − 4x + 4) − 4 + 3\n      = (x − 2)² − 1\n∴ 顶点 (2, −1)</text>
+          <text wx:if="{{userAnswer}}">{{userAnswer}}</text>
+          <text wx:else class="fm-placeholder">在此手写你的解答…（轻触开始）</text>
           <view class="cursor-blink"></view>
         </view>
       </view>
@@ -162,7 +170,9 @@
         <text class="reveal-sub">AI · GPT-4o mini</text>
       </view>
       <view class="ans">
-        <text class="ans-k">顶点式</text>
+        <!-- 揭示答案区的 KP 标签: 用 question.kpName · 没 KP 不渲染 ·
+             之前死写 "顶点式" 跟当前题无关 -->
+        <text wx:if="{{question.kpName}}" class="ans-k">{{question.kpName}}</text>
         <text class="ans-v">{{question.answer}}</text>
       </view>
       <view class="steps">

@@ -41,10 +41,7 @@ page {
   font-size: 34rpx;
 }
 
-.back-chevron {
-  font-size: 40rpx;
-  font-weight: 300;
-}
+/* back-chevron 已删 · MP <text>&lt;</text> 不解析 entity · 改 van-icon arrow-left */
 
 .nav-cancel-text {
   color: #8E8E93;
@@ -81,7 +78,10 @@ page {
 
 /* ─── Content ──────────────────────────────────────────────── */
 .content {
-  padding: 220rpx 32rpx 220rpx;
+  /* bottom padding 必须 > cancel-wrap 占领高度 (bottom:200rpx + height:100rpx = 300rpx)
+   * 原 220rpx 是按旧 .stream 块尾估的 · 改成 .afterview 后 第 4 行 bullet "艾宾浩斯"
+   * 被 sticky cancel 盖住一半. 加到 360rpx (300 + 60 视觉呼吸) 让最后 1 行干净露出. */
+  padding: 220rpx 32rpx 360rpx;
 }
 
 /* ─── Preview card ─────────────────────────────────────────── */
@@ -409,54 +409,52 @@ page {
   100% { left: 100%; }
 }
 
-/* ─── Streaming JSON terminal ──────────────────────────────── */
-.stream {
+/* ─── "完成后将看到" 引导卡 (替换原 SSE JSON 终端 mockup) ─────
+   原 .stream 是 mockup 开发者风深色终端 · 永远显示假 JSON · 对学生无用
+   现改成轻量引导卡 · 4 行 bullet · 与主卡风格一致 (浅底 + 紫色强调) */
+.afterview {
   margin-top: 28rpx;
-  background: #0F1422;
-  color: #E2E8F0;
+  background: rgba(255, 255, 255, 0.7);
   border-radius: 28rpx;
-  padding: 28rpx;
-  font-family: "SF Mono", "JetBrains Mono", ui-monospace, Menlo, monospace;
-  font-size: 23rpx;
-  line-height: 1.55;
-  letter-spacing: 0.4rpx;
-  box-shadow: 0 2rpx 0 rgba(0,0,0,0.04), 0 24rpx 56rpx rgba(40,50,90,0.10);
+  padding: 32rpx 32rpx 28rpx;
+  border: 1rpx solid rgba(88, 86, 214, 0.12);
+  box-shadow: 0 2rpx 0 rgba(0,0,0,0.04), 0 24rpx 56rpx rgba(40,50,90,0.08);
 }
 
-.stream-hdr {
+.afterview-hdr {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16rpx;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
 }
 
-.stream-hdr-text {
-  font-size: 20rpx;
-  color: #94A3B8;
-  letter-spacing: 1.2rpx;
+.afterview-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #5856D6;
+  letter-spacing: 0.5rpx;
 }
 
-.stream-dots {
+.afterview-row {
   display: flex;
-  gap: 10rpx;
+  align-items: center;
+  gap: 16rpx;
+  padding: 10rpx 0;
 }
 
-.dot {
-  width: 16rpx;
-  height: 16rpx;
+.afterview-bullet {
+  width: 10rpx;
+  height: 10rpx;
   border-radius: 50%;
-  background: #475569;
+  background: #5856D6;
+  opacity: 0.55;
+  flex-shrink: 0;
 }
 
-.dot-red { background: #FF5F57; }
-.dot-yellow { background: #FEBC2E; }
-.dot-green { background: #28C840; }
-
-.stream-pre {
-  white-space: pre-wrap;
-  word-break: break-word;
-  font-size: 23rpx;
-  color: #E2E8F0;
+.afterview-text {
+  font-size: 26rpx;
+  color: #3A3A3C;
+  line-height: 1.5;
 }
 
 /* ─── Cancel sticky ────────────────────────────────────────── */
