@@ -61,8 +61,12 @@ export function getSlotIconClass(key: string): string {
   return 'slotIconIndigo';
 }
 
+// BE wrong_item.subject 是 enum 字符串 ('math'/'physics'/...) · FE 渲染要中文标签
+const SUBJECT_LABEL_MAP: Record<string, string> = {
+  math: '数学', physics: '物理', chemistry: '化学', english: '英语', chinese: '语文',
+};
 const SUBJECT_COLOR_MAP: Record<string, string> = {
-  '数学': 'red', '物理': 'orange', '化学': 'indigo', '英语': 'green',
+  math: 'red', physics: 'orange', chemistry: 'indigo', english: 'green', chinese: 'blue',
 };
 
 export function buildSlotsFromItems(items: ReviewPlanDto[], now: Date): SlotData[] {
@@ -76,17 +80,21 @@ export function buildSlotsFromItems(items: ReviewPlanDto[], now: Date): SlotData
     const diffMin = Math.round(diffMs / 60000);
     const cd = buildCountdown(diffMin);
 
-    const raw = item as unknown as Record<string, unknown>;
-    const strategyCode = typeof raw.strategyCode === 'string' ? raw.strategyCode : '';
-    const color = SUBJECT_COLOR_MAP[strategyCode] || 'blue';
+    // BE today 接口现在返 subject + stem (单库 join wrong_item 拿) ·
+    // 之前 fallback 拿 strategyCode (= "EBBINGHAUS_SM2" 算法常量) 当学科 +
+    // 拿 nodeId 当题干, 是因为 BE 那时不返这俩字段, FE 没东西可显示 (用户截图所见).
+    const subjectKey = (item.subject ?? '').toLowerCase();
+    const subjectLabel = SUBJECT_LABEL_MAP[subjectKey] || '数学';
+    const color = SUBJECT_COLOR_MAP[subjectKey] || 'blue';
+    const stem = (item.stem && item.stem.trim()) || '题干暂未识别 · OCR 待补';
 
     const itemData: ItemData = {
       nid: String(item.id),
       tLevel: `T${item.nodeIndex}`,
       hhmm,
-      subject: strategyCode || '数学',
-      kp: '',
-      stem: `节点 #${item.id} · 第 ${item.nodeIndex + 1} 次复习`,
+      subject: subjectLabel,
+      kp: '',  // followup: BE 再 join knowledge_points 表 (现在 wrong_item 没存 kp)
+      stem,
       tags: [`T${item.nodeIndex}`],
       countdownState: cd.state,
       countdownLabel: cd.label,

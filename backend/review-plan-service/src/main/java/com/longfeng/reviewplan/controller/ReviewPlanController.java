@@ -275,7 +275,24 @@ public class ReviewPlanController {
         Instant start = today.atStartOfDay(zone).toInstant();
         Instant end = today.plusDays(1).atStartOfDay(zone).toInstant().plus(LATE_NIGHT_LOOKAHEAD);
         List<ReviewPlan> plans = planService.getDayPlans(userId, start, end);
-        List<ReviewPlanDto> items = plans.stream().map(ReviewPlanDto::from).collect(Collectors.toList());
+
+        // P07-RENDER · 单库迁移后 (2026-05-17 用户拍板 C 方案) 同库 join wrong_item ·
+        // 一次性拿所有 plan 的 subject+stem · 内存 enrich · 比 FE N+1 调用快得多.
+        // 没 wrong_item (FK miss / 已删) 的 plan 走 null 字段 · FE 降级渲染.
+        java.util.Map<Long, String[]> wiMap = new java.util.HashMap<>();
+        if (!plans.isEmpty()) {
+            List<Long> wiIds = plans.stream().map(ReviewPlan::getWrongItemId).distinct().toList();
+            List<Object[]> rows = planRepo.findSubjectStemByIds(wiIds);
+            for (Object[] r : rows) {
+                wiMap.put(((Number) r[0]).longValue(),
+                        new String[] { r[1] == null ? null : r[1].toString(),
+                                       r[2] == null ? null : r[2].toString() });
+            }
+        }
+        List<ReviewPlanDto> items = plans.stream().map(p -> {
+            String[] sx = wiMap.get(p.getWrongItemId());
+            return ReviewPlanDto.from(p, sx == null ? null : sx[0], sx == null ? null : sx[1]);
+        }).collect(Collectors.toList());
         String useTz = tz != null && !tz.isBlank() ? tz : DEFAULT_TZ;
         return ApiResult.ok(new TodayResp(items, items.size(), useTz));
     }

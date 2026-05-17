@@ -5,6 +5,12 @@
 
 import { TEST_IDS, p08Ids } from '@longfeng/testids';
 import { getNode, revealNode, gradeNode } from '../../src/api/review';
+import { getQuestionById } from '../../src/api/wrongbook';
+
+// BE wrong_item.subject 是 enum 小写串 (math/physics/...) · 渲染要中文标签
+const SUBJECT_LABEL_MAP: Record<string, string> = {
+  math: '数学', physics: '物理', chemistry: '化学', english: '英语', chinese: '语文',
+};
 
 // ─── Types ──────────────────────────────────────────────────────
 type ExecState = 'READING' | 'ANSWERING' | 'REVEALED' | 'GRADED';
@@ -125,16 +131,25 @@ Page({
     // 单题深链 (P07 item tap 或 P02 推送) 直传 nid · 跳过 first nid 探测
     this._nid = options.nid ?? '';
 
-    // Build step testIds
+    // Build step testIds (兜底 mock 渲染下 · 真数据回来时 _fetchNodeAndQuestion 再 rebuild)
     const steps = this.data.steps.map((s, i) => ({
       ...s,
       testId: p08Ids.revealStep(i + 1),
     }));
+    this.setData({ steps, nodeDots: this._buildNodeDots(this.data.node.nodeIndex) });
 
-    // Build node timeline
-    const nodeDots = Array.from({ length: 7 }, (_, idx) => {
-      const isPast = idx < this.data.node.nodeIndex;
-      const isCurrent = idx === this.data.node.nodeIndex;
+    // 真 nid 透传 → 拉 BE 数据 (节点 + 题目). 没 nid (直接打开 P08 dev 路径) 保留 mock.
+    // 用户反馈: 点 P07 任意题进 P08, 都显示 "二次函数 f(x)=x²−4x+3" mock · 跟实际拍的题无关.
+    // spec §4.1 要求 question.stem/subject/kpName/difficulty/answer/steps 全来自 BE.
+    if (this._nid) {
+      this._fetchNodeAndQuestion(this._nid);
+    }
+  },
+
+  _buildNodeDots(currentNodeIndex: number) {
+    return Array.from({ length: 7 }, (_, idx) => {
+      const isPast = idx < currentNodeIndex;
+      const isCurrent = idx === currentNodeIndex;
       let cls = 'node-dot';
       if (isPast) cls += ' node-dot-done';
       if (isCurrent) cls += ' node-dot-now';
@@ -146,8 +161,62 @@ Page({
         lineGreen: isPast,
       };
     });
+  },
 
-    this.setData({ steps, nodeDots });
+  // 拉真 node + question · 替换 MOCK_QUESTION/MOCK_NODE.
+  // 失败时保留 mock (UI 不崩) · console.error · spec §9 降级.
+  async _fetchNodeAndQuestion(nid: string) {
+    try {
+      const node = await getNode(nid);
+      const qid = String(node.wrongItemId);
+      const resp = await getQuestionById(qid);
+      const q = resp.question;
+
+      // BE knowledgePoints[] → 拼 1-3 个 KP 名作为 kpName 字符串
+      const kpName = q.knowledgePoints && q.knowledgePoints.length > 0
+        ? q.knowledgePoints.slice(0, 3).map((k) => k.name).join(' · ')
+        : '';
+      const subjectKey = (q.subject ?? '').toLowerCase();
+      const subjectLabel = SUBJECT_LABEL_MAP[subjectKey] || (q.subject || '数学');
+      const difficulty = typeof q.difficulty === 'number' && q.difficulty > 0 ? q.difficulty : 3;
+
+      // BE QuestionDetail.steps 是 {step, explain, ...} 对象数组 · 取 explain 文本
+      const stepTexts: string[] = (q.steps ?? []).map((s) => {
+        const obj = s as unknown as { explain?: string; title?: string };
+        return obj.explain || obj.title || '';
+      }).filter((t) => t.length > 0);
+
+      const newQuestion: QuestionData = {
+        qid,
+        stem: q.stem || '题干暂未识别 · 等 AI OCR 完成后重新进入',
+        subject: subjectLabel,
+        kpName,
+        difficulty,
+        answer: q.correctAnswer || 'AI 暂未给出答案 · 见下方解答步骤',
+        steps: stepTexts.length > 0 ? stepTexts : ['AI 暂未生成解答步骤'],
+      };
+      const newNode: NodeData = {
+        nid: String(node.id),
+        nodeIndex: node.nodeIndex ?? 0,
+        tLevel: `T${node.nodeIndex ?? 0}`,
+        easeFactor: typeof node.easeFactor === 'number' ? node.easeFactor : 2.5,
+      };
+
+      const steps = newQuestion.steps.map((text, i) => ({
+        text, num: i + 1, testId: p08Ids.revealStep(i + 1),
+      }));
+      this.setData({
+        question: newQuestion,
+        node: newNode,
+        difficultyLabel: DIFFICULTY_MAP[difficulty] || '中等',
+        starsLabel: STARS_MAP[difficulty] || '★★★☆☆',
+        steps,
+        nodeDots: this._buildNodeDots(newNode.nodeIndex),
+        nodeLabel: `${newNode.tLevel} · 复习节点`,
+      });
+    } catch (err) {
+      console.error('[P08] _fetchNodeAndQuestion failed · 保留 mock 兜底:', err);
+    }
   },
 
   // ── State transitions ──────────────────────────────────────

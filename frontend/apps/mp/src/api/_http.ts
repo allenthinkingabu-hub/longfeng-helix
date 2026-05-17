@@ -56,12 +56,18 @@ export async function httpJSON<T = unknown>(
 ): Promise<T> {
   const { method = 'GET', body, headers = {}, timeout = 10_000 } = options;
   // MP 还没有真鉴权 · capture (P02) hardcode studentId:1 写入 · 但所有 GET 接口
-  // (today / list / 等) BE 用 @RequestHeader X-Student-Id 默认 0L 取 user · 这就
-  // 导致用户拍的题在 student=1 下入库, 但读时 BE 用 student=0 查, 结果永远空。
-  // 临时方案: 全局注入 X-Student-Id:1 · 与 capture body 对齐 · 真鉴权后再删此 fallback。
+  // BE 用 @RequestHeader 默认 0L 取 user · 这就导致用户拍的题在 student=1 下入库,
+  // 但读时 BE 用 student=0 查, 结果永远空。
+  //
+  // 两套 header 共存 · BE 服务用的常量不同:
+  //   - wrongbook-service (8082): @RequestHeader("X-Student-Id")
+  //   - review-plan-service (8085): @RequestHeader("X-User-Id")  (USER_ID_HEADER)
+  //   - file-service (8084): 不要 user 信息
+  // 同时发两个 · 每个 BE 各取所需 · 真鉴权后再删此 fallback.
   const baseHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
     'X-Student-Id': '1',
+    'X-User-Id': '1',
     ...headers,
   };
 

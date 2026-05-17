@@ -20,15 +20,20 @@ interface ApiEnvelope<T> {
 // ── Types ────────────────────────────────────────────────────
 
 export interface ReviewPlanDto {
-  id: number;
-  wrongItemId: number;
-  studentId: number;
+  // Snowflake ID 19 位 > 2^53 · BE 用 @JsonSerialize(ToStringSerializer)
+  // 把 Long 序列化成字符串发出来 · 不然 JS Number 精度只到 9e15 · 后 3 位被截.
+  id: string;
+  wrongItemId: string;
+  studentId: string;
   nodeIndex: number;
   easeFactor: number;
   intervalDays: number;
   nextDueAt: string;
   completedAt: string | null;
   mastered: boolean;
+  // P07 单库 enrich · BE today join wrong_item 注入 · 其他端点为 null
+  subject?: string | null;
+  stem?: string | null;
 }
 
 export interface CreateSessionResp {
