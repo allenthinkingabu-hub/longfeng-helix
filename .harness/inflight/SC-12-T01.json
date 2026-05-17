@@ -10,7 +10,7 @@
     "passes": true,
     "retries": 0,
     "audit_retries": 0,
-    "git_commits": ["0c18bb8", "2f06044"]
+    "git_commits": ["0c18bb8", "2f06044", "84da738"]
   },
   "work_log_dir": "audits/runs/SC-12-T01/team-1/attempt-1",
   "log_requirements": {
