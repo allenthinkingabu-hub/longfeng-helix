@@ -35,7 +35,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { trackLanding } from '../Landing/telemetry';
 import { fetchShare, type ShareFetchResult } from './api';
 import styles from './SharedView.module.css';
-import shellStyles from '../GuestCaptureStub/index.module.css';
 
 type SharedState =
   | { kind: 'LOADING' }
@@ -100,11 +99,14 @@ export const SharedView: React.FC = () => {
   };
 
   // ── Anonymous Shell (Logo 左 + 登录胶囊右 · 无 TabBar · biz §2A.3.2) ──
+  // 2026-05-18 SC-12-T03: switched from deleted GuestCaptureStub/index.module.css
+  // to SharedView.module.css own classes (.shell / .shellLogo / .shellLogin
+  // already defined for SC-13 hero gradient header · same testid contract kept).
   const shellNav = (
-    <nav className={shellStyles.shellTop} aria-label="anon-shell-top-nav">
+    <nav className={styles.shell} aria-label="anon-shell-top-nav">
       <button
         type="button"
-        className={shellStyles.logo}
+        className={styles.shellLogo}
         data-testid="anon-shell-logo"
         onClick={() => navigate('/welcome')}
         aria-label="返回首页"
@@ -113,7 +115,7 @@ export const SharedView: React.FC = () => {
       </button>
       <button
         type="button"
-        className={shellStyles.loginPill}
+        className={styles.shellLogin}
         data-testid="anon-shell-login-pill"
         onClick={handleLogin}
       >

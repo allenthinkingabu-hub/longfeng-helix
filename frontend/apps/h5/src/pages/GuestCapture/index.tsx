@@ -116,6 +116,11 @@ export const GuestCapturePage: React.FC = () => {
       if (phase === 'CONSENT_PENDING') setPhase('IDLE');
       return;
     }
+    // 乐观更新: 立刻把 UI 翻成 checked · 让 controlled component 反映用户意图.
+    // PATCH 完成后再把 consentAt 写回; 失败则回滚 checked → false.
+    // 这是 controlled checkbox 的标准模式 · 也让 Playwright 的 .check() 不需
+    // 反复重试等待 async state (避免 "click did not change state" timeout).
+    setConsent({ checked: true, consentAt: null });
     try {
       const r = await fetch(endpointConsent(session.anonSessionId), {
         method: 'PATCH',
@@ -137,7 +142,7 @@ export const GuestCapturePage: React.FC = () => {
         consent_type: 1,
       });
     } catch {
-      // 失败不锁 checkbox · 让用户重试 (UI 状态回退 unchecked)
+      // 失败回滚 checked · 让用户重试
       setConsent({ checked: false, consentAt: null });
       setErrorMsg('Consent 失败 · 请重试');
     }
