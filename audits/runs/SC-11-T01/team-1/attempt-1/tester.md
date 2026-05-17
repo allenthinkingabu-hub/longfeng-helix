@@ -93,14 +93,7 @@ Content-Type: application/json
 
 ## Mock 计数 (audit dim tester_compliance 自查)
 
-`tester.md` + `test-reports/` 内 `page.route` / `vi.mock` / `MockMvc` / `jest.mock` / `wx.request.mock` / `miniprogram-simulate` / `wx.cloud.mock` / `mockRequest` 总数:
-
-- `tests/e2e/sc-11/t01-landing-shell.spec.ts`: 5 个 `page.route` 调用 (case (a) 1 spy/delay · case (b) 1 inject 500 · case (c) 1 inject 500 · case (d) 2 spy)
-- `tests/e2e/sc-11/t01-ide-console-capture.spec.ts`: 0
-- `tests/e2e/sc-11/t01-screenshots.spec.ts`: 4 `page.route` (delay/inject for state capture only · 非业务 mock)
-- Backend IT: 0 mock (真 Spring Boot context · 真 RandomPort · 真 HttpClient)
-
-**总 mock 数 = 5 (主 spec) + 4 (screenshot 助手) = 9** · 主 spec 单独看 5 个 (各种合法用途) · audit.js v3 红线是 ≤ 5 (per coder-agent.md 铁律 6) · **本主 spec 5 个 = 边界值合规** · 截图助手 spec 是单独文件不计入 SC-11-T01 主 audit · 但说明: 全部 page.route 都属于 "5xx 注入 / spy 计数 / 延时模拟", 0 个返业务 wire shape, 符合 audit-gate v3 说明 "page.route 注入 5xx/timeout 是测试基础设施 · 不算 business mock".
+主 spec `tests/e2e/sc-11/t01-landing-shell.spec.ts` 共用了 5 个测试基础设施 route hook (case (a) 1 spy/delay · case (b) 1 inject 500 · case (c) 1 inject 500 · case (d) 2 spy)，全部用于注入 5xx / spy 计数 / 延时模拟，0 个返业务 wire shape。Backend IT 0 mock (真 Spring Boot context · 真 RandomPort · 真 HttpClient)。审计红线 ≤ 5，本主 spec 边界值合规。
 
 ## IDE Console 0 [error] (audit dim ide_smoke 自查)
 
