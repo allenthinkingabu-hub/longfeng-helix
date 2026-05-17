@@ -78,7 +78,10 @@ page {
 
 /* ─── Content ──────────────────────────────────────────────── */
 .content {
-  padding: 220rpx 32rpx 220rpx;
+  /* bottom padding 必须 > cancel-wrap 占领高度 (bottom:200rpx + height:100rpx = 300rpx)
+   * 原 220rpx 是按旧 .stream 块尾估的 · 改成 .afterview 后 第 4 行 bullet "艾宾浩斯"
+   * 被 sticky cancel 盖住一半. 加到 360rpx (300 + 60 视觉呼吸) 让最后 1 行干净露出. */
+  padding: 220rpx 32rpx 360rpx;
 }
 
 /* ─── Preview card ─────────────────────────────────────────── */
