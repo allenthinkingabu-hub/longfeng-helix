@@ -1,0 +1,22 @@
+<testsuites id="" name="" tests="8" failures="0" skipped="0" errors="0" time="4.766555">
+<testsuite name="sc-12-stub/t01-guest-capture-stub-adversarial.spec.ts" timestamp="2026-05-17T19:53:08.109Z" hostname="chromium" tests="4" failures="0" skipped="0" time="1.925" errors="0">
+<testcase name="SC-12-STUB-T01 · adversarial · 匿名 Shell + XSS 安全 + a11y (4 cases) › ADV-12-STUB-T01 (a) shell_top_nav_renders: Logo + 登录胶囊 visible + 各自跳对路由" classname="sc-12-stub/t01-guest-capture-stub-adversarial.spec.ts" time="0.862">
+</testcase>
+<testcase name="SC-12-STUB-T01 · adversarial · 匿名 Shell + XSS 安全 + a11y (4 cases) › ADV-12-STUB-T01 (b) no_tabbar_rendered: 匿名 stub 页严禁 Tab Bar (biz §2A.3.2)" classname="sc-12-stub/t01-guest-capture-stub-adversarial.spec.ts" time="0.26">
+</testcase>
+<testcase name="SC-12-STUB-T01 · adversarial · 匿名 Shell + XSS 安全 + a11y (4 cases) › ADV-12-STUB-T01 (c) entry_source_xss_safe: ?entry_source=&lt;script&gt;...· sanitize → unknown" classname="sc-12-stub/t01-guest-capture-stub-adversarial.spec.ts" time="0.529">
+</testcase>
+<testcase name="SC-12-STUB-T01 · adversarial · 匿名 Shell + XSS 安全 + a11y (4 cases) › ADV-12-STUB-T01 (d) cta_keyboard_accessible: Tab + Enter 也能触发 CTA → /auth/login" classname="sc-12-stub/t01-guest-capture-stub-adversarial.spec.ts" time="0.274">
+</testcase>
+</testsuite>
+<testsuite name="sc-12-stub/t01-guest-capture-stub.spec.ts" timestamp="2026-05-17T19:53:08.109Z" hostname="chromium" tests="4" failures="0" skipped="0" time="1.575" errors="0">
+<testcase name="SC-12-STUB-T01 · P-GUEST-CAPTURE 占位 stub 主 spec (4 cases) › TC-12-STUB-T01 (a) stub_page_renders: /guest/capture · root + 文字「游客试用功能开发中」visible" classname="sc-12-stub/t01-guest-capture-stub.spec.ts" time="0.243">
+</testcase>
+<testcase name="SC-12-STUB-T01 · P-GUEST-CAPTURE 占位 stub 主 spec (4 cases) › TC-12-STUB-T01 (b) cta_navigates_to_auth: click CTA → /auth/login · 不带 redirect query" classname="sc-12-stub/t01-guest-capture-stub.spec.ts" time="0.296">
+</testcase>
+<testcase name="SC-12-STUB-T01 · P-GUEST-CAPTURE 占位 stub 主 spec (4 cases) › TC-12-STUB-T01 (c) no_backend_calls: /api/guest/* + /api/ai/* + /api/file/* 累计 0 calls" classname="sc-12-stub/t01-guest-capture-stub.spec.ts" time="0.801">
+</testcase>
+<testcase name="SC-12-STUB-T01 · P-GUEST-CAPTURE 占位 stub 主 spec (4 cases) › TC-12-STUB-T01 (d) deeplink_direct_works: 直接 goto (无 referer) · stub 仍 mount" classname="sc-12-stub/t01-guest-capture-stub.spec.ts" time="0.235">
+</testcase>
+</testsuite>
+</testsuites>
