@@ -2,6 +2,7 @@ package com.longfeng.anonymousservice.service;
 
 import com.longfeng.anonymousservice.dto.MaskedPayloadDto;
 import com.longfeng.anonymousservice.dto.ShareDto;
+import com.longfeng.anonymousservice.dto.ShareIssueRequest;
 import com.longfeng.anonymousservice.entity.ShareToken;
 import com.longfeng.anonymousservice.repo.ShareTokenRepository;
 import io.jsonwebtoken.Claims;
@@ -9,13 +10,18 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import javax.crypto.SecretKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +51,16 @@ public class ShareTokenService {
 
     /** Redis SET key for revoked jtis · biz §4.11 + §10.9 "Redis Bloom Filter". */
     private static final String REVOKED_SET_KEY = "share:revoked";
+
+    /** biz §4.11: expires_at ≤ created_at + 7d (hard cap). */
+    static final long MAX_TTL_SECONDS = 7L * 24 * 60 * 60;  // 604_800
+
+    /** Default TTL when sharer doesn't request one (24h). */
+    static final long DEFAULT_TTL_SECONDS = 24L * 60 * 60;  // 86_400
+
+    /** Status enum (mirror DDL §4.11). */
+    static final short STATUS_ACTIVE = 1;
+    static final short STATUS_REVOKED = 3;
 
     private final ShareTokenRepository repo;
     private final StringRedisTemplate redis;
@@ -186,5 +202,143 @@ public class ShareTokenService {
         ShareLookupOutcome(Kind kind, ShareDto dto) { this.kind = kind; this.dto = dto; }
         public Kind getKind() { return kind; }
         public ShareDto getDto() { return dto; }
+    }
+
+    // ====================================================================
+    // SC-13-SHARER · sharer-side · issue + revoke (biz §10.9)
+    // ====================================================================
+
+    /**
+     * SC-13-SHARER · biz §10.9 step 1 · sharer creates a share token.
+     *
+     * <p>Pipeline:
+     * <ol>
+     *   <li>Generate fresh jti (UUIDv4 sans hyphens)
+     *   <li>Clamp TTL to [1, 604800] · default 86400 if absent
+     *   <li>Sign HS256 JWT with the same secret/iss/aud the receiver verifier expects
+     *   <li>INSERT {@code share_token} row · status=ACTIVE · {@code id} = current nanoTime
+     *       with collision retry (mirrors {@code SC13ShareE2EIT.insertShareToken} pattern)
+     *   <li>Return raw JWT + jti + expiresAt for the controller to assemble shareUrl
+     * </ol>
+     *
+     * <p>{@code relationId} is persisted but never wire-encoded by the receiver side
+     * ({@link #lookup}'s {@link ShareDto} field whitelist enforces).
+     */
+    public IssueOutcome issue(long sharerStudentId, ShareIssueRequest req) {
+        long requestedTtl = req.getExpiresInSec() == null ? DEFAULT_TTL_SECONDS : req.getExpiresInSec();
+        long effectiveTtl = Math.min(Math.max(requestedTtl, 1L), MAX_TTL_SECONDS);
+        boolean allowClaim = Boolean.TRUE.equals(req.getAllowClaim());
+
+        Instant now = Instant.now();
+        Instant exp = now.plusSeconds(effectiveTtl);
+        String jti = UUID.randomUUID().toString().replace("-", "");
+
+        // Sign HS256 JWT — sub=sharerStudentId, jti, shareType, relationId, allowClaim as claims.
+        String shareToken = Jwts.builder()
+                .id(jti)
+                .subject(String.valueOf(sharerStudentId))
+                .issuer(expectedIssuer)
+                .audience().add(expectedAudience).and()
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(exp))
+                .claim("shareType", req.getShareType())
+                .claim("relationId", req.getRelationId())
+                .claim("allowClaim", allowClaim)
+                .signWith(signingKey, Jwts.SIG.HS256)
+                .compact();
+
+        OffsetDateTime expiresAt = exp.atOffset(OffsetDateTime.now().getOffset());
+
+        ShareToken row = new ShareToken();
+        row.setJti(jti);
+        row.setSharerStudentId(sharerStudentId);
+        row.setShareType(req.getShareType());
+        row.setRelationId(req.getRelationId());
+        row.setAllowClaim(allowClaim);
+        row.setUsageLimit(1000);
+        row.setUsageCount(0);
+        row.setStatus(STATUS_ACTIVE);
+        row.setCreatedAt(OffsetDateTime.now());
+        row.setExpiresAt(expiresAt);
+
+        // share_token.id PK is BIGINT (no PG sequence) — use nanoTime jittered by random
+        // bits, with up to 3 collision retries (uniqueness on id PK + jti unique index).
+        for (int attempt = 0; attempt < 3; attempt++) {
+            long candidateId = generateRowId();
+            row.setId(candidateId);
+            try {
+                repo.save(row);
+                LOG.info("share_issue jti={} sharer={} type={} ttlSec={}",
+                        maskJti(jti), sharerStudentId, req.getShareType(), effectiveTtl);
+                return new IssueOutcome(shareToken, jti, expiresAt);
+            } catch (DataIntegrityViolationException dup) {
+                LOG.warn("share_issue id_collision attempt={} id={} retrying", attempt + 1, candidateId);
+            }
+        }
+        // 3 collisions in a row is astronomically unlikely; surface loudly.
+        throw new IllegalStateException("share_issue failed after 3 id collision retries");
+    }
+
+    /**
+     * SC-13-SHARER · biz §10.9 step 2 · sharer revokes a previously issued token.
+     *
+     * <p>Outcomes:
+     * <ul>
+     *   <li>{@code NOT_FOUND} — jti has no DB row (controller → 404)
+     *   <li>{@code NOT_OWNER} — DB row's sharer ≠ caller (controller → 403)
+     *   <li>{@code ALREADY_REVOKED} — DB status == 3; idempotent · still Redis SADD to heal a missed write
+     *   <li>{@code SUCCESS} — flipped status → 3 + Redis SADD
+     * </ul>
+     *
+     * <p>Redis failure mode: only WARN-logged (mirror {@link #lookup}'s
+     * degraded behavior — biz §10.9 tolerates short Bloom unavailability;
+     * the DB row is the durable source of truth).
+     */
+    public RevokeOutcome.Kind revoke(String jti, long callerStudentId) {
+        Optional<ShareToken> opt = repo.findByJti(jti);
+        if (opt.isEmpty()) {
+            LOG.info("share_revoke not_found jti={}", maskJti(jti));
+            return RevokeOutcome.Kind.NOT_FOUND;
+        }
+        ShareToken row = opt.get();
+        if (row.getSharerStudentId() == null || row.getSharerStudentId() != callerStudentId) {
+            LOG.info("share_revoke not_owner jti={} caller={}", maskJti(jti), callerStudentId);
+            return RevokeOutcome.Kind.NOT_OWNER;
+        }
+        boolean alreadyRevoked = row.getStatus() == STATUS_REVOKED;
+        if (!alreadyRevoked) {
+            row.setStatus(STATUS_REVOKED);
+            repo.save(row);
+        }
+        // Always SADD (idempotent) — heals a missed Redis write from a prior revoke.
+        try {
+            redis.opsForSet().add(REVOKED_SET_KEY, jti);
+        } catch (Exception e) {
+            LOG.warn("redis_revoke_sadd_failed jti={} reason={}", maskJti(jti), e.toString());
+            // Degraded — DB row is the durable source of truth; lookup() falls back to DB.
+        }
+        LOG.info("share_revoke {} jti={} sharer={}",
+                alreadyRevoked ? "already_revoked" : "success", maskJti(jti), callerStudentId);
+        return alreadyRevoked ? RevokeOutcome.Kind.ALREADY_REVOKED : RevokeOutcome.Kind.SUCCESS;
+    }
+
+    /**
+     * Generate a {@code share_token.id} candidate. PK is plain BIGINT (no PG sequence)
+     * so we mix {@code System.nanoTime()} with {@link ThreadLocalRandom} to keep the
+     * value monotonic-ish + collision-resistant. {@code Math.abs} avoids negative IDs.
+     */
+    private static long generateRowId() {
+        long base = System.nanoTime() & 0x7fff_ffff_ffff_ffffL;  // strip sign
+        long jitter = ThreadLocalRandom.current().nextLong(0, 1_000_000L);
+        return base ^ jitter;
+    }
+
+    /** sharer-side issue result · controller wraps with shareUrl. */
+    public record IssueOutcome(String shareToken, String jti, OffsetDateTime expiresAt) {}
+
+    /** sharer-side revoke discriminator. */
+    public static final class RevokeOutcome {
+        public enum Kind { NOT_FOUND, NOT_OWNER, ALREADY_REVOKED, SUCCESS }
+        private RevokeOutcome() {}
     }
 }
