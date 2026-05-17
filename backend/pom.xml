@@ -21,5 +21,6 @@
     <module>calendar-core</module>
     <module>review-plan-service</module>
     <module>auth-service</module>
+    <module>anonymous-service</module>
   </modules>
 </project>

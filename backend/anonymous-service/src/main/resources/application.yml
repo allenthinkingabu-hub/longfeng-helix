@@ -1,0 +1,47 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: anonymous-service
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:15432/wrongbook
+    username: longfeng
+    password: longfeng_dev
+  flyway:
+    enabled: true
+    # Namespaced under db/anonymous/ (NOT db/migration/) to avoid colliding with
+    # the common module's own V*.sql files which Flyway also picks up from the
+    # classpath. common's migrations target wrong_item / review_plan / etc and
+    # depend on tables we do not own here. Mirrors auth-service's db/auth/ pattern.
+    locations: classpath:db/anonymous
+    table: flyway_schema_history_anonymous
+    baseline-on-migrate: true
+    baseline-version: 0
+    # First-time runs against an existing shared PG may briefly observe rows
+    # from the common module's V*.sql files (they still get picked up off the
+    # classpath even when this service's locations is db/anonymous/, because
+    # any failed first-run attempt against db/migration leaves rows behind).
+    # Treat those as advisory; this service owns only V20260421_02 and onwards.
+    ignore-migration-patterns: "*:missing"
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 16379
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  info:
+    env:
+      enabled: true
+
+# Surface application name + version in /actuator/info so the smoke test
+# can assert the right service answered the health probe.
+info:
+  app:
+    name: anonymous-service
+    description: PHASE-A skeleton — Flyway V20260421_02 (7 anonymous-state tables) + zod contracts owner
+    version: 1.0.0-SNAPSHOT
