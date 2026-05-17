@@ -32,28 +32,10 @@ export interface ItemData {
 
 // ─── Pure helpers ───────────────────────────────────────────────
 
-/**
- * "本次到期已 grade" 判定 · 用于 P07/P-HOME doneCount/progress 计算.
- *
- * 业务真相: review_plan 是 cyclic 的 · 每次 grade 把 completedAt 更新为该时刻 +
- * next_due_at 推到下一个 T 级未来. 同一行被反复 grade.
- *
- * 因此 completedAt != null 仅代表 "曾经 grade 过", 不代表 "本次到期已完成".
- * 正确判定: completedAt 落在今日窗口 (用户本地时区 today_start) 才算今日已 grade.
- *
- * 示例:
- *   - 昨晚 22:50 grade → completedAt = 昨晚 + next_due_at 推到今晚 22:50
- *   - 今日打开 P07 看到该节点: completedAt < today_start → "未开始" (正确)
- *   - 今晚 22:50 再 grade → completedAt = 今晚 + next_due_at 推到 +2d
- *   - 此时 completedAt >= today_start → "已完成" (正确)
- */
-export function isCompletedToday(completedAt: string | null | undefined, now: Date): boolean {
-  if (!completedAt) return false;
-  const c = new Date(completedAt);
-  if (isNaN(c.getTime())) return false;
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  return c.getTime() >= todayStart.getTime();
-}
+// "今日已 grade" 判定的源 · 抽到 src/utils/today.ts 让 P07 + P-HOME 共享 ·
+// 保证两页 "已完成" / progress / 角标 口径永远一致 · re-export 让现有 import 不破.
+import { isCompletedToday } from '../../src/utils/today';
+export { isCompletedToday };
 
 export function buildCountdown(diffMin: number): { state: 'now' | 'soon' | 'wait'; label: string } {
   if (diffMin <= 15) {
