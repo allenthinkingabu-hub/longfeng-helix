@@ -1,0 +1,14 @@
+
+Running 9 tests using 1 worker
+
+  ✓  1 [chromium] › tests/e2e/sc-11/t03-landing-sample-chips-adversarial.spec.ts:20:3 › SC-11-T03 · adversarial · 破坏性边界 + 探索性 (4 cases) › ADV-T03 (a) android_back_closes_overlay: page.goBack() · overlay hidden · URL 仍 /welcome (454ms)
+  ✓  2 [chromium] › tests/e2e/sc-11/t03-landing-sample-chips-adversarial.spec.ts:47:3 › SC-11-T03 · adversarial · 破坏性边界 + 探索性 (4 cases) › ADV-T03 (b) 3_chip_cycle_open_close: 循环 3 chip · 每次浮层内容不同 · 无叠加 (1.4s)
+  ✓  3 [chromium] › tests/e2e/sc-11/t03-landing-sample-chips-adversarial.spec.ts:83:3 › SC-11-T03 · adversarial · 破坏性边界 + 探索性 (4 cases) › ADV-T03 (c) sheet_click_does_not_close: 点浮层卡片内部不关闭浮层 (1.2s)
+  ✓  4 [chromium] › tests/e2e/sc-11/t03-landing-sample-chips-adversarial.spec.ts:116:3 › SC-11-T03 · adversarial · 破坏性边界 + 探索性 (4 cases) › ADV-T03 (d) chip_double_tap_no_double_overlay: 同一 task 内连发 2 个 click event · 浮层 DOM 数恰 1 (690ms)
+  ✓  5 [chromium] › tests/e2e/sc-11/t03-landing-sample-chips-overlay.spec.ts:33:3 › SC-11-T03 · P-LANDING SampleChips + SampleOverlay (5 cases) › TC-11-T03 (a) chips_render_3_subjects: 3 chip 全 visible · 文字 数学/英语/物理 (325ms)
+  ✓  6 [chromium] › tests/e2e/sc-11/t03-landing-sample-chips-overlay.spec.ts:59:3 › SC-11-T03 · P-LANDING SampleChips + SampleOverlay (5 cases) › TC-11-T03 (b) chip_tap_opens_overlay: 浮层 + 3 卡片 visible · body overflow=hidden (477ms)
+  ✓  7 [chromium] › tests/e2e/sc-11/t03-landing-sample-chips-overlay.spec.ts:97:3 › SC-11-T03 · P-LANDING SampleChips + SampleOverlay (5 cases) › TC-11-T03 (c) overlay_close_via_x_button: × close · overlayRoot hidden · body overflow 恢复 (692ms)
+  ✓  8 [chromium] › tests/e2e/sc-11/t03-landing-sample-chips-overlay.spec.ts:123:3 › SC-11-T03 · P-LANDING SampleChips + SampleOverlay (5 cases) › TC-11-T03 (d) overlay_close_via_mask_tap: tap mask · overlayRoot hidden (458ms)
+  ✓  9 [chromium] › tests/e2e/sc-11/t03-landing-sample-chips-overlay.spec.ts:146:3 › SC-11-T03 · P-LANDING SampleChips + SampleOverlay (5 cases) › TC-11-T03 (e) no_ai_calls_during_overlay: 完整开合 3 次 · /api/ai/* + /api/guest/* 累计 0 (1.4s)
+
+  9 passed (7.8s)
