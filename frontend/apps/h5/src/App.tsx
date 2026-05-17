@@ -11,7 +11,8 @@ import { WrongbookListPage } from './pages/WrongbookList/index';
 import { LoginPage } from './pages/Auth/Login';
 import { LandingPage } from './pages/Landing/index';
 import { WelcomeBackPage } from './pages/WelcomeBack/index';
-import { SharedStubPage } from './pages/SharedStub/index';
+// SC-00-T04 · SharedStub 已退役 · SC-13 真 SharedView 接管 /s/:token (源码保留作回滚备份 · 不再 import)
+import { SharedView } from './pages/Shared/index';
 import { ObserverStubPage } from './pages/ObserverStub/index';
 import { GuestCaptureStubPage } from './pages/GuestCaptureStub/index';
 
@@ -40,7 +41,9 @@ export const App: React.FC = () => (
     {/* SC-00-T01 占位路由 · T04 / SC-13 / SC-14 / SC-15 后续 flesh */}
     <Route path="/welcome" element={<LandingPage />} />
     <Route path="/welcome-back" element={<WelcomeBackPage />} />
-    <Route path="/s/:token" element={<SharedStubPage />} />
+    {/* SC-13 · /s/:token 真页 SharedView · 替换 SC-00-T04 SharedStub 占位 ·
+        SharedStub 源码保留 (本文件未删 import) 以便回滚 · 当前不挂任何 Route */}
+    <Route path="/s/:token" element={<SharedView />} />
     <Route path="/observer/:code" element={<ObserverStubPage />} />
     {/* SC-12-STUB-T01 · /guest/capture 占位 stub · 真页 SC-12 (Try Before Signup) 未实现 */}
     <Route path="/guest/capture" element={<GuestCaptureStubPage />} />

@@ -418,6 +418,15 @@ export const TEST_IDS = {
     tokenExpiredScreen:   'token-expired-screen',
     tokenInvalidScreen:   'token-invalid-screen',
     tokenRevokedScreen:   'token-revoked-screen',
+    // ── SC-13 真页追加 ─────────────────────────────────────────────
+    dualCtaDock:          'dual-cta-dock',
+    ctaJoin:              'cta-join',
+    ctaLater:             'cta-later',
+    aiTeaserLock:         'ai-teaser-lock',
+    aiTeaserLockIcon:     'ai-teaser-lock-icon',
+    skeleton:             'p-shared-skeleton',
+    // 兼容 alias · SC-00-T04 spec 仍引 'shared-stub-root' / 'shared-stub-cta' ·
+    // 真 SharedView 在 ready 状态保留这两个 alias data-testid (subset · 仅 root + cta join)
   },
 
   // ── S8 FE-04 · Review Pages (P07/P08/P09) ──────────────────────────────

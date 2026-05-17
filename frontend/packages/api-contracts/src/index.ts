@@ -14,3 +14,5 @@ export { analyzeClient } from './clients/analyze';
 // ---------------------------------------------------------------------------
 export * from './session-resolve';
 export * from './landing';
+// SC-13 · GET /api/share/:shareToken (anonymous-service)
+export * from './share';
