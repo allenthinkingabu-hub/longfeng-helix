@@ -172,4 +172,18 @@ public class WrongItemService {
             return null;
         }
     }
+
+    /**
+     * P08-RENDER · 拿 AI 完整输出 (stem + steps + error_reason).
+     * 返 [stem, stepsJsonStr, errorReason] · 全 String · 任一字段可 null.
+     * 失败 / 没数据时返 null.
+     */
+    public Object[] findLatestAnalysisFull(Long wrongItemId) {
+        try {
+            java.util.List<Object[]> rows = repo.findLatestAnalysisFullByWrongItemId(wrongItemId);
+            return rows == null || rows.isEmpty() ? null : rows.get(0);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

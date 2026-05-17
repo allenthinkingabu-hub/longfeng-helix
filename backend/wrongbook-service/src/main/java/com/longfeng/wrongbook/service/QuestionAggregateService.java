@@ -185,22 +185,55 @@ public class QuestionAggregateService {
         }
     }
 
+    private static final com.fasterxml.jackson.databind.ObjectMapper STEPS_MAPPER =
+            new com.fasterxml.jackson.databind.ObjectMapper();
+
     private QuestionDetailResp toDetailResp(WrongItem item) {
-        // P08-RENDER: wrong_item.stem_text 为 null 时, fallback 单库 analysis_result.stem
+        // P08-RENDER: wrong_item.stem_text 为 null 时, fallback 单库 analysis_result
         // (AI OCR 输出长期只在 analysis_result 不回写 wrong_item · 2026-05-17 单库迁移后修).
+        // 同时拿 steps[] (jsonb) + error_reason · 给 P08 揭示答案区 + 解答步骤区 + 错因.
         String stemText = item.getStemText();
-        if (stemText == null || stemText.isBlank()) {
-            String aiStem = wrongItemService.findLatestAnalysisStem(item.getId());
-            if (aiStem != null && !aiStem.isBlank()) {
+        List<Object> steps = Collections.emptyList();
+        String correctAnswer = null;
+        String errorReason = null;
+
+        Object[] aiRow = wrongItemService.findLatestAnalysisFull(item.getId());
+        if (aiRow != null && aiRow.length >= 3) {
+            String aiStem = aiRow[0] == null ? null : aiRow[0].toString();
+            String stepsJson = aiRow[1] == null ? null : aiRow[1].toString();
+            errorReason = aiRow[2] == null ? null : aiRow[2].toString();
+
+            if ((stemText == null || stemText.isBlank()) && aiStem != null && !aiStem.isBlank()) {
                 stemText = aiStem;
             }
+
+            // Parse steps jsonb · shape: [{stepNo, text}, ...] · 解析失败回退 empty
+            if (stepsJson != null && !stepsJson.isBlank()) {
+                try {
+                    steps = STEPS_MAPPER.readValue(stepsJson,
+                            new com.fasterxml.jackson.core.type.TypeReference<List<Object>>() {});
+                } catch (Exception ignore) {
+                    steps = Collections.emptyList();
+                }
+                // correct_answer 兜底: AI 流水线没单独存"正确答案"字段, 取末步 text 作答案行 ·
+                // spec §3 reveal 区 .ans 行 (标准解答) 跟 .steps 列表是两个层次 · 末步通常是
+                // "得 3543600" 这种最终结果 · 切走 spec §4.1 answer 字段.
+                if (!steps.isEmpty() && steps.get(steps.size() - 1) instanceof java.util.Map<?,?> last) {
+                    Object lastText = last.get("text");
+                    if (lastText != null) {
+                        correctAnswer = lastText.toString();
+                    }
+                }
+            }
         }
+
         QuestionDetailResp.QuestionVO vo = new QuestionDetailResp.QuestionVO(
                 toQid(item.getId()), item.getStudentId(), item.getSubject(),
                 item.getGradeCode(), item.getSourceType(), item.getOriginImageKey(),
                 item.getProcessedImageKey(), item.getOcrText(), stemText,
                 item.getStatus(), item.getMastery(), item.getDifficulty(),
-                item.getCreatedAt(), item.getUpdatedAt());
+                item.getCreatedAt(), item.getUpdatedAt(),
+                steps, correctAnswer, errorReason);
         return new QuestionDetailResp(vo, Collections.emptyList());
     }
 
