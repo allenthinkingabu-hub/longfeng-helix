@@ -1,0 +1,23 @@
+[
+  {
+    "subject": "数学",
+    "stemText": "已知函数 f(x)=2x²-3x+1, 求 f(x) 的最小值。",
+    "knowledgePoints": ["二次函数", "顶点公式", "配方法"],
+    "errorReason": "未正确应用顶点公式 x=-b/(2a), 把对称轴算错。",
+    "correction": "对称轴 x=3/4 处取最小值 f(3/4)=2·9/16-9/4+1=-1/8。"
+  },
+  {
+    "subject": "英语",
+    "stemText": "Choose the best word: She _____ to school by bike every day.",
+    "knowledgePoints": ["一般现在时", "主谓一致", "动词第三人称单数"],
+    "errorReason": "主语 she 是第三人称单数, 选错动词形式 go。",
+    "correction": "答案 goes。一般现在时, 第三人称单数主语动词加 -es。"
+  },
+  {
+    "subject": "物理",
+    "stemText": "一物体在水平面上受 5N 拉力做匀速直线运动, 求摩擦力大小和方向。",
+    "knowledgePoints": ["牛顿第一定律", "二力平衡", "摩擦力方向"],
+    "errorReason": "误认为匀速运动时合外力不为零, 算出摩擦力大于拉力。",
+    "correction": "匀速运动 → 合外力为零 → 摩擦力 = 5N, 方向与拉力相反。"
+  }
+]

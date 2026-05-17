@@ -1,0 +1,23 @@
+[
+  {
+    "subject": "化学",
+    "stemText": "下列物质中, 属于氧化物的是: A. NaOH  B. CO₂  C. H₂SO₄  D. NaCl",
+    "knowledgePoints": ["氧化物定义", "无机物分类", "化学式判读"],
+    "errorReason": "把含氧化合物全部当作氧化物, 误选 A 或 C。",
+    "correction": "氧化物 = 两种元素组成且其中一种是氧。答案 B (CO₂)。"
+  },
+  {
+    "subject": "生物",
+    "stemText": "光合作用的暗反应阶段发生在叶绿体的哪个部位? 主要产物是什么?",
+    "knowledgePoints": ["光合作用", "暗反应", "叶绿体结构"],
+    "errorReason": "把暗反应与光反应位置弄混, 误答类囊体薄膜。",
+    "correction": "暗反应发生在叶绿体基质中, 主要产物是 (CH₂O) 和 ADP。"
+  },
+  {
+    "subject": "数学",
+    "stemText": "已知等差数列 {a_n} 中, a₁=3, d=2, 求 a₁₀ 和前 10 项和 S₁₀。",
+    "knowledgePoints": ["等差数列通项", "求和公式", "首项与公差"],
+    "errorReason": "通项公式记成 a_n=a₁+nd, 漏掉 (n-1)。",
+    "correction": "a_n=a₁+(n-1)d, 故 a₁₀=3+9·2=21, S₁₀=10·(3+21)/2=120。"
+  }
+]
