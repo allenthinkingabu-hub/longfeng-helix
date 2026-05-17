@@ -19,10 +19,14 @@ export const MASTERY_CONFIG: Record<string, { text: string; color: string }> = {
 };
 
 export function formatDueLabel(item: WrongQuestionListItem): string {
-  const now = Date.now();
-  const due = new Date(item.nextDueAt).getTime();
-  const diffMs = due - now;
   const stage = `T${item.nodeStage}`;
+  // BE GET /api/wb/questions 当前不 join review_plan · nextDueAt 常为空串 ·
+  // new Date('').getTime() = NaN · 所有比较都 false · 落到末行 "T1 · NaN 天后"
+  // 这里短路: 空串/NaN 都走 "暂未安排" · UX 不漏 NaN
+  if (!item.nextDueAt) return `${stage} · 暂未安排`;
+  const due = new Date(item.nextDueAt).getTime();
+  if (Number.isNaN(due)) return `${stage} · 暂未安排`;
+  const diffMs = due - Date.now();
 
   if (diffMs < 0) return `${stage} · 已逾期`;
   if (diffMs < 3600000) return `${stage} · ${Math.ceil(diffMs / 60000)} 分钟后`;
