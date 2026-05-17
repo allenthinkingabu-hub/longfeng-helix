@@ -5,9 +5,14 @@ spring:
   application:
     name: review-plan-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/wrongbook
-    username: postgres
-    password: wb
+    # ⚠ review-plan 历史上连 team-5-pg (15436) · wrongbook 连 team-1-pg (15432) ·
+    # split-brain 但既成事实. team-5-pg.review_plan 是完整 23 列 (含 student_id /
+    # next_due_at / node_index 等); team-1-pg.review_plan 是 2 列残壳 (历史 ddl-auto
+    # 误建). 短期: review-plan 必须连 15436 才能 flyway 通过 + 跑业务. 长期: 把
+    # wrongbook 也搬到 15436 同库 · 让 fetchNextDueByItems 跨服务也是同库查 (followup).
+    url: jdbc:postgresql://localhost:15436/wrongbook
+    username: longfeng
+    password: longfeng_dev
   jpa:
     hibernate:
       ddl-auto: validate
@@ -18,11 +23,20 @@ spring:
   cache:
     type: caffeine
 
+rocketmq:
+  # 本地 dev 无 RocketMQ broker · spring-starter 强制要 nameServer 才肯启 ·
+  # 给个占位地址 · listener 注册成功 · 实际拉消息会持续 retry 但不影响 HTTP API.
+  # @Value("${review.mq.enabled:true}") 的开关只控制业务路径 · 不阻断 starter 自身.
+  name-server: 127.0.0.1:9876
+
 review:
+  # 本地 dev: 跳过 feign fallback (CalendarFeignClientFallback 需要专配的
+  # Cache<String,List<Map>> bean · auto-config 没给) · 也跳 MQ 路径.
+  # SC-01 happy path 走 HTTP /internal/plans/from-question · 不依赖 feign/MQ.
   feign:
-    enabled: true
+    enabled: false
   mq:
-    enabled: true
+    enabled: false
   job:
     enabled: false
   algorithm:
