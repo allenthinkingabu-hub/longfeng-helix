@@ -1,0 +1,10 @@
+
+Running 5 tests using 1 worker
+
+  ✓  1 [chromium] › tests/e2e/sc-00/t03-deeplink-redirect.spec.ts:81:3 › SC-00-T03 · P00 deeplink redirect roundtrip (5 cases) › TC-00.03 (a) redirect_query_renders_hint: ?redirect=/review/exec/123 → hint visible · text contains path-only (脱敏) (880ms)
+  ✓  2 [chromium] › tests/e2e/sc-00/t03-deeplink-redirect.spec.ts:92:3 › SC-00-T03 · P00 deeplink redirect roundtrip (5 cases) › TC-00.03 (b) no_redirect_no_hint: /auth/login (无 query) → hint DOM 不存在 (472ms)
+  ✓  3 [chromium] › tests/e2e/sc-00/t03-deeplink-redirect.spec.ts:101:3 › SC-00-T03 · P00 deeplink redirect roundtrip (5 cases) › TC-00.03 (c) login_success_replaces_to_redirect: 正确密码 → router.replace(/review/exec/123) (837ms)
+  ✓  4 [chromium] › tests/e2e/sc-00/t03-deeplink-redirect.spec.ts:125:3 › SC-00-T03 · P00 deeplink redirect roundtrip (5 cases) › TC-00.03 (d) login_failure_keeps_redirect: 错密码 → URL ?redirect= 保留 · error 可见 (932ms)
+  ✓  5 [chromium] › tests/e2e/sc-00/t03-deeplink-redirect.spec.ts:147:3 › SC-00-T03 · P00 deeplink redirect roundtrip (5 cases) › TC-00.03 (e) open_redirect_blocked: 外域 + javascript: + data: + // → 一律 fallback /home + console.warn (2.1s)
+
+  5 passed (5.9s)

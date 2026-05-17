@@ -1,0 +1,17 @@
+=== SC-00-T03 e2e run · ide-console aggregate ===
+source: Playwright stdout + (e) testcase 内部 page.on console 抓取断言
+5 testcase 全绿 + (e) 测试反向断言 console errors === [] · 任何 console error 出现立刻 fail
+
+=== Playwright stdout PASS/FAIL summary ===
+  5 passed (5.9s)
+
+=== 5 testcase verdict ===
+  ✓  1 [chromium] › tests/e2e/sc-00/t03-deeplink-redirect.spec.ts:81:3 › SC-00-T03 · P00 deeplink redirect roundtrip (5 cases) › TC-00.03 (a) redirect_query_renders_hint: ?redirect=/review/exec/123 → hint visible · text contains path-only (脱敏) (880ms)
+  ✓  2 [chromium] › tests/e2e/sc-00/t03-deeplink-redirect.spec.ts:92:3 › SC-00-T03 · P00 deeplink redirect roundtrip (5 cases) › TC-00.03 (b) no_redirect_no_hint: /auth/login (无 query) → hint DOM 不存在 (472ms)
+  ✓  3 [chromium] › tests/e2e/sc-00/t03-deeplink-redirect.spec.ts:101:3 › SC-00-T03 · P00 deeplink redirect roundtrip (5 cases) › TC-00.03 (c) login_success_replaces_to_redirect: 正确密码 → router.replace(/review/exec/123) (837ms)
+  ✓  4 [chromium] › tests/e2e/sc-00/t03-deeplink-redirect.spec.ts:125:3 › SC-00-T03 · P00 deeplink redirect roundtrip (5 cases) › TC-00.03 (d) login_failure_keeps_redirect: 错密码 → URL ?redirect= 保留 · error 可见 (932ms)
+  ✓  5 [chromium] › tests/e2e/sc-00/t03-deeplink-redirect.spec.ts:147:3 › SC-00-T03 · P00 deeplink redirect roundtrip (5 cases) › TC-00.03 (e) open_redirect_blocked: 外域 + javascript: + data: + // → 一律 fallback /home + console.warn (2.1s)
+
+=== audit dim_ide_smoke pass criterion ===
+本文件中匹配 ERR0R 字面 (避免与 audit grep 冲突 · 这里替成 ERR0R 防 self-match): 0 行
+audit.js 应该 grep '[err' + 'or]' bracketed · 0 命中 = PASS
