@@ -21,7 +21,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**
- * PHASE-A · auth-service IT — 4 cases per inflight scope_in #15.
+ * PHASE-A · auth-service IT — 4 cases per inflight scope_in #15 + 2 P1 drift fix cases (2026-05-17).
  *
  * <ol>
  *   <li>happy: test@example.com + Test@1234 → 200 + jwt + refreshToken + student
@@ -29,6 +29,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
  *   <li>non_existent_email:                   → 401 INVALID_CREDENTIALS (unified to prevent enumeration)
  *   <li>5_strike_lockout: 5 consecutive wrong → 423 ACCOUNT_LOCKED on 5th
  *       (1-4 still return 401; the 5th attempt triggers the lockout error itself)
+ *   <li>email_case_insensitive: TEST@Example.COM + correct pw → 200 (P1 drift #1 fix)
+ *   <li>short_password_validation: pw="abc" → 400 + AuthErrorResponse{code=VALIDATION_FAILED} (P1 drift #2 fix)
  * </ol>
  *
  * <p>Connects to real sandbox PG (port 15432) + real Redis (port 16379) — NO mocks,
@@ -128,6 +130,60 @@ class AuthServiceLoginE2EIT extends IntegrationTestBase {
         AuthUser user = repo.findByEmail(FIXTURE_EMAIL).orElseThrow();
         assertThat(user.getStatus()).isEqualTo("LOCKED");
         assertThat(user.getLockedUntil()).isNotNull();
+    }
+
+    /**
+     * P1 drift #1 (2026-05-17) — email lookup must be case-insensitive.
+     * Users typing TEST@example.com or Test@Example.com expect the same
+     * account row as test@example.com. Without normalization, Postgres
+     * varchar comparison is case-sensitive → 401.
+     */
+    @Test
+    void email_case_insensitive_login_succeeds() throws Exception {
+        // Both variants must hit the same fixture row (test@example.com lowercased on disk).
+        // Whitespace handling is defensive code in LoginService.normalize but @Email validator
+        // strictly rejects leading/trailing spaces before we ever reach the service — so we
+        // only assert case-insensitivity here.
+        String[] variants = { "TEST@EXAMPLE.COM", "Test@Example.com" };
+        for (String variant : variants) {
+            HttpResponse<String> resp = postLogin(variant, FIXTURE_PASSWORD);
+            assertThat(resp.statusCode())
+                    .as("email variant '%s' must normalize to lowercase and 200", variant)
+                    .isEqualTo(200);
+            JsonNode body = objectMapper.readTree(resp.body());
+            assertThat(body.path("jwt").asText()).isNotBlank();
+            assertThat(body.path("student").path("id").asLong()).isPositive();
+            // Reset failed_attempts between iterations (success already does this, but be defensive)
+            resetFixture();
+        }
+        // failed_attempts must remain 0 — case variants are not "wrong"
+        assertThat(repo.findByEmail(FIXTURE_EMAIL).orElseThrow().getFailedAttempts())
+                .isEqualTo(0);
+    }
+
+    /**
+     * P1 drift #2 (2026-05-17) — @Size(min=6) on password (and any bean-validation
+     * failure) must surface via the unified AuthErrorResponse envelope, not Spring's
+     * default {timestamp, status, error, path} shape. Frontend code reading body.code
+     * was broken on short passwords.
+     */
+    @Test
+    void short_password_returns_400_validation_failed_envelope() throws Exception {
+        HttpResponse<String> resp = postLogin(FIXTURE_EMAIL, "abc"); // 3 chars < min=6
+        assertThat(resp.statusCode()).isEqualTo(400);
+        JsonNode body = objectMapper.readTree(resp.body());
+        assertThat(body.path("code").asText())
+                .as("must be unified VALIDATION_FAILED, not Spring default error")
+                .isEqualTo("VALIDATION_FAILED");
+        assertThat(body.path("message").asText()).isNotBlank().contains("password");
+        // Spring default envelope keys must be absent
+        assertThat(body.path("timestamp").isMissingNode()).isTrue();
+        assertThat(body.path("error").isMissingNode()).isTrue();
+        assertThat(body.path("path").isMissingNode()).isTrue();
+        // failed_attempts must NOT tick (validation failure is pre-service)
+        assertThat(repo.findByEmail(FIXTURE_EMAIL).orElseThrow().getFailedAttempts())
+                .as("validation failure must not consume a strike")
+                .isEqualTo(0);
     }
 
     // ──────────── helpers ─────────────

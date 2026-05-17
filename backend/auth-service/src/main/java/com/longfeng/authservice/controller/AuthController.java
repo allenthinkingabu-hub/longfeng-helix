@@ -15,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -98,6 +100,31 @@ public class AuthController {
                         "ACCOUNT_LOCKED",
                         "账号已锁定 · 5 分钟后重试",
                         e.getLockedUntil().toString()));
+    }
+
+    /**
+     * P1 drift fix (2026-05-17): @Valid failures (e.g. short password via
+     * {@code @Size(min=6)}, missing email, malformed email) previously fell through
+     * to Spring's default {@code DefaultErrorAttributes} envelope (timestamp/status/
+     * error/path). Frontend code that parses {@code body.code} broke. Unify the wire
+     * shape — always 400 + {@link AuthErrorResponse} with {@code code=VALIDATION_FAILED}.
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<AuthErrorResponse> handleValidation(MethodArgumentNotValidException e) {
+        String msg = e.getBindingResult().getFieldErrors().stream()
+                .findFirst()
+                .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
+                .orElse("请求参数无效");
+        LOG.debug("login_validation_failed msg={}", msg);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new AuthErrorResponse("VALIDATION_FAILED", msg));
+    }
+
+    /** Malformed JSON body — also surfaces as VALIDATION_FAILED, not Spring's default. */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<AuthErrorResponse> handleNotReadable(HttpMessageNotReadableException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new AuthErrorResponse("VALIDATION_FAILED", "请求体格式无效"));
     }
 
     /** "Mask" the local-part of the email — first char + *** + @domain. */

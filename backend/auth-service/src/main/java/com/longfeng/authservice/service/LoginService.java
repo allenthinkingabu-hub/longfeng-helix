@@ -4,6 +4,7 @@ import com.longfeng.authservice.entity.AuthUser;
 import com.longfeng.authservice.repo.AuthUserRepository;
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.util.Locale;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,10 +59,22 @@ public class LoginService {
             AccountLockedException.class
     })
     public AuthUser verifyCredentials(String email, String password) {
-        Optional<AuthUser> opt = repo.findByEmail(email);
+        // P1 drift fix (2026-05-17): emails are case-insensitive identifiers
+        // (RFC 5321 local-part is technically case-sensitive but every major
+        // provider normalizes; users typing TEST@example.com expect to log
+        // into test@example.com). Normalize the input *before* the lookup so
+        // the DB UNIQUE constraint stays canonical (lowercase) — future
+        // registration paths must also lowercase on write to stay consistent.
+        String normalizedEmail = email == null
+                ? null
+                : email.trim().toLowerCase(Locale.ROOT);
+
+        Optional<AuthUser> opt = normalizedEmail == null
+                ? Optional.empty()
+                : repo.findByEmail(normalizedEmail);
         if (opt.isEmpty()) {
             // Unified error to prevent enumeration · do NOT reveal that email is unknown.
-            LOG.debug("login_fail email_not_found email={}", maskEmail(email));
+            LOG.debug("login_fail email_not_found email={}", maskEmail(normalizedEmail));
             throw new InvalidCredentialsException();
         }
         AuthUser user = opt.get();
@@ -95,7 +108,7 @@ public class LoginService {
                 user.setLockedUntil(lockUntil);
                 repo.save(user);
                 LOG.info("login_lockout email={} attempts={} until={}",
-                        maskEmail(email), attempts, lockUntil);
+                        maskEmail(normalizedEmail), attempts, lockUntil);
                 // The 5th failure both increments AND locks — treat as ACCOUNT_LOCKED so
                 // client sees the lockout banner immediately.
                 throw new AccountLockedException(lockUntil);
