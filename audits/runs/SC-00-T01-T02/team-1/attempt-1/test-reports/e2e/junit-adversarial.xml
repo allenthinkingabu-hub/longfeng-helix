@@ -1,0 +1,22 @@
+<testsuites id="" name="" tests="8" failures="0" skipped="0" errors="0" time="8.050056999999999">
+<testsuite name="sc-00/t01-resolve-entry-adversarial.spec.ts" timestamp="2026-05-17T13:11:52.979Z" hostname="chromium" tests="4" failures="0" skipped="0" time="6.199" errors="0">
+<testcase name="SC-00-T01 · ADVERSARIAL · 破坏性边界 › ADV-1 · /s/&lt;deeplink&gt; + valid local JWT → 占位页直接渲染 · BootstrapGate 跳过 (T04 占位页负责调后端)" classname="sc-00/t01-resolve-entry-adversarial.spec.ts" time="0.426">
+</testcase>
+<testcase name="SC-00-T01 · ADVERSARIAL · 破坏性边界 › ADV-2 · resolve schema 篡改 (decision=&quot;WTF&quot;) → zod reject + fallback /welcome" classname="sc-00/t01-resolve-entry-adversarial.spec.ts" time="0.217">
+</testcase>
+<testcase name="SC-00-T01 · ADVERSARIAL · 破坏性边界 › ADV-3 · resolve 慢响应 6s → 5s timeout → 无 JWT fallback /welcome" classname="sc-00/t01-resolve-entry-adversarial.spec.ts" time="5.327">
+</testcase>
+<testcase name="SC-00-T01 · ADVERSARIAL · 破坏性边界 › ADV-4 · JWT 前缀篡改 → decodeJwt 抛 → 当本地无 JWT 处理 → 调后端" classname="sc-00/t01-resolve-entry-adversarial.spec.ts" time="0.229">
+</testcase>
+</testsuite>
+<testsuite name="sc-00/t01-resolve-entry.spec.ts" timestamp="2026-05-17T13:11:52.979Z" hostname="chromium" tests="4" failures="0" skipped="0" time="0.944" errors="0">
+<testcase name="SC-00-T01 · resolve-entry · bootstrap decision tree dispatch › TC-00-A · jwt_local_valid_no_resolve_call → /home AND 0 backend call" classname="sc-00/t01-resolve-entry.spec.ts" time="0.244">
+</testcase>
+<testcase name="SC-00-T01 · resolve-entry · bootstrap decision tree dispatch › TC-00-B · no_jwt_resolve_returns_landing → /welcome (真后端打通)" classname="sc-00/t01-resolve-entry.spec.ts" time="0.22">
+</testcase>
+<testcase name="SC-00-T01 · resolve-entry · bootstrap decision tree dispatch › TC-00-C · jwt_expired_resolve_returns_login → /auth/login?redirect=..." classname="sc-00/t01-resolve-entry.spec.ts" time="0.245">
+</testcase>
+<testcase name="SC-00-T01 · resolve-entry · bootstrap decision tree dispatch › TC-00-D · resolve_500_offline_with_stale_jwt → /home (stale tolerance)" classname="sc-00/t01-resolve-entry.spec.ts" time="0.235">
+</testcase>
+</testsuite>
+</testsuites>

@@ -1,0 +1,132 @@
+{
+  "task_id": "SC-00-T01-T02",
+  "attempt": 1,
+  "team_id": "team-1",
+  "audited_at": "2026-05-17T13:17:29.259Z",
+  "audited_by": "audit.js v3 (deterministic · 7 dims · +test_cases_alignment)",
+  "pass": true,
+  "checks": [
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_exists",
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/audits/runs/SC-00-T01-T02/team-1/attempt-1/coder.md"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_keyword_地形侦察",
+      "pass": true,
+      "evidence": "1×"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_keyword_编码",
+      "pass": true,
+      "evidence": "1×"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_keyword_自检",
+      "pass": true,
+      "evidence": "1×"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_keyword_提交",
+      "pass": true,
+      "evidence": "1×"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "bugs_found_md_exists",
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/audits/runs/SC-00-T01-T02/team-1/attempt-1/bugs-found.md"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "bugs_found_md_has_declaration",
+      "pass": true,
+      "evidence": "\"0 bug\" declaration found"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "tester_md_exists",
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/audits/runs/SC-00-T01-T02/team-1/attempt-1/tester.md"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "adversarial_md_exists",
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/audits/runs/SC-00-T01-T02/team-1/attempt-1/adversarial.md"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "test_reports_nonempty",
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/audits/runs/SC-00-T01-T02/team-1/attempt-1/test-reports"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "adversarial_has_reject_round",
+      "pass": true,
+      "evidence": "REJECT/驳回 keyword found"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "adversarial_has_fix_round",
+      "pass": true,
+      "evidence": "fix/修复 keyword found"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "mock_total_le_5",
+      "pass": true,
+      "evidence": "mock=0/5 (none)"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "maxDiffPixels_le_500",
+      "pass": true,
+      "evidence": "max=500/500"
+    },
+    {
+      "dimension": "bug_reality",
+      "name": "all_git_commits_verified",
+      "pass": true,
+      "evidence": "6/6 hash(es) git cat-file -e PASS"
+    },
+    {
+      "dimension": "test_validity",
+      "name": "tester_md_testcase_count_matches_xml",
+      "pass": true,
+      "evidence": "claimed=30 == xml<testcase>=30"
+    },
+    {
+      "dimension": "test_validity",
+      "name": "adversarial_has_exploratory_keywords",
+      "pass": true,
+      "evidence": "3 matched: [边界,timeout,500]"
+    },
+    {
+      "dimension": "spec_alignment",
+      "name": "dor_e2e_required",
+      "pass": true,
+      "evidence": "inflight.physical_verification.dor_c1_to_c6_required=false — DoR skipped (P0 audit task)"
+    },
+    {
+      "dimension": "ide_smoke",
+      "name": "ide_smoke_required_by_team",
+      "pass": true,
+      "evidence": "team_id=team-1 · not UI team · IDE smoke skipped"
+    },
+    {
+      "dimension": "test_cases_alignment",
+      "name": "test_case_first_required",
+      "pass": true,
+      "evidence": "inflight.test_case_first_required=false · Test-Case-First skip (legacy task)"
+    }
+  ],
+  "redo_target": null,
+  "redo_reason": null
+}
