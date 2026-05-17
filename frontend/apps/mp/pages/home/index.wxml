@@ -185,12 +185,12 @@
         </view>
       </view>
 
-      <!-- ── Messages ────────────────────────────────── -->
+      <!-- ── Messages · BE 派生 ≤3 条 (替代 MVP_MESSAGES 写死) ── -->
       <view class="sec">
         <text class="sec-t">最近消息</text>
-        <text class="sec-m" data-test-id="p-home-messages-more-link">全部 2 ›</text>
+        <text wx:if="{{messages.length > 0}}" class="sec-m" data-test-id="p-home-messages-more-link">全部 {{messages.length}} ›</text>
       </view>
-      <view class="msgs" data-test-id="p-home-messages">
+      <view wx:if="{{messages.length > 0}}" class="msgs" data-test-id="p-home-messages">
         <view wx:for="{{messages}}" wx:key="title" class="msg">
           <view class="msg-ic msg-ic-{{item.theme}}">
             <van-icon name="{{item.icon}}" color="{{item.iconColor}}" size="16px" />
@@ -201,6 +201,10 @@
           </view>
           <text class="msg-tm">{{item.time}}</text>
         </view>
+      </view>
+      <!-- 空态 · 不假装有 3 条 "妈妈分享 / 免打扰" mock -->
+      <view wx:else class="msgs msgs-empty" data-test-id="p-home-messages-empty">
+        <text class="msgs-empty-tx">本周暂无消息</text>
       </view>
 
       <!-- ── AI Weak KP ──────────────────────────────── -->

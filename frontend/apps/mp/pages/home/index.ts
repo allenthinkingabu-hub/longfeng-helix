@@ -4,7 +4,14 @@
 // API: src/api/home.ts · getHomeTodayCount · 真 API · 0 mock
 
 import { TEST_IDS } from '@longfeng/testids';
-import { getHomeTodayCount } from '../../src/api/home';
+import {
+  getHomeTodayCount,
+  getRecentMessages,
+  getWeekDots,
+  getWeeklyStats,
+  type MessageItem,
+  type WeeklyStatsResp,
+} from '../../src/api/home';
 import {
   buildCurrentWeekStrip,
   buildGreeting,
@@ -14,20 +21,13 @@ import {
 } from './helpers';
 import type { PageState, SubjectChip } from './helpers';
 
-// ─── Mock/MVP data ──────────────────────────────────────────────
-// 注: MVP_SUBJECTS 已删除 · 之前写死 3 数学 + 2 物理 + 3 英语 = 8 但 todayTotal=4 数字打架 ·
-// 现 subjects 由 _fetchTodayData 从 items[] 真聚合 · 学科 chip 与 hero 题数自洽.
-
-const MVP_WEEK_STATS = { mastered: 23, newItems: 8, forgotten: 2, masteryRate: 68 };
-
-// (B4 · B5) MVP_WEEK_DAYS / weekLabel 由 buildCurrentWeekStrip() 动态生成
-// 旧硬编码 (周二/周三 d=22 重复 · 4 月 20-26 日) 已删除
-
-const MVP_MESSAGES = [
-  { title: '记忆曲线 T3 · 二次函数', subtitle: '今晚 20:30 · 3 题即将到期', time: '10 min', icon: 'bell', iconColor: '#5856D6', theme: 'ind' },
-  { title: '妈妈分享了「5 月月考安排」', subtitle: '5 月 12 日 · 周一 · 已同步到日历', time: '昨天', icon: 'calendar-o', iconColor: '#FF2D55', theme: 'pnk' },
-  { title: '本周免打扰时段已更新', subtitle: '23:00 – 07:30 · 记忆曲线节奏不变', time: '周日', icon: 'clock-o', iconColor: '#30B0C7', theme: 'tea' },
-];
+// ─── Mock/MVP data 已全部删除 (2026-05-18 用户选项 A 全修) ─────────
+// 之前 3 块 mock:
+//   - MVP_SUBJECTS (3 数学/2 物理/3 英语 = 8 与 todayTotal 撞车)
+//   - MVP_WEEK_STATS (23/8/2/68 永远不动)
+//   - MVP_MESSAGES (含"妈妈分享" "免打扰更新" 完全假数据)
+//   - PLACEHOLDER_DOTS_BY_WEEKDAY (helpers.ts · 周历下假彩点)
+// 现全部由 BE /api/home/{weekly-stats, week-dots, messages/recent} 派生真值.
 
 // (B3) Sparkline SVG · trace 01_home.html L280-290
 // MP <view> 不能直接放 <svg> 标签 · 改成 data URI 给 <image> 用
@@ -77,16 +77,16 @@ Page({
     // subjects 由 _fetchTodayData 真聚合 · init 空 · 之前写死 3/2/3 与 todayTotal 撞车.
     subjects: [] as SubjectChip[],
 
-    // weekly
-    weekStats: MVP_WEEK_STATS,
+    // weekly · BE /api/home/weekly-stats 真值 · init 0 · 加载后填充
+    weekStats: { mastered: 0, newItems: 0, forgotten: 0, masteryRate: 0 } as WeeklyStatsResp,
     sparklineSvgUri: SPARKLINE_SVG_URI,
 
-    // week schedule · 动态 (B4 + B5)
+    // week schedule · 动态 (B4 + B5) · dots 由 BE /api/home/week-dots 注入
     weekLabel: buildCurrentWeekStrip(new Date()).label,
     weekDays: buildCurrentWeekStrip(new Date()).days,
 
-    // messages
-    messages: MVP_MESSAGES,
+    // messages · BE /api/home/messages/recent 派生 ≤3 · init 空
+    messages: [] as MessageItem[],
 
     // quick entries
     quickEntries: QUICK_ENTRIES,
@@ -121,45 +121,62 @@ Page({
   },
 
   async _fetchTodayData() {
-    try {
-      const data = await getHomeTodayCount();
-      const total = data.total ?? 0;
-      // BE TodayResp 不返 done 字段 · FE 必须从 items 派生.
-      // 口径: spec L94 严格 doneCount = GRADED (= completedAt != null) ·
-      // 与 P07 hero "已完成" 同口径 · 进度 = 任务完成度 (不是 mastery 进度).
-      // mastered 维度由 BE 新加的 masteryPct 字段 (ease 聚合) 单独反映 ·
-      // 撤掉之前 mastered=done 的口径 (因为 BE ReviewPlanDto 不返 mastered 字段 →
-      // FE filter 永远 0 → 角标永远显总数 · 跟"今天还有几题没做" 语义不符).
-      const itemsArr = Array.isArray(data.items) ? data.items : [];
-      const done = typeof data.done === 'number'
-        ? data.done
+    // 4 接口并行拉 · 各自 catch 独立降级 · 任一挂不拖累其它块.
+    // 用 .catch → undefined 而非 Promise.allSettled (tsconfig lib 不含 ES2020 PromiseSettledResult).
+    type FailableTodayData = Awaited<ReturnType<typeof getHomeTodayCount>> | undefined;
+    type FailableWeekly = WeeklyStatsResp | undefined;
+    type FailableDots = Awaited<ReturnType<typeof getWeekDots>> | undefined;
+    type FailableMsg = Awaited<ReturnType<typeof getRecentMessages>> | undefined;
+
+    const [todayData, weeklyData, dotsData, msgData] = await Promise.all([
+      getHomeTodayCount().catch((err: unknown): FailableTodayData => {
+        console.error('[P-HOME] getHomeTodayCount failed:', err);
+        return undefined;
+      }),
+      getWeeklyStats().catch((err: unknown): FailableWeekly => {
+        console.error('[P-HOME] getWeeklyStats failed:', err);
+        return undefined;
+      }),
+      getWeekDots().catch((err: unknown): FailableDots => {
+        console.error('[P-HOME] getWeekDots failed:', err);
+        return undefined;
+      }),
+      getRecentMessages().catch((err: unknown): FailableMsg => {
+        console.error('[P-HOME] getRecentMessages failed:', err);
+        return undefined;
+      }),
+    ]);
+
+    // ── #1 today (hero + subjects + circle + allDone + weekStrip badge) ──
+    if (todayData) {
+      const total = todayData.total ?? 0;
+      // spec L94 严格口径 doneCount = GRADED (completedAt != null) · 任务完成度.
+      const itemsArr = Array.isArray(todayData.items) ? todayData.items : [];
+      const done = typeof todayData.done === 'number'
+        ? todayData.done
         : itemsArr.filter(i => i && (i as { completedAt?: unknown }).completedAt).length;
       const pct = computeCirclePct(done, total);
-
-      // 学科 chip 从 items[].subject 真聚合 · 替换 MVP_SUBJECTS 写死.
-      // BE today endpoint join wrong_item 后已经返 subject 字段 (P07 复用同接口).
       const subjects = buildSubjectsFromItems(itemsArr as Array<{ subject?: string | null }>);
-
-      // weekDays 红角标 num 注入真值 (pending = total - done) · 之前写死 8 ·
-      // 0 时 wxml wx:if 自动 hide · 与 100% DONE 圆环自洽.
       const pending = Math.max(0, total - done);
-      const strip = buildCurrentWeekStrip(new Date(), pending);
+
+      // weekStrip dots 来自 dotsData · 失败时 undefined (空 dots 真实反映 "无排程")
+      const dotsByDay = dotsData
+        ? dotsData.days.map((d: { date: string; dots: string[] }) => d.dots)
+        : undefined;
+      const strip = buildCurrentWeekStrip(new Date(), pending, dotsByDay);
 
       this.setData({
-        pageState: derivePageState(data, false),
+        pageState: derivePageState(todayData, false),
         todayTotal: total,
         todayDone: done,
         circleProgress: pct / 100,
         circlePctText: `${pct}%`,
-        // allDone = total>0 且 全部 GRADED · hero 切庆祝文案 (P07 已用同模型 · 跨页统一)
         allDone: total > 0 && done >= total,
         subjects,
         weekLabel: strip.label,
         weekDays: strip.days,
       }, () => this._syncReviewBadge());
-    } catch (err) {
-      // §9 降级: 真失败时露白 · 不假装有 8/3/38% mock 数据骗用户
-      console.error('[P-HOME] getHomeTodayCount failed:', err);
+    } else {
       this.setData({
         pageState: 'READY' as PageState,
         todayTotal: 0,
@@ -169,6 +186,18 @@ Page({
         allDone: false,
         subjects: [] as SubjectChip[],
       }, () => this._syncReviewBadge());
+    }
+
+    // ── #2 weekly-stats (本周回顾 4 stat) ──
+    // 失败时保持 init {0,0,0,0} · 真值 0 比假 23/8/2/68 诚实.
+    if (weeklyData) {
+      this.setData({ weekStats: weeklyData });
+    }
+
+    // ── #3 messages (派生 ≤3 条) ──
+    // 失败时保持 init [] · 用户看到 "暂无消息" 比看假 "妈妈分享" 诚实.
+    if (msgData) {
+      this.setData({ messages: msgData.messages });
     }
   },
 

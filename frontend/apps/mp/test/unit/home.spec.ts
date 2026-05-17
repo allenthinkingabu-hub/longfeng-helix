@@ -177,16 +177,33 @@ describe('buildCurrentWeekStrip (B4 + B5 · pure)', () => {
     expect(strip.days[6].d).toBe('10');
   });
 
-  it('每个 day 必带 dots[] (mockup 占位) · today 的 num 接 todayBadgeNum 参数', () => {
-    // 之前断言 num=8 硬编码 · 现 buildCurrentWeekStrip 第 2 参 todayBadgeNum 注入 ·
-    // 不传 = 0 (角标 hide) · 传 N = 实际 pending 数.
+  it('每个 day 必带 dots[] (BE 注入或空数组) · today 的 num 接 todayBadgeNum 参数', () => {
+    // 之前断言 num=8 + dots.length>0 硬编码 · 现 buildCurrentWeekStrip:
+    // - 第 2 参 todayBadgeNum (= pending) · 0 = 角标 hide
+    // - 第 3 参 dotsByDay 由 BE /api/home/week-dots 注入 · 不传时全空数组 (诚实表示无排程).
     const strip = buildCurrentWeekStrip(new Date(2026, 4, 16), 8);
     for (const d of strip.days) {
       expect(Array.isArray(d.dots)).toBe(true);
-      expect(d.dots.length).toBeGreaterThan(0);
+      // 不再断言 length>0 · 因为 dots 从 BE 来 · 不传时 = [] 是合法状态
     }
     const today = strip.days.find((d) => d.today)!;
     expect(today.num).toBe(8);
+  });
+
+  it('dotsByDay 注入 · 每天 dots 取对应位置 · 未注入 = 空数组', () => {
+    const fakeDots: string[][] = [
+      ['#FF3B30'],                                 // Mon
+      ['#FF9500', '#34C759'],                      // Tue
+      [],                                          // Wed
+      ['#FF3B30', '#FF3B30'],                      // Thu (dedup 由 BE 做 · helper 不去重)
+      ['#34C759'],                                 // Fri
+      [],                                          // Sat
+      ['#FF9500'],                                 // Sun
+    ];
+    const strip = buildCurrentWeekStrip(new Date(2026, 4, 16), 0, fakeDots);
+    expect(strip.days[0].dots).toEqual(['#FF3B30']);
+    expect(strip.days[2].dots).toEqual([]);
+    expect(strip.days[6].dots).toEqual(['#FF9500']);
   });
 });
 

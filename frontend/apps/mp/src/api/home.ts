@@ -56,3 +56,47 @@ export async function getHomeTodayCount(tz = 'Asia/Shanghai'): Promise<HomeToday
     `${BASE}/api/review/today${query}`,
   );
 }
+
+// ── 本周回顾 4 stat · 替代 MVP_WEEK_STATS ───────────────────────
+export interface WeeklyStatsResp {
+  mastered: number;
+  newItems: number;
+  forgotten: number;
+  masteryRate: number;
+}
+
+export async function getWeeklyStats(tz = 'Asia/Shanghai'): Promise<WeeklyStatsResp> {
+  return httpJSON<WeeklyStatsResp>(
+    `${BASE}/api/home/weekly-stats?tz=${encodeURIComponent(tz)}`,
+  );
+}
+
+// ── 本周日程 dots · 替代 PLACEHOLDER_DOTS_BY_WEEKDAY ──────────────
+export interface WeekDotsResp {
+  days: Array<{ date: string; dots: string[] }>;
+}
+
+export async function getWeekDots(tz = 'Asia/Shanghai'): Promise<WeekDotsResp> {
+  return httpJSON<WeekDotsResp>(
+    `${BASE}/api/home/week-dots?tz=${encodeURIComponent(tz)}`,
+  );
+}
+
+// ── 最近消息 (≤3 · 派生自现有数据) · 替代 MVP_MESSAGES ──────────
+export interface MessageItem {
+  title: string;
+  subtitle: string;
+  time: string;
+  icon: string;
+  iconColor: string;
+  theme: string;
+}
+export interface MessagesResp {
+  messages: MessageItem[];
+}
+
+export async function getRecentMessages(tz = 'Asia/Shanghai'): Promise<MessagesResp> {
+  return httpJSON<MessagesResp>(
+    `${BASE}/api/home/messages/recent?tz=${encodeURIComponent(tz)}`,
+  );
+}
