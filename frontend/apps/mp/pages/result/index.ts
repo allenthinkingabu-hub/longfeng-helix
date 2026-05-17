@@ -15,6 +15,9 @@ import type { QuestionDetail, PlannedNode, QuestionStep } from '../../src/api/wr
 // 暂时直接 hardcode 中文 · key 命名预留 result.fallback.* 便于后续 i18n 化.
 const FALLBACK_REASON_PENDING = 'AI 暂时未能给出诊断，请稍后重试或手动修正。';
 const FALLBACK_STEPS_EMPTY = '解答步骤生成中…可下拉刷新或点击下方手动修正。';
+// 正确答案区域 · BE 既不持久化 correctAnswer · AiAnswer 也没此字段 ·
+// 兜底从 AI steps 最后一步派生 (formula > text) · 仍空时显示此 placeholder
+const FALLBACK_CORRECT_PENDING = 'AI 暂未给出答案 · 见下方解答步骤';
 
 const SUBJECT_LABEL: Record<string, string> = {
   math: '数学',
@@ -50,6 +53,10 @@ interface PageData {
   isSaving: boolean;
   /** fallback bar shown when AI reason/steps couldn't be fetched (test-case #2/#3). */
   aiFallback: { reasonShown: boolean; stepsShown: boolean; text: string };
+  /** hero kicker · "{subject} · {kp1} · {kp2}" 动态拼接 · 替代硬编码 "二次函数 · 顶点式" */
+  topicChain: string;
+  /** thumbnail 题干摘要 · 1 行截断 · 替代硬编码 "已知 f(x)=x²−4x+3" */
+  stemSnippet: string;
 }
 
 Page<PageData, WechatMiniprogram.IAnyObject>({
@@ -82,6 +89,8 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
     ],
     isSaving: false,
     aiFallback: { reasonShown: false, stepsShown: false, text: '' },
+    topicChain: '',
+    stemSnippet: '',
   },
 
   /** cached raw question for save mutation */
@@ -170,21 +179,41 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
     };
     const finalReason = reasonShown ? FALLBACK_REASON_PENDING : mergedReason;
 
+    // 正确答案派生: BE 不持久 q.correctAnswer · AI 也没此字段 · 从 steps 最后一步取 ·
+    // formula > text · 仍空时给 placeholder · 修 mockup 硬编码 "顶点 (2,-1)..." 假数据
+    let mergedCorrectAnswer = (q.correctAnswer || '').trim();
+    if (!mergedCorrectAnswer && mergedSteps.length > 0) {
+      const last = mergedSteps[mergedSteps.length - 1];
+      mergedCorrectAnswer = (last.formula?.trim()) || (last.title?.trim()) || '';
+    }
+    if (!mergedCorrectAnswer) {
+      mergedCorrectAnswer = FALLBACK_CORRECT_PENDING;
+    }
+
     this._questionRaw = q;
     q.reasonMarkdown = finalReason;
     q.steps = mergedSteps;
     q.stem = mergedStem;
+    q.correctAnswer = mergedCorrectAnswer;
 
     const difficulty = q.difficulty || 3;
     const diffStars = Array.from({ length: 5 }, (_, i) => i < difficulty);
     const timelineNodes = this._buildTimeline(wbResp.plannedNodes || []);
+    const subjectLabel = SUBJECT_LABEL[q.subject] || q.subject;
+    // hero kicker · 替代硬编码 "二次函数 · 顶点式" · 真 KP 名链
+    const kpNames = (q.knowledgePoints || []).map(k => k.name).filter(Boolean);
+    const topicChain = kpNames.length > 0
+      ? `${subjectLabel} · ${kpNames.slice(0, 2).join(' · ')}`
+      : subjectLabel;
+    // 缩略图题干摘要 · 替代硬编码 "已知 f(x)=x²−4x+3" · 1 行 ~16 字
+    const stemSnippet = (q.stem || '').slice(0, 16);
 
     this.setData({
       pageState: 'DRAFT',
       question: {
         id: q.id,
         subject: q.subject,
-        subjectLabel: SUBJECT_LABEL[q.subject] || q.subject,
+        subjectLabel,
         stem: q.stem,
         formula: q.formula || '',
         myAnswer: q.myAnswer,
@@ -199,6 +228,8 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
       diffLabel: DIFF_LABELS[difficulty] || '中等',
       timelineNodes,
       aiFallback,
+      topicChain,
+      stemSnippet,
     });
   },
 

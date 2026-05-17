@@ -24,20 +24,20 @@
 <view class="content">
 
   <!-- Preview card (mockup: .preview) -->
+  <!-- 红框: 之前硬编码 "第 17 题 · 顶点与对称轴 / G9 / 2026-04-21 14:28" ·
+       OCR 还没跑就显示题号是误导 · 现按 currentStep 动态滚 · 完成后填真 stem -->
   <view class="preview" data-test-id="p03-thumb-card">
-    <view class="thumb" data-test-id="p03-thumb-card-image">
-      <text class="thumb-lbl">{{ subjectLabel }} · 12</text>
-      <text class="thumb-qno">17</text>
-      <text class="thumb-h3">已知 f(x)=x²-4x+3</text>
-      <view class="thumb-strk"></view>
-      <text class="thumb-pen">B</text>
+    <view class="thumb thumb-loading" data-test-id="p03-thumb-card-image">
+      <text class="thumb-lbl">{{ subjectLabel }}</text>
+      <view class="thumb-spinner"></view>
+      <text class="thumb-status">AI 分析中</text>
     </view>
     <view class="meta">
-      <text class="meta-title" data-test-id="p03-thumb-card-title">第 17 题 · 顶点与对称轴</text>
+      <text class="meta-title" data-test-id="p03-thumb-card-title">{{ previewTitle }}</text>
+      <text class="meta-subtitle">{{ previewSubtitle }}</text>
       <view class="meta-chips">
         <text class="chip">{{ subjectLabel }}</text>
-        <text class="chip">G9</text>
-        <text class="chip">2026-04-21 14:28</text>
+        <text wx:if="{{ timeChip }}" class="chip">{{ timeChip }}</text>
       </view>
     </view>
   </view>

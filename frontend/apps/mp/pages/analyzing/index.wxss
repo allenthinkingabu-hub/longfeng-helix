@@ -116,6 +116,44 @@ page {
   font-weight: 700;
 }
 
+/* ── Loading state · replaces hardcoded "17/已知 f(x).../B" mockup ── */
+.thumb-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.thumb-spinner {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  border: 6rpx solid rgba(167, 138, 60, 0.18);
+  border-top-color: #a78a3c;
+  animation: thumb-spin 0.9s linear infinite;
+  margin-top: 16rpx;
+}
+
+@keyframes thumb-spin {
+  to { transform: rotate(360deg); }
+}
+
+.thumb-status {
+  margin-top: 16rpx;
+  font-size: 18rpx;
+  color: #7a6233;
+  font-weight: 600;
+  letter-spacing: 0.4rpx;
+}
+
+.meta-subtitle {
+  font-size: 22rpx;
+  color: #8E8E93;
+  font-weight: 500;
+  margin: 6rpx 0 12rpx;
+  line-height: 1.4;
+}
+
 .thumb-qno {
   position: absolute;
   top: 28rpx;

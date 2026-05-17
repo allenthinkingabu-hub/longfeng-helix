@@ -24,6 +24,22 @@ const STEP_LABELS: Record<number, string> = {
   4: '生成解答步骤',
 };
 
+// 红框预览卡的动态标题 · 按 currentStep 滚 · 替代硬编码 "第 17 题 · 顶点与对称轴"
+const PREVIEW_TITLE_BY_STEP: Record<number, string> = {
+  1: 'OCR 识别题干中…',
+  2: '判断学科与知识点…',
+  3: '诊断错因中…',
+  4: '生成解答步骤…',
+};
+
+function formatTimeChip(d: Date): string {
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mi = String(d.getMinutes()).padStart(2, '0');
+  return `${d.getFullYear()}-${mm}-${dd} ${hh}:${mi}`;
+}
+
 // Step descs · "done" is a function so we can substitute real BE values (stem length /
 // subject / model name) once the poll response lands. The old hard-coded mockup strings
 // ("已提取 132 字符，置信度 99.4%" / "数学 · 二次函数 · 顶点式 · Bloom: APPLY") were obvious
@@ -124,6 +140,11 @@ Page({
     steps: buildSteps(0, 'init'),
     streamOutput: STREAM_PLACEHOLDER,
     taskId: '',
+    // 红框预览卡 · 用户视角 "OCR 还没跑就显示题号 17" 反 bug ·
+    // 这些字段按 pageState/currentStep 动态滚 · 不再写死 mockup 文案
+    previewTitle: '准备分析…',
+    previewSubtitle: '正在上传图像 · 等待 AI 模型响应',
+    timeChip: '',
   },
 
   _pollTimer: 0 as unknown as number,
@@ -146,7 +167,7 @@ Page({
     // raw value when capture supplied a Chinese label directly (legacy callers).
     const subjectLabel = SUBJECT_LABELS[subject] || subject;
     this._qid = options.qid || '';
-    this.setData({ subjectLabel });
+    this.setData({ subjectLabel, timeChip: formatTimeChip(new Date()) });
 
     if (imageUrl) {
       this._startAnalysis(imageUrl, subject);
@@ -157,6 +178,8 @@ Page({
         statusText: 'AI 正在分析…',
         steps: buildSteps(3, 'analyzing'),
         doneCount: 2,
+        previewTitle: PREVIEW_TITLE_BY_STEP[3],
+        previewSubtitle: '正在与 AI 模型通信中',
       });
     }
   },
@@ -167,7 +190,14 @@ Page({
 
   async _startAnalysis(imageUrl: string, subject: string) {
     try {
-      this.setData({ pageState: 'analyzing', statusText: 'AI 正在分析…', steps: buildSteps(1, 'analyzing'), doneCount: 0 });
+      this.setData({
+        pageState: 'analyzing',
+        statusText: 'AI 正在分析…',
+        steps: buildSteps(1, 'analyzing'),
+        doneCount: 0,
+        previewTitle: PREVIEW_TITLE_BY_STEP[1],
+        previewSubtitle: '正在与 AI 模型通信中',
+      });
       // SC01-MP-BUG-AI-FAKE in_scope #6: pass qid as taskId so BE persists
       // analysis_result.task_id == qid (closure anchor · GET /api/ai/{qid}/answer
       // on P04 can find a row).
@@ -230,12 +260,22 @@ Page({
           subjectLabel: SUBJECT_LABELS[resp.subject || ''] || this.data.subjectLabel,
           ocrModel: resp.ocrModel || this.data.currentModel,
         };
+        // 真分析结果到手 · 用 OCR 出的 stem 当预览标题 (前 20 字截断) ·
+        // 仍空时 fallback "已识别 N 字符" · 给用户一瞬间真实反馈 再跳 P04
+        const resultObj = (resp.result ?? {}) as Record<string, unknown>;
+        const realStem = typeof resultObj.stem === 'string' ? resultObj.stem.trim() : '';
+        const previewTitle = realStem
+          ? (realStem.length > 20 ? realStem.slice(0, 20) + '…' : realStem)
+          : (resp.stemLength ? `已识别 ${resp.stemLength} 字符` : 'AI 分析完成');
+        const previewSubtitle = `${facts.subjectLabel} · ${facts.ocrModel} · ${resp.stemLength ?? 0} 字符`;
         this.setData({
           pageState: 'success',
           statusText: 'AI 分析完成',
           doneCount: 4,
           steps: buildSteps(5, 'analyzing', facts),
           streamOutput: resp.result ? JSON.stringify(resp.result, null, 2) : this.data.streamOutput,
+          previewTitle,
+          previewSubtitle,
         });
         // Transition P03→P04: navigate to result page after brief delay
         const qid = this._qid || this.data.taskId;
@@ -255,9 +295,16 @@ Page({
           doneCount,
         });
       } else {
+        // 分析进行中 · 红框预览卡按 currentStep 滚动文案 · 真实进度反馈
+        const previewTitle = PREVIEW_TITLE_BY_STEP[step] || 'AI 分析中…';
+        const previewSubtitle = step >= 2 && resp.stemLength
+          ? `${this.data.subjectLabel} · 已识别 ${resp.stemLength} 字符`
+          : '正在与 AI 模型通信中';
         this.setData({
           doneCount,
           steps: buildSteps(step, 'analyzing'),
+          previewTitle,
+          previewSubtitle,
         });
       }
     } catch {

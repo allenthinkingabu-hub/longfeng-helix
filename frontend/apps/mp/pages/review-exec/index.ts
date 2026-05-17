@@ -75,6 +75,8 @@ const STARS_MAP: Record<number, string> = {
 // ─── Page ──────────────────────────────────────────────────────
 Page({
   _openedAt: 0 as number,
+  _sid: '' as string,        // P07 createSession 透传 · 用于 P09 onGradeTap 真 sid
+  _nid: '' as string,        // 单题深链 / 推送进入时直接给 nid
   data: {
     // test ids
     testIds: TEST_IDS.p08,
@@ -116,8 +118,12 @@ Page({
     })),
   },
 
-  onLoad() {
+  onLoad(options: Record<string, string | undefined>) {
     this._openedAt = Date.now();
+    // P07 全部开始 (createSession) 透传 sid · P09 onGradeTap 要用
+    this._sid = options.sid ?? '';
+    // 单题深链 (P07 item tap 或 P02 推送) 直传 nid · 跳过 first nid 探测
+    this._nid = options.nid ?? '';
 
     // Build step testIds
     const steps = this.data.steps.map((s, i) => ({
@@ -265,9 +271,11 @@ Page({
     });
 
     // T12: GRADED → P09 transition (mirrors H5 ReviewExec handleGrade)
-    const sid = 'mock-sid-001'; // production: from session context
+    // sid 优先来自 P07 onLoad 透传 · 没有时 fallback mock 以兼容直接打开 P08 的 dev 路径
+    const sid = this._sid || 'mock-sid-001';
+    const nid = this._nid || this.data.node.nid;
     wx.navigateTo({
-      url: `/pages/review-done/index?sid=${sid}&grade=${grade}&nodeId=${this.data.node.nid}`,
+      url: `/pages/review-done/index?sid=${encodeURIComponent(sid)}&grade=${grade}&nodeId=${encodeURIComponent(nid)}`,
     });
   },
 
