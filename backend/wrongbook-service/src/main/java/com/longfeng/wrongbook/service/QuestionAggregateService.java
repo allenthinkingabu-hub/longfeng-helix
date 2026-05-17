@@ -107,6 +107,16 @@ public class QuestionAggregateService {
         return toListItem(item);
     }
 
+    /**
+     * wrong_item.status 枚举 (entity 实测):
+     *   0 = PENDING (P02 拍题占位 · OCR/AI 还没跑完 · 不算"已确认错题")
+     *   3 = CONFIRMED (P04 "保存并开启复习" 后 · 此时 review-plan 建 7 节点)
+     *   8 = ARCHIVED (P05 归档)
+     * P05 列表 root cause: 之前不过滤 status · 把 PENDING 占位 一起列 ·
+     * 用户看到 37 道"错题" 实际仅 ~1 道真错题 · P07 复习页空也是真相 (PENDING 不进 plan).
+     */
+    private static final short STATUS_CONFIRMED = 3;
+
     public QuestionListResp listQuestions(Long studentId, String subject, Short mastery,
                                           int page, int size, String sort) {
         Sort s = Sort.by(Sort.Direction.DESC, "created_at");
@@ -114,7 +124,10 @@ public class QuestionAggregateService {
             s = Sort.by(Sort.Direction.ASC, "created_at");
         }
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), size, s);
-        Page<WrongItem> result = wrongItemService.list(studentId, subject, mastery, null, pageable);
+        // 默认 status=CONFIRMED · 只列学生已"保存并开启复习"的题 ·
+        // PENDING (0) 是 OCR 中途的占位 · 没建复习计划 · 列出来误导.
+        // 后续如果要管理后台看 PENDING/ARCHIVED · 走另一个 admin 接口.
+        Page<WrongItem> result = wrongItemService.list(studentId, subject, mastery, STATUS_CONFIRMED, pageable);
 
         // P05-LIST: 批量取每个 wrong_item 的 next-due active plan ·
         // 单条 HTTP POST · review-plan-service down 时降级 (空 map) 不 hang.
