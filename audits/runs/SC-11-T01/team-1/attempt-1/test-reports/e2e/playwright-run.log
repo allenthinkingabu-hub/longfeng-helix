@@ -1,0 +1,24 @@
+
+Running 5 tests using 1 worker
+
+  ✓  1 [chromium] › tests/e2e/sc-11/t01-landing-shell.spec.ts:32:3 › SC-11-T01 · P-LANDING shell (5 cases) › TC-11-T01 (a) loading_skeleton_then_ready: race-free allSettled · skeleton → samples section (870ms)
+  ✓  2 [chromium] › tests/e2e/sc-11/t01-landing-shell.spec.ts:70:3 › SC-11-T01 · P-LANDING shell (5 cases) › TC-11-T01 (b) samples_5xx_falls_to_degraded_state: 500 · banner visible · samples 区缺失 (303ms)
+  ✓  3 [chromium] › tests/e2e/sc-11/t01-landing-shell.spec.ts:92:3 › SC-11-T01 · P-LANDING shell (5 cases) › TC-11-T01 (c) kpi_5xx_partial_degraded: kpi 500 · kpi-bar absent · samples 正常 (314ms)
+  ✓  4 [chromium] › tests/e2e/sc-11/t01-landing-shell.spec.ts:114:3 › SC-11-T01 · P-LANDING shell (5 cases) › TC-11-T01 (d) no_auth_no_resolve_calls: 匿名访问 · /api/auth/* + /api/session/resolve count===0 (621ms)
+  ✓  5 [chromium] › tests/e2e/sc-11/t01-landing-shell.spec.ts:140:3 › SC-11-T01 · P-LANDING shell (5 cases) › TC-11-T01 (e) cdn_cache_headers: samples response · Cache-Control + Vary headers (CDN 强缓存) (22ms)
+
+  5 passed (2.9s)
+<testsuites id="" name="" tests="5" failures="0" skipped="0" errors="0" time="2.882514">
+<testsuite name="sc-11/t01-landing-shell.spec.ts" timestamp="2026-05-17T14:47:58.718Z" hostname="chromium" tests="5" failures="0" skipped="0" time="2.13" errors="0">
+<testcase name="SC-11-T01 · P-LANDING shell (5 cases) › TC-11-T01 (a) loading_skeleton_then_ready: race-free allSettled · skeleton → samples section" classname="sc-11/t01-landing-shell.spec.ts" time="0.87">
+</testcase>
+<testcase name="SC-11-T01 · P-LANDING shell (5 cases) › TC-11-T01 (b) samples_5xx_falls_to_degraded_state: 500 · banner visible · samples 区缺失" classname="sc-11/t01-landing-shell.spec.ts" time="0.303">
+</testcase>
+<testcase name="SC-11-T01 · P-LANDING shell (5 cases) › TC-11-T01 (c) kpi_5xx_partial_degraded: kpi 500 · kpi-bar absent · samples 正常" classname="sc-11/t01-landing-shell.spec.ts" time="0.314">
+</testcase>
+<testcase name="SC-11-T01 · P-LANDING shell (5 cases) › TC-11-T01 (d) no_auth_no_resolve_calls: 匿名访问 · /api/auth/* + /api/session/resolve count===0" classname="sc-11/t01-landing-shell.spec.ts" time="0.621">
+</testcase>
+<testcase name="SC-11-T01 · P-LANDING shell (5 cases) › TC-11-T01 (e) cdn_cache_headers: samples response · Cache-Control + Vary headers (CDN 强缓存)" classname="sc-11/t01-landing-shell.spec.ts" time="0.022">
+</testcase>
+</testsuite>
+</testsuites>

@@ -1,0 +1,96 @@
+<testsuites id="" name="" tests="38" failures="0" skipped="0" errors="0" time="30.353908">
+<testsuite name="auth/login-adversarial.spec.ts" timestamp="2026-05-17T14:45:50.312Z" hostname="chromium" tests="4" failures="0" skipped="0" time="3.145" errors="0">
+<testcase name="PHASE-A-LOGIN-H5 · adversarial › 连点: triple-click login CTA → only 1 request fires (debounce guard)" classname="auth/login-adversarial.spec.ts" time="0.935">
+</testcase>
+<testcase name="PHASE-A-LOGIN-H5 · adversarial › 注入/超长: 1000-char email + XSS script tag in password → no crash, graceful error" classname="auth/login-adversarial.spec.ts" time="0.68">
+</testcase>
+<testcase name="PHASE-A-LOGIN-H5 · adversarial › SQL注入: email = SQL payload → backend rejects gracefully (no 500)" classname="auth/login-adversarial.spec.ts" time="0.706">
+</testcase>
+<testcase name="PHASE-A-LOGIN-H5 · adversarial › 阻断: abort inflight request → 网络不可用 error" classname="auth/login-adversarial.spec.ts" time="0.824">
+</testcase>
+</testsuite>
+<testsuite name="auth/login-sqli-adversarial.spec.ts" timestamp="2026-05-17T14:45:50.312Z" hostname="chromium" tests="3" failures="0" skipped="0" time="6.491" errors="0">
+<testcase name="PHASE-A-LOGIN-H5 · SQL Injection Adversarial › SQL 注入 email: a&apos; OR &apos;1&apos;=&apos;1 必须被参数化 query 拦下" classname="auth/login-sqli-adversarial.spec.ts" time="2.094">
+</testcase>
+<testcase name="PHASE-A-LOGIN-H5 · SQL Injection Adversarial › SQL 注入 password: &apos; OR 1=1 -- 必须被 bcrypt verify 拒绝" classname="auth/login-sqli-adversarial.spec.ts" time="2.316">
+</testcase>
+<testcase name="PHASE-A-LOGIN-H5 · SQL Injection Adversarial › SQL 注入 LIKE wildcard: %@example.com 不应模糊匹配其他账号" classname="auth/login-sqli-adversarial.spec.ts" time="2.081">
+</testcase>
+</testsuite>
+<testsuite name="auth/login.spec.ts" timestamp="2026-05-17T14:45:50.312Z" hostname="chromium" tests="4" failures="0" skipped="0" time="4.946" errors="0">
+<testcase name="PHASE-A-LOGIN-H5 · P00 login (4 cases) › PHASE-A-LOGIN-H5 happy: test@example.com + Test@1234 → /home" classname="auth/login.spec.ts" time="0.736">
+</testcase>
+<testcase name="PHASE-A-LOGIN-H5 · P00 login (4 cases) › PHASE-A-LOGIN-H5 wrong_password → inline 邮箱或密码错误" classname="auth/login.spec.ts" time="0.953">
+</testcase>
+<testcase name="PHASE-A-LOGIN-H5 · P00 login (4 cases) › PHASE-A-LOGIN-H5 wrong_email → same 邮箱或密码错误 (prevent enumeration)" classname="auth/login.spec.ts" time="0.651">
+</testcase>
+<testcase name="PHASE-A-LOGIN-H5 · P00 login (4 cases) › PHASE-A-LOGIN-H5 lockout: 5 connectives wrong → 账号已锁定 · 5 分钟后重试" classname="auth/login.spec.ts" time="2.606">
+</testcase>
+</testsuite>
+<testsuite name="sc-00/t01-resolve-entry-adversarial.spec.ts" timestamp="2026-05-17T14:45:50.312Z" hostname="chromium" tests="4" failures="0" skipped="0" time="1.65" errors="0">
+<testcase name="SC-00-T01 · ADVERSARIAL · 破坏性边界 › ADV-1 · /s/&lt;deeplink&gt; + valid local JWT → stub 页直接渲染 · BootstrapGate 跳过" classname="sc-00/t01-resolve-entry-adversarial.spec.ts" time="0.216">
+</testcase>
+<testcase name="SC-00-T01 · ADVERSARIAL · 破坏性边界 › ADV-2 · resolve schema 篡改 (decision=&quot;WTF&quot;) → zod reject + fallback /welcome" classname="sc-00/t01-resolve-entry-adversarial.spec.ts" time="0.215">
+</testcase>
+<testcase name="SC-00-T01 · ADVERSARIAL · 破坏性边界 › ADV-3 · resolve 慢响应 6s → 5s timeout → 无 JWT fallback /welcome" classname="sc-00/t01-resolve-entry-adversarial.spec.ts" time="1.021">
+</testcase>
+<testcase name="SC-00-T01 · ADVERSARIAL · 破坏性边界 › ADV-4 · JWT 前缀篡改 → decodeJwt 抛 → 当本地无 JWT 处理 → 调后端" classname="sc-00/t01-resolve-entry-adversarial.spec.ts" time="0.198">
+</testcase>
+</testsuite>
+<testsuite name="sc-00/t01-resolve-entry.spec.ts" timestamp="2026-05-17T14:45:50.312Z" hostname="chromium" tests="4" failures="0" skipped="0" time="0.907" errors="0">
+<testcase name="SC-00-T01 · resolve-entry · bootstrap decision tree dispatch › TC-00-A · jwt_local_valid_no_resolve_call → /home AND 0 backend call" classname="sc-00/t01-resolve-entry.spec.ts" time="0.221">
+</testcase>
+<testcase name="SC-00-T01 · resolve-entry · bootstrap decision tree dispatch › TC-00-B · no_jwt_resolve_returns_landing → /welcome (真后端打通)" classname="sc-00/t01-resolve-entry.spec.ts" time="0.243">
+</testcase>
+<testcase name="SC-00-T01 · resolve-entry · bootstrap decision tree dispatch › TC-00-C · jwt_expired_resolve_returns_login → /auth/login?redirect=..." classname="sc-00/t01-resolve-entry.spec.ts" time="0.224">
+</testcase>
+<testcase name="SC-00-T01 · resolve-entry · bootstrap decision tree dispatch › TC-00-D · resolve_500_offline_with_stale_jwt → /home (stale tolerance)" classname="sc-00/t01-resolve-entry.spec.ts" time="0.219">
+</testcase>
+</testsuite>
+<testsuite name="sc-00/t03-deeplink-redirect.spec.ts" timestamp="2026-05-17T14:45:50.312Z" hostname="chromium" tests="5" failures="0" skipped="0" time="4.776" errors="0">
+<testcase name="SC-00-T03 · P00 deeplink redirect roundtrip (5 cases) › TC-00.03 (a) redirect_query_renders_hint: ?redirect=/review/exec/123 → hint visible · text contains path-only (脱敏)" classname="sc-00/t03-deeplink-redirect.spec.ts" time="0.48">
+</testcase>
+<testcase name="SC-00-T03 · P00 deeplink redirect roundtrip (5 cases) › TC-00.03 (b) no_redirect_no_hint: /auth/login (无 query) → hint DOM 不存在" classname="sc-00/t03-deeplink-redirect.spec.ts" time="0.449">
+</testcase>
+<testcase name="SC-00-T03 · P00 deeplink redirect roundtrip (5 cases) › TC-00.03 (c) login_success_replaces_to_redirect: 正确密码 → router.replace(/review/exec/123)" classname="sc-00/t03-deeplink-redirect.spec.ts" time="0.771">
+</testcase>
+<testcase name="SC-00-T03 · P00 deeplink redirect roundtrip (5 cases) › TC-00.03 (d) login_failure_keeps_redirect: 错密码 → URL ?redirect= 保留 · error 可见" classname="sc-00/t03-deeplink-redirect.spec.ts" time="0.906">
+</testcase>
+<testcase name="SC-00-T03 · P00 deeplink redirect roundtrip (5 cases) › TC-00.03 (e) open_redirect_blocked: 外域 + javascript: + data: + // → 一律 fallback /home + console.warn" classname="sc-00/t03-deeplink-redirect.spec.ts" time="2.17">
+</testcase>
+</testsuite>
+<testsuite name="sc-00/t04-fallback-adversarial.spec.ts" timestamp="2026-05-17T14:45:50.312Z" hostname="chromium" tests="3" failures="0" skipped="0" time="1.981" errors="0">
+<testcase name="SC-00-T04 · Adversarial · 探索性边界 (3 cases) › TC-00-T04-ADV (a) timeout_800ms_triggers_degradation: 1500ms 延迟 · stale JWT · abort 后落 /home + banner" classname="sc-00/t04-fallback-adversarial.spec.ts" time="1.049">
+</testcase>
+<testcase name="SC-00-T04 · Adversarial · 探索性边界 (3 cases) › TC-00-T04-ADV (b) no_jwt_5xx_falls_to_welcome: 无 JWT + resolve 500 → /welcome (NOT /home, NOT /auth/login)" classname="sc-00/t04-fallback-adversarial.spec.ts" time="0.206">
+</testcase>
+<testcase name="SC-00-T04 · Adversarial · 探索性边界 (3 cases) › TC-00-T04-ADV (c) stub_token_path_param_in_telemetry: /s/abc123 → anon_stub_view 的 token_hash 是 djb2 hash 非明文" classname="sc-00/t04-fallback-adversarial.spec.ts" time="0.726">
+</testcase>
+</testsuite>
+<testsuite name="sc-00/t04-fallback-stubs.spec.ts" timestamp="2026-05-17T14:45:50.312Z" hostname="chromium" tests="6" failures="0" skipped="0" time="3.813" errors="0">
+<testcase name="SC-00-T04 · stub 兜底真页 + 离线降级真 UI (6 cases) › TC-00-T04 (a) shared_stub_renders: /s/abc123 → stub UI visible · /api/share/* count===0" classname="sc-00/t04-fallback-stubs.spec.ts" time="0.521">
+</testcase>
+<testcase name="SC-00-T04 · stub 兜底真页 + 离线降级真 UI (6 cases) › TC-00-T04 (b) welcomeback_stub_renders: /welcome-back → stub UI · device-refresh + 二次 resolve count===0" classname="sc-00/t04-fallback-stubs.spec.ts" time="0.517">
+</testcase>
+<testcase name="SC-00-T04 · stub 兜底真页 + 离线降级真 UI (6 cases) › TC-00-T04 (c) observer_stub_renders: /observer/ABC123 → stub UI · /api/observer/* count===0" classname="sc-00/t04-fallback-stubs.spec.ts" time="0.511">
+</testcase>
+<testcase name="SC-00-T04 · stub 兜底真页 + 离线降级真 UI (6 cases) › TC-00-T04 (d) stub_cta_redirects_to_login: shared stub CTA click → URL pathname === /auth/login" classname="sc-00/t04-fallback-stubs.spec.ts" time="0.267">
+</testcase>
+<testcase name="SC-00-T04 · stub 兜底真页 + 离线降级真 UI (6 cases) › TC-00-T04 (e) offline_banner_with_stale_jwt: resolve 5xx + stale JWT → /home + banner visible · 文字 &quot;离线模式&quot;" classname="sc-00/t04-fallback-stubs.spec.ts" time="0.231">
+</testcase>
+<testcase name="SC-00-T04 · stub 兜底真页 + 离线降级真 UI (6 cases) › TC-00-T04 (f) offline_banner_close_persists: close → hidden · reload + 仍 5xx → banner 不再出现" classname="sc-00/t04-fallback-stubs.spec.ts" time="1.766">
+</testcase>
+</testsuite>
+<testsuite name="sc-11/t01-landing-shell.spec.ts" timestamp="2026-05-17T14:45:50.312Z" hostname="chromium" tests="5" failures="0" skipped="0" time="1.845" errors="0">
+<testcase name="SC-11-T01 · P-LANDING shell (5 cases) › TC-11-T01 (a) loading_skeleton_then_ready: race-free allSettled · skeleton → samples section" classname="sc-11/t01-landing-shell.spec.ts" time="0.567">
+</testcase>
+<testcase name="SC-11-T01 · P-LANDING shell (5 cases) › TC-11-T01 (b) samples_5xx_falls_to_degraded_state: 500 · banner visible · samples 区缺失" classname="sc-11/t01-landing-shell.spec.ts" time="0.302">
+</testcase>
+<testcase name="SC-11-T01 · P-LANDING shell (5 cases) › TC-11-T01 (c) kpi_5xx_partial_degraded: kpi 500 · kpi-bar absent · samples 正常" classname="sc-11/t01-landing-shell.spec.ts" time="0.314">
+</testcase>
+<testcase name="SC-11-T01 · P-LANDING shell (5 cases) › TC-11-T01 (d) no_auth_no_resolve_calls: 匿名访问 · /api/auth/* + /api/session/resolve count===0" classname="sc-11/t01-landing-shell.spec.ts" time="0.643">
+</testcase>
+<testcase name="SC-11-T01 · P-LANDING shell (5 cases) › TC-11-T01 (e) cdn_cache_headers: samples response · Cache-Control + Vary headers (CDN 强缓存)" classname="sc-11/t01-landing-shell.spec.ts" time="0.019">
+</testcase>
+</testsuite>
+</testsuites>
