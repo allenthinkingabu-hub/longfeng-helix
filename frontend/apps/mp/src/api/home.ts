@@ -32,6 +32,9 @@ export interface HomeTodayItem {
   easeFactor: number;
   totalReview: number;
   totalForget: number;
+  // BE today endpoint single-DB join wrong_item · 'math'/'physics'/'chemistry'/'english'/'chinese' ·
+  // FE 自己 i18n 映射 + chip 渲染 (替代之前 MVP_SUBJECTS 写死 3/2/3).
+  subject?: string | null;
 }
 
 export interface HomeTodayData {

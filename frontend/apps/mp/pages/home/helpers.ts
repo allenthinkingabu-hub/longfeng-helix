@@ -34,7 +34,44 @@ export const SUBJECT_COLORS: Record<string, string> = {
   '物理': '#FFD166',
   '化学': '#30B0C7',
   '英语': '#6DE895',
+  '语文': '#FF9F40',
 };
+
+// BE wrong_item.subject 是 enum 字符串 ('math'/'physics'/...) · FE 映射中文 chip label.
+// 跟 review-today/helpers.ts SUBJECT_LABEL_MAP 同源 · 之所以两份是因为 P-HOME 在
+// MP 内独立 module · 不允许 import 跨 module 共享.
+const SUBJECT_LABEL: Record<string, string> = {
+  math: '数学', physics: '物理', chemistry: '化学', english: '英语', chinese: '语文',
+};
+
+export interface SubjectChip {
+  name: string;   // 中文 label
+  count: number;  // 该学科当日题数
+  color: string;
+}
+
+/**
+ * 从 today items[] 聚合每学科题数 · 替代之前 MVP_SUBJECTS 写死 3/2/3.
+ * spec P-HOME L80 <TodayReviewCard> props 含 subjectDist[] · spec L151 标 MVP hardcoded ·
+ * 但 BE 实际已经在 /api/review/today items[] 返了 subject 字段 (P07 enrich 复用) ·
+ * P-HOME 可以一并消费 · 避免 3+2+3=8 ≠ todayTotal=4 数字打架.
+ */
+export function buildSubjectsFromItems(
+  items: Array<{ subject?: string | null }>
+): SubjectChip[] {
+  const counts: Record<string, number> = {};
+  for (const it of items) {
+    const key = (it.subject ?? '').toLowerCase();
+    const label = SUBJECT_LABEL[key];
+    if (!label) continue;  // 未知/空 subject 跳过 · 不渲染"未知 N 题"误导
+    counts[label] = (counts[label] ?? 0) + 1;
+  }
+  return Object.entries(counts).map(([name, count]) => ({
+    name,
+    count,
+    color: SUBJECT_COLORS[name] ?? '#999',
+  }));
+}
 
 export function buildGreeting(): string {
   const now = new Date();
@@ -86,7 +123,11 @@ function pad2(n: number): string {
   return n < 10 ? `0${n}` : String(n);
 }
 
-export function buildCurrentWeekStrip(now: Date): WeekStrip {
+/**
+ * todayBadgeNum: 今日红点角标显示的数字 · 之前写死 8 · 现注入真值 (= pending = total - done).
+ * 0 时 wxml `wx:if="{{item.num}}"` 自动 hide.
+ */
+export function buildCurrentWeekStrip(now: Date, todayBadgeNum: number = 0): WeekStrip {
   // JS getDay(): 0=Sunday..6=Saturday · 项目 ISO 周一→周日, 转换:
   // Mon=0, Tue=1, Wed=2, Thu=3, Fri=4, Sat=5, Sun=6
   const jsDay = now.getDay();
@@ -104,7 +145,7 @@ export function buildCurrentWeekStrip(now: Date): WeekStrip {
       d: pad2(dt.getDate()),
       dots: PLACEHOLDER_DOTS_BY_WEEKDAY[i],
       today: isToday,
-      num: isToday ? 8 : 0,
+      num: isToday ? todayBadgeNum : 0,
     });
   }
 

@@ -6,20 +6,17 @@
 import { TEST_IDS } from '@longfeng/testids';
 import { getHomeTodayCount } from '../../src/api/home';
 import {
-  SUBJECT_COLORS,
   buildCurrentWeekStrip,
   buildGreeting,
+  buildSubjectsFromItems,
   computeCirclePct,
   derivePageState,
 } from './helpers';
-import type { PageState } from './helpers';
+import type { PageState, SubjectChip } from './helpers';
 
 // ─── Mock/MVP data ──────────────────────────────────────────────
-const MVP_SUBJECTS = [
-  { name: '数学', count: 3, color: SUBJECT_COLORS['数学'] },
-  { name: '物理', count: 2, color: SUBJECT_COLORS['物理'] },
-  { name: '英语', count: 3, color: SUBJECT_COLORS['英语'] },
-];
+// 注: MVP_SUBJECTS 已删除 · 之前写死 3 数学 + 2 物理 + 3 英语 = 8 但 todayTotal=4 数字打架 ·
+// 现 subjects 由 _fetchTodayData 从 items[] 真聚合 · 学科 chip 与 hero 题数自洽.
 
 const MVP_WEEK_STATS = { mastered: 23, newItems: 8, forgotten: 2, masteryRate: 68 };
 
@@ -75,7 +72,10 @@ Page({
     estMin: 25,
     circleProgress: 0,
     circlePctText: '0%',
-    subjects: MVP_SUBJECTS,
+    // allDone = 今日 4 题全 GRADED · hero 切庆祝文案 (与 P07 一致 · 撤掉 "N 题待复习" 误导).
+    allDone: false,
+    // subjects 由 _fetchTodayData 真聚合 · init 空 · 之前写死 3/2/3 与 todayTotal 撞车.
+    subjects: [] as SubjectChip[],
 
     // weekly
     weekStats: MVP_WEEK_STATS,
@@ -97,8 +97,10 @@ Page({
   },
 
   onShow() {
-    // Refresh time-dependent data (greeting + 本周日程 · 跨日要切高亮)
-    const strip = buildCurrentWeekStrip(new Date());
+    // Refresh time-dependent data (greeting + 本周日程 · 跨日要切高亮).
+    // weekDays badge num 用上次已知 pending · _fetchTodayData 拉到新值后会再次更新.
+    const cachedPending = Math.max(0, (this.data.todayTotal as number) - (this.data.todayDone as number));
+    const strip = buildCurrentWeekStrip(new Date(), cachedPending);
     this.setData({
       greeting: buildGreeting(),
       weekLabel: strip.label,
@@ -134,12 +136,26 @@ Page({
         : itemsArr.filter(i => i && (i as { completedAt?: unknown }).completedAt).length;
       const pct = computeCirclePct(done, total);
 
+      // 学科 chip 从 items[].subject 真聚合 · 替换 MVP_SUBJECTS 写死.
+      // BE today endpoint join wrong_item 后已经返 subject 字段 (P07 复用同接口).
+      const subjects = buildSubjectsFromItems(itemsArr as Array<{ subject?: string | null }>);
+
+      // weekDays 红角标 num 注入真值 (pending = total - done) · 之前写死 8 ·
+      // 0 时 wxml wx:if 自动 hide · 与 100% DONE 圆环自洽.
+      const pending = Math.max(0, total - done);
+      const strip = buildCurrentWeekStrip(new Date(), pending);
+
       this.setData({
         pageState: derivePageState(data, false),
         todayTotal: total,
         todayDone: done,
         circleProgress: pct / 100,
         circlePctText: `${pct}%`,
+        // allDone = total>0 且 全部 GRADED · hero 切庆祝文案 (P07 已用同模型 · 跨页统一)
+        allDone: total > 0 && done >= total,
+        subjects,
+        weekLabel: strip.label,
+        weekDays: strip.days,
       }, () => this._syncReviewBadge());
     } catch (err) {
       // §9 降级: 真失败时露白 · 不假装有 8/3/38% mock 数据骗用户
@@ -150,6 +166,8 @@ Page({
         todayDone: 0,
         circleProgress: 0,
         circlePctText: '0%',
+        allDone: false,
+        subjects: [] as SubjectChip[],
       }, () => this._syncReviewBadge());
     }
   },

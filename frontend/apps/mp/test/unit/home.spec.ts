@@ -11,6 +11,7 @@ import {
   SUBJECT_COLORS,
   buildCurrentWeekStrip,
   buildGreeting,
+  buildSubjectsFromItems,
   computeCirclePct,
   derivePageState,
 } from '../../pages/home/helpers';
@@ -129,11 +130,23 @@ describe('buildCurrentWeekStrip (B4 + B5 · pure)', () => {
   });
 
   it('B5 regression · today is 周六 → days[5].today === true · others false', () => {
-    const strip = buildCurrentWeekStrip(new Date(2026, 4, 16)); // Saturday
+    // buildCurrentWeekStrip 第 2 参 todayBadgeNum (= pending) · default 0 · 之前写死 8 ·
+    // 现 P-HOME _fetchTodayData 注入真值 (total - done) · 让今天角标与 hero 自洽.
+    const strip = buildCurrentWeekStrip(new Date(2026, 4, 16), 8); // Saturday · pending=8
     const todays = strip.days.map((d) => d.today);
     expect(todays).toEqual([false, false, false, false, false, true, false]);
-    expect(strip.days[5].num).toBe(8); // today 上挂 badge
+    expect(strip.days[5].num).toBe(8); // today 上挂 badge (来自参数)
     expect(strip.days[0].num).toBe(0);
+  });
+
+  it('badge num 默认 0 (hide) · all-done 场景不假装"还有题"', () => {
+    const strip = buildCurrentWeekStrip(new Date(2026, 4, 16)); // 不传第二参 · 默认 0
+    expect(strip.days[5].num).toBe(0);
+  });
+
+  it('badge num 接 pending 真值 · pending=0 角标 hide', () => {
+    const strip = buildCurrentWeekStrip(new Date(2026, 4, 16), 0);
+    expect(strip.days[5].num).toBe(0);
   });
 
   it('B5 regression · 周日 (Sunday) 算本周最后一天 · today index = 6', () => {
@@ -164,8 +177,10 @@ describe('buildCurrentWeekStrip (B4 + B5 · pure)', () => {
     expect(strip.days[6].d).toBe('10');
   });
 
-  it('每个 day 必带 dots[] (mockup 占位) · today 必带 num=8', () => {
-    const strip = buildCurrentWeekStrip(new Date(2026, 4, 16));
+  it('每个 day 必带 dots[] (mockup 占位) · today 的 num 接 todayBadgeNum 参数', () => {
+    // 之前断言 num=8 硬编码 · 现 buildCurrentWeekStrip 第 2 参 todayBadgeNum 注入 ·
+    // 不传 = 0 (角标 hide) · 传 N = 实际 pending 数.
+    const strip = buildCurrentWeekStrip(new Date(2026, 4, 16), 8);
     for (const d of strip.days) {
       expect(Array.isArray(d.dots)).toBe(true);
       expect(d.dots.length).toBeGreaterThan(0);
@@ -196,7 +211,50 @@ describe('SUBJECT_COLORS (B6 · 亮色 regression)', () => {
     expect(SUBJECT_COLORS['英语']).not.toBe('#9C4F00');
   });
 
-  it('all 4 subjects defined', () => {
-    expect(Object.keys(SUBJECT_COLORS).sort()).toEqual(['化学', '数学', '物理', '英语'].sort());
+  it('all subjects defined (B6 四学科 + 语文新加 · subject chip 真聚合需要)', () => {
+    // 之前只 4 学科 · 现加语文 (BE chinese key) · subjects chip 从 items[] 真聚合时需要色映射.
+    expect(Object.keys(SUBJECT_COLORS).sort()).toEqual(['化学', '数学', '物理', '英语', '语文'].sort());
+  });
+});
+
+// ── buildSubjectsFromItems · subject chip 从 items[] 真聚合 ─────
+describe('buildSubjectsFromItems (替代之前 MVP_SUBJECTS 3/2/3 写死)', () => {
+  it('items 空 → 空数组 (不渲染假 chip)', () => {
+    expect(buildSubjectsFromItems([])).toEqual([]);
+  });
+
+  it('单学科 4 题 → 1 chip count=4 · 与 todayTotal 自洽', () => {
+    const items = [
+      { subject: 'math' }, { subject: 'math' }, { subject: 'math' }, { subject: 'math' },
+    ];
+    const out = buildSubjectsFromItems(items);
+    expect(out).toEqual([{ name: '数学', count: 4, color: SUBJECT_COLORS['数学'] }]);
+  });
+
+  it('多学科 · 标签 + 计数都对', () => {
+    const items = [
+      { subject: 'math' }, { subject: 'math' },
+      { subject: 'physics' },
+      { subject: 'english' },
+    ];
+    const out = buildSubjectsFromItems(items);
+    const sum = out.reduce((acc, x) => acc + x.count, 0);
+    expect(sum).toBe(4);
+    expect(out.find(x => x.name === '数学')?.count).toBe(2);
+    expect(out.find(x => x.name === '物理')?.count).toBe(1);
+    expect(out.find(x => x.name === '英语')?.count).toBe(1);
+  });
+
+  it('未知 subject 不渲染 (避免"未知 N 题" 误导)', () => {
+    const items = [
+      { subject: 'math' },
+      { subject: 'unknown_subject' },
+      { subject: null },
+      { subject: '' },
+    ];
+    const out = buildSubjectsFromItems(items);
+    const sum = out.reduce((acc, x) => acc + x.count, 0);
+    expect(sum).toBe(1);  // 仅 math 计入
+    expect(out).toEqual([{ name: '数学', count: 1, color: SUBJECT_COLORS['数学'] }]);
   });
 });
