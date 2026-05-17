@@ -38,7 +38,8 @@ export interface ReviewPlanDto {
 
 export interface CreateSessionResp {
   sid: string;
-  nids: number[];
+  // BE @JsonSerialize(contentUsing=ToStringSerializer) · 每个 Long nid 是字符串
+  nids: string[];
   total: number;
 }
 
@@ -49,7 +50,8 @@ export interface TodayResp {
 }
 
 export interface CompleteResult {
-  planId: number;
+  // Snowflake ID 19 位 → BE ToStringSerializer 输出字符串 · 避免 JS 精度截尾
+  planId: string;
   quality: number;
   oldEF: number;
   newEF: number;
@@ -60,15 +62,17 @@ export interface CompleteResult {
 }
 
 export interface NextInSessionResp {
-  nextNid: number | null;
+  nextNid: string | null;
   completed: number;
   total: number;
   done: boolean;
 }
 
 export interface NodeResultResp {
-  nid: number;
-  wrongItemId: number;
+  // Snowflake ID 走 ToStringSerializer · FE 必须 string · 否则精度截尾 184 → 200
+  nid?: string;
+  planId?: string;
+  wrongItemId: string;
   nodeIndex: number;
   nodeState: string;
   quality: number | null;

@@ -267,8 +267,10 @@ public class ReviewPlanService {
     return planRepo.findDueOnDate(studentId, startOfDayUtc, endOfDayUtc);
   }
 
-  /** complete 返回值 · 用于 Controller Response. */
+  /** complete 返回值 · 用于 Controller Response. planId Snowflake 走字符串. */
   public record CompleteResult(
+      @com.fasterxml.jackson.databind.annotation.JsonSerialize(
+          using = com.fasterxml.jackson.databind.ser.std.ToStringSerializer.class)
       Long planId, Instant nextReviewAt, BigDecimal easeFactorAfter, boolean mastered) {}
 
   // =======================================================================

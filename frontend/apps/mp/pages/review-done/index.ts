@@ -13,8 +13,9 @@ import { getQuestionById } from '../../src/api/wrongbook';
 
 // ── Types ───────────────────────────────────────────────────
 interface NodeResult {
-  planId: number;
-  wrongItemId: number;
+  // Snowflake ID 走字符串 · 否则 JS 精度截尾 184→200 (FE 拿错 qid 调 getQuestionById 404)
+  planId: string;
+  wrongItemId: string;
   nodeIndex: number;
   nodeState: string;
   mastered: boolean;
@@ -43,8 +44,8 @@ type PageState = 'LOADING' | 'RESULT' | 'ALL_DONE' | 'ERROR';
 
 // ── Mock data (matching H5 sibling) ─────────────────────────
 const MOCK_NODE_RESULT: NodeResult = {
-  planId: 1001,
-  wrongItemId: 2001,
+  planId: '1001',
+  wrongItemId: '2001',
   nodeIndex: 2,
   nodeState: 'MASTERED',
   mastered: true,
@@ -179,7 +180,7 @@ Page({
     // #1 nodeResult — Hero / 曲线 / nextDueAt 主数据
     const r = await nodeResult(nid);
     const result: NodeResult = {
-      planId: 0,                                              // NodeResultResp 不含 planId · 模板未使用 · 安全置 0
+      planId: r.planId || '0',                                // NodeResultResp.planId 字符串 · 老 mock fallback '0'
       wrongItemId: r.wrongItemId,
       nodeIndex: r.nodeIndex,
       nodeState: r.nodeState,
