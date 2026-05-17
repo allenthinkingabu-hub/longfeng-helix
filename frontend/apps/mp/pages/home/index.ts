@@ -122,12 +122,14 @@ Page({
     try {
       const data = await getHomeTodayCount();
       const total = data.total ?? 0;
-      // BE TodayResp 不返 done 字段 · FE 必须从 items.completedAt 派生真 done count
-      // (之前 data.done 永远 undefined · ?? 0 兜底 · 圆圈进度永远 0%)
+      // BE TodayResp 不返 done 字段 · FE 必须从 items 派生.
+      // 口径: mastered=true 才算 done · 与 P07 hero "已完成" 一致.
+      // 之前用 completedAt!=null 派生 (= 答过) · PARTIAL/FORGOT 也算 done ·
+      // 4 都进行中时 done=4 → pending=0 → tabBar 角标消失 · 但用户实际还没掌握.
       const itemsArr = Array.isArray(data.items) ? data.items : [];
       const done = typeof data.done === 'number'
         ? data.done
-        : itemsArr.filter(i => i && (i as { completedAt?: unknown }).completedAt).length;
+        : itemsArr.filter(i => i && (i as { mastered?: unknown }).mastered === true).length;
       const pct = computeCirclePct(done, total);
 
       this.setData({
