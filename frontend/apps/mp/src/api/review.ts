@@ -38,7 +38,8 @@ export interface ReviewPlanDto {
 
 export interface CreateSessionResp {
   sid: string;
-  nids: number[];
+  // BE @JsonSerialize(contentUsing=ToStringSerializer) · 每个 Long nid 是字符串
+  nids: string[];
   total: number;
 }
 
@@ -46,10 +47,14 @@ export interface TodayResp {
   items: ReviewPlanDto[];
   total: number;
   tz: string;
+  // P07 spec L98 · 0-100 · BE 算 latest ease_factor_after avg → mastery 映射 ·
+  // 0 = 今日所有题目全新没复习过 (诚实 · 不是 hard-code 假死值).
+  masteryPct?: number | null;
 }
 
 export interface CompleteResult {
-  planId: number;
+  // Snowflake ID 19 位 → BE ToStringSerializer 输出字符串 · 避免 JS 精度截尾
+  planId: string;
   quality: number;
   oldEF: number;
   newEF: number;
@@ -60,15 +65,17 @@ export interface CompleteResult {
 }
 
 export interface NextInSessionResp {
-  nextNid: number | null;
+  nextNid: string | null;
   completed: number;
   total: number;
   done: boolean;
 }
 
 export interface NodeResultResp {
-  nid: number;
-  wrongItemId: number;
+  // Snowflake ID 走 ToStringSerializer · FE 必须 string · 否则精度截尾 184 → 200
+  nid?: string;
+  planId?: string;
+  wrongItemId: string;
   nodeIndex: number;
   nodeState: string;
   quality: number | null;
@@ -79,6 +86,8 @@ export interface NodeResultResp {
   nextDueAt: string | null;
   durationMs: number | null;
   mastered: boolean;
+  // P09-MASTERY · BE review_plan.mastery_score · 真值 0..100 · 没复习过 = 0 (诚实).
+  masteryScore?: number | null;
 }
 
 export interface RevealResp {

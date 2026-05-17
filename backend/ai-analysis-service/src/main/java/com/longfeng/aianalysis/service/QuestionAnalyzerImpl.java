@@ -144,6 +144,7 @@ public class QuestionAnalyzerImpl {
         result.setStem(stem);
         result.setErrorReason(analysis.errorReason());
         result.setSteps(analysis.steps());
+        result.setKnowledgePoints(analysis.knowledgePoints());
         result.setProvider(analysis.provider());
         result.setModel(analysis.model());
         result.setUsageTokens(analysis.tokens());

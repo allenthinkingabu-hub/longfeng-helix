@@ -3180,6 +3180,7 @@ calendar-platform/
 |---|---|---|---|
 | [biz/features/P-WEEKLY-REVIEW__weekly-review.md](features/P-WEEKLY-REVIEW__weekly-review.md) | 学生周回顾详情页 P-WEEKLY-REVIEW + SC-16 + GET /api/home/weekly · 补 P-HOME 「本周」Bento「查看全部 ›」link 落地页缺口 | P1 | 2026-05-16 |
 | [biz/features/M-MULTI-QUESTION-CAPTURE__multi-question-capture.md](features/M-MULTI-QUESTION-CAPTURE__multi-question-capture.md) | 多题拍照支持 · 跨 4 既有页 (P02/P03/P04/P05) 行为增强 + SC-17/18/19 + 2 新 DB 表/列 + 4 API 改造/新增 · 治理 4 层 silent drift (biz 单题假设 / mockup 3-mode / testids modeMulti / H5 假按钮) · 对齐业内主流 (学而思/作业帮) | P1 | 2026-05-16 |
+| [biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md](features/M-AI-ANSWER-JUDGE__ai-answer-judge.md) | 拍照作答 + AI 辅助判题 (方案 A 辅助式) · P08 复习执行加第 4 input tab + `<AiJudgeBanner>` · SC-20/21/22 · wb_review_node 加 6 列 (含 final_grade_source 溯源) · 1 新 API `POST :judge` + 2 改造 API (`:grade` 加 source / `:result` 加 aiJudge) · §6.2 judge prompt 新写 · 复用 M-MULTI §6.1 ChatModel + §6.4 阈值 yml 模式 · 三大宪法 (学生主体性 / 双信源溯源 / 优雅降级) | P1 | 2026-05-16 |
 
 ---
 

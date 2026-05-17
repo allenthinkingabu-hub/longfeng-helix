@@ -190,4 +190,60 @@ describe('buildSlotsFromItems (pure · integration of all helpers)', () => {
     const slots = buildSlotsFromItems(items, now);
     expect(slots[0].items[0].hhmm).toBe('09:05');
   });
+
+  // 用户反馈: hero 显 "1 进行中 / 1 未开始" 但卡片无标识 · 用户分不清是哪条 ·
+  // 这组测试锁住卡片 progress 与 hero 计数同口径 (index.ts 内同 if-else 分支)
+  it('progress: mastered=true → 已完成', () => {
+    const item = { ...makeItem(1, 1, '2026-04-21T09:45:00'), mastered: true, completedAt: '2026-04-21T09:30:00' };
+    const slots = buildSlotsFromItems([item], now);
+    expect(slots[0].items[0].progress).toBe('done');
+    expect(slots[0].items[0].progressLabel).toBe('已完成');
+  });
+
+  it('progress: !mastered && !completedAt → 未开始', () => {
+    const item = { ...makeItem(1, 1, '2026-04-21T09:45:00'), mastered: false, completedAt: null };
+    const slots = buildSlotsFromItems([item], now);
+    expect(slots[0].items[0].progress).toBe('wait');
+    expect(slots[0].items[0].progressLabel).toBe('未开始');
+  });
+
+  it('progress: !mastered && completedAt → 进行中 (PARTIAL/FORGOT 已答但未掌握)', () => {
+    const item = { ...makeItem(1, 1, '2026-04-21T09:45:00'), mastered: false, completedAt: '2026-04-21T09:30:00' };
+    const slots = buildSlotsFromItems([item], now);
+    expect(slots[0].items[0].progress).toBe('inprogress');
+    expect(slots[0].items[0].progressLabel).toBe('进行中');
+  });
+
+  // P07-D · sortMode 桶内排序锁住 · 不同 mode 出不同顺序
+  it('sortMode=tlevel · 桶内按 T 级升序', () => {
+    const items = [
+      makeItem(1, 5, '2026-04-21T09:45:00'),  // T5
+      makeItem(2, 1, '2026-04-21T09:50:00'),  // T1
+      makeItem(3, 3, '2026-04-21T09:55:00'),  // T3
+    ];
+    const slots = buildSlotsFromItems(items, now, 'tlevel');
+    expect(slots[0].items.map(i => i.tLevel)).toEqual(['T1', 'T3', 'T5']);
+  });
+
+  it('sortMode=subject · 桶内按学科字母序', () => {
+    const items = [
+      { ...makeItem(1, 1, '2026-04-21T09:45:00'), subject: 'physics' },
+      { ...makeItem(2, 1, '2026-04-21T09:50:00'), subject: 'math' },
+      { ...makeItem(3, 1, '2026-04-21T09:55:00'), subject: 'english' },
+    ];
+    const slots = buildSlotsFromItems(items, now, 'subject');
+    // 中文 localeCompare zh-CN: 化学/数学/物理/英语/语文 → 这里中英对比 · subject 字段是 BE enum string
+    // SUBJECT_LABEL_MAP 转中文 → 数学/物理/英语 · zh-CN localeCompare 拼音序: 数(s)<物(w)<英(y)
+    expect(slots[0].items.map(i => i.subject)).toEqual(['数学', '物理', '英语']);
+  });
+
+  it('sortMode=time (默认) · 桶内按 hhmm 升序', () => {
+    const items = [
+      makeItem(1, 1, '2026-04-21T09:55:00'),
+      makeItem(2, 1, '2026-04-21T09:45:00'),
+      makeItem(3, 1, '2026-04-21T09:50:00'),
+    ];
+    const slots = buildSlotsFromItems(items, now);  // default time
+    expect(slots[0].items.map(i => i.hhmm)).toEqual(['09:45', '09:50', '09:55']);
+  });
 });

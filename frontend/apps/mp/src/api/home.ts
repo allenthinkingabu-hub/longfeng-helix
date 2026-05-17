@@ -24,7 +24,11 @@ export interface HomeTodayItem {
   nodeIndex: number;             // T0..T6
   status: 'ACTIVE' | 'MASTERED';
   nextDueAt: string;
-  completedAt: string | null;    // 非 null = 当日已复习完
+  completedAt: string | null;    // 非 null = 当日已答过 (含 PARTIAL/FORGOT · 不等于掌握)
+  // BE ReviewPlanDto.mastered · 真掌握判定 (= 用户选 MASTERED 的题).
+  // P-HOME 角标 done 口径必须用这个 · 与 P07 hero "0 已完成" 一致 ·
+  // 之前用 completedAt 判 done · PARTIAL/FORGOT 也算 done · 4 都进行中时角标消失.
+  mastered: boolean;
   easeFactor: number;
   totalReview: number;
   totalForget: number;

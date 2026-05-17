@@ -43,6 +43,13 @@ public class AnalysisResult {
     @Column(name = "explain_chunks", columnDefinition = "jsonb")
     private String explainChunks;
 
+    // P09-FOLLOWUP-#2 · AI 提示词新加 knowledgePoints 输出 ·
+    // shape: [{name:string}, ...] · 1-3 个 KP 名 (顶点式 / 配方法 / 对称轴 ...)
+    // 老数据 null · 新分析才填.
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "knowledge_points", columnDefinition = "jsonb")
+    private String knowledgePoints;
+
     @Column(name = "provider")
     private String provider;
 
@@ -78,6 +85,8 @@ public class AnalysisResult {
     public void setSteps(String steps) { this.steps = steps; }
     public String getExplainChunks() { return explainChunks; }
     public void setExplainChunks(String explainChunks) { this.explainChunks = explainChunks; }
+    public String getKnowledgePoints() { return knowledgePoints; }
+    public void setKnowledgePoints(String knowledgePoints) { this.knowledgePoints = knowledgePoints; }
     public String getProvider() { return provider; }
     public void setProvider(String provider) { this.provider = provider; }
     public String getModel() { return model; }

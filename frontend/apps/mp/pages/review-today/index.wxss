@@ -353,6 +353,37 @@ page {
   border-color: rgba(255,149,0,0.22);
 }
 
+/* Progress chip · 三态颜色对齐 hero 计数语义 (done=绿/进行中=蓝/未开始=灰)
+   独立 .tg-prog 类避免被通用 .tg (紫色) 遮盖 · 与 ★ tag .tg-m (橙) 区分 */
+.tg-prog {
+  display: inline-flex;
+  align-items: center;
+  padding: 4rpx 14rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  letter-spacing: 0.4rpx;
+  border: 1rpx solid transparent;
+}
+
+.tg-prog-done {
+  background: rgba(52,199,89,0.12);
+  color: #34C759;
+  border-color: rgba(52,199,89,0.24);
+}
+
+.tg-prog-inprogress {
+  background: rgba(0,122,255,0.12);
+  color: #007AFF;
+  border-color: rgba(0,122,255,0.24);
+}
+
+.tg-prog-wait {
+  background: #F2F2F7;
+  color: #8E8E93;
+  border-color: rgba(60,60,67,0.18);
+}
+
 .right {
   display: flex;
   flex-direction: column;

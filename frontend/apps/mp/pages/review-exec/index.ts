@@ -180,10 +180,10 @@ Page({
       const subjectLabel = SUBJECT_LABEL_MAP[subjectKey] || (q.subject || '数学');
       const difficulty = typeof q.difficulty === 'number' && q.difficulty > 0 ? q.difficulty : 3;
 
-      // BE QuestionDetail.steps 是 {step, explain, ...} 对象数组 · 取 explain 文本
+      // BE analysis_result.steps jsonb shape: [{stepNo, text}, ...] · 兼容老 shape (explain/title)
       const stepTexts: string[] = (q.steps ?? []).map((s) => {
-        const obj = s as unknown as { explain?: string; title?: string };
-        return obj.explain || obj.title || '';
+        const obj = s as unknown as { text?: string; explain?: string; title?: string };
+        return obj.text || obj.explain || obj.title || '';
       }).filter((t) => t.length > 0);
 
       const newQuestion: QuestionData = {

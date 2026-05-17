@@ -12,6 +12,7 @@ import com.longfeng.reviewplan.entity.ReviewOutcome;
 import com.longfeng.reviewplan.entity.ReviewPlan;
 import com.longfeng.reviewplan.exception.PlanMasteredException;
 import com.longfeng.reviewplan.exception.PlanNotFoundException;
+import com.longfeng.reviewplan.repo.ReviewOutcomeRepository;
 import com.longfeng.reviewplan.repo.ReviewPlanRepository;
 import com.longfeng.reviewplan.service.NodeLifecycleTracker;
 import com.longfeng.reviewplan.service.ReviewPlanService;
@@ -54,16 +55,19 @@ public class ReviewPlanController {
     private final ReviewSessionService sessionService;
     private final NodeLifecycleTracker lifecycleTracker;
     private final ReviewPlanRepository planRepo;
+    private final ReviewOutcomeRepository outcomeRepo;
 
     public ReviewPlanController(
             ReviewPlanService planService,
             ReviewSessionService sessionService,
             NodeLifecycleTracker lifecycleTracker,
-            ReviewPlanRepository planRepo) {
+            ReviewPlanRepository planRepo,
+            ReviewOutcomeRepository outcomeRepo) {
         this.planService = planService;
         this.sessionService = sessionService;
         this.lifecycleTracker = lifecycleTracker;
         this.planRepo = planRepo;
+        this.outcomeRepo = outcomeRepo;
     }
 
     // =======================================================================
@@ -294,7 +298,49 @@ public class ReviewPlanController {
             return ReviewPlanDto.from(p, sx == null ? null : sx[0], sx == null ? null : sx[1]);
         }).collect(Collectors.toList());
         String useTz = tz != null && !tz.isBlank() ? tz : DEFAULT_TZ;
-        return ApiResult.ok(new TodayResp(items, items.size(), useTz));
+
+        // P07 masteryPct · spec L98 ease_factor 聚合 from review_outcome ·
+        // 公式: avg(latest ease_factor_after) 映射 [1.3, 3.0] → [0, 100].
+        // 0 outcome (今日所有题全新没复习过) → 0% · 诚实 · 不假装有 mastery.
+        Integer masteryPct = computeMasteryPct(plans);
+
+        return ApiResult.ok(new TodayResp(items, items.size(), useTz, masteryPct));
+    }
+
+    /**
+     * P07 掌握度% · spec L98 ease_factor 聚合.
+     *
+     * <p>SM-2 ease 范围 [1.3, 3.0] · 线性映射:
+     * <pre>
+     *   1.3 (SM-2 floor)  → 0%
+     *   2.5 (init)        → 70.6%
+     *   3.0 (cap)         → 100%
+     * </pre>
+     *
+     * <p>每题取 latest outcome (= 最新一次 grade 后的 ease). 没 outcome 的题跳过 (= 未复习过).
+     * 全今日 plan 都无 outcome → 0%. 用 plan.ease_factor 同等价但 spec 明文说 "来源 review_outcome",
+     * 严格走 spec.
+     */
+    private Integer computeMasteryPct(List<ReviewPlan> plans) {
+        if (plans.isEmpty()) return 0;
+        List<Long> planIds = plans.stream().map(ReviewPlan::getId).toList();
+        List<Object[]> easeRows = outcomeRepo.findLatestEaseByPlanIds(planIds);
+        if (easeRows.isEmpty()) return 0;
+
+        double sum = 0;
+        int count = 0;
+        for (Object[] r : easeRows) {
+            if (r.length < 2 || r[1] == null) continue;
+            java.math.BigDecimal ease = (java.math.BigDecimal) r[1];
+            sum += ease.doubleValue();
+            count++;
+        }
+        if (count == 0) return 0;
+
+        double avgEase = sum / count;
+        // (avgEase - 1.3) / (3.0 - 1.3) * 100 · clamp [0,100]
+        double pct = Math.max(0, Math.min(100, (avgEase - 1.3) / 1.7 * 100));
+        return (int) Math.round(pct);
     }
 
     /** SC-01-C05 #3 · GET /api/review/nodes/{nid} · 节点详情. */
@@ -388,7 +434,8 @@ public class ReviewPlanController {
             outcome != null ? outcome.getIntervalDaysAfter() : null,
             plan.getNextDueAt(),
             durationMs,
-            plan.isMastered()));
+            plan.isMastered(),
+            plan.getMasteryScore()));
     }
 
     // =======================================================================

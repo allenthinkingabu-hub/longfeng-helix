@@ -62,13 +62,27 @@ public interface ReviewPlanRepository extends JpaRepository<ReviewPlan, Long> {
 
   /**
    * P07-TODAY-RENDER · 拿 wrong_item subject+stem · 供 today 卡渲染.
-   * 单库迁移后同库直接 SQL · 返 [wrong_item_id, subject, stem_text] · 数量 <= 50.
-   * Caller (controller) 把结果转 Map<Long, [subject, stem]> 再 enrich plans.
+   * 单库迁移后 (2026-05-17 用户拍板 C+B 方案) wrong_item + analysis_result 同库.
+   * wrong_item.stem_text 可能为 null (AI 写到 analysis_result 不回写) ·
+   * LEFT JOIN analysis_result + COALESCE 兜底 AI OCR 真题干.
+   *
+   * <p>取 analysis_result 时按 created_at DESC 拿最新 · 子查询展开 · 同 wrongbook
+   * GET 那侧 (commit 9dbaf45) 的逻辑对齐.
+   *
+   * <p>返 [wrong_item.id, subject, effective_stem] · 数量 <= 50.
    */
   @Query(
       value =
-          "SELECT id, subject, stem_text FROM wrong_item WHERE id IN (:ids) "
-              + "AND deleted_at IS NULL",
+          "SELECT wi.id, wi.subject, COALESCE(NULLIF(wi.stem_text, ''), ar_latest.stem) "
+              + "FROM wrong_item wi "
+              + "LEFT JOIN LATERAL ("
+              + "  SELECT stem FROM analysis_result "
+              + "  WHERE task_id = cast(wi.id as varchar) "
+              + "    AND deleted_at IS NULL "
+              + "    AND stem IS NOT NULL AND length(stem) > 0 "
+              + "  ORDER BY created_at DESC LIMIT 1"
+              + ") ar_latest ON true "
+              + "WHERE wi.id IN (:ids) AND wi.deleted_at IS NULL",
       nativeQuery = true)
   List<Object[]> findSubjectStemByIds(@Param("ids") List<Long> ids);
 
