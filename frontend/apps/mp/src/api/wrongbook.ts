@@ -207,8 +207,75 @@ export interface ListWrongQuestionsParams {
   mastery?: string;
 }
 
+// BE 实际 wire shape (snake_case + 字段缺失) · 跟 FE 类型对不上
+// 真实 curl 探的:
+// { source_type, stem_text(可 null), origin_image_key, created_at, qid,
+//   subject, status, mastery(数值 0..2), difficulty(可 null) }
+// FE WrongQuestionListItem 期待 camelCase + kp[] / stemSnippet / masteryLabel /
+// nextDueAt / nodeStage / questionNo · 之前 0c7e0b8 之前是直接 cast ·
+// 跑到 helpers.enrichItem(stemSnippet.slice) 时 TypeError 整页 ERROR.
+interface WrongQuestionListItemWire {
+  qid?: string;
+  subject?: string;
+  stem_text?: string | null;
+  stemSnippet?: string | null;
+  origin_image_key?: string | null;
+  thumb?: string | null;
+  mastery?: number | null;
+  masteryLabel?: string;
+  difficulty?: number | null;
+  created_at?: string;
+  createdAt?: string;
+  next_due_at?: string | null;
+  nextDueAt?: string | null;
+  node_stage?: number | null;
+  nodeStage?: number | null;
+  knowledge_points?: string[] | null;
+  kp?: string[] | null;
+  question_no?: string | null;
+  questionNo?: string | null;
+  error_type?: string | null;
+  errorType?: string | null;
+  status?: number;
+}
+
+function masteryLabelFromNum(m: number | null | undefined): 'NOT_MASTERED' | 'PARTIAL' | 'MASTERED' {
+  // BE wrong_item.mastery: 0=未掌握 1=部分 2=已掌握 · 缺/null 当未掌握
+  if (m == null) return 'NOT_MASTERED';
+  if (m >= 2) return 'MASTERED';
+  if (m === 1) return 'PARTIAL';
+  return 'NOT_MASTERED';
+}
+
+function normalizeListItem(w: WrongQuestionListItemWire): WrongQuestionListItem {
+  const stemRaw = w.stemSnippet ?? w.stem_text ?? '';
+  return {
+    qid: w.qid ?? '',
+    subject: w.subject ?? '',
+    kp: w.kp ?? w.knowledge_points ?? [],
+    // stem_text 可为 null (OCR 未跑完时) · 走空串 · enrichItem.slice 安全
+    stemSnippet: stemRaw ?? '',
+    thumb: w.thumb ?? w.origin_image_key ?? '',
+    masteryPct: typeof w.mastery === 'number' ? w.mastery : 0,
+    masteryLabel: (w.masteryLabel as 'NOT_MASTERED' | 'PARTIAL' | 'MASTERED') ?? masteryLabelFromNum(w.mastery),
+    nextDueAt: w.nextDueAt ?? w.next_due_at ?? '',
+    nodeStage: typeof w.nodeStage === 'number' ? w.nodeStage : (typeof w.node_stage === 'number' ? w.node_stage : 1),
+    createdAt: w.createdAt ?? w.created_at ?? '',
+    errorType: w.errorType ?? w.error_type ?? undefined,
+    difficulty: typeof w.difficulty === 'number' ? w.difficulty : 0,
+    questionNo: w.questionNo ?? w.question_no ?? '',
+  };
+}
+
+interface ListWrongQuestionsRespWire {
+  items?: WrongQuestionListItemWire[] | null;
+  total?: number;
+  page?: number;
+  size?: number;
+}
+
 /** GET /api/wb/questions */
-export function listWrongQuestions(
+export async function listWrongQuestions(
   params: ListWrongQuestionsParams = {},
 ): Promise<ListWrongQuestionsResp> {
   const parts: string[] = [];
@@ -218,5 +285,11 @@ export function listWrongQuestions(
   if (params.mastery) parts.push(`mastery=${params.mastery}`);
   const query = parts.join('&');
   const url = `${apiBase('wb')}/api/wb/questions${query ? `?${query}` : ''}`;
-  return httpJSON<ListWrongQuestionsResp>(url);
+  const raw = await httpJSON<ListWrongQuestionsRespWire>(url);
+  return {
+    items: (raw.items ?? []).map(normalizeListItem),
+    total: typeof raw.total === 'number' ? raw.total : 0,
+    page: typeof raw.page === 'number' ? raw.page : (params.page ?? 1),
+    size: typeof raw.size === 'number' ? raw.size : (params.size ?? 50),
+  };
 }
