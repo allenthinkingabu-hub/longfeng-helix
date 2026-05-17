@@ -1,0 +1,18 @@
+
+Running 13 tests using 1 worker
+
+  ✓   1 [chromium] › tests/e2e/sc-11/t04-evidence-capture.spec.ts:19:1 › SC-11-T04 evidence: IDE console capture + 4 state screenshots (1.9s)
+  ✓   2 [chromium] › tests/e2e/sc-11/t04-landing-adversarial.spec.ts:20:3 › SC-11-T04 · adversarial · entry_source 白名单 + ParentHint P0 跳转 (4 cases) › ADV-T04 (a) entry_source_whitelist_strict: 6+ 个非白名单字符串全标 "unknown" (3.7s)
+  ✓   3 [chromium] › tests/e2e/sc-11/t04-landing-adversarial.spec.ts:72:3 › SC-11-T04 · adversarial · entry_source 白名单 + ParentHint P0 跳转 (4 cases) › ADV-T04 (b) parent_hint_p1_stub: ParentHint click → /auth/login (P0) · URL 不含 /observer (P1 P-OBSERVER 未上线) (411ms)
+  ✓   4 [chromium] › tests/e2e/sc-11/t04-landing-adversarial.spec.ts:101:3 › SC-11-T04 · adversarial · entry_source 白名单 + ParentHint P0 跳转 (4 cases) › ADV-T04 (c) entry_source_unicode_bidi: Unicode 反向标记 / 零宽空格 / homoglyph 全 unknown (1.9s)
+  ✓   5 [chromium] › tests/e2e/sc-11/t04-landing-adversarial.spec.ts:146:3 › SC-11-T04 · adversarial · entry_source 白名单 + ParentHint P0 跳转 (4 cases) › ADV-T04 (e) bounce_once_no_dup: pagehide + visibilitychange 同时触发 · anon_landing_bounce 仅 1 次 (735ms)
+  ✓   6 [chromium] › tests/e2e/sc-11/t04-landing-adversarial.spec.ts:195:3 › SC-11-T04 · adversarial · entry_source 白名单 + ParentHint P0 跳转 (4 cases) › ADV-T04 (d) safe_area_inset_padding_present: DualCTA wrap padding-bottom 含 env(safe-area-inset-bottom) (315ms)
+  ✓   7 [chromium] › tests/e2e/sc-11/t04-landing-cta-exits-tracking.spec.ts:34:3 › SC-11-T04 · P-LANDING CTA + 埋点 + entry_source 安全 (6 cases) › TC-11-T04 (a) cta_try_navigates_to_guest_capture: ctaTry → 导航记录含 /guest/capture (TC-11.02) (356ms)
+  ✓   8 [chromium] › tests/e2e/sc-11/t04-landing-cta-exits-tracking.spec.ts:74:3 › SC-11-T04 · P-LANDING CTA + 埋点 + entry_source 安全 (6 cases) › TC-11-T04 (b) cta_login_navigates_to_auth: ctaLogin → URL pathname === /auth/login (335ms)
+  ✓   9 [chromium] › tests/e2e/sc-11/t04-landing-cta-exits-tracking.spec.ts:87:3 › SC-11-T04 · P-LANDING CTA + 埋点 + entry_source 安全 (6 cases) › TC-11-T04 (c) ab_bucket_order_swap: login_first 桶 · login CTA 在左 · try CTA 在右 (352ms)
+  ✓  10 [chromium] › tests/e2e/sc-11/t04-landing-cta-exits-tracking.spec.ts:130:3 › SC-11-T04 · P-LANDING CTA + 埋点 + entry_source 安全 (6 cases) › TC-11-T04 (d) entry_source_xss_sanitized: ?entry_source=<script>... · 上报 entry_source 净化为 "unknown" (TC-11.05) (722ms)
+  ✓  11 [chromium] › tests/e2e/sc-11/t04-landing-cta-exits-tracking.spec.ts:189:3 › SC-11-T04 · P-LANDING CTA + 埋点 + entry_source 安全 (6 cases) › TC-11-T04 (e) bounce_pagehide_telemetry: pagehide → sendBeacon 投递 anon_landing_bounce 含 dwell_ms (1.3s)
+  ✓  12 [chromium] › tests/e2e/sc-11/t04-landing-cta-exits-tracking.spec.ts:267:3 › SC-11-T04 · P-LANDING CTA + 埋点 + entry_source 安全 (6 cases) › TC-11-T04 (f) consent_not_required_for_cta: 不勾 ConsentBar · click ctaTry · navigation 成功 (578ms)
+  ✓  13 [chromium] › tests/e2e/sc-11/t04-landing-cta-exits-tracking.spec.ts:305:3 › SC-11-T04 · P-LANDING CTA + 埋点 + entry_source 安全 (6 cases) › TC-11-T04 (g) sanity_no_unexpected_api_calls: 整 spec /api/ai/* + /api/guest/* 累计 0 (440ms)
+
+  13 passed (14.0s)

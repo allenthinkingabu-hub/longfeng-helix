@@ -1,0 +1,34 @@
+<testsuites id="" name="" tests="13" failures="0" skipped="0" errors="0" time="13.998528">
+<testsuite name="sc-11/t04-evidence-capture.spec.ts" timestamp="2026-05-17T19:39:23.071Z" hostname="chromium" tests="1" failures="0" skipped="0" time="1.889" errors="0">
+<testcase name="SC-11-T04 evidence: IDE console capture + 4 state screenshots" classname="sc-11/t04-evidence-capture.spec.ts" time="1.889">
+</testcase>
+</testsuite>
+<testsuite name="sc-11/t04-landing-adversarial.spec.ts" timestamp="2026-05-17T19:39:23.071Z" hostname="chromium" tests="5" failures="0" skipped="0" time="7.122" errors="0">
+<testcase name="SC-11-T04 · adversarial · entry_source 白名单 + ParentHint P0 跳转 (4 cases) › ADV-T04 (a) entry_source_whitelist_strict: 6+ 个非白名单字符串全标 &quot;unknown&quot;" classname="sc-11/t04-landing-adversarial.spec.ts" time="3.725">
+</testcase>
+<testcase name="SC-11-T04 · adversarial · entry_source 白名单 + ParentHint P0 跳转 (4 cases) › ADV-T04 (b) parent_hint_p1_stub: ParentHint click → /auth/login (P0) · URL 不含 /observer (P1 P-OBSERVER 未上线)" classname="sc-11/t04-landing-adversarial.spec.ts" time="0.427">
+</testcase>
+<testcase name="SC-11-T04 · adversarial · entry_source 白名单 + ParentHint P0 跳转 (4 cases) › ADV-T04 (c) entry_source_unicode_bidi: Unicode 反向标记 / 零宽空格 / homoglyph 全 unknown" classname="sc-11/t04-landing-adversarial.spec.ts" time="1.973">
+</testcase>
+<testcase name="SC-11-T04 · adversarial · entry_source 白名单 + ParentHint P0 跳转 (4 cases) › ADV-T04 (e) bounce_once_no_dup: pagehide + visibilitychange 同时触发 · anon_landing_bounce 仅 1 次" classname="sc-11/t04-landing-adversarial.spec.ts" time="0.72">
+</testcase>
+<testcase name="SC-11-T04 · adversarial · entry_source 白名单 + ParentHint P0 跳转 (4 cases) › ADV-T04 (d) safe_area_inset_padding_present: DualCTA wrap padding-bottom 含 env(safe-area-inset-bottom)" classname="sc-11/t04-landing-adversarial.spec.ts" time="0.277">
+</testcase>
+</testsuite>
+<testsuite name="sc-11/t04-landing-cta-exits-tracking.spec.ts" timestamp="2026-05-17T19:39:23.071Z" hostname="chromium" tests="7" failures="0" skipped="0" time="4.132" errors="0">
+<testcase name="SC-11-T04 · P-LANDING CTA + 埋点 + entry_source 安全 (6 cases) › TC-11-T04 (a) cta_try_navigates_to_guest_capture: ctaTry → 导航记录含 /guest/capture (TC-11.02)" classname="sc-11/t04-landing-cta-exits-tracking.spec.ts" time="0.33">
+</testcase>
+<testcase name="SC-11-T04 · P-LANDING CTA + 埋点 + entry_source 安全 (6 cases) › TC-11-T04 (b) cta_login_navigates_to_auth: ctaLogin → URL pathname === /auth/login" classname="sc-11/t04-landing-cta-exits-tracking.spec.ts" time="0.342">
+</testcase>
+<testcase name="SC-11-T04 · P-LANDING CTA + 埋点 + entry_source 安全 (6 cases) › TC-11-T04 (c) ab_bucket_order_swap: login_first 桶 · login CTA 在左 · try CTA 在右" classname="sc-11/t04-landing-cta-exits-tracking.spec.ts" time="0.341">
+</testcase>
+<testcase name="SC-11-T04 · P-LANDING CTA + 埋点 + entry_source 安全 (6 cases) › TC-11-T04 (d) entry_source_xss_sanitized: ?entry_source=&lt;script&gt;... · 上报 entry_source 净化为 &quot;unknown&quot; (TC-11.05)" classname="sc-11/t04-landing-cta-exits-tracking.spec.ts" time="0.714">
+</testcase>
+<testcase name="SC-11-T04 · P-LANDING CTA + 埋点 + entry_source 安全 (6 cases) › TC-11-T04 (e) bounce_pagehide_telemetry: pagehide → sendBeacon 投递 anon_landing_bounce 含 dwell_ms" classname="sc-11/t04-landing-cta-exits-tracking.spec.ts" time="1.323">
+</testcase>
+<testcase name="SC-11-T04 · P-LANDING CTA + 埋点 + entry_source 安全 (6 cases) › TC-11-T04 (f) consent_not_required_for_cta: 不勾 ConsentBar · click ctaTry · navigation 成功" classname="sc-11/t04-landing-cta-exits-tracking.spec.ts" time="0.643">
+</testcase>
+<testcase name="SC-11-T04 · P-LANDING CTA + 埋点 + entry_source 安全 (6 cases) › TC-11-T04 (g) sanity_no_unexpected_api_calls: 整 spec /api/ai/* + /api/guest/* 累计 0" classname="sc-11/t04-landing-cta-exits-tracking.spec.ts" time="0.439">
+</testcase>
+</testsuite>
+</testsuites>
