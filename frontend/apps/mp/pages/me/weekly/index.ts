@@ -266,11 +266,13 @@ Page({
     // §12 埋点
     track(WEEKLY_EVENTS.weakKpTap, { kpId, rank });
 
-    // INV-5: URL 必含 ?kpId=KP-XXX
-    // §7 出口: wx.navigateTo (不是 switchTab · 因为 INV-5 要求 query 字符串)
-    // app.json tabBar.list 有 wrongbook-list · spec drift surface · 仍按 INV-5 字面用 navigateTo
-    wx.navigateTo({
-      url: `/pages/wrongbook-list/index?kpId=${encodeURIComponent(kpId)}`,
+    // INV-5: 必带 kpId · 因 wrongbook-list 在 tabBar (wx.navigateTo 对 tab 页静默失败)
+    // 改用 wx.switchTab + wx.setStorageSync 传递 weakKpIntent · 接收端 onShow 读 storage
+    // spec drift surface (2026-05-17 E2E TC-2 抓获): spec §7 字面 navigateTo
+    //   与 app.json tabBar.list 冲突 · 已落代码注释 + adversarial.md 待 TL 决策
+    wx.setStorageSync('weakKpIntent', { kpId, rank, ts: Date.now() });
+    wx.switchTab({
+      url: '/pages/wrongbook-list/index',
     });
   },
 

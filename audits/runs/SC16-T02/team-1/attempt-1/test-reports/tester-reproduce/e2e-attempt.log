@@ -1,0 +1,651 @@
+
+> @longfeng/mp@0.1.0 test:e2e:automator /Users/allen/workspace/longfeng/.claude/worktrees/brave-shaw-0bb0e4/frontend/apps/mp
+> vitest run --config test/vitest.config.ts test/e2e test/e2e/sc-16/t02-weekly-mp-page.spec.ts
+
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v1.6.1 /Users/allen/workspace/longfeng/.claude/worktrees/brave-shaw-0bb0e4/frontend/apps/mp
+
+ ❯ test/e2e/sc-16/t02-weekly-mp-page.spec.ts  (6 tests) 13ms
+ ❯ test/e2e/review-api-contract.spec.ts  (9 tests | 3 failed) 1372ms
+   ❯ test/e2e/review-api-contract.spec.ts > Review API contract (9 endpoints · real backend :8085) > GET /api/review/nodes/:nid → envelope { ReviewPlanDto fields }
+     → expected { id: 1, wrongItemId: 100, …(10) } to have property "intervalDays"
+   ❯ test/e2e/review-api-contract.spec.ts > Review API contract (9 endpoints · real backend :8085) > POST /api/review/sessions/:sid/next → envelope { nextNid, completed, total, done }
+     → expected { next_nid: null, completed: +0, …(2) } to have property "nextNid"
+   ❯ test/e2e/review-api-contract.spec.ts > Review API contract (9 endpoints · real backend :8085) > GET /api/review/nodes/:nid/result → envelope { NodeResultResp 12 fields }
+     → expected { planId: 1, wrongItemId: 100, …(10) } to have property "nid"
+ ❯ test/e2e/tabbar-visible-all-tabs.spec.ts  (6 tests) 4ms
+ ❯ test/e2e/sc01-happy-path.spec.ts  (8 tests) 4ms
+ ❯ test/e2e/home-vrt-tester.spec.ts  (2 tests) 2ms
+ ❯ test/e2e/home.spec.ts  (4 tests) 2ms
+ ❯ test/e2e/today-to-exec.spec.ts  (3 tests) 2ms
+ ❯ test/e2e/exec-to-done.spec.ts  (3 tests) 3ms
+ ❯ test/e2e/capture-to-analyzing.spec.ts  (3 tests) 3ms
+ ❯ test/e2e/review-exec.spec.ts  (4 tests) 2ms
+ ❯ test/e2e/done-to-home.spec.ts  (4 tests) 2ms
+ ❯ test/e2e/analyzing-to-result.spec.ts  (4 tests) 2ms
+ ❯ test/e2e/wrongbook-list.spec.ts  (3 tests) 2ms
+ ❯ test/e2e/home-recompile.spec.ts  (1 test) 2ms
+ ❯ test/e2e/review-done.spec.ts  (3 tests) 2ms
+ ❯ test/e2e/capture.spec.ts  (3 tests) 2ms
+ ❯ test/e2e/automator-smoke.spec.ts  (3 tests) 2ms
+ ❯ test/e2e/analyzing.spec.ts  (3 tests) 2ms
+ ❯ test/e2e/review-today.spec.ts  (3 tests) 2ms
+ ❯ test/e2e/home-data-probe.spec.ts  (1 test) 4ms
+ ❯ test/e2e/result.spec.ts  (3 tests) 2ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 20 ⎯⎯⎯⎯⎯⎯
+
+ FAIL  test/e2e/analyzing-to-result.spec.ts > P03→P04 transition: analyzing → result (真 IDE)
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/analyzing-to-result.spec.ts:19:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/42]⎯
+
+ FAIL  test/e2e/analyzing-to-result.spec.ts > P03→P04 transition: analyzing → result (真 IDE)
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ Module.assertConsoleClean test/e2e/_helpers.ts:68:14
+     66| // 每个 it 块末必须 call · 任何累积 error 直接 throw · 防 silent succe…
+     67| export function assertConsoleClean(errors: string[], step: string): vo…
+     68|   if (errors.length > 0) {
+       |              ^
+     69|     const sample = errors.slice(0, 3).join('\n');
+     70|     throw new Error(`${step}: IDE console produced ${errors.length} er…
+ ❯ test/e2e/analyzing-to-result.spec.ts:24:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/42]⎯
+
+ FAIL  test/e2e/analyzing.spec.ts > P03 Analyzing page · page-load + testid
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/analyzing.spec.ts:16:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/42]⎯
+
+ FAIL  test/e2e/analyzing.spec.ts > P03 Analyzing page · page-load + testid
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ Module.assertConsoleClean test/e2e/_helpers.ts:68:14
+     66| // 每个 it 块末必须 call · 任何累积 error 直接 throw · 防 silent succe…
+     67| export function assertConsoleClean(errors: string[], step: string): vo…
+     68|   if (errors.length > 0) {
+       |              ^
+     69|     const sample = errors.slice(0, 3).join('\n');
+     70|     throw new Error(`${step}: IDE console produced ${errors.length} er…
+ ❯ test/e2e/analyzing.spec.ts:21:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/42]⎯
+
+ FAIL  test/e2e/automator-smoke.spec.ts > MP automator smoke (真 IDE)
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/automator-smoke.spec.ts:21:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/42]⎯
+
+ FAIL  test/e2e/automator-smoke.spec.ts > MP automator smoke (真 IDE)
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ Module.assertConsoleClean test/e2e/_helpers.ts:68:14
+     66| // 每个 it 块末必须 call · 任何累积 error 直接 throw · 防 silent succe…
+     67| export function assertConsoleClean(errors: string[], step: string): vo…
+     68|   if (errors.length > 0) {
+       |              ^
+     69|     const sample = errors.slice(0, 3).join('\n');
+     70|     throw new Error(`${step}: IDE console produced ${errors.length} er…
+ ❯ test/e2e/automator-smoke.spec.ts:26:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/42]⎯
+
+ FAIL  test/e2e/capture-to-analyzing.spec.ts > capture → analyzing transition (真 IDE)
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/capture-to-analyzing.spec.ts:19:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/42]⎯
+
+ FAIL  test/e2e/capture-to-analyzing.spec.ts > capture → analyzing transition (真 IDE)
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ Module.assertConsoleClean test/e2e/_helpers.ts:68:14
+     66| // 每个 it 块末必须 call · 任何累积 error 直接 throw · 防 silent succe…
+     67| export function assertConsoleClean(errors: string[], step: string): vo…
+     68|   if (errors.length > 0) {
+       |              ^
+     69|     const sample = errors.slice(0, 3).join('\n');
+     70|     throw new Error(`${step}: IDE console produced ${errors.length} er…
+ ❯ test/e2e/capture-to-analyzing.spec.ts:24:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/42]⎯
+
+ FAIL  test/e2e/capture.spec.ts > P02 capture page-load + testid (真 IDE)
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/capture.spec.ts:16:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/42]⎯
+
+ FAIL  test/e2e/capture.spec.ts > P02 capture page-load + testid (真 IDE)
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ Module.assertConsoleClean test/e2e/_helpers.ts:68:14
+     66| // 每个 it 块末必须 call · 任何累积 error 直接 throw · 防 silent succe…
+     67| export function assertConsoleClean(errors: string[], step: string): vo…
+     68|   if (errors.length > 0) {
+       |              ^
+     69|     const sample = errors.slice(0, 3).join('\n');
+     70|     throw new Error(`${step}: IDE console produced ${errors.length} er…
+ ❯ test/e2e/capture.spec.ts:23:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/42]⎯
+
+ FAIL  test/e2e/done-to-home.spec.ts > SC01-MP-T14-E2E · done→home transition (真 IDE)
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/done-to-home.spec.ts:18:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/42]⎯
+
+ FAIL  test/e2e/done-to-home.spec.ts > SC01-MP-T14-E2E · done→home transition (真 IDE)
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ Module.assertConsoleClean test/e2e/_helpers.ts:68:14
+     66| // 每个 it 块末必须 call · 任何累积 error 直接 throw · 防 silent succe…
+     67| export function assertConsoleClean(errors: string[], step: string): vo…
+     68|   if (errors.length > 0) {
+       |              ^
+     69|     const sample = errors.slice(0, 3).join('\n');
+     70|     throw new Error(`${step}: IDE console produced ${errors.length} er…
+ ❯ test/e2e/done-to-home.spec.ts:23:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/42]⎯
+
+ FAIL  test/e2e/exec-to-done.spec.ts > SC01-MP-T12-E2E · P08→P09 transition (exec → done)
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/exec-to-done.spec.ts:18:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/42]⎯
+
+ FAIL  test/e2e/exec-to-done.spec.ts > SC01-MP-T12-E2E · P08→P09 transition (exec → done)
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ Module.assertConsoleClean test/e2e/_helpers.ts:68:14
+     66| // 每个 it 块末必须 call · 任何累积 error 直接 throw · 防 silent succe…
+     67| export function assertConsoleClean(errors: string[], step: string): vo…
+     68|   if (errors.length > 0) {
+       |              ^
+     69|     const sample = errors.slice(0, 3).join('\n');
+     70|     throw new Error(`${step}: IDE console produced ${errors.length} er…
+ ❯ test/e2e/exec-to-done.spec.ts:23:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/42]⎯
+
+ FAIL  test/e2e/home-data-probe.spec.ts > Home page data probe (Tester attempt-1)
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/home-data-probe.spec.ts:19:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/42]⎯
+
+ FAIL  test/e2e/home-data-probe.spec.ts > Home page data probe (Tester attempt-1)
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ Module.assertConsoleClean test/e2e/_helpers.ts:68:14
+     66| // 每个 it 块末必须 call · 任何累积 error 直接 throw · 防 silent succe…
+     67| export function assertConsoleClean(errors: string[], step: string): vo…
+     68|   if (errors.length > 0) {
+       |              ^
+     69|     const sample = errors.slice(0, 3).join('\n');
+     70|     throw new Error(`${step}: IDE console produced ${errors.length} er…
+ ❯ test/e2e/home-data-probe.spec.ts:24:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/42]⎯
+
+ FAIL  test/e2e/home-recompile.spec.ts > Force reload + recompile + re-probe
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/home-recompile.spec.ts:18:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/42]⎯
+
+ FAIL  test/e2e/home-recompile.spec.ts > Force reload + recompile + re-probe
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ Module.assertConsoleClean test/e2e/_helpers.ts:68:14
+     66| // 每个 it 块末必须 call · 任何累积 error 直接 throw · 防 silent succe…
+     67| export function assertConsoleClean(errors: string[], step: string): vo…
+     68|   if (errors.length > 0) {
+       |              ^
+     69|     const sample = errors.slice(0, 3).join('\n');
+     70|     throw new Error(`${step}: IDE console produced ${errors.length} er…
+ ❯ test/e2e/home-recompile.spec.ts:23:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/42]⎯
+
+ FAIL  test/e2e/home-vrt-tester.spec.ts > Home page VRT (Tester attempt-1)
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/home-vrt-tester.spec.ts:24:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/42]⎯
+
+ FAIL  test/e2e/home-vrt-tester.spec.ts > Home page VRT (Tester attempt-1)
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ Module.assertConsoleClean test/e2e/_helpers.ts:68:14
+     66| // 每个 it 块末必须 call · 任何累积 error 直接 throw · 防 silent succe…
+     67| export function assertConsoleClean(errors: string[], step: string): vo…
+     68|   if (errors.length > 0) {
+       |              ^
+     69|     const sample = errors.slice(0, 3).join('\n');
+     70|     throw new Error(`${step}: IDE console produced ${errors.length} er…
+ ❯ test/e2e/home-vrt-tester.spec.ts:41:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/42]⎯
+
+ FAIL  test/e2e/home.spec.ts > Home page E2E + testid (SC01-MP-T08-E2E)
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/home.spec.ts:20:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/42]⎯
+
+ FAIL  test/e2e/home.spec.ts > Home page E2E + testid (SC01-MP-T08-E2E)
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ Module.assertConsoleClean test/e2e/_helpers.ts:68:14
+     66| // 每个 it 块末必须 call · 任何累积 error 直接 throw · 防 silent succe…
+     67| export function assertConsoleClean(errors: string[], step: string): vo…
+     68|   if (errors.length > 0) {
+       |              ^
+     69|     const sample = errors.slice(0, 3).join('\n');
+     70|     throw new Error(`${step}: IDE console produced ${errors.length} er…
+ ❯ test/e2e/home.spec.ts:25:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/42]⎯
+
+ FAIL  test/e2e/result.spec.ts > P04 result page-load + testid (真 IDE)
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/result.spec.ts:16:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[23/42]⎯
+
+ FAIL  test/e2e/result.spec.ts > P04 result page-load + testid (真 IDE)
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ Module.assertConsoleClean test/e2e/_helpers.ts:68:14
+     66| // 每个 it 块末必须 call · 任何累积 error 直接 throw · 防 silent succe…
+     67| export function assertConsoleClean(errors: string[], step: string): vo…
+     68|   if (errors.length > 0) {
+       |              ^
+     69|     const sample = errors.slice(0, 3).join('\n');
+     70|     throw new Error(`${step}: IDE console produced ${errors.length} er…
+ ❯ test/e2e/result.spec.ts:23:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[24/42]⎯
+
+ FAIL  test/e2e/review-done.spec.ts > SC01-MP-T13 · P09 review-done page-load + testid (真 IDE)
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/review-done.spec.ts:16:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[25/42]⎯
+
+ FAIL  test/e2e/review-done.spec.ts > SC01-MP-T13 · P09 review-done page-load + testid (真 IDE)
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ Module.assertConsoleClean test/e2e/_helpers.ts:68:14
+     66| // 每个 it 块末必须 call · 任何累积 error 直接 throw · 防 silent succe…
+     67| export function assertConsoleClean(errors: string[], step: string): vo…
+     68|   if (errors.length > 0) {
+       |              ^
+     69|     const sample = errors.slice(0, 3).join('\n');
+     70|     throw new Error(`${step}: IDE console produced ${errors.length} er…
+ ❯ test/e2e/review-done.spec.ts:23:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[26/42]⎯
+
+ FAIL  test/e2e/review-exec.spec.ts > P08 review-exec page-load + testid (真 IDE)
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/review-exec.spec.ts:16:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[27/42]⎯
+
+ FAIL  test/e2e/review-exec.spec.ts > P08 review-exec page-load + testid (真 IDE)
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ Module.assertConsoleClean test/e2e/_helpers.ts:68:14
+     66| // 每个 it 块末必须 call · 任何累积 error 直接 throw · 防 silent succe…
+     67| export function assertConsoleClean(errors: string[], step: string): vo…
+     68|   if (errors.length > 0) {
+       |              ^
+     69|     const sample = errors.slice(0, 3).join('\n');
+     70|     throw new Error(`${step}: IDE console produced ${errors.length} er…
+ ❯ test/e2e/review-exec.spec.ts:23:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[28/42]⎯
+
+ FAIL  test/e2e/review-today.spec.ts > P07 review-today · page-load + testid (真 IDE automator)
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/review-today.spec.ts:17:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[29/42]⎯
+
+ FAIL  test/e2e/review-today.spec.ts > P07 review-today · page-load + testid (真 IDE automator)
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ Module.assertConsoleClean test/e2e/_helpers.ts:68:14
+     66| // 每个 it 块末必须 call · 任何累积 error 直接 throw · 防 silent succe…
+     67| export function assertConsoleClean(errors: string[], step: string): vo…
+     68|   if (errors.length > 0) {
+       |              ^
+     69|     const sample = errors.slice(0, 3).join('\n');
+     70|     throw new Error(`${step}: IDE console produced ${errors.length} er…
+ ❯ test/e2e/review-today.spec.ts:24:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[30/42]⎯
+
+ FAIL  test/e2e/sc01-happy-path.spec.ts > SC-01 happy path · 8 pages · real backend + real IDE
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/sc01-happy-path.spec.ts:23:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[31/42]⎯
+
+ FAIL  test/e2e/sc01-happy-path.spec.ts > SC-01 happy path · 8 pages · real backend + real IDE
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ Module.assertConsoleClean test/e2e/_helpers.ts:68:14
+     66| // 每个 it 块末必须 call · 任何累积 error 直接 throw · 防 silent succe…
+     67| export function assertConsoleClean(errors: string[], step: string): vo…
+     68|   if (errors.length > 0) {
+       |              ^
+     69|     const sample = errors.slice(0, 3).join('\n');
+     70|     throw new Error(`${step}: IDE console produced ${errors.length} er…
+ ❯ test/e2e/sc01-happy-path.spec.ts:28:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[32/42]⎯
+
+ FAIL  test/e2e/tabbar-visible-all-tabs.spec.ts > SC01-MP-MENU-FIX · 全 tab 页底部 menu (tabBar) 可见性
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/tabbar-visible-all-tabs.spec.ts:104:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[33/42]⎯
+
+ FAIL  test/e2e/tabbar-visible-all-tabs.spec.ts > SC01-MP-MENU-FIX · 全 tab 页底部 menu (tabBar) 可见性
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ Module.assertConsoleClean test/e2e/_helpers.ts:68:14
+     66| // 每个 it 块末必须 call · 任何累积 error 直接 throw · 防 silent succe…
+     67| export function assertConsoleClean(errors: string[], step: string): vo…
+     68|   if (errors.length > 0) {
+       |              ^
+     69|     const sample = errors.slice(0, 3).join('\n');
+     70|     throw new Error(`${step}: IDE console produced ${errors.length} er…
+ ❯ test/e2e/tabbar-visible-all-tabs.spec.ts:109:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[34/42]⎯
+
+ FAIL  test/e2e/today-to-exec.spec.ts > SC01-MP-T10-E2E · today→exec transition (真 IDE)
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/today-to-exec.spec.ts:18:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[35/42]⎯
+
+ FAIL  test/e2e/today-to-exec.spec.ts > SC01-MP-T10-E2E · today→exec transition (真 IDE)
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ Module.assertConsoleClean test/e2e/_helpers.ts:68:14
+     66| // 每个 it 块末必须 call · 任何累积 error 直接 throw · 防 silent succe…
+     67| export function assertConsoleClean(errors: string[], step: string): vo…
+     68|   if (errors.length > 0) {
+       |              ^
+     69|     const sample = errors.slice(0, 3).join('\n');
+     70|     throw new Error(`${step}: IDE console produced ${errors.length} er…
+ ❯ test/e2e/today-to-exec.spec.ts:23:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[36/42]⎯
+
+ FAIL  test/e2e/wrongbook-list.spec.ts > P05 wrongbook-list page-load + DOM (真 IDE)
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/wrongbook-list.spec.ts:16:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[37/42]⎯
+
+ FAIL  test/e2e/wrongbook-list.spec.ts > P05 wrongbook-list page-load + DOM (真 IDE)
+TypeError: Cannot read properties of undefined (reading 'length')
+ ❯ Module.assertConsoleClean test/e2e/_helpers.ts:68:14
+     66| // 每个 it 块末必须 call · 任何累积 error 直接 throw · 防 silent succe…
+     67| export function assertConsoleClean(errors: string[], step: string): vo…
+     68|   if (errors.length > 0) {
+       |              ^
+     69|     const sample = errors.slice(0, 3).join('\n');
+     70|     throw new Error(`${step}: IDE console produced ${errors.length} er…
+ ❯ test/e2e/wrongbook-list.spec.ts:23:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[38/42]⎯
+
+ FAIL  test/e2e/sc-16/t02-weekly-mp-page.spec.ts > SC-16-T02 · P-WEEKLY-REVIEW MP page (Phase 3 Coder)
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/sc-16/t02-weekly-mp-page.spec.ts:26:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[39/42]⎯
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  test/e2e/review-api-contract.spec.ts > Review API contract (9 endpoints · real backend :8085) > GET /api/review/nodes/:nid → envelope { ReviewPlanDto fields }
+AssertionError: expected { id: 1, wrongItemId: 100, …(10) } to have property "intervalDays"
+ ❯ test/e2e/review-api-contract.spec.ts:139:20
+    137|       expect(data).toHaveProperty('nodeIndex');
+    138|       expect(data).toHaveProperty('easeFactor');
+    139|       expect(data).toHaveProperty('intervalDays');
+       |                    ^
+    140|       expect(data).toHaveProperty('nextDueAt');
+    141|       expect(data).toHaveProperty('mastered');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[40/42]⎯
+
+ FAIL  test/e2e/review-api-contract.spec.ts > Review API contract (9 endpoints · real backend :8085) > POST /api/review/sessions/:sid/next → envelope { nextNid, completed, total, done }
+AssertionError: expected { next_nid: null, completed: +0, …(2) } to have property "nextNid"
+ ❯ test/e2e/review-api-contract.spec.ts:226:20
+    224|       assertEnvelope(json);
+    225|       const data = (json as { data: unknown }).data as Record<string, …
+    226|       expect(data).toHaveProperty('nextNid');
+       |                    ^
+    227|       expect(data).toHaveProperty('completed');
+    228|       expect(typeof data.completed).toBe('number');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[41/42]⎯
+
+ FAIL  test/e2e/review-api-contract.spec.ts > Review API contract (9 endpoints · real backend :8085) > GET /api/review/nodes/:nid/result → envelope { NodeResultResp 12 fields }
+AssertionError: expected { planId: 1, wrongItemId: 100, …(10) } to have property "nid"
+ ❯ test/e2e/review-api-contract.spec.ts:247:20
+    245|       const data = (json as { data: unknown }).data as Record<string, …
+    246|       // 5 required fields
+    247|       expect(data).toHaveProperty('nid');
+       |                    ^
+    248|       expect(data).toHaveProperty('wrongItemId');
+    249|       expect(data).toHaveProperty('nodeIndex');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[42/42]⎯
+
+ Test Files  21 failed (21)
+      Tests  3 failed | 6 passed (79)
+   Start at  22:36:08
+   Duration  2.17s (transform 121ms, setup 0ms, collect 508ms, tests 1.43s, environment 0ms, prepare 75ms)
+
+/Users/allen/workspace/longfeng/.claude/worktrees/brave-shaw-0bb0e4/frontend/apps/mp:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @longfeng/mp@0.1.0 test:e2e:automator: `vitest run --config test/vitest.config.ts test/e2e test/e2e/sc-16/t02-weekly-mp-page.spec.ts`
+Exit status 1
