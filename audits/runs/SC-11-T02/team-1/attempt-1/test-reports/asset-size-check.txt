@@ -1,0 +1,3 @@
+INFO: frontend/apps/h5/public/landing/hero.webp not present (acceptable if other format covers fallback)
+OK: frontend/apps/h5/public/landing/hero.png = 22848 bytes (cap 61440)
+PASS: combined size 22848 bytes <= 307200 bytes (300 KB)
