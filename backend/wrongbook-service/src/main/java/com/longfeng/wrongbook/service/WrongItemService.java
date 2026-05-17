@@ -158,4 +158,18 @@ public class WrongItemService {
                                 Short status, Pageable pageable) {
         return repo.findByFilters(studentId, subject, mastery, status, pageable);
     }
+
+    /**
+     * P08-RENDER 兜底 · 从单库 analysis_result 拿 AI OCR 的真题干 ·
+     * 调用方 (QuestionAggregateService) 在 wrong_item.stem_text 为空时 fallback.
+     * 返 null 表示这道题没有 DONE 状态的 AI 分析结果.
+     */
+    public String findLatestAnalysisStem(Long wrongItemId) {
+        try {
+            return repo.findLatestAnalysisStemByWrongItemId(wrongItemId);
+        } catch (Exception e) {
+            // analysis_result 表查询失败不让 wrongbook GET 整体崩 · 退到 null
+            return null;
+        }
+    }
 }

@@ -29,4 +29,26 @@ public interface WrongItemRepository extends JpaRepository<WrongItem, Long> {
             Pageable pageable);
 
     List<WrongItem> findByStudentIdAndSubject(Long studentId, String subject);
+
+    /**
+     * P08-RENDER · 单库迁移后 (2026-05-17 用户拍板) analysis_task + analysis_result 同库.
+     * AI OCR 输出 stem 落 analysis_result.stem · 从来没回写 wrong_item.stem_text ·
+     * 导致 wrongbook GET 返空. 这里 LEFT JOIN 拿最新 analysis_result.stem 兜底.
+     *
+     * <p>多条 analysis_result 对同一 task_id 时取 created_at DESC 第 1 条
+     * (一次重新分析会写入新行 · 我们要最新). task_id = wrong_item.id::text.
+     * 返 String[] {ai_stem, error_reason, steps_json} · null 表示没有 AI 数据.
+     */
+    // PostgreSQL ::text 跟 JPA :param 占位符冲突 (parser 误以为 :text 是参数) ·
+    // 改 cast(... as text). 也简化 · 现在只需要 stem · 不返 error_reason/steps.
+    @Query(
+        value = "SELECT ar.stem "
+              + "FROM analysis_result ar "
+              + "JOIN analysis_task at ON at.task_id = ar.task_id "
+              + "WHERE at.task_id = cast(:wrongItemId as varchar) "
+              + "AND ar.deleted_at IS NULL "
+              + "AND at.status = 'DONE' "
+              + "ORDER BY ar.created_at DESC LIMIT 1",
+        nativeQuery = true)
+    String findLatestAnalysisStemByWrongItemId(@Param("wrongItemId") Long wrongItemId);
 }

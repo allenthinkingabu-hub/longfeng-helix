@@ -186,10 +186,19 @@ public class QuestionAggregateService {
     }
 
     private QuestionDetailResp toDetailResp(WrongItem item) {
+        // P08-RENDER: wrong_item.stem_text 为 null 时, fallback 单库 analysis_result.stem
+        // (AI OCR 输出长期只在 analysis_result 不回写 wrong_item · 2026-05-17 单库迁移后修).
+        String stemText = item.getStemText();
+        if (stemText == null || stemText.isBlank()) {
+            String aiStem = wrongItemService.findLatestAnalysisStem(item.getId());
+            if (aiStem != null && !aiStem.isBlank()) {
+                stemText = aiStem;
+            }
+        }
         QuestionDetailResp.QuestionVO vo = new QuestionDetailResp.QuestionVO(
                 toQid(item.getId()), item.getStudentId(), item.getSubject(),
                 item.getGradeCode(), item.getSourceType(), item.getOriginImageKey(),
-                item.getProcessedImageKey(), item.getOcrText(), item.getStemText(),
+                item.getProcessedImageKey(), item.getOcrText(), stemText,
                 item.getStatus(), item.getMastery(), item.getDifficulty(),
                 item.getCreatedAt(), item.getUpdatedAt());
         return new QuestionDetailResp(vo, Collections.emptyList());
