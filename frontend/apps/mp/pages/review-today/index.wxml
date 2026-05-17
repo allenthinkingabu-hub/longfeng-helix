@@ -67,8 +67,18 @@
       <text class="empty-sub">还没有待复习的题目</text>
     </view>
 
-    <!-- ── Slot groups (仅 LIST 态 · 否则 EMPTY/ALL_DONE 会和 mock cards 同屏渲染) ── -->
-    <block wx:if="{{pageState === 'today.LIST'}}" wx:for="{{slots}}" wx:key="key">
+    <!-- ── ALL_DONE 庆祝 banner (spec §6 状态机 "庆祝升级态") ──
+         今日 N 题全部 GRADED → 出庆祝 + 卡片仍渲染 (用户能复看哪几道) -->
+    <view wx:if="{{pageState === 'today.ALL_DONE'}}" class="all-done-banner" data-test-id="p07-all-done-banner">
+      <text class="all-done-emoji">🎉</text>
+      <view>
+        <view class="all-done-title">今日复习全部完成</view>
+        <view class="all-done-sub">{{totalCount}} 题 · 掌握度 {{masteryPct}}%</view>
+      </view>
+    </view>
+
+    <!-- ── Slot groups (LIST + ALL_DONE 都渲染 · 之前仅 LIST · ALL_DONE 态卡片消失变白屏) -->
+    <block wx:if="{{pageState === 'today.LIST' || pageState === 'today.ALL_DONE'}}" wx:for="{{slots}}" wx:key="key">
       <view class="slot">
         <view class="slot-icon {{item.iconClass}}">
           <van-icon wx:if="{{item.key === 'now'}}" name="clock-o" size="12px" />
@@ -111,11 +121,18 @@
     <view style="height: 140rpx;"></view>
   </scroll-view>
 
-  <!-- ── Floating CTA ────────────────────────────── -->
-  <view wx:if="{{pageState !== 'today.EMPTY' && pageState !== 'today.ALL_DONE'}}" class="cta" bind:tap="onStartAllTap" data-test-id="p07-bottom-cta-start-all-btn">
+  <!-- ── Floating CTA · LIST 态 · 全部开始 ── -->
+  <view wx:if="{{pageState === 'today.LIST'}}" class="cta" bind:tap="onStartAllTap" data-test-id="p07-bottom-cta-start-all-btn">
     <van-icon name="play" color="#fff" size="20px" />
     <text>全部开始</text>
     <text class="cta-sz">{{totalCount}} 题 · {{estMinutes}} min</text>
+  </view>
+
+  <!-- ── ALL_DONE CTA · 跳回首页 (spec §6 状态机 ALL_DONE → 跳 P-HOME) ── -->
+  <view wx:if="{{pageState === 'today.ALL_DONE'}}" class="cta cta--done" bind:tap="onBackHome" data-test-id="p07-all-done-cta">
+    <van-icon name="success" color="#fff" size="20px" />
+    <text>回到首页</text>
+    <text class="cta-sz">今日全部完成</text>
   </view>
 
 </view>

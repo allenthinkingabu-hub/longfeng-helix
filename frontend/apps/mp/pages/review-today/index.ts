@@ -129,6 +129,12 @@ Page({
     wx.navigateBack();
   },
 
+  // P07 ALL_DONE 态 CTA · spec §6 状态机 ALL_DONE → 跳 P-HOME ·
+  // P07 是 tabBar 页 · 不能 navigateBack · 用 switchTab.
+  onBackHome() {
+    wx.switchTab({ url: '/pages/home/index' });
+  },
+
   // P07-D · 右上 "排序 · {mode}" tap · ActionSheet 3 选项
   // 桶分组 (上午/下午/晚上) 不动 · 仅桶内 sort 顺序变.
   // spec/biz 都没具体定义这个 chip · 这里就定一份 "时间/T级/学科" 作为初版.
