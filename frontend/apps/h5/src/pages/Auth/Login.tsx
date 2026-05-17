@@ -97,6 +97,22 @@ export const LoginPage: React.FC = () => {
           password,
           rememberMe,
           consentAt: new Date().toISOString(),
+          // SC-00-T02 · forward device-fp so auth-service can silent-upsert
+          // account_device (SC-14 P-WELCOMEBACK uses this binding later).
+          deviceFp: (() => {
+            try {
+              let fp = localStorage.getItem('deviceFp');
+              if (!fp) {
+                // light fallback when bootstrap never ran (direct landing on /auth/login)
+                fp = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+                localStorage.setItem('deviceFp', fp);
+              }
+              return fp;
+            } catch {
+              return undefined;
+            }
+          })(),
+          platform: 'H5',
         }),
       });
 

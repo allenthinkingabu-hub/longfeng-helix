@@ -28,6 +28,9 @@ importers:
       i18next:
         specifier: ^23.15.0
         version: 23.16.8
+      jose:
+        specifier: ^5.9.0
+        version: 5.10.0
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -1533,6 +1536,9 @@ packages:
 
   jimp@0.6.8:
     resolution: {integrity: sha512-F7emeG7Hp61IM8VFbNvWENLTuHe0ghizWPuP4JS9ujx2r5mCVYEd/zdaz6M2M42ZdN41blxPajLWl9FXo7Mr2Q==}
+
+  jose@5.10.0:
+    resolution: {integrity: sha512-s+3Al/p9g32Iq+oqXxkW//7jk2Vig6FF1CFqzVXoTUXt2qz89YWbL+OwS17NFYEvxC35n0FKeGO2LGYSxeM2Gg==}
 
   jpeg-js@0.3.7:
     resolution: {integrity: sha512-9IXdWudL61npZjvLuVe/ktHiA41iE8qFyLB+4VDTblEsWBzeg8WQTlktdUK4CdncUqtUgUg0bbOmTE2bKBKaBQ==}
@@ -3794,6 +3800,8 @@ snapshots:
       regenerator-runtime: 0.13.11
     transitivePeerDependencies:
       - debug
+
+  jose@5.10.0: {}
 
   jpeg-js@0.3.7: {}
 

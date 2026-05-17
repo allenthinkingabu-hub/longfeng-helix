@@ -48,6 +48,11 @@ export default defineConfig({
         target: process.env.VITE_AUTH_PROXY_TARGET || 'http://localhost:8091',
         changeOrigin: true,
       },
+      // SC-00-T01-T02: /api/session/resolve → anonymous-service :8090
+      '/api/session': {
+        target: process.env.VITE_ANON_PROXY_TARGET || 'http://localhost:8090',
+        changeOrigin: true,
+      },
       '/api/file': {
         target: process.env.VITE_FILE_PROXY_TARGET || 'http://localhost:8084',
         changeOrigin: true,

@@ -478,6 +478,16 @@ export const TEST_IDS = {
     ctaContinueBtn:     'p09-cta-row-continue-btn',
     ctaEndBtn:          'p09-cta-row-end-btn',
   },
+
+  // SC-00-T01 · BootstrapGate splash + 4 占位路由
+  sc00: {
+    bootstrapSplash:            'bootstrap-splash',
+    landingPlaceholderRoot:     'landing-placeholder-root',
+    sharedPlaceholderRoot:      'shared-placeholder-root',
+    welcomeBackPlaceholderRoot: 'welcomeback-placeholder-root',
+    observerPlaceholderRoot:    'observer-placeholder-root',
+    offlineBannerRoot:          'offline-banner-root',
+  },
 } as const;
 
 // ── S8 FE-04 · Dynamic testid helpers (functions · not in const for type safety) ──

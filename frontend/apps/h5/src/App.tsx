@@ -9,6 +9,10 @@ import { HomePage } from './pages/Home/index';
 import { ReviewTodayPage } from './pages/ReviewToday/index';
 import { WrongbookListPage } from './pages/WrongbookList/index';
 import { LoginPage } from './pages/Auth/Login';
+import { LandingPage } from './pages/Landing/index';
+import { WelcomeBackPage } from './pages/WelcomeBack/index';
+import { SharedStubPage } from './pages/SharedStub/index';
+import { ObserverStubPage } from './pages/ObserverStub/index';
 
 const ManualEntryStub: React.FC = () => (
   <div data-testid="manual-entry-root" style={{ padding: 20, color: '#333' }}>
@@ -32,6 +36,11 @@ export const App: React.FC = () => (
     <Route path="/review-done" element={<ReviewDonePage />} />
     <Route path="/review/done" element={<ReviewDonePage />} />
     <Route path="/manual-entry" element={<ManualEntryStub />} />
+    {/* SC-00-T01 占位路由 · T04 / SC-13 / SC-14 / SC-15 后续 flesh */}
+    <Route path="/welcome" element={<LandingPage />} />
+    <Route path="/welcome-back" element={<WelcomeBackPage />} />
+    <Route path="/s/:token" element={<SharedStubPage />} />
+    <Route path="/observer/:code" element={<ObserverStubPage />} />
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 );
