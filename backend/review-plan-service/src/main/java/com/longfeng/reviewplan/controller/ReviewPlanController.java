@@ -222,7 +222,16 @@ public class ReviewPlanController {
         return ApiResult.ok(new CreateSessionResp(session.sid, session.nids, session.nids.size()));
     }
 
-    /** SC-01-C05 #2 · GET /api/review/today?tz= · 今日待复习. */
+    /**
+     * SC-01-C05 #2 · GET /api/review/today?tz= · 今日待复习.
+     *
+     * <p>窗口语义: [today_start, today_end + LATE_NIGHT_LOOKAHEAD_HOURS) ·
+     * lookahead 4h 解决"晚上保存的题 T0=+2h 落入次日凌晨, 永远进不来今日窗口"问题
+     * (NODE_OFFSETS[0] = Duration.ofHours(2) · spec §SC-01.10 Q-D 起点不动)。
+     * UX 语义: "今天能做的复习" 而非死板的日历日切。
+     */
+    private static final java.time.Duration LATE_NIGHT_LOOKAHEAD = java.time.Duration.ofHours(4);
+
     @Operation(summary = "SC-01-C05 today due nodes")
     @GetMapping("/api/review/today")
     public ApiResult<TodayResp> today(
@@ -231,7 +240,7 @@ public class ReviewPlanController {
         ZoneId zone = resolveZone(tz);
         LocalDate today = LocalDate.now(zone);
         Instant start = today.atStartOfDay(zone).toInstant();
-        Instant end = today.plusDays(1).atStartOfDay(zone).toInstant();
+        Instant end = today.plusDays(1).atStartOfDay(zone).toInstant().plus(LATE_NIGHT_LOOKAHEAD);
         List<ReviewPlan> plans = planService.getDayPlans(userId, start, end);
         List<ReviewPlanDto> items = plans.stream().map(ReviewPlanDto::from).collect(Collectors.toList());
         String useTz = tz != null && !tz.isBlank() ? tz : DEFAULT_TZ;

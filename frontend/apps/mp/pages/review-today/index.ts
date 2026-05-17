@@ -5,7 +5,7 @@
 
 import { TEST_IDS } from '@longfeng/testids';
 import { getToday, createSession } from '../../src/api/review';
-import { buildSlotsFromItems, MOCK_SLOTS } from './helpers';
+import { buildSlotsFromItems } from './helpers';
 import type { SlotData } from './helpers';
 
 // ─── Types ──────────────────────────────────────────────────────
@@ -17,14 +17,16 @@ Page({
     testIds: TEST_IDS.p07,
 
     pageState: 'LOADING' as PageState,
-    slots: MOCK_SLOTS as SlotData[],
-    totalCount: 8,
-    doneCount: 3,
-    inProgressCount: 1,
-    waitCount: 4,
-    estMinutes: 25,
-    progressPct: 38,
-    masteryPct: 72,
+    // 全部 0 初始 · 真 API 返回后填充 · 之前预置 MOCK_SLOTS + 8/3/1/4/38/72 是
+    // 假数据穿透生产: EMPTY 时 wx:if 没遮 slots → mock 卡片 + 空状态同屏渲染
+    slots: [] as SlotData[],
+    totalCount: 0,
+    doneCount: 0,
+    inProgressCount: 0,
+    waitCount: 0,
+    estMinutes: 0,
+    progressPct: 0,
+    masteryPct: 0,
 
     dateStr: '',
     weekday: '',
@@ -39,6 +41,13 @@ Page({
     this._fetchToday();
   },
 
+  // 从 P04 保存新题回来 / tab 切换回来 都要重新拉 · 保证 "我刚加的题" 立刻出现
+  onShow() {
+    if (this.data.pageState !== 'LOADING') {
+      this._fetchToday();
+    }
+  },
+
   async _fetchToday() {
     try {
       const resp = await getToday('Asia/Shanghai');
@@ -46,7 +55,17 @@ Page({
       const total = resp.total;
 
       if (total === 0) {
-        this.setData({ pageState: 'today.EMPTY' as PageState, totalCount: 0 });
+        // 全部 hero 计数清零 · 防止上次的真数据残留 · 防 hero 显 8 但 slots 空 的不一致
+        this.setData({
+          pageState: 'today.EMPTY' as PageState,
+          slots: [],
+          totalCount: 0,
+          doneCount: 0,
+          inProgressCount: 0,
+          waitCount: 0,
+          estMinutes: 0,
+          progressPct: 0,
+        });
         return;
       }
 
@@ -59,7 +78,9 @@ Page({
       const progressPct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
 
       this.setData({
-        slots: builtSlots.length > 0 ? builtSlots : MOCK_SLOTS,
+        // 真 builtSlots 即使是空数组也用 · 之前 builtSlots.length>0 ? : MOCK_SLOTS
+        // fallback 会把假题塞进真有数据但分桶失败的场景 · 假装有题
+        slots: builtSlots,
         totalCount: total,
         doneCount,
         inProgressCount,
@@ -68,9 +89,17 @@ Page({
         progressPct,
         pageState: (doneCount === total ? 'today.ALL_DONE' : 'today.LIST') as PageState,
       });
-    } catch {
-      // §9 降级: use mock data
-      this.setData({ pageState: 'today.LIST' as PageState });
+    } catch (err) {
+      // §9 降级: API 真失败时露白 · 不假装有 mock 复习题
+      console.error('[P07] getToday failed:', err);
+      this.setData({
+        pageState: 'today.EMPTY' as PageState,
+        slots: [],
+        totalCount: 0,
+        doneCount: 0,
+        inProgressCount: 0,
+        waitCount: 0,
+      });
     }
   },
 

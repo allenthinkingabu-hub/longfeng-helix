@@ -3,11 +3,13 @@
 
 export type PageState = 'LOADING' | 'READY' | 'EMPTY' | 'ERROR';
 
+// 与 src/api/home.ts HomeTodayData 保持兼容 · derivePageState 只看 total ·
+// done/items 在 api 层是可选/typed · helpers 这层只关心 total 是否 0
 export interface HomeTodayData {
   total: number;
-  done: number;
-  items: unknown[];
-  tz: string;
+  done?: number;
+  items?: unknown[];
+  tz?: string;
 }
 
 export interface WeekDay {
