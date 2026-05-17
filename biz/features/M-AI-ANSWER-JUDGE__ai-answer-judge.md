@@ -5,7 +5,7 @@
 **Created**: 2026-05-16
 **Priority**: **P1** (MVP 14 天不做 · P1 启动 · 建议与 M-MULTI satellite 同周期跑 · 共享 §6 AI Backend 基建)
 **Master ref**: [../业务与技术解决方案_AI错题本_基于日历系统.md](../业务与技术解决方案_AI错题本_基于日历系统.md) (v1.2)
-**Mockup**: `design/mockups/wrongbook/08_review_exec.html` (现有 287 行 · 需 diff 扩展加第 4 input tab + `<AiJudgeBanner>` · 不新建独立 mockup HTML)
+**Mockup**: `design/mockups/wrongbook/20_review_exec_ai_judge.html` (NEW · 414 行 · 22 testid · gen-mockup skill v1 第 3 次实战 · 风格基准 `08_review_exec.html` (P08 现有) · 演示 SC-20 step 5 瞬间: AI 已判 PARTIAL · confidence 75% · 自评 PARTIAL 按钮预选高亮 · 学生未点击采纳) · 原版 `08_review_exec.html` 保留 (纯自评流 · 作为 photo input disabled 时的 fallback 视觉参照)
 **前置参考**: [./M-MULTI-QUESTION-CAPTURE__multi-question-capture.md](./M-MULTI-QUESTION-CAPTURE__multi-question-capture.md) v1.2 §6 AI Backend (复用 Claude Sonnet 主模型 + 配置化阈值 yml 模式)
 
 ---
@@ -441,7 +441,7 @@ Resp 加字段: {
 落地本 satellite 后的下游动作 (按优先级排):
 
 - **(用户决策 5 件 · 见 §17 开放问题 · 必须先答完才推进)**
-- **(决策后 1 周)** 触发 [gen-mockup.md](../../.harness/skills/gen-mockup.md) **diff 模式**: 改 `design/mockups/wrongbook/08_review_exec.html` 加第 4 input tab + `<AiJudgeBanner>` + 全补 testid (P08 spec L71 drift 治理) — 注意: 当前 gen-mockup skill v1 仅支持新 mockup · diff 模式是 skill v1.1 待扩展 (与 M-MULTI satellite §16 同 ask)
+- **✓ 2026-05-18 完成**: 已落 `design/mockups/wrongbook/20_review_exec_ai_judge.html` (gen-mockup skill v1 第 3 次实战 · 走"新建独立 mockup"模式而非 diff 模式 · 与 M-MULTI satellite 的 `19_result_multi.html` 同策略 · 原版 08 保留作为 fallback 视觉)
 - **(决策后 1 周)** 触发 [gen-page-spec.md](../../.harness/skills/gen-page-spec.md): 为 P08 产 satellite-aware spec.md 增量 (`design/system/pages/P08-review-exec.spec.md` 加 §4 字段 / §5 API / §9 异常态 / §10 验收点 增量 · 不重写整 spec) — 复用 gen-page-spec v1.1 satellite biz fallback 能力
 - **(决策后 2 周)** 触发 [gen-feature-list.md](../../.harness/skills/gen-feature-list.md) × 3: 为 SC-20/21/22 各产 feature_list (预估 SC-20: 5-7 task · SC-21: 3-4 task · SC-22: 3-4 task · 共 11-15 task)
 - **(决策后 3 周)** 主 biz §15.5 已自动追加 1 行 cross-ref · 等 P1 立项确认后由 owner 把本 satellite 合 main 分支 (本 satellite Created=2026-05-16 · 真 P1 落地预计 2026-06 中 · 与 M-MULTI 同周期)
