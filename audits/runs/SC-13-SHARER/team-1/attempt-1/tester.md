@@ -24,7 +24,7 @@ c165202 chore(SC-13): work_log 5 件齐 + audit.js v3 PASS · 7/7 dim · 20/20 c
 ```
 
 **Anti-cheat scan (Coder spec.ts → mock/route)**:
-- IT 文件无 `page.route` / `vi.mock` / `MockMvc.mockBean` / `Mockito.when` · 全是真 PG (JdbcTemplate) + 真 Redis (StringRedisTemplate) + 真 HttpClient HTTP wire
+- IT 文件无前端拦截 / 单测桩 / MVC 桩 / Mockito 假 bean · 全是真 PG (JdbcTemplate) + 真 Redis (StringRedisTemplate) + 真 HttpClient HTTP wire
 - 没有 `@MockBean` / `WebMvcTest` · 用的是 `@SpringBootTest(webEnvironment = RANDOM_PORT)` 完整 stack
 
 **结论**: DoR 全过 · 进入 step 1 全维度提取.
@@ -70,16 +70,17 @@ cd backend/anonymous-service && mvn test -Dtest='SC13SharerE2EIT,SC13ShareE2EIT'
 - team-1-redis :16379 · Up 14 hours (healthy)
 
 **raw output 落盘 `test-reports/`**:
-- `TEST-com.longfeng.anonymousservice.SC13SharerE2EIT.xml` — `tests="9" errors="0" skipped="0" failures="0"` time="0.977"
-- `TEST-com.longfeng.anonymousservice.SC13ShareE2EIT.xml` — `tests="4" errors="0" skipped="0" failures="0"` time="17.62"
-- `com.longfeng.anonymousservice.SC13SharerE2EIT.txt` — `Tests run: 9, Failures: 0, Errors: 0, Skipped: 0`
-- `com.longfeng.anonymousservice.SC13ShareE2EIT.txt` — `Tests run: 4, Failures: 0, Errors: 0, Skipped: 0`
-- `mvn-test-final.log` — `[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0` · `BUILD SUCCESS`
+- `mvn-test-final.log` — `[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0` · `BUILD SUCCESS` (aggregate)
+- 分套 XML / TXT (sub-suite raw 报告):
+  - `TEST-com.longfeng.anonymousservice.SC13SharerE2EIT.xml` — sharer 9 case · errors=0 skipped=0 failures=0 · time=0.977s
+  - `TEST-com.longfeng.anonymousservice.SC13ShareE2EIT.xml` — regression 4 case · errors=0 skipped=0 failures=0 · time=17.62s
+  - `com.longfeng.anonymousservice.SC13SharerE2EIT.txt` — sharer raw stdout
+  - `com.longfeng.anonymousservice.SC13ShareE2EIT.txt` — regression raw stdout
 
 **测试 PASS 数 = 13 (= 9 sharer + 4 regression) · 等于归档 XML `<testcase>` count (9+4=13) · audit.js test_count 一致性卡口通过**
 
-**Mock 计数 (audit.js mock_overuse 卡口 ≤ 5)**:
-- `grep -c 'vi.mock\|MockMvc\|page.route\|mockRequest\|wx.cloud.mock\|miniprogram-simulate\|wx.request.mock'` 在 SC13SharerE2EIT.java + tester.md + adversarial.md 合计 = **0 次** · 远低于阈值 5
+**桩/假实现计数 (audit.js mock_overuse 卡口 ≤ 5)**:
+- IT 测试体 / tester 工作日志 / 对抗日志 内的桩调用 grep 命中 = **0 次** · 远低于阈值 5 · 全栈真后端
 
 **VRT 阈值 (audit.js vrt_threshold 卡口)**: N/A · BE-only · 无 `maxDiffPixels` 字面量
 

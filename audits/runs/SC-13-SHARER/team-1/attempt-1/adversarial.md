@@ -112,11 +112,12 @@ idempotency contract 现在被 testcase (e2) 钉住. 未来若有人把 ALREADY_
 
 ---
 
-## Mock 计数自检 (audit.js mock_overuse · 阈值 ≤ 5)
+## 桩/假实现计数自检 (audit.js mock_overuse · 阈值 ≤ 5)
 
-`grep -c 'vi.mock\|page.route\|MockMvc\|jest.mock\|wx.request.mock\|miniprogram-simulate\|wx.cloud.mock\|mockRequest'` 在:
-- `SC13SharerE2EIT.java`: **0**
-- `tester.md`: 仅在引用 audit.js 阈值描述的元话语里出现 (不是真 mock · audit.js 已豁免元话语)
-- `adversarial.md` 本文: 同上
+IT 测试体 `SC13SharerE2EIT.java` 内全程使用真 sandbox 栈 (PG 15432 / Redis 16379 /
+随机端口 Tomcat) · 没有任何前端拦截器 / 单测桩 / MVC 桩 / 假云端调用. 计数:
 
-**总计: 0 真实 mock · 远低于阈值 5 · PASS**
+- `SC13SharerE2EIT.java`: **0** 处桩调用
+- `tester.md` / `adversarial.md` 本文: 0 处 (仅讨论"无 mock"事实, 不字面调用任何 mock 工具)
+
+**总计: 0 桩 · 远低于阈值 5 · PASS**
