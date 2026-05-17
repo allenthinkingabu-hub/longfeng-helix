@@ -78,6 +78,16 @@ export default defineConfig({
         target: process.env.VITE_ANON_PROXY_TARGET || 'http://localhost:8090',
         changeOrigin: true,
       },
+      // SC-12-T01-T03: /api/anon/* → anonymous-service :8090
+      // (AnonSessionController POST /api/anon/session +
+      //  AnonSessionConsentController PATCH /api/anon/session/{id}/consent)
+      // Same anonymous-service as /api/session + /api/landing + /api/share;
+      // longest-prefix-first ordering means /api/anon takes precedence over
+      // future generic /api/* routes if ever added.
+      '/api/anon': {
+        target: process.env.VITE_ANON_PROXY_TARGET || 'http://localhost:8090',
+        changeOrigin: true,
+      },
       '/api/file': {
         target: process.env.VITE_FILE_PROXY_TARGET || 'http://localhost:8084',
         changeOrigin: true,

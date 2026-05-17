@@ -515,9 +515,31 @@ export const TEST_IDS = {
   },
 
   // SC-12-STUB-T01 · P-GUEST-CAPTURE 占位 stub 页 (真页 SC-12 未实现)
+  // SC-12-T03 (2026-05-18) replaces the stub with pGuestCapture below.
+  // Old keys kept for testids pkg consumer backward-compat (e.g. legacy
+  // ESLint plugin caches); the DOM no longer renders these ids.
   sc12stub: {
     guestCaptureStubRoot:  'guest-capture-stub-root',
     guestCaptureStubCta:   'guest-capture-stub-cta',
+  },
+
+  // SC-12-T03 · P-GUEST-CAPTURE 真页 (替换 SC-12-STUB-T01 stub)
+  // biz §2A.3.2 P-GUEST-CAPTURE 规格卡 + spec §13 testid 提案
+  // mint flow: page mounts → POST /api/anon/session → IDLE
+  // consent flow: checkbox toggle → PATCH /api/anon/session/{id}/consent → CONSENT_PENDING
+  // Shutter is disabled until consent.checked && phase !== 'BOOTSTRAPPING'.
+  pGuestCapture: {
+    root:            'p-guest-capture-root',
+    shellNav:        'guest-shell-nav',
+    shellLogo:       'guest-shell-logo',
+    loginBtn:        'guest-login-btn',
+    quotaBanner:     'guest-quota-banner',
+    quotaRemaining:  'guest-quota-remaining',
+    consentCard:     'guest-consent-card',
+    consentCheckbox: 'guest-consent-checkbox',
+    cameraPreview:   'guest-camera-preview',
+    shutter:         'guest-shutter',
+    errorBanner:     'guest-error-banner',
   },
 
   // SC-11-T01 · P-LANDING shell (replaces SC-00-T01 landing-placeholder-root)
