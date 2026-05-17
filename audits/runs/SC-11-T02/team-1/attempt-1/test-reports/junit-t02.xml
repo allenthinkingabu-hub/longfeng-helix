@@ -1,0 +1,14 @@
+<testsuites id="" name="" tests="5" failures="0" skipped="0" errors="0" time="4.622196">
+<testsuite name="sc-11/t02-landing-hero-three-step.spec.ts" timestamp="2026-05-17T18:30:11.131Z" hostname="chromium" tests="5" failures="0" skipped="0" time="3.908" errors="0">
+<testcase name="SC-11-T02 · P-LANDING hero 动图 + 三步漫画 (5 cases) › TC-11-T02 (a) hero_renders_default: heroDemo + heroImage visible · poster 不可见" classname="sc-11/t02-landing-hero-three-step.spec.ts" time="0.611">
+</testcase>
+<testcase name="SC-11-T02 · P-LANDING hero 动图 + 三步漫画 (5 cases) › TC-11-T02 (b) hero_404_falls_back_to_poster: 404 · onError → poster visible · 页面仍可交互" classname="sc-11/t02-landing-hero-three-step.spec.ts" time="0.285">
+</testcase>
+<testcase name="SC-11-T02 · P-LANDING hero 动图 + 三步漫画 (5 cases) › TC-11-T02 (c) three_step_comic_renders: 3 step DOM · fadeIn 完成后 opacity=1" classname="sc-11/t02-landing-hero-three-step.spec.ts" time="2.142">
+</testcase>
+<testcase name="SC-11-T02 · P-LANDING hero 动图 + 三步漫画 (5 cases) › TC-11-T02 (d) slow_3g_cta_clickable_in_1500ms: hero throttle 5s · 页面主交互 1500ms 内可见" classname="sc-11/t02-landing-hero-three-step.spec.ts" time="0.322">
+</testcase>
+<testcase name="SC-11-T02 · P-LANDING hero 动图 + 三步漫画 (5 cases) › TC-11-T02 (e) demo_play_telemetry: 30s 后 anon_landing_demo_play 上报 1 次" classname="sc-11/t02-landing-hero-three-step.spec.ts" time="0.548">
+</testcase>
+</testsuite>
+</testsuites>
