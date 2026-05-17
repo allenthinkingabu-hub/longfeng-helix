@@ -101,8 +101,11 @@ test.describe('SC-00-T01 · resolve-entry · bootstrap decision tree dispatch', 
     await page.waitForURL('**/welcome', { timeout: 8000 });
     expect(page.url()).toMatch(/\/welcome$/);
 
-    // Placeholder testid (per scope_in #5 + #6) must render to prove we landed.
-    await expect(page.getByTestId('landing-placeholder-root')).toBeVisible();
+    // SC-11-T01 migration: placeholder was replaced with the real P-LANDING shell
+    // (data-testid='p-landing-root'). We assert the new root testid is visible
+    // to prove we landed AND the SC-00-T01-T02 placeholder is gone.
+    await expect(page.getByTestId('p-landing-root')).toBeVisible();
+    await expect(page.getByTestId('landing-placeholder-root')).toHaveCount(0);
   });
 
   // (c) ──────────────────────────────────────────────────────────────────────
