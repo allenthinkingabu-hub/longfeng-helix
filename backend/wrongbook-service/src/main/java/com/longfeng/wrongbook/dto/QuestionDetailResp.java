@@ -33,6 +33,9 @@ public record QuestionDetailResp(
             //   error_reason: 错因分析 · spec §3 reasonMarkdown
             @JsonProperty("steps") List<Object> steps,
             @JsonProperty("correct_answer") String correctAnswer,
-            @JsonProperty("error_reason") String errorReason
+            @JsonProperty("error_reason") String errorReason,
+            // P09-FOLLOWUP-#2 · AI 提示词加 knowledgePoints 输出 · jsonb 列
+            //   shape: [{name:string}, ...] · 老题 null · 新分析才有
+            @JsonProperty("knowledge_points") List<Object> knowledgePoints
     ) {}
 }

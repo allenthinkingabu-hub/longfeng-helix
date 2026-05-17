@@ -15,7 +15,12 @@ public interface AiProvider {
     /** Invoke analysis: diagnose error reason + generate solution steps. */
     AnalysisResponse analyze(String stem, String subject) throws AiProviderException;
 
-    record AnalysisResponse(String errorReason, String steps, String provider, String model, int tokens) {}
+    /**
+     * @param knowledgePoints JSON array string of {name:string} · 可为空数组 "[]" ·
+     *   新版 (2026-05-17 followup) 加 · P09 KP 显示和 KpChart 依赖.
+     */
+    record AnalysisResponse(String errorReason, String steps, String knowledgePoints,
+                            String provider, String model, int tokens) {}
 
     class AiProviderException extends RuntimeException {
         public AiProviderException(String message) { super(message); }

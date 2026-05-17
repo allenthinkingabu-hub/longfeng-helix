@@ -196,12 +196,14 @@ public class QuestionAggregateService {
         List<Object> steps = Collections.emptyList();
         String correctAnswer = null;
         String errorReason = null;
+        List<Object> knowledgePoints = Collections.emptyList();
 
         Object[] aiRow = wrongItemService.findLatestAnalysisFull(item.getId());
         if (aiRow != null && aiRow.length >= 3) {
             String aiStem = aiRow[0] == null ? null : aiRow[0].toString();
             String stepsJson = aiRow[1] == null ? null : aiRow[1].toString();
             errorReason = aiRow[2] == null ? null : aiRow[2].toString();
+            String kpJson = aiRow.length >= 4 && aiRow[3] != null ? aiRow[3].toString() : null;
 
             if ((stemText == null || stemText.isBlank()) && aiStem != null && !aiStem.isBlank()) {
                 stemText = aiStem;
@@ -215,14 +217,22 @@ public class QuestionAggregateService {
                 } catch (Exception ignore) {
                     steps = Collections.emptyList();
                 }
-                // correct_answer 兜底: AI 流水线没单独存"正确答案"字段, 取末步 text 作答案行 ·
-                // spec §3 reveal 区 .ans 行 (标准解答) 跟 .steps 列表是两个层次 · 末步通常是
-                // "得 3543600" 这种最终结果 · 切走 spec §4.1 answer 字段.
                 if (!steps.isEmpty() && steps.get(steps.size() - 1) instanceof java.util.Map<?,?> last) {
                     Object lastText = last.get("text");
                     if (lastText != null) {
                         correctAnswer = lastText.toString();
                     }
+                }
+            }
+
+            // P09-FOLLOWUP-#2 · 解析 KP jsonb · 老数据 null (column 新加 · prompt 也新加) ·
+            // 失败回退 empty · FE 显 "—" / 整块 hide.
+            if (kpJson != null && !kpJson.isBlank() && !"null".equals(kpJson)) {
+                try {
+                    knowledgePoints = STEPS_MAPPER.readValue(kpJson,
+                            new com.fasterxml.jackson.core.type.TypeReference<List<Object>>() {});
+                } catch (Exception ignore) {
+                    knowledgePoints = Collections.emptyList();
                 }
             }
         }
@@ -233,7 +243,7 @@ public class QuestionAggregateService {
                 item.getProcessedImageKey(), item.getOcrText(), stemText,
                 item.getStatus(), item.getMastery(), item.getDifficulty(),
                 item.getCreatedAt(), item.getUpdatedAt(),
-                steps, correctAnswer, errorReason);
+                steps, correctAnswer, errorReason, knowledgePoints);
         return new QuestionDetailResp(vo, Collections.emptyList());
     }
 

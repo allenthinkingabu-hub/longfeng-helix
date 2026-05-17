@@ -83,6 +83,8 @@ export interface NodeResultResp {
   nextDueAt: string | null;
   durationMs: number | null;
   mastered: boolean;
+  // P09-MASTERY · BE review_plan.mastery_score · 真值 0..100 · 没复习过 = 0 (诚实).
+  masteryScore?: number | null;
 }
 
 export interface RevealResp {

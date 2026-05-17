@@ -388,7 +388,8 @@ public class ReviewPlanController {
             outcome != null ? outcome.getIntervalDaysAfter() : null,
             plan.getNextDueAt(),
             durationMs,
-            plan.isMastered()));
+            plan.isMastered(),
+            plan.getMasteryScore()));
     }
 
     // =======================================================================

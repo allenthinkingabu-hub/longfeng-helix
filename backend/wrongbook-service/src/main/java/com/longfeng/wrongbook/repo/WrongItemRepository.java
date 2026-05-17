@@ -54,13 +54,13 @@ public interface WrongItemRepository extends JpaRepository<WrongItem, Long> {
     String findLatestAnalysisStemByWrongItemId(@Param("wrongItemId") Long wrongItemId);
 
     /**
-     * P08-RENDER · 拿 analysis_result 的完整 AI 输出 (stem + steps jsonb + error_reason) ·
-     * 一次 SQL 拿全, 比单查 stem 多回个 2 列 · 调 1 次 SQL 不是 N+1.
-     * 返 List<[stem, steps_jsonb_str, error_reason]> · 调用方取 list.get(0) ·
-     * JPA native query 返 Object[] (单行多列) 不稳定 · List 包一层稳.
+     * P08/P09-RENDER · 拿 analysis_result 的完整 AI 输出 ·
+     * 返 [stem, steps_jsonb_str, error_reason, knowledge_points_jsonb_str].
+     * P09-FOLLOWUP-#2 加 knowledge_points 字段 (AI 提示词 V1.0.083 起输出).
      */
     @Query(
-        value = "SELECT ar.stem, cast(ar.steps as text) AS steps_json, ar.error_reason "
+        value = "SELECT ar.stem, cast(ar.steps as text) AS steps_json, ar.error_reason, "
+              + "cast(ar.knowledge_points as text) AS kp_json "
               + "FROM analysis_result ar "
               + "WHERE ar.task_id = cast(:wrongItemId as varchar) "
               + "AND ar.deleted_at IS NULL "

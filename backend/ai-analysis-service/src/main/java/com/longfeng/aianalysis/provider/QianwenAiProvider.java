@@ -120,12 +120,13 @@ public class QianwenAiProvider implements AiProvider {
                     .put("content",
                             "你是一位资深 K-12 教师，正在帮助学生分析错题。"
                                     + "严格按 JSON 返回，键固定为：errorReason (string · ≥10 字简体中文错因诊断) · "
-                                    + "steps (array · 每元素 {stepNo:int, text:string ≥5 字})，至少 3 步。"
+                                    + "steps (array · 每元素 {stepNo:int, text:string ≥5 字})，至少 3 步 · "
+                                    + "knowledgePoints (array · 1-3 个元素 · 每元素 {name:string · 2-8 中文字符 · 涉及的核心知识点})。"
                                     + "不要 markdown 包装，不要解释。");
             messages.addObject()
                     .put("role", "user")
                     .put("content",
-                            String.format("学科: %s\n题干:\n%s\n\n请给出 errorReason + steps 数组。",
+                            String.format("学科: %s\n题干:\n%s\n\n请给出 errorReason + steps + knowledgePoints 三字段.",
                                     subject == null ? "未知" : subject, stem));
 
             JsonNode resp = call("/chat/completions", body);
@@ -145,9 +146,16 @@ public class QianwenAiProvider implements AiProvider {
             }
             String stepsJson = json.writeValueAsString(steps);
 
+            // KP 可选 · 不强校验 · 失败回 "[]" · 老模型不返也兼容
+            JsonNode kps = parsed.path("knowledgePoints");
+            String kpsJson = "[]";
+            if (kps.isArray() && kps.size() > 0) {
+                kpsJson = json.writeValueAsString(kps);
+            }
+
             int tokens = resp.path("usage").path("total_tokens").asInt(0);
 
-            return new AnalysisResponse(errorReason, stepsJson, NAME, cfg.getChatModel(), tokens);
+            return new AnalysisResponse(errorReason, stepsJson, kpsJson, NAME, cfg.getChatModel(), tokens);
         } catch (AiProviderException e) {
             throw e;
         } catch (Exception e) {

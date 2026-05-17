@@ -234,6 +234,7 @@ Page({
     // ❗去掉 mock fallback (|| this.data.questionTitle 等) · 真数据空就显空态 ·
     //   spec 没要 mock 假数据 · 之前混进 "f(x)=x²−4x+3" 误导用户
     const qPatch: Record<string, unknown> = {};
+    let realKpNames: string[] = [];
     try {
       const q = await getQuestionById(String(result.wrongItemId));
       qPatch.questionTitle = q.question.stem || '';
@@ -243,11 +244,22 @@ Page({
         math: '数学', physics: '物理', chemistry: '化学', english: '英语', chinese: '语文',
       };
       qPatch.questionSubject = SUBJECT_LABEL[subjectKey] || q.question.subject || '';
-      const kpNames = (q.question.knowledgePoints ?? []).map(k => k.name).filter(Boolean);
-      qPatch.questionKpSummary = kpNames.length > 0 ? kpNames.join(' / ') : '';
-      qPatch.questionTopic = kpNames[0] ?? '';
+      realKpNames = (q.question.knowledgePoints ?? []).map(k => k.name).filter(Boolean);
+      qPatch.questionKpSummary = realKpNames.length > 0 ? realKpNames.join(' / ') : '';
+      qPatch.questionTopic = realKpNames[0] ?? '';
     } catch (e) {
       console.warn('[P09] getQuestionById failed:', e);
+    }
+
+    // P09-FOLLOWUP-#3 · KpChart 真 delta · 用 review_outcome ease before/after 派生 ·
+    // 同一道题的每个 KP 都套同 delta (BE 没存 KP 维度 ease 历史 · 短期最诚实可行方案).
+    // ease 1.3→0%, 3.0→100% 线性映射 · 没 outcome (没复习过) 则 KpChart 空.
+    let computedKpDelta: KpDelta[] = [];
+    if (r.easeFactorBefore != null && r.easeFactorAfter != null && realKpNames.length > 0) {
+      const easeToPct = (e: number) => Math.max(0, Math.min(100, Math.round((e - 1.3) / 1.7 * 100)));
+      const oldPct = easeToPct(r.easeFactorBefore);
+      const newPct = easeToPct(r.easeFactorAfter);
+      computedKpDelta = realKpNames.slice(0, 4).map(kp => ({ kp, oldPct, newPct }));
     }
 
     this.setData({
@@ -257,10 +269,15 @@ Page({
       isForgot,
       prevT: `T${Math.max(0, result.nodeIndex)}`,
       nextT: `T${result.nodeIndex + 1}`,
-      masteryPct: Math.round(result.easeAfter * 32),
+      // P09-MASTERY: 优先用 BE review_plan.mastery_score 真值 · 没有时 (老节点 / 没复习过)
+      // 退到原 easeAfter*32 派生公式. 真做完一次 MASTERED 才会有 >0 值.
+      masteryPct: typeof r.masteryScore === 'number' && r.masteryScore > 0
+        ? r.masteryScore
+        : Math.round(result.easeAfter * 32),
       nextDueFormatted: formatNextDue(result.nextDueAt),
       durationFormatted: formatDuration(result.durationMs),
       tLevels: buildTLevels(result.nodeIndex),
+      kpDelta: computedKpDelta,
       ...qPatch,
     });
   },

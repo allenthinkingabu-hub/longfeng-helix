@@ -176,6 +176,22 @@ public class ReviewPlanService {
                   : 0);
       plan.setConsecutiveGoodCount(next);
     }
+
+    // P09-MASTERY · 更新 mastery_score (0-100) · 之前 SM-2 不管这字段, 永远 0,
+    // 导致 P09 "Mastery %" 长期靠 FE 派生 easeAfter×32 假数据.
+    // 简化口径: review 一次正确 +25 · 错一次 -15 · clamp · MASTERED 直接 100.
+    int newMastery;
+    if (plan.isMastered()) {
+      newMastery = 100;
+    } else {
+      int total = plan.getTotalReview();
+      int forget = plan.getTotalForget();
+      // (total-forget) 是净正确次数 · *25 给个有意义梯度 (1 次→25 / 2 次→50 / 3 次→75 / 4 次→95 cap)
+      int gross = (total - forget) * 25 - forget * 15;
+      newMastery = Math.max(0, Math.min(95, gross));
+    }
+    plan.setMasteryScore(newMastery);
+
     planRepo.save(plan);
 
     // 审计

@@ -25,5 +25,8 @@ public record NodeResultResp(
     Integer intervalAfter,
     Instant nextDueAt,
     Long durationMs,
-    boolean mastered
+    boolean mastered,
+    // P09-MASTERY · review_plan.mastery_score (0..100) · 替代 FE 派生公式 easeAfter*32.
+    // SM-2 完成时由 ReviewPlanService.complete() 更新 · 没复习过保持 0 (诚实).
+    Integer masteryScore
 ) {}
