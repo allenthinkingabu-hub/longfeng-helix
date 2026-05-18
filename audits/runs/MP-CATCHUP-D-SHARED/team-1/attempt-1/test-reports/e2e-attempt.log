@@ -1,0 +1,10 @@
+
+ RUN  v1.6.1 /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/frontend/apps/mp
+
+ ❯ test/e2e/mp-shared/shared.spec.ts  (5 tests) 22ms
+
+ Test Files  1 failed (1)
+      Tests   (5)
+   Start at  18:20:37
+   Duration  424ms (transform 30ms, setup 0ms, collect 231ms, tests 22ms, environment 0ms, prepare 57ms)
+

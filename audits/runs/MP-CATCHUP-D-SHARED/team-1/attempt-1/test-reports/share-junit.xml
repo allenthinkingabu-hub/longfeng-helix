@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="9" failures="0" errors="0" time="0.373">
+    <testsuite name="test/api/share.integration.spec.ts" timestamp="2026-05-18T14:18:31.776Z" hostname="Wangs-MacBook-Pro.local" tests="4" failures="0" errors="0" skipped="0" time="0.16">
+        <testcase classname="test/api/share.integration.spec.ts" name="P-SHARED · share API integration (真 BE :8090 · 0 mock) &gt; TC-INT-1 · 不存在的 token → throw ShareError{code:TOKEN_INVALID}" time="0.046">
+        </testcase>
+        <testcase classname="test/api/share.integration.spec.ts" name="P-SHARED · share API integration (真 BE :8090 · 0 mock) &gt; TC-INT-2 · 异形 token (无 dot · 非 JWT) → ShareError{code:TOKEN_INVALID}" time="0.037">
+        </testcase>
+        <testcase classname="test/api/share.integration.spec.ts" name="P-SHARED · share API integration (真 BE :8090 · 0 mock) &gt; TC-INT-3 · wire response 不含 PII 字段名 (relation_id / student_email / original_image_url / sharer_student_id)" time="0.01">
+        </testcase>
+        <testcase classname="test/api/share.integration.spec.ts" name="P-SHARED · share API integration (真 BE :8090 · 0 mock) &gt; TC-INT-4 · response Cache-Control: no-store (令牌安全 · BE 强制)" time="0.006">
+        </testcase>
+    </testsuite>
+    <testsuite name="test/unit/share-api.spec.ts" timestamp="2026-05-18T14:18:31.778Z" hostname="Wangs-MacBook-Pro.local" tests="5" failures="0" errors="0" skipped="0" time="0.001">
+        <testcase classname="test/unit/share-api.spec.ts" name="share API · status→ShareError code mapping (unit · no mock libs) &gt; 200 → resolve ShareResponse (无 throw)" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/share-api.spec.ts" name="share API · status→ShareError code mapping (unit · no mock libs) &gt; 410 → throw ShareError{code:TOKEN_EXPIRED, httpStatus:410}" time="0">
+        </testcase>
+        <testcase classname="test/unit/share-api.spec.ts" name="share API · status→ShareError code mapping (unit · no mock libs) &gt; 404 → throw ShareError{code:TOKEN_INVALID, httpStatus:404}" time="0">
+        </testcase>
+        <testcase classname="test/unit/share-api.spec.ts" name="share API · status→ShareError code mapping (unit · no mock libs) &gt; 403 → throw ShareError{code:TOKEN_REVOKED, httpStatus:403}" time="0">
+        </testcase>
+        <testcase classname="test/unit/share-api.spec.ts" name="share API · status→ShareError code mapping (unit · no mock libs) &gt; 5xx → fallback ShareError{code:TOKEN_INVALID} (spec §9 网络异常)" time="0">
+        </testcase>
+    </testsuite>
+</testsuites>
