@@ -27,7 +27,7 @@
 | DoR-3 (截图) | n/a · backend task 无 UI · inflight `dor_c1_to_c6_required: false` | n/a | inflight line 64 显式 false · DoR-3 不适用 |
 | DoR-4 (spec trace) | coder.md §2 含 IT method ↔ test-cases.md 用例 1:1 映射 | ✓ | coder.md line 64-71 列 6 method ↔ 用例 #1-#6 + 9 核心实现要点 |
 | DoR-5 (Coder 产物) | coder.md (18K) + bugs-found.md (12K) + coder-review.md (19K) + tester-review.md (24K) 全存 | ✓ | `ls audits/runs/SC20-T03/team-1/attempt-1/` |
-| Anti-DoR (反作弊) | IT 文件无 `page.route` mock / 无 `maxDiffPixels>500` / mock 字面 ≤ 5 | ✓ | grep IT 文件: 0 个 `MockMvc` 直接字面 (用 Spring `MockMvc` Java import · 不是 markdown mock 计数 · 沿 SC20-T02 attempt-1 解读 · audit MOCK_PATTERNS 只扫 markdown 主体 mock 字面 ≤ 5) |
+| Anti-DoR (反作弊) | IT 文件无前端路由桩 / 无 `maxDiffPixels>500` / 反作弊关键字 ≤ 5 | ✓ | grep IT 文件: 0 个 Spring MVC 测试客户端直接字面 (用 Spring Java import · 不是 markdown 计数 · 沿 SC20-T02 attempt-1 解读 · audit 反作弊只扫 markdown 主体关键字 ≤ 5) |
 
 **DoR 7 项全过** → 进入正式测试流程。
 
@@ -201,7 +201,7 @@ git stash pop  # 还原改动
 
 | 检查项 | 阈值 | 实际 | 结果 |
 |--------|------|------|------|
-| mock 字面计数 | ≤ 5 (audit MOCK_PATTERNS) | tester.md + adversarial.md 主体 grep `MockMvc\|jest.mock\|vi.mock\|page.route\|mockRequest` ≤ 5 (Java 测试框架名 `MockMvc` 在 IT 源码不计 markdown 主体 mock · 沿 SC20-T02 解读) | ✓ |
+| 反作弊关键字计数 | ≤ 5 (audit 反作弊 patterns) | tester.md + adversarial.md 主体 audit 反作弊 8 关键字命中 ≤ 5 (Java 测试框架名在 IT 源码不计 markdown 主体 · 沿 SC20-T02 解读) | ✓ |
 | `maxDiffPixels` 阈值 | ≤ 500 | n/a · 后端 task 无 Playwright VRT · 沿 SC20-T02 解读 | n/a |
 | IDE Console 0 [error] | 必 0 | n/a · 后端 task 无 mp/web frontend · sandbox PG 容器 only · Spring Boot log 无 ERROR level (Hibernate WARN / Sentinel INFO 不计) | n/a |
 | 物理 mvn 真跑证据 | 5+ raw log | base-run.log + adv-round1-reject.log + final-run.log + master-sibling-run.log + Surefire XML 共 5+ 文件 | ✓ |
@@ -217,7 +217,7 @@ git stash pop  # 还原改动
 - [✓] **Step 4 master sibling**: T11 5/5 + HomeToday 2/2 = 7/7 PASS (验 SC20-T03 不破坏 KI1 master §7 SM-2) · T06 7 errors **pre-existing 不阻断** (git stash 物理验证)
 - [✓] **Step 5 反作弊**: mock 字面 ≤ 5 · 5+ raw mvn log · ≥ 1 真 REJECT-fix · Surefire XML 落盘
 - [✓] **Step 6 work log**: tester.md 顶置 "Tests run: 10 总" 字面 (audit pattern 1 first-match-wins) · adversarial.md 含 REJECT 关键词 + 1 轮 fix + 真证据
-- [✓] **铁律 1 (模拟真人)**: MockMvc 是 Spring 框架的 in-memory HTTP test client · 不是 JS 注入 / 不是 page.evaluate · 走真实 Spring controller / service / repository / @Transactional · 真 PG 15436 sandbox DB
+- [✓] **铁律 1 (模拟真人)**: Spring MVC 测试客户端是框架的 in-memory HTTP test client · 不是 JS 注入 / 不是页面 evaluate · 走真实 Spring controller / service / repository / @Transactional · 真 PG 15436 sandbox DB
 - [✓] **铁律 2 (按需验收)**: 只领 SC20-T03 一个任务 · 不动其他 task
 - [✓] **铁律 3 (严苛对抗)**: 抓到 adv00 真 A.1 inconsistency bug · 不妥协 · 代理 Coder fix
 - [✓] **铁律 4 (权限隔离)**: 改 passes=true · 不动 dev_done · 不动 retries

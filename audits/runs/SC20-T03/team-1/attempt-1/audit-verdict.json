@@ -2,39 +2,81 @@
   "task_id": "SC20-T03",
   "attempt": 1,
   "team_id": "team-1",
-  "audited_at": "2026-05-18T16:36:00.943Z",
+  "audited_at": "2026-05-18T17:47:21.462Z",
   "audited_by": "audit.js v3 (deterministic · 7 dims · +test_cases_alignment)",
-  "pass": false,
+  "pass": true,
   "checks": [
     {
       "dimension": "coder_compliance",
       "name": "coder_md_exists",
-      "pass": false,
-      "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/coder.md"
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/coder.md"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_keyword_地形侦察",
+      "pass": true,
+      "evidence": "3×"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_keyword_编码",
+      "pass": true,
+      "evidence": "4×"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_keyword_自检",
+      "pass": true,
+      "evidence": "3×"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_keyword_提交",
+      "pass": true,
+      "evidence": "4×"
     },
     {
       "dimension": "coder_compliance",
       "name": "bugs_found_md_exists",
-      "pass": false,
-      "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/bugs-found.md"
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/bugs-found.md"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "bugs_found_md_has_declaration",
+      "pass": true,
+      "evidence": "bug list found"
     },
     {
       "dimension": "tester_compliance",
       "name": "tester_md_exists",
-      "pass": false,
-      "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/tester.md"
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/tester.md"
     },
     {
       "dimension": "tester_compliance",
       "name": "adversarial_md_exists",
-      "pass": false,
-      "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/adversarial.md"
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/adversarial.md"
     },
     {
       "dimension": "tester_compliance",
       "name": "test_reports_nonempty",
-      "pass": false,
-      "evidence": "empty or missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/test-reports"
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/test-reports"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "adversarial_has_reject_round",
+      "pass": true,
+      "evidence": "REJECT/驳回 keyword found"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "adversarial_has_fix_round",
+      "pass": true,
+      "evidence": "fix/修复 keyword found"
     },
     {
       "dimension": "tester_compliance",
@@ -50,9 +92,21 @@
     },
     {
       "dimension": "bug_reality",
-      "name": "git_commits_present",
-      "pass": false,
-      "evidence": "task.git_commits[] is empty — Coder must record at least one commit"
+      "name": "all_git_commits_verified",
+      "pass": true,
+      "evidence": "4/4 hash(es) git cat-file -e PASS"
+    },
+    {
+      "dimension": "test_validity",
+      "name": "tester_md_testcase_count_matches_xml",
+      "pass": true,
+      "evidence": "claimed=10 == xml<testcase>=10"
+    },
+    {
+      "dimension": "test_validity",
+      "name": "adversarial_has_exploratory_keywords",
+      "pass": true,
+      "evidence": "4 matched: [边界,boundary,race,并发]"
     },
     {
       "dimension": "spec_alignment",
@@ -133,6 +187,6 @@
       "evidence": "user verdict: APPROVE"
     }
   ],
-  "redo_target": "coder",
-  "redo_reason": "[coder_compliance.coder_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/coder.md · [coder_compliance.bugs_found_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/bugs-found.md · [tester_compliance.tester_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/tester.md · [tester_compliance.adversarial_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/adversarial.md · [tester_compliance.test_reports_nonempty] empty or missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/test-reports · [bug_reality.git_commits_present] task.git_commits[] is empty — Coder must record at least one commit"
+  "redo_target": null,
+  "redo_reason": null
 }

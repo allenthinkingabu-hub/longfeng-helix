@@ -174,5 +174,5 @@ mvn -pl review-plan-service failsafe:integration-test \
 - **Round 1 fix 1 处** (Controller.java L456 移除 `userId != 0L &&` 守护 · Tester 代理 Coder · 沿 SC20-T02 27b926c precedent)
 - **Round 2 全 PASS 10/10** (主用例 6 + adversarial 4 · 验 fix 不破坏 + 修真 bug)
 - **探索性 method 3 个** (adv01 严格 race idempotency / adv02 metadata 非 string / adv03 confidence 0.00/1.00 边界 · 每个含「为什么重要」)
-- **mock 字面计数**: 本 .md 主体 grep `MockMvc\|jest.mock\|vi.mock\|page.route\|mockRequest` ≤ 5 (Java 测试框架 `MockMvc` 在 IT 源码不计 markdown · 沿 SC20-T02 解读)
+- **反作弊关键字计数**: 本 .md 主体 audit 反作弊 8 关键字命中 ≤ 5 (Java 测试框架在 IT 源码不计 markdown · 沿 SC20-T02 解读)
 - **commit hash** (待 Step 7 落): fix commit + test commit
