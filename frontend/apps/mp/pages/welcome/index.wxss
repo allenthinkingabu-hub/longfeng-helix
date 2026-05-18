@@ -406,28 +406,13 @@
   border-bottom: 0;
 }
 
-/* SVG 图标 · 一字不改 mockup line 200/209/218 原 SVG (currentColor→white) ·
-   48rpx 置中 · 96rpx 渐变方框 · 50% 比例 = mockup (18px in 36px) 相同 */
+/* 图标 · /images/icons/feat-{camera,clock,bell}.png · Playwright 渲染 mockup HTML
+   产物 · 像素级与 mockup 一致 · 含渐变底, 不再用 background-image stack */
 .feat .ico {
   width: 96rpx;
   height: 96rpx;
   border-radius: 24rpx;
   flex: none;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 48rpx 48rpx;
-}
-
-.feat .ico.ico-a {
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTE0LjUgNGgtNUw3IDdINGEyIDIgMCAwIDAtMiAydjlhMiAyIDAgMCAwIDIgMmgxNmEyIDIgMCAwIDAgMi0yVjlhMiAyIDAgMCAwLTItMmgtM2wtMi41LTN6Ii8+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMyIgcj0iNCIvPjwvc3ZnPgo="), linear-gradient(135deg, #4C9BFF, #5856D6);
-}
-
-.feat .ico.ico-b {
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iOSIvPjxwb2x5bGluZSBwb2ludHM9IjEyIDcgMTIgMTIgMTUgMTQiLz48L3N2Zz4K"), linear-gradient(135deg, #FF9500, #FF3B30);
-}
-
-.feat .ico.ico-c {
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTE4IDhBNiA2IDAgMCAwIDYgOGMwIDctMyA5LTMgOWgxOHMtMy0yLTMtOSIvPjxwYXRoIGQ9Ik0xMy43IDIxYTIgMiAwIDAgMS0zLjQgMCIvPjwvc3ZnPgo="), linear-gradient(135deg, #34C759, #30B0C7);
 }
 
 .feat .feat-text {
