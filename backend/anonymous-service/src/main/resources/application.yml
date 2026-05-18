@@ -87,6 +87,17 @@ anon:
     secret-key: minioadmin
     presign-ttl-seconds: 300
     max-upload-size: 10485760
+  # SC-12-T06 · biz §2B.13 F04 · POST /api/anon/analyze-by-url forwards the
+  # captured image to the real ai-analysis-service over HTTP. Same shared
+  # sandbox instance the registered-user flow uses; ai-analysis-service then
+  # calls Qianwen VL externally. No mock in either dev or test.
+  # Property root MUST be `anon.ai-analysis` (kebab-case under existing anon.*
+  # mapping) — NOT a sibling top-level key, to avoid YAML duplicate-key bug
+  # surfaced in T04 (separate `anon:` blocks silently dropped earlier keys).
+  ai-analysis:
+    base-url: http://localhost:8083
+    connect-timeout-ms: 2000
+    read-timeout-ms: 5000
 
 # SC-13-SHARER · POST /api/share/tokens 用 shareUrl 模板 ${share.public-base-url}/s/${shareToken}.
 # P0 默认指向 vite dev 端口 (与前端 H5 SharedView 路由 /s/:token 对齐).

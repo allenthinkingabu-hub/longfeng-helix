@@ -138,6 +138,44 @@ public class AnonPresignService {
         }
     }
 
+    /**
+     * SC-12-T06 · Mint a pre-signed GET URL for an already-uploaded object
+     * scoped to the {@code guest-tmp} bucket — used to hand the image to
+     * {@code ai-analysis-service} (which forwards to Qianwen VL · external
+     * vendor cannot reach MinIO directly).
+     *
+     * <p>Unlike {@link #mintPresignedPut}, this does <b>not</b> bootstrap the
+     * bucket: the GET URL only makes sense for an object that was already
+     * written through a prior PUT URL (T04 → T05 flow). Skipping
+     * {@code ensureBucket} avoids a redundant network round-trip on every
+     * analyze call.
+     *
+     * <p>TTL is caller-supplied (in seconds). The analyze flow uses 600 (10
+     * minutes) — long enough for Qianwen to fetch the image but short enough
+     * that a leaked URL expires before a meaningful replay window opens.
+     *
+     * @param objectKey   MinIO object key (e.g. {@code guest-tmp/123/abc.jpg};
+     *                    must already exist in the bucket)
+     * @param ttlSeconds  URL TTL in seconds (≤ 7 days · MinIO ceiling)
+     * @return GET URL string suitable for an HTTP client to fetch the object
+     * @throws RuntimeException if MinIO presign signing fails (wrapped IOException etc.)
+     */
+    public String mintPresignedGet(String objectKey, long ttlSeconds) {
+        try {
+            return client.getPresignedObjectUrl(
+                    GetPresignedObjectUrlArgs.builder()
+                            .method(Method.GET)
+                            .bucket(props.getBucket())
+                            .object(objectKey)
+                            .expiry((int) ttlSeconds, TimeUnit.SECONDS)
+                            .build());
+        } catch (Exception e) {
+            LOG.warn("anon_presign_get_failed object_key={} bucket={} err={}",
+                    objectKey, props.getBucket(), e.toString());
+            throw new RuntimeException("MinIO presigned GET failed for " + objectKey, e);
+        }
+    }
+
     /** Wire-friendly result record; controller maps to JSON response. */
     public record PresignResult(String uploadUrl, String fileKey, long ttlSeconds, String bucket) {}
 
