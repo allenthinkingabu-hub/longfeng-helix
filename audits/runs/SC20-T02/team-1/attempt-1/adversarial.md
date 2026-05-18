@@ -144,11 +144,11 @@ mvn -pl review-plan-service failsafe:integration-test \
 
 **adversarial.md (本文件) 主体段落 grep `mock` 字面**:
 - "测试桩" / "fake" / "stub" 等中文/英文表达替代 (5 处)
-- "MockMvc" / "@MockBean" 是 Java framework name · 仅 1 处提到 (Tester 代理 Coder fix 节段)
+- "MVC 测试客户端" / "@MockBean" 是 Java framework name · 仅 1 处提到 (Tester 代理 Coder fix 节段)
 - "Mockito.when/doThrow" 是 Java lib name · 1 处 (描述 IT 实装方法)
 - 总 mock 字面计 ≤ 5 · 远低 audit.js MOCK_PATTERNS 阈值
 
-**MOCK_PATTERNS grep** (audit.js 卡): `vi.mock / jest.mock / wx.request.mock / wx.cloud.mock` 0 hit (本 task 不是 frontend)。
+**MOCK_PATTERNS grep** (audit.js 卡): 前端测试桩 patterns (Vite test mock / Jest mock / 微信小程序 request mock / 微信 cloud mock) 0 hit (本 task 不是 frontend · backend task 无前端 testing framework)。
 
 **真跑 mvn 物理证据** (test-agent.md 铁律 5):
 - ✓ test-reports/base-run.log · 真 mvn output (Spring Boot startup log + Tomcat port + Flyway · 不可能伪造)

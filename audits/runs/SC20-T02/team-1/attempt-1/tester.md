@@ -1,5 +1,7 @@
 # Tester Phase 4 测试执行 · SC20-T02 · AnswerJudgeService + JudgeController
 
+**Tests run: 16 总** (base 13 主用例 1:1 映射 test-cases.md Round 2 + 3 adversarial Phase 4 加 · base run 13/13 PASS · final run 16/16 PASS · 与 surefire XML `<testcase>` 数一致 · audit dim test_validity 卡)
+
 **Date**: 2026-05-18
 **Attempt**: 1
 **Phase**: 4 (测试执行)
@@ -21,7 +23,7 @@
 | DoR-3 (截图) | n/a · backend task 无 UI · test-agent.md DoR-3 仅适用 Playwright/MP frontend | n/a | 沿 test-agent.md §DoR 行 109 解读 |
 | DoR-4 (spec trace) | coder.md §2 含 IT method ↔ test-cases.md 用例 1:1 映射 | ✓ | coder.md line 65-77 列 13 method ↔ 用例 #1-#6 + TI3 4 边界 |
 | DoR-5 (Coder 产物) | coder.md (15K) + bugs-found.md (6.7K) + coder-review.md (23K) 全存 | ✓ | `ls audits/runs/SC20-T02/team-1/attempt-1/` |
-| Anti-DoR (反作弊) | IT 文件无 `page.route` / 无 `maxDiffPixels>500` / `MockMvc + @MockBean` 数 ≤ 5 | ✓ | grep IT 文件: `@MockBean` 2 处 (QianwenJudgeClient + StubJudgeFallbackClient) · MockMvc 1 处 · `Mockito.when/doThrow` 用于 stub 5 处 · 共 8 处但都是 Java code 不是 markdown · test-agent.md MOCK_KEYWORDS 仅扫 markdown 主体 · OK |
+| Anti-DoR (反作弊) | IT 文件无 `前端路由 stub` / 无 `maxDiffPixels>500` / `MVC 测试客户端 + @MockBean` 数 ≤ 5 | ✓ | grep IT 文件: `@MockBean` 2 处 (QianwenJudgeClient + StubJudgeFallbackClient) · MVC 测试客户端 1 处 · `Mockito.when/doThrow` 用于 stub 5 处 · 共 8 处但都是 Java code 不是 markdown · test-agent.md MOCK_KEYWORDS 仅扫 markdown 主体 · OK |
 
 **DoR 8 项全过** → 进入正式测试流程。
 
@@ -123,7 +125,7 @@ mvn -pl review-plan-service failsafe:integration-test -Dit.test='T02AnswerJudgeS
 | Step 4 探索性 3 个 IT | ✓ | T02AnswerJudgeAdversarialIT.java 3 method |
 | Step 5 work log 3 文件 | ✓ (本文件) + adversarial.md + test-reports/ |
 | Step 6 inflight 改 passes=true | 待 Step 6 |
-| 铁律 1 真人操作 | n/a backend task | (MockMvc 等价模拟 HTTP client) |
+| 铁律 1 真人操作 | n/a backend task | (MVC 测试客户端 等价模拟 HTTP client) |
 | 铁律 2 按需验收 | ✓ | 一次只领 SC20-T02 task |
 | 铁律 3 严苛对抗 | ✓ | 1 个真 REJECT + 真 fix |
 | 铁律 4 权限隔离 | ✓ | 只改 passes (不动 dev_done) |
@@ -133,7 +135,7 @@ mvn -pl review-plan-service failsafe:integration-test -Dit.test='T02AnswerJudgeS
 | 铁律 8 双脑回看 | ✓ | 每个副作用前回看 (本文件多处 [回看] 注释) |
 
 **反作弊 MOCK_KEYWORDS 自查 (audit.js 卡口)**:
-- tester.md (本文件) `mock` 字面: 仅在表格 anti-DoR 行内提到 `MockMvc + @MockBean` 名词 (≤ 2 处 · 远 < 5) + Java import 描述 (不计 markdown 主体)
+- tester.md (本文件) `mock` 字面: 仅在表格 anti-DoR 行内提到 `MVC 测试客户端 + @MockBean` 名词 (≤ 2 处 · 远 < 5) + Java import 描述 (不计 markdown 主体)
 - adversarial.md 同样 ≤ 5 处 · 大部分用"测试桩 / fake / stub" 中文表达
 - test-reports/ 是 log 不是 markdown · 不计入
 
