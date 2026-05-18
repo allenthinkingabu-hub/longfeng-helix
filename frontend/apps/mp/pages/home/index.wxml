@@ -16,14 +16,18 @@
       </view>
       <view class="avatar">A</view>
     </view>
-    <!-- spec §3 <StreakBar> props={days,lastDate} · 不含 mastered · 移除 mockup 设计漂移的"掌握 N 题" chip
-         spec §5 L166: streak=0 时整个 .streakchip 隐藏 (从昨天起往回数 · 今天没复习不破 streak)
-         streak 真值来自 backend WeeklyAggregateService · 经 GET /api/home/today.weekSummary.streak 下发 -->
-    <view class="streak-bar" wx:if="{{streak > 0}}">
-      <view class="flame" data-test-id="streak-bar-fire-icon">
+    <!-- spec §3 <StreakBar> + mastered chip (2026-05-18 用户决策 · 接 wrongbook 真值)
+         streak 真值: backend WeeklyAggregateService · GET /api/home/today.weekSummary.streak
+         mastered 真值: backend HomeAggregatorController 跨服务调 wrongbook-service ·
+                       GET /api/home/today.today.masteredTotal (mastery=2 OR status=ARCHIVED)
+         spec §5 L166: streak=0 时 chip 隐藏 · mastered=0 同样隐藏 (无累计掌握不展示假数据) -->
+    <view class="streak-bar" wx:if="{{streak > 0 || mastered > 0}}">
+      <view class="flame" data-test-id="streak-bar-fire-icon" wx:if="{{streak > 0}}">
         <text class="flame-icon">🔥</text>
         <text data-test-id="streak-bar-days-number">连续 {{streak}} 天</text>
       </view>
+      <view class="dot" wx:if="{{streak > 0 && mastered > 0}}"></view>
+      <text wx:if="{{mastered > 0}}">掌握 <text class="mastered-num">{{mastered}}</text> 题</text>
     </view>
   </view>
 

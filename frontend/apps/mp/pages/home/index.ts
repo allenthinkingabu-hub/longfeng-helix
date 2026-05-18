@@ -62,8 +62,11 @@ Page({
     greeting: buildGreeting(),
     studentName: '小 A',
     // streak 初始 0 · 真值由 _fetchWeekSummary 从 backend weekSummary.streak 覆盖
-    // mastered chip 已按 spec §3 移除 (mockup 设计漂移 · spec <StreakBar> props 不含)
+    // mastered 初始 0 · 真值由 _fetchWeekSummary 从 backend today.masteredTotal 覆盖
+    // 数据来源: GET /api/home/today · today.masteredTotal (HomeAggregatorController 跨服务调 wrongbook-service
+    // /internal/students/{id}/mastered-count · mastery=2 OR status=ARCHIVED · 失败降级 0)
     streak: 0,
+    mastered: 0,
 
     // review hero
     todayTotal: 0,
@@ -227,6 +230,8 @@ Page({
     try {
       const data = await getHomeTodayAggregate(MVP_STUDENT_ID);
       const ws = data.weekSummary || null;
+      // hero "掌握 N 题" 来源: today.masteredTotal · 与 weekSummary 同一聚合 endpoint 投影 · BE 失败降级 0
+      const masteredTotal = data.today?.masteredTotal ?? 0;
       if (ws) {
         const sparklineUri = buildSparklineSvgFromWeekSummary(ws.sparkline);
         this.setData({
@@ -237,7 +242,12 @@ Page({
           weekSummaryNewCount: ws.newCount,
           // hero streak chip · 与 bento weekSummaryStreak 同源 · spec §5 L166 整数 ≥ 0 (0 时 wxml wx:if 隐藏)
           streak: ws.streak,
+          // hero "掌握 N 题" chip · today.masteredTotal · 0 时 wxml wx:if 隐藏
+          mastered: masteredTotal,
         });
+      } else {
+        // weekSummary 缺失但 today 可能仍有 masteredTotal (BE 部分降级)
+        this.setData({ mastered: masteredTotal });
       }
     } catch {
       // 静默降级 · 让 P-HOME 其他 sections 继续渲染 · weekSummary 显 "—%"
@@ -248,6 +258,8 @@ Page({
         weekSummaryNewCount: 0,
         // hero streak 失败时清零 · wx:if 自动隐藏 chip (不展示假 "连续 0 天")
         streak: 0,
+        // hero "掌握 N 题" 失败时清零 · wx:if 自动隐藏 chip
+        mastered: 0,
       });
     }
   },

@@ -47,6 +47,13 @@ export interface HomeTodayData {
   tz: string;
   /** BE 当前不返 · 见 FE 兼容: 缺失时 ?? 0 兜底 + 由 items.completedAt 派生 */
   done?: number;
+  /**
+   * P-HOME hero "掌握 N 题" chip · 累计已掌握题数.
+   * 来源: backend HomeAggregatorController 跨服务调 wrongbook-service /internal/students/{id}/mastered-count
+   * (mastery=2 OR status=ARCHIVED, deleted_at IS NULL).
+   * 缺失/降级时 ?? 0 兜底 (BE wrongbook 不可用时降级返 0).
+   */
+  masteredTotal?: number;
 }
 
 /**
@@ -83,6 +90,12 @@ export interface HomeTodayCard {
   done: number;
   /** 0..1 · 前端乘 100 取整 */
   circleProgress: number;
+  /**
+   * P-HOME hero "掌握 N 题" chip · 累计已掌握题数 (mastery=2 OR ARCHIVED).
+   * 来源: HomeAggregatorController 跨服务调 wrongbook-service · 失败降级 0.
+   * 缺失时 ?? 0 兜底.
+   */
+  masteredTotal?: number;
 }
 
 export interface HomeTodayAggregate {
