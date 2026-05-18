@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * SC-12 · biz §4.10 · {@code guest_session} JPA entity.
@@ -57,15 +59,27 @@ public class GuestSession {
     private String imageTmpUrl;
 
     /**
-     * JSONB at DDL level. T01 never reads or writes it, so we mark
-     * {@code insertable=false, updatable=false} — that lets Hibernate skip the
-     * column on INSERT (otherwise it would bind a {@code character varying}
-     * parameter into a {@code jsonb} slot and PG would 500 with SQLState 42804).
-     * T04 will replace this stub with a proper {@code @JdbcTypeCode(SqlTypes.JSON)}
-     * mapping when it actually needs to persist analysis results.
+     * JSONB at DDL level · biz §4.10.
+     *
+     * <p>T07 (2026-05-18) closes the T01 punt: now that {@link
+     * com.longfeng.anonymousservice.service.AnonResultService} polls
+     * ai-analysis-service and on a {@code DONE} verdict needs to persist the
+     * full result payload into this column, the {@code insertable=false,
+     * updatable=false} guard is removed and the {@code @JdbcTypeCode(SqlTypes.JSON)}
+     * mapping that {@code AnalysisResult.steps} already uses is applied here
+     * too. That pair tells Hibernate to bind the {@link String} via the JSONB
+     * setter rather than as {@code character varying}, sidestepping the
+     * SQLState 42804 ({@code column "analysis_result_json" is of type jsonb
+     * but expression is of type character varying}) that T01 was working
+     * around.
+     *
+     * <p>Type stays {@link String} — keeping the parse boundary at the
+     * service layer means T08 (anonymous-claim) can pick the persisted JSON
+     * apart at its leisure without forcing every reader to materialize a
+     * {@code Map<String,Object>}.
      */
-    @Column(name = "analysis_result_json", columnDefinition = "jsonb",
-            insertable = false, updatable = false)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "analysis_result_json", columnDefinition = "jsonb")
     private String analysisResultJson;
 
     @Column(name = "consent_at")
