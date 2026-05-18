@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.longfeng.anonymousservice.entity.GuestSession;
 import com.longfeng.anonymousservice.repo.GuestSessionRepository;
+import com.longfeng.anonymousservice.service.AnonQuotaService;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import java.io.ByteArrayInputStream;
@@ -16,9 +17,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -100,6 +104,9 @@ class SC12T07AnonResultE2EIT extends IntegrationTestBase {
     @Autowired ObjectMapper objectMapper;
     @Autowired @Qualifier("anonMinioClient") MinioClient minio;
     @Autowired GuestSessionRepository sessionRepo;
+    // SC-12-T09 (2026-05-18) added Redis quota keys; scrub between runs so
+    // repeated executions don't trip the 1/device cap.
+    @Autowired StringRedisTemplate redis;
 
     private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(5))
@@ -146,6 +153,15 @@ class SC12T07AnonResultE2EIT extends IntegrationTestBase {
         // Also clean upstream analysis_task rows for our task ids so the
         // race-window assertions (case 4) are deterministic.
         jdbc.update("DELETE FROM analysis_task WHERE task_id LIKE 'anon-%'");
+        // T09 · scrub quota keys this suite seeds (fpT07-* device + 127.0.0.1 IP).
+        LocalDate today = LocalDate.now(AnonQuotaService.TZ);
+        Set<String> deviceKeys = redis.keys(
+                AnonQuotaService.KEY_DEVICE_PREFIX + "fpT07-*:" + today);
+        if (deviceKeys != null && !deviceKeys.isEmpty()) {
+            redis.delete(deviceKeys);
+        }
+        redis.delete(AnonQuotaService.KEY_IP_PREFIX
+                + AnonQuotaService.hashIp("127.0.0.1") + ":" + today);
     }
 
     // ──────────────────────────────────────────────────────────────────────
