@@ -37,5 +37,17 @@ public abstract class IntegrationTestBase {
         r.add("spring.flyway.ignore-migration-patterns", () -> "*:missing");
         r.add("spring.data.redis.host", () -> "127.0.0.1");
         r.add("spring.data.redis.port", () -> "16379");
+        // SC-12-T06 fix · Spring's TestContext cache keeps ~11 distinct
+        // ApplicationContexts alive across this module's IT suite (each unique
+        // @DynamicPropertySource set is a fresh context). With HikariCP's
+        // default pool of 10 connections per context, the team-1-pg sandbox
+        // (max_connections=100) refused new clients during `mvn verify`
+        // once T06 added two more contexts (E2EIT + DownE2EIT).
+        // Pinning maximum-pool-size to 4 caps total IT-suite PG consumption
+        // at ~44 connections — comfortably under the sandbox limit and well
+        // above what any single IT class needs (each IT issues ~3-5 in-flight
+        // HTTP→JPA roundtrips concurrently). Identical fix file-service uses.
+        r.add("spring.datasource.hikari.maximum-pool-size", () -> "4");
+        r.add("spring.datasource.hikari.minimum-idle", () -> "1");
     }
 }
