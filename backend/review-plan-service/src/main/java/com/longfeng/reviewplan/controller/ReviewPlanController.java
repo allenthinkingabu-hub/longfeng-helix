@@ -452,8 +452,11 @@ public class ReviewPlanController {
 
         // CHECK 2: 跨用户访问 (Round 2 #6 子断言 #c · A.1 学生主体性 · 403 NODE_NOT_OWNED)
         //   - X-User-Id default 0 (header 缺失) · 与真实 plan.studentId != 时拒
-        //   - userId == 0 通常意味着无 header · 但本现役风格 default 0 · 故只比对 != studentId
-        if (userId != null && userId != 0L && plan.getStudentId() != null
+        //   - **Tester Round 1 REJECT fix · 2026-05-18** (audits/.../adversarial.md adv00):
+        //     之前实装 `userId != 0L && ...` 短路导致 header 缺失时跳过 CHECK · 任何客户端可 grade 任何 node
+        //     (A.1 学生主体性宪法严重违反)。修复: 移除 `userId != 0L` 守护 · 仅 plan.studentId != userId 时拒。
+        //     header 缺失 userId=0 与 plan.studentId (任何合法 student) 必然不等 → 拒 403 NODE_NOT_OWNED.
+        if (userId != null && plan.getStudentId() != null
                 && !userId.equals(plan.getStudentId())) {
             throw new GradeExceptions.NodeNotOwned(
                 "NODE_NOT_OWNED: plan.studentId=" + plan.getStudentId() + " != userId=" + userId);
