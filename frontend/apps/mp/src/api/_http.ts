@@ -1,6 +1,6 @@
 // MP HTTP client - dual runtime adapter
 // wx runtime: wx.request | Node test runtime (vitest): global fetch
-// Port map: file=8084 wb=8082 ai=8083 review=8085 s3=9000
+// Port map: file=8084 wb=8082 ai=8083 review=8085 anon=8090 auth=8091 s3=9000
 
 declare const wx: any;
 declare const process: { env: Record<string, string | undefined> };
@@ -19,9 +19,11 @@ const PORT_MAP: Record<string, number> = {
   wb: 8082,
   ai: 8083,
   review: 8085,
+  anon: 8090,
+  auth: 8091,
 };
 
-export function apiBase(prefix: 'file' | 'wb' | 'ai' | 'review'): string {
+export function apiBase(prefix: 'file' | 'wb' | 'ai' | 'review' | 'anon' | 'auth'): string {
   return `${BACKEND_HOST}:${PORT_MAP[prefix]}`;
 }
 

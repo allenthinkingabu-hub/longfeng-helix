@@ -9,7 +9,11 @@
     "pages/review-exec/index",
     "pages/review-done/index",
     "pages/me/index",
-    "pages/me/weekly/index"
+    "pages/me/weekly/index",
+    "pages/login/index",
+    "pages/welcome/index",
+    "pages/guest/capture/index",
+    "pages/shared/index"
   ],
   "window": {
     "navigationStyle": "custom",
