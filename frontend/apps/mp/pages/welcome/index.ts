@@ -19,28 +19,13 @@
 //   (d) 双 CTA 跳: 主 → /pages/guest/capture/index (team C); 次 → /pages/login/index (team A)
 //       两 placeholder 已存在 (Phase 0 0857c9e), 不会 404
 
-interface LandingSampleVM {
-  subject: string;
-  stemText: string;
-  knowledgePoints: string[];
-  errorReason: string;
-  correction: string;
-}
-
-interface KpiVM {
-  cumulativeQuestions: number;
-  dailyAnalyses: number;
-  happyUsers: number;
-}
-
-type LandingPhase =
-  | 'LOADING'
-  | 'READY'
-  | 'DEGRADED-samples'
-  | 'DEGRADED-kpi'
-  | 'DEGRADED-both';
-
-import { getSamples, getKpi, type LandingSample, type KpiResponse } from '../../src/api/landing';
+import { getSamples, getKpi } from '../../src/api/landing';
+import {
+  deriveLandingState,
+  type LandingPhase,
+  type LandingSampleVM,
+  type KpiVM,
+} from './helpers';
 
 declare const wx: any;
 
@@ -64,10 +49,10 @@ Page({
   },
 
   /**
-   * 状态机映射 (spec §6) · 并行 fetch 部分降级
+   * 状态机映射 (spec §6) · 并行 fetch 部分降级 · pure derive 委托 helpers.ts
    *
    * NOTE: 不用 Promise.allSettled · 项目 tsconfig lib=ES2017 不含 PromiseSettledResult
-   *       (与 pages/home/index.ts 同决策 · L138 注释)
+   *       (与 pages/home/index.ts L138 同决策)
    *       → .catch(() => undefined) 等价语义 · undefined = rejected
    */
   async _bootstrap(): Promise<void> {
@@ -75,55 +60,8 @@ Page({
       getSamples('default').catch(() => undefined),
       getKpi().catch(() => undefined),
     ]);
-    const samplesOk = samplesVal !== undefined;
-    const kpiOk = kpiVal !== undefined;
-
-    let phase: LandingPhase;
-    if (samplesOk && kpiOk) phase = 'READY';
-    else if (!samplesOk && !kpiOk) phase = 'DEGRADED-both';
-    else if (!samplesOk) phase = 'DEGRADED-samples';
-    else phase = 'DEGRADED-kpi';
-
-    const samples: LandingSampleVM[] = samplesOk
-      ? (samplesVal as LandingSample[]).map((s) => ({
-          subject: s.subject,
-          stemText: s.stemText,
-          knowledgePoints: s.knowledgePoints || [],
-          errorReason: s.errorReason,
-          correction: s.correction,
-        }))
-      : [];
-    const kpi: KpiVM | null = kpiOk ? (kpiVal as KpiResponse) : null;
-
-    const showSamples = samplesOk;
-    const showKpi = kpiOk;
-    const showDegradedBanner = !samplesOk || !kpiOk;
-    let degradedMsg = '';
-    if (phase === 'DEGRADED-samples') {
-      degradedMsg = '样例加载失败 · 直接试试看 →';
-    } else if (phase === 'DEGRADED-kpi') {
-      degradedMsg = '统计数据暂时无法加载 · 不影响您体验 AI 错题分析';
-    } else if (phase === 'DEGRADED-both') {
-      degradedMsg = '网络不稳 · CTA 仍可点击进入';
-    }
-
-    // KPI 千分化 (避免 wxml filter)
-    const kpiQuestionsM = kpi ? (kpi.cumulativeQuestions / 1_000_000).toFixed(1) : '0.0';
-    const kpiDailyK = kpi ? Math.round(kpi.dailyAnalyses / 1000).toString() : '0';
-    const kpiUsersK = kpi ? Math.round(kpi.happyUsers / 1000).toString() : '0';
-
-    this.setData({
-      phase,
-      samples,
-      kpi,
-      showSamples,
-      showKpi,
-      showDegradedBanner,
-      degradedMsg,
-      kpiQuestionsM,
-      kpiDailyK,
-      kpiUsersK,
-    });
+    const derived = deriveLandingState(samplesVal, kpiVal);
+    this.setData(derived);
   },
 
   /** 主 CTA "试试看" → P-GUEST-CAPTURE (team C scope) */
