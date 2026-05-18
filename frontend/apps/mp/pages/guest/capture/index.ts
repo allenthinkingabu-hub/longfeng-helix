@@ -79,6 +79,8 @@ Page({
     anonToken: '',
     anonSessionId: 0,
     anonQid: 0,
+    statusBarHeight: 44,
+    cameraPosition: 'back' as 'back' | 'front',
     subjects: [
       { value: 'math', label: '数学' },
       { value: 'physics', label: '物理' },
@@ -103,6 +105,8 @@ Page({
       const sys = wx.getSystemInfoSync();
       const fpSource = `${sys.brand || ''}|${sys.model || ''}|${sys.system || ''}|${sys.SDKVersion || ''}`;
       const deviceFp = 'fp-' + djb2(fpSource);
+      const sb = typeof sys.statusBarHeight === 'number' ? sys.statusBarHeight : 44;
+      this.setData({ statusBarHeight: sb });
 
       const minted = await mint({ deviceFp, entrySource: 'mp-guest-capture' });
       this.setData({
@@ -395,5 +399,53 @@ Page({
     wx.navigateTo({
       url: `/pages/login/index?anonToken=${encodeURIComponent(anonToken)}&returnTo=/pages/home/index`,
     });
+  },
+
+  /** 返回 · top-left back · 优先 navigateBack, 没栈就跳 welcome */
+  onBackTap() {
+    const pages = getCurrentPages();
+    if (pages.length > 1) {
+      wx.navigateBack();
+    } else {
+      wx.reLaunch({ url: '/pages/welcome/index' });
+    }
+  },
+
+  /** 3 源 tab (相册/相机/文件) · 必须先勾同意 */
+  onSourcePick(e: WechatMiniprogram.TouchEvent) {
+    if (!this.data.consent.checked) {
+      wx.showToast({ title: '请先勾选同意条款', icon: 'none' });
+      return;
+    }
+    const source = e.currentTarget.dataset.source as 'album' | 'camera' | 'file';
+    if (source === 'album') {
+      wx.chooseImage({
+        count: 1,
+        sourceType: ['album'],
+        success: (res) => {
+          const path = res.tempFilePaths && res.tempFilePaths[0];
+          if (path) this.uploadFlow(path);
+        },
+      });
+    } else if (source === 'camera') {
+      this.setData({ phase: 'CAMERA_ACTIVE', shutterLabel: shutterLabelFor('CAMERA_ACTIVE') });
+    } else {
+      wx.showToast({ title: '文件导入即将开放', icon: 'none' });
+    }
+  },
+
+  /** Settings (左侧齿轮) · P1 placeholder */
+  onSettingsTap() {
+    wx.showToast({ title: '设置即将开放', icon: 'none' });
+  },
+
+  /** Flip camera · 仅 CAMERA_ACTIVE 态生效 */
+  onFlipCameraTap() {
+    if (this.data.phase !== 'CAMERA_ACTIVE') {
+      wx.showToast({ title: '请先解锁相机', icon: 'none' });
+      return;
+    }
+    const next = this.data.cameraPosition === 'back' ? 'front' : 'back';
+    this.setData({ cameraPosition: next });
   },
 });
