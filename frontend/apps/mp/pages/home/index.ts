@@ -22,6 +22,8 @@ import {
   derivePageState,
   buildSparklineSvgFromWeekSummary,
   formatMasteryPctFromWeekSummary,
+  buildWeekDayLabels,
+  computeIsoTodayIdx,
 } from './helpers';
 import type { PageState, SubjectChip } from './helpers';
 // 跨页共享 "今日 grade" 判定 · P07 + P-HOME 同一 source · 防漂移
@@ -39,23 +41,9 @@ const MVP_STUDENT_ID = '1';
 // 现全部由 BE /api/home/{weekly-stats, week-dots, messages/recent} 派生真值.
 // SC-16-T02 weekSummary 4 字段更走 /api/home/today.weekSummary 投影.
 
-// (B3) Sparkline SVG · trace 01_home.html L280-290
-// MP <view> 不能直接放 <svg> 标签 · 改成 data URI 给 <image> 用
-// path / circle 数值与 mockup 完全一致 (300×40 viewBox · 7 段折线)
-const SPARKLINE_SVG = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 40" preserveAspectRatio="none">
-  <defs>
-    <linearGradient id="sparkg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#34C759" stop-opacity=".35"/>
-      <stop offset="100%" stop-color="#34C759" stop-opacity="0"/>
-    </linearGradient>
-  </defs>
-  <path d="M0 28 L43 22 L86 24 L129 16 L172 12 L215 18 L258 8 L300 14 L300 40 L0 40 Z" fill="url(#sparkg)"/>
-  <path d="M0 28 L43 22 L86 24 L129 16 L172 12 L215 18 L258 8 L300 14" stroke="#34C759" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="258" cy="8" r="3.5" fill="#34C759" stroke="#fff" stroke-width="1.5"/>
-</svg>`;
-// 用 encodeURIComponent 比 base64 更轻量, MP <image src="data:image/svg+xml;utf8,..."> OK
-const SPARKLINE_SVG_URI = `data:image/svg+xml;utf8,${encodeURIComponent(SPARKLINE_SVG)}`;
+// (B3) Sparkline SVG mockup 常量已删 (2026-05-18 用户决策 B 严格真值) ·
+// 改用 SC-16-T02 weekSummarySparklineUri (真值 /today.weekSummary.sparkline) ·
+// 空周不渲染 · 防 mockup 假曲线穿透 (与 P03/P04 治理同根)
 
 const QUICK_ENTRIES = [
   { title: '错题本', subtitle: '128 题 · 未掌握 42', icon: 'description', theme: 'red', url: '/pages/wrongbook-list/index' },
@@ -97,11 +85,16 @@ Page({
     weekSummaryNewCount: 0,
     // weekly · BE /api/home/weekly-stats 真值 · init 0 · 加载后填充 (与 weekSummary 共存)
     weekStats: { mastered: 0, newItems: 0, forgotten: 0, masteryRate: 0 } as WeeklyStatsResp,
-    sparklineSvgUri: SPARKLINE_SVG_URI,
+    // sparklineSvgUri mockup 占位已删 (B 方案 · 严格真值)
 
     // week schedule · 动态 (B4 + B5) · dots 由 BE /api/home/week-dots 注入
     weekLabel: buildCurrentWeekStrip(new Date()).label,
     weekDays: buildCurrentWeekStrip(new Date()).days,
+
+    // 2026-05-18 sparkline 下方 day bar 标签 · 7 桶周一→周日 · "今天"贴 ISO 今天
+    // index (周一=0..周日=6). 之前写死 [周一..周六,今天] 假设今天=周日 → 错位.
+    weekDayLabels: buildWeekDayLabels(new Date()),
+    todayIdx: computeIsoTodayIdx(new Date()),
 
     // messages · BE /api/home/messages/recent 派生 ≤3 · init 空
     messages: [] as MessageItem[],

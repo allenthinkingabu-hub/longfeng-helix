@@ -72,9 +72,12 @@ public class HomeController {
         }
         int newItems = (int) outcomeRepo.countNewWrongItemsInWeek(userId, win[0], win[1]);
 
-        int totalEvents = mastered + partial + forgotten;
-        int masteryRate = totalEvents == 0 ? 0
-            : (int) Math.round(mastered * 100.0 / totalEvents);
+        // 2026-05-18 用户决策: masteryRate 改 SM-2 ease 折算 · 与 P07 复习页 + sparkline
+        // 三处统一 · 公式 (avg_ease - 1.3) / 1.7 * 100 clamp [0,100].
+        // 空周 (0 outcome) → 0 (诚实显 0% 不假装 mastery).
+        List<Object[]> easeRows = outcomeRepo.aggregateWeeklyAvgEase(userId, win[0], win[1]);
+        Object[] easeAgg = easeRows.isEmpty() ? null : easeRows.get(0);
+        int masteryRate = computeMasteryPctFromAvgEase(easeAgg);
 
         return ApiResult.ok(new WeeklyStatsResp(mastered, newItems, forgotten, masteryRate));
     }
@@ -244,5 +247,19 @@ public class HomeController {
         if (diffHr < 24) return diffHr + " h";
         long diffDay = diffHr / 24L;
         return diffDay + " 天";
+    }
+
+    /**
+     * 2026-05-18 用户决策: P-HOME 4 数字 masteryRate 公式与 P07 复习页 computeMasteryPct 一致 ·
+     * SM-2 ease 折算: (avg_ease - 1.3) / 1.7 * 100 · clamp [0,100].
+     *
+     * @param easeAgg ReviewOutcomeRepository.aggregateWeeklyAvgEase 返回 [avg_ease, cnt]
+     * @return 0..100 整数百分比 · 空周 / 无 ease 数据 → 0
+     */
+    private static int computeMasteryPctFromAvgEase(Object[] easeAgg) {
+        if (easeAgg == null || easeAgg.length < 2 || easeAgg[0] == null) return 0;
+        java.math.BigDecimal avgEase = (java.math.BigDecimal) easeAgg[0];
+        double pct = Math.max(0, Math.min(100, (avgEase.doubleValue() - 1.3) / 1.7 * 100));
+        return (int) Math.round(pct);
     }
 }

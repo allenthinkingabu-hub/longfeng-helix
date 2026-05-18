@@ -66,11 +66,13 @@ public record WeeklyReviewResp(
       @JsonProperty("reviewedDurationMin") int reviewedDurationMin,
       @JsonProperty("newCount") int newCount) {}
 
-  /** {@code failedTop[i]} · max 5. */
+  /** {@code failedTop[i]} · max 5. thumbnailUrl 2026-05-18 加 ·
+   *  wrong_item.origin_image_key 经 MinIO public endpoint 构完整 URL · 前端 image src 直接消费. */
   public record FailedQ(
       @JsonProperty("questionId") String questionId,
       @JsonProperty("subject") String subject,
-      @JsonProperty("missCount") int missCount) {}
+      @JsonProperty("missCount") int missCount,
+      @JsonProperty("thumbnailUrl") String thumbnailUrl) {}
 
   /** {@code aiInsight.{insightId,text,generatedAt}} · 3 子字段. */
   public record AiInsight(

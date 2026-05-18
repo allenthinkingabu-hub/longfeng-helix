@@ -47,6 +47,8 @@ export interface WeeklyFailedQDto {
   questionId: string;
   subject: string;
   missCount: number;
+  /** 2026-05-18 加 · MinIO public URL · null = wrong_item.origin_image_key 缺失 */
+  thumbnailUrl?: string | null;
 }
 
 export interface WeeklyAiInsightDto {

@@ -177,12 +177,31 @@ describe('buildSubjectRadarSvg · subjects → 完整 svg', () => {
     expect(polygonCount).toBe(5);
   });
 
-  it('空 subjects → svg 仍生成 (只有 grid 不画 data)', () => {
+  it('空 subjects → svg 仍生成 (只 grid · 无 data 形状 · 2026-05-18 调整)', () => {
     const svg = buildSubjectRadarSvg([]);
     expect(svg).toContain('<svg');
-    // 4 层 grid + 1 空 data polygon (points="")
+    // 4 层 grid polygon · 旧版多 1 个空 data polygon · 新版去掉 (无意义)
     const polygonCount = (svg.match(/<polygon/g) || []).length;
-    expect(polygonCount).toBe(5);
+    expect(polygonCount).toBe(4);
+  });
+
+  it('单 subject (math 42%) → 顶部 line + circle (2026-05-18 修 polygon 1 点不可见 bug)', () => {
+    const svg = buildSubjectRadarSvg([
+      { subject: 'math', masteryRate: 0.42, sampleSize: 7 },
+    ]);
+    expect(svg).toContain('<line');
+    expect(svg).toContain('<circle');
+    // 4 层 grid polygon (无 data polygon · 单点用 line+circle)
+    expect((svg.match(/<polygon/g) || []).length).toBe(4);
+  });
+
+  it('双 subject → 两点连线 + 两端 circle', () => {
+    const svg = buildSubjectRadarSvg([
+      { subject: 'math', masteryRate: 0.42, sampleSize: 7 },
+      { subject: 'physics', masteryRate: 0.55, sampleSize: 3 },
+    ]);
+    expect(svg).toContain('<line');
+    expect((svg.match(/<circle/g) || []).length).toBe(2);
   });
 
   it('masteryRate 超界 1.5 → clamp 到 1.0', () => {

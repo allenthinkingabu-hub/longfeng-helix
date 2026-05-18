@@ -48,71 +48,114 @@ public class WeeklyAggregateService {
   private final JdbcTemplate jdbc;
   private final Clock clock;
 
-  // -------- biz §10.14 字段 1 · masteryRate · 单一字面 SELECT (INV-1) --------
-  // 聚合: grade IS NOT NULL 做分母 · grade='MASTERED' 做分子 · 空周分母为 0 服务层判 null.
-  // groupBy day(reviewed_at AT student_tz) → 7 行 daily 数据.
+  // -------- 2026-05-18 用户决策: 全 service 切到 review_outcome + wrong_item --------
+  // 数据源统一: review_outcome (复习页同源) + wrong_item (生产真表) ·
+  // wb_review_record + wb_question (我 SC-16-T01 并行表) 不再用 · 生产实际数据全在前者.
+  //
+  // 字段映射:
+  //   review_outcome.user_id        ← wb_review_record.student_id
+  //   review_outcome.completed_at   ← wb_review_record.reviewed_at
+  //   review_outcome.quality=5      ← grade='MASTERED'
+  //   review_outcome.quality=0      ← grade='FORGOT'
+  //   review_outcome.wrong_item_id  ← wb_review_record.question_id
+  //   wrong_item.subject            ← wb_question.subject_code
+  //   wrong_item.student_id         ← wb_question.owner_id
+  //   wrong_item.kp_id / kp_name    ← 不存在 (spec gap · weakKPs 返空列表)
+
+  // 本周 daily 聚合 (mastered/forgotten 计数 + duration)
+  // duration_sec 在 review_outcome 没有列 · 用 60s 默认估算 (待 schema 补)
   private static final String AGGREGATE_DAILY_GRADED_SQL =
-      "SELECT date_trunc('day', reviewed_at AT TIME ZONE ?) AS day_tz, "
-          + "       COUNT(*) FILTER (WHERE grade IS NOT NULL) AS graded, "
-          + "       COUNT(*) FILTER (WHERE grade = 'MASTERED') AS mastered, "
-          + "       COALESCE(SUM(duration_sec) FILTER (WHERE grade IS NOT NULL), 0) AS duration_sec_sum "
-          + "FROM wb_review_record "
-          + "WHERE student_id = ? AND reviewed_at >= ? AND reviewed_at < ? "
+      "SELECT date_trunc('day', completed_at AT TIME ZONE ?) AS day_tz, "
+          + "       COUNT(*) AS graded, "
+          + "       COUNT(*) FILTER (WHERE quality = 5) AS mastered, "
+          + "       COUNT(*) * 60 AS duration_sec_sum "
+          + "FROM review_outcome "
+          + "WHERE user_id = ? AND completed_at >= ? AND completed_at < ? "
           + "GROUP BY 1";
 
-  // 上周 masteryRate (用于 masteryDelta · 不返回 sparkline)
-  private static final String AGGREGATE_PREV_WEEK_MASTERY_SQL =
-      "SELECT COUNT(*) FILTER (WHERE grade IS NOT NULL) AS graded, "
-          + "       COUNT(*) FILTER (WHERE grade = 'MASTERED') AS mastered "
-          + "FROM wb_review_record "
-          + "WHERE student_id = ? AND reviewed_at >= ? AND reviewed_at < ?";
-
-  // 学科雷达: groupBy subject_code
+  // 学科雷达: groupBy wrong_item.subject · 用 avg ease 折算 (与 masteryRate 算法统一)
   private static final String AGGREGATE_SUBJECT_SQL =
-      "SELECT q.subject_code AS subject, "
-          + "       COUNT(*) FILTER (WHERE r.grade IS NOT NULL) AS graded, "
-          + "       COUNT(*) FILTER (WHERE r.grade = 'MASTERED') AS mastered "
-          + "FROM wb_review_record r "
-          + "JOIN wb_question q ON r.question_id = q.id AND q.deleted_at IS NULL "
-          + "WHERE r.student_id = ? AND r.reviewed_at >= ? AND r.reviewed_at < ? "
-          + "GROUP BY q.subject_code";
+      "SELECT w.subject AS subject, "
+          + "       AVG(r.ease_factor_after) AS avg_ease, "
+          + "       COUNT(*) AS sample_size "
+          + "FROM review_outcome r "
+          + "JOIN wrong_item w ON w.id = r.wrong_item_id AND w.deleted_at IS NULL "
+          + "WHERE r.user_id = ? AND r.completed_at >= ? AND r.completed_at < ? "
+          + "  AND r.ease_factor_after IS NOT NULL AND w.subject IS NOT NULL "
+          + "GROUP BY w.subject";
 
-  // 薄弱 KP: 本周 grade='FORGOT' 按 kp_id 计数 + 历史总错次数 (排序键: 本周 FORGOT count DESC)
-  // INV-4: 按 recentMissCount DESC limit 3 · 不允许按 totalMissCount 排
-  private static final String AGGREGATE_WEAK_KP_SQL =
-      "SELECT q.kp_id, q.kp_name, q.subject_code, "
-          + "       COUNT(*) FILTER (WHERE r.reviewed_at >= ? AND r.reviewed_at < ? "
-          + "                         AND r.grade = 'FORGOT') AS recent_miss, "
-          + "       COUNT(*) FILTER (WHERE r.grade = 'FORGOT') AS total_miss "
-          + "FROM wb_question q "
-          + "LEFT JOIN wb_review_record r ON r.question_id = q.id AND r.student_id = q.owner_id "
-          + "WHERE q.owner_id = ? AND q.deleted_at IS NULL AND q.kp_id IS NOT NULL "
-          + "GROUP BY q.kp_id, q.kp_name, q.subject_code "
-          + "HAVING COUNT(*) FILTER (WHERE r.reviewed_at >= ? AND r.reviewed_at < ? "
-          + "                         AND r.grade = 'FORGOT') > 0";
-
-  // 失败题 top 5: 本周 FORGOT 按 question_id 计数
+  // 失败题 top 5: 本周 quality=0 按 wrong_item_id 计数 · 2026-05-18 加 origin_image_key
+  // 用 MIN(image_key) 因 GROUP BY 不暴露 (同 wrong_item_id 必同 image_key · MIN 仅满足 SQL)
   private static final String AGGREGATE_FAILED_TOP_SQL =
-      "SELECT r.question_id, q.subject_code, COUNT(*) AS miss_count "
-          + "FROM wb_review_record r "
-          + "JOIN wb_question q ON r.question_id = q.id AND q.deleted_at IS NULL "
-          + "WHERE r.student_id = ? AND r.reviewed_at >= ? AND r.reviewed_at < ? "
-          + "  AND r.grade = 'FORGOT' "
-          + "GROUP BY r.question_id, q.subject_code "
+      "SELECT r.wrong_item_id AS question_id, w.subject AS subject_code, "
+          + "       COUNT(*) AS miss_count, MIN(w.origin_image_key) AS image_key "
+          + "FROM review_outcome r "
+          + "JOIN wrong_item w ON w.id = r.wrong_item_id AND w.deleted_at IS NULL "
+          + "WHERE r.user_id = ? AND r.completed_at >= ? AND r.completed_at < ? "
+          + "  AND r.quality = 0 "
+          + "GROUP BY r.wrong_item_id, w.subject "
           + "ORDER BY miss_count DESC LIMIT 5";
 
-  // newCount: 本周新建 wb_question
+  // newCount: 本周新增 wrong_item · 学生归属用 student_id
   private static final String AGGREGATE_NEW_COUNT_SQL =
-      "SELECT COUNT(*) FROM wb_question "
-          + "WHERE owner_id = ? AND created_at >= ? AND created_at < ? AND deleted_at IS NULL";
+      "SELECT COUNT(*) FROM wrong_item "
+          + "WHERE student_id = ? AND created_at >= ? AND created_at < ? AND deleted_at IS NULL";
 
-  // streak yesterday-back: 找 last GRADED 日序列 · 直接查所有 GRADED 日 (limit 60 防失控)
+  // streak yesterday-back: review_outcome.completed_at distinct day (limit 60 防失控)
   private static final String AGGREGATE_GRADED_DAYS_SQL =
-      "SELECT DISTINCT date_trunc('day', reviewed_at AT TIME ZONE ?) AS day_tz "
-          + "FROM wb_review_record "
-          + "WHERE student_id = ? AND grade IS NOT NULL "
-          + "  AND reviewed_at >= ? AND reviewed_at < ? "
+      "SELECT DISTINCT date_trunc('day', completed_at AT TIME ZONE ?) AS day_tz "
+          + "FROM review_outcome "
+          + "WHERE user_id = ? "
+          + "  AND completed_at >= ? AND completed_at < ? "
           + "ORDER BY day_tz DESC";
+
+  // 薄弱 KP top 3 (2026-05-18 用户决策 A · 真 AI 数据): JOIN analysis_result 拿 AI 已生成 KP
+  // - task_id == wrong_item.id (SC01-MP-BUG-AI-FAKE root cause #3 已修 · 闭环)
+  // - knowledge_points 是 JSONB array: [{"name":"韦达定理"}, ...]
+  // - DISTINCT ON wrong_item_id + ORDER BY ar.created_at DESC 取每题最新分析
+  // - 取首个 KP (knowledge_points->0->>'name')
+  // - 本周 quality=0 (FORGOT) 按 KP 分组 · 错次数 DESC limit 3
+  // - INV-4 排序键: recentMissCount DESC (不允许 totalMissCount)
+  private static final String AGGREGATE_WEAK_KP_SQL =
+      "WITH latest_kp AS ( "
+          + "  SELECT DISTINCT ON (CAST(task_id AS BIGINT)) "
+          + "         CAST(task_id AS BIGINT) AS wrong_item_id, "
+          + "         knowledge_points->0->>'name' AS kp_name "
+          + "  FROM analysis_result "
+          + "  WHERE knowledge_points IS NOT NULL "
+          + "    AND jsonb_array_length(knowledge_points) > 0 "
+          + "    AND task_id ~ '^[0-9]+$' "
+          + "  ORDER BY CAST(task_id AS BIGINT), created_at DESC "
+          + ") "
+          + "SELECT lk.kp_name, w.subject, COUNT(*) AS recent_miss "
+          + "FROM review_outcome r "
+          + "JOIN wrong_item w ON w.id = r.wrong_item_id AND w.deleted_at IS NULL "
+          + "JOIN latest_kp lk ON lk.wrong_item_id = w.id "
+          + "WHERE r.user_id = ? "
+          + "  AND r.completed_at >= ? AND r.completed_at < ? "
+          + "  AND r.quality = 0 "
+          + "GROUP BY lk.kp_name, w.subject "
+          + "ORDER BY recent_miss DESC LIMIT 3";
+
+  // -------- 2026-05-18 用户决策: sparkline + masteryRate 改 SM-2 ease 折算 --------
+  // 数据源 review_outcome.ease_factor_after · 与 P07 复习页 + P-HOME weekly-stats 三处统一.
+  // 公式 (avg_ease - 1.3) / 1.7 · clamp [0,1] · 返 0..1 fraction.
+  // 每日 avg 用 groupBy day(completed_at AT student_tz).
+  private static final String AGGREGATE_DAILY_AVG_EASE_SQL =
+      "SELECT date_trunc('day', completed_at AT TIME ZONE ?) AS day_tz, "
+          + "       AVG(ease_factor_after) AS avg_ease, "
+          + "       COUNT(*) AS cnt "
+          + "FROM review_outcome "
+          + "WHERE user_id = ? AND completed_at >= ? AND completed_at < ? "
+          + "  AND ease_factor_after IS NOT NULL "
+          + "GROUP BY 1";
+
+  // 上周整周 avg ease (用于 masteryDelta · 同上算法)
+  private static final String AGGREGATE_PREV_WEEK_AVG_EASE_SQL =
+      "SELECT AVG(ease_factor_after) AS avg_ease, COUNT(*) AS cnt "
+          + "FROM review_outcome "
+          + "WHERE user_id = ? AND completed_at >= ? AND completed_at < ? "
+          + "  AND ease_factor_after IS NOT NULL";
 
   @Autowired
   public WeeklyAggregateService(DataSource dataSource, Clock clock) {
@@ -137,7 +180,9 @@ public class WeeklyAggregateService {
     LocalDate mondayDate = weekStart.atZone(tz).toLocalDate();
     LocalDate sundayDate = mondayDate.plusDays(6);
 
-    // ---- 字段 1+2 · 本周 daily 聚合 (含 sparkline + masteryRate + duration_sec sum) ----
+    // ---- 字段 1+2 · 本周 daily 聚合 ----
+    // grade-based SQL: 提供 mastered/forgotten 计数 + duration_sec_sum + streak 用.
+    // sparkline/masteryRate (2026-05-18 用户决策) 切到 ease-based SQL · 与 P07 一致.
     String tzId = tz.getId();
     List<DailyAggRow> dailyRows = jdbc.query(
         AGGREGATE_DAILY_GRADED_SQL,
@@ -148,46 +193,64 @@ public class WeeklyAggregateService {
             rs.getLong("duration_sec_sum")),
         tzId, studentId, Timestamp.from(weekStart), Timestamp.from(weekEnd));
 
-    // 7 天 sparkline · index 0 = 周一 · 6 = 周日 · 空日 null (不 forward-fill · biz §10.14 字段 2)
-    Double[] sparkline = new Double[7];
-    long totalGraded = 0L;
-    long totalMastered = 0L;
     long totalDurationSec = 0L;
-    Map<LocalDate, DailyAggRow> dailyMap = new HashMap<>();
+    long totalGraded = 0L; // reviewedCount 用 · 不参与 masteryRate 计算 (已切 ease)
     for (DailyAggRow row : dailyRows) {
-      LocalDate dayLocal = row.dayTzTs.toInstant().atZone(tz).toLocalDate();
-      dailyMap.put(dayLocal, row);
-      totalGraded += row.graded;
-      totalMastered += row.mastered;
       totalDurationSec += row.durationSecSum;
+      totalGraded += row.graded;
+    }
+
+    // ---- sparkline + masteryRate · SM-2 ease 折算 (2026-05-18 用户决策) ----
+    // 每日 avg(ease_factor_after) → 映射 [1.3,3.0]→[0,1] · 空日 null (不 forward-fill).
+    List<DailyEaseRow> easeRows = jdbc.query(
+        AGGREGATE_DAILY_AVG_EASE_SQL,
+        (rs, n) -> new DailyEaseRow(
+            rs.getTimestamp("day_tz"),
+            rs.getBigDecimal("avg_ease"),
+            rs.getLong("cnt")),
+        tzId, studentId, Timestamp.from(weekStart), Timestamp.from(weekEnd));
+
+    Double[] sparkline = new Double[7];
+    Map<LocalDate, DailyEaseRow> easeMap = new HashMap<>();
+    double totalEaseSum = 0.0;
+    long totalEaseCnt = 0L;
+    for (DailyEaseRow row : easeRows) {
+      LocalDate dayLocal = row.dayTzTs.toInstant().atZone(tz).toLocalDate();
+      easeMap.put(dayLocal, row);
+      if (row.avgEase != null && row.cnt > 0) {
+        totalEaseSum += row.avgEase.doubleValue() * row.cnt;
+        totalEaseCnt += row.cnt;
+      }
     }
     for (int i = 0; i < 7; i++) {
       LocalDate day = mondayDate.plusDays(i);
-      DailyAggRow row = dailyMap.get(day);
-      if (row == null || row.graded == 0L) {
-        sparkline[i] = null; // 空日 null · biz §10.14 字段 2
+      DailyEaseRow row = easeMap.get(day);
+      if (row == null || row.avgEase == null || row.cnt == 0L) {
+        sparkline[i] = null; // 空日 null
       } else {
-        sparkline[i] = (double) row.mastered / (double) row.graded;
+        sparkline[i] = clampEaseToFraction(row.avgEase.doubleValue());
       }
     }
 
     Double masteryRate;
-    if (totalGraded == 0L) {
-      masteryRate = null; // 空周 null · biz §10.14 字段 1
+    if (totalEaseCnt == 0L) {
+      masteryRate = null; // 空周 null · 诚实显 — % 不假装
     } else {
-      masteryRate = (double) totalMastered / (double) totalGraded;
+      masteryRate = clampEaseToFraction(totalEaseSum / (double) totalEaseCnt);
     }
 
-    // ---- masteryDelta · 上周聚合 ----
+    // ---- masteryDelta · 上周整周 avg ease ----
     Double prevMasteryRate;
-    List<long[]> prevRows = jdbc.query(
-        AGGREGATE_PREV_WEEK_MASTERY_SQL,
-        (rs, n) -> new long[] {rs.getLong("graded"), rs.getLong("mastered")},
+    List<Object[]> prevEaseRows = jdbc.query(
+        AGGREGATE_PREV_WEEK_AVG_EASE_SQL,
+        (rs, n) -> new Object[] {rs.getBigDecimal("avg_ease"), rs.getLong("cnt")},
         studentId, Timestamp.from(prevWeekStart), Timestamp.from(weekStart));
-    if (prevRows.isEmpty() || prevRows.get(0)[0] == 0L) {
+    if (prevEaseRows.isEmpty() || prevEaseRows.get(0)[0] == null
+        || ((Long) prevEaseRows.get(0)[1]) == 0L) {
       prevMasteryRate = null;
     } else {
-      prevMasteryRate = (double) prevRows.get(0)[1] / (double) prevRows.get(0)[0];
+      java.math.BigDecimal prevAvg = (java.math.BigDecimal) prevEaseRows.get(0)[0];
+      prevMasteryRate = clampEaseToFraction(prevAvg.doubleValue());
     }
     Double masteryDelta;
     if (masteryRate == null || prevMasteryRate == null) {
@@ -196,36 +259,42 @@ public class WeeklyAggregateService {
       masteryDelta = masteryRate - prevMasteryRate;
     }
 
-    // ---- 学科雷达 ----
+    // ---- 学科雷达 (2026-05-18 切 review_outcome JOIN wrong_item · ease 折算) ----
     List<SubjectRadarRaw> subjectRadar = jdbc.query(
         AGGREGATE_SUBJECT_SQL,
         (rs, n) -> {
-          long graded = rs.getLong("graded");
-          long mastered = rs.getLong("mastered");
-          Double rate = graded == 0L ? null : (double) mastered / (double) graded;
-          return new SubjectRadarRaw(rs.getString("subject"), rate, (int) graded);
+          java.math.BigDecimal avgEase = rs.getBigDecimal("avg_ease");
+          long sampleSize = rs.getLong("sample_size");
+          Double rate = avgEase == null ? null : clampEaseToFraction(avgEase.doubleValue());
+          return new SubjectRadarRaw(rs.getString("subject"), rate, (int) sampleSize);
         },
         studentId, Timestamp.from(weekStart), Timestamp.from(weekEnd));
 
-    // ---- 薄弱 KP top 3 (INV-4 按 recentMissCount DESC) ----
-    List<WeakKpRaw> weakKpsAll = jdbc.query(
+    // ---- 薄弱 KP top 3 (2026-05-18 用户决策 A · 复用 AI 已生成 KP) ----
+    // analysis_result.knowledge_points JSONB (qwen-vl-max prompt 输出 · 真 AI 提取) ·
+    // task_id == wrong_item.id 闭环 · 不用加 wrong_item.kp_name 列 · 不用 ai-service 回写.
+    // kpId 复用 kp_name (无 dictionary 表 · MVP) · 前端 weakKpTap 用 kp_name 当 query.
+    List<WeakKpRaw> weakKps = jdbc.query(
         AGGREGATE_WEAK_KP_SQL,
-        (rs, n) -> new WeakKpRaw(
-            rs.getString("kp_id"),
-            rs.getString("kp_name"),
-            rs.getString("subject_code"),
-            rs.getInt("recent_miss"),
-            rs.getInt("total_miss")),
-        Timestamp.from(weekStart), Timestamp.from(weekEnd), studentId,
-        Timestamp.from(weekStart), Timestamp.from(weekEnd));
-    weakKpsAll.sort(Comparator.comparingInt((WeakKpRaw w) -> w.recentMissCount).reversed());
-    List<WeakKpRaw> weakKps = weakKpsAll.size() > 3 ? weakKpsAll.subList(0, 3) : weakKpsAll;
+        (rs, n) -> {
+          String kpName = rs.getString("kp_name");
+          return new WeakKpRaw(
+              kpName,             // kpId 复用 kp_name (MVP · 无独立 dict)
+              kpName,             // kpName 字面
+              rs.getString("subject"),
+              rs.getInt("recent_miss"),
+              rs.getInt("recent_miss"));  // totalMissCount 同 recent (MVP · 仅本周维度)
+        },
+        studentId, Timestamp.from(weekStart), Timestamp.from(weekEnd));
 
-    // ---- 失败题 top 5 ----
+    // ---- 失败题 top 5 (2026-05-18 切 review_outcome WHERE quality=0 JOIN wrong_item) ----
     List<FailedQRaw> failedTop = jdbc.query(
         AGGREGATE_FAILED_TOP_SQL,
         (rs, n) -> new FailedQRaw(
-            rs.getString("question_id"), rs.getString("subject_code"), rs.getInt("miss_count")),
+            String.valueOf(rs.getLong("question_id")),
+            rs.getString("subject_code"),
+            rs.getInt("miss_count"),
+            rs.getString("image_key")),
         studentId, Timestamp.from(weekStart), Timestamp.from(weekEnd));
 
     // ---- newCount ----
@@ -341,7 +410,7 @@ public class WeeklyAggregateService {
   public record WeakKpRaw(
       String kpId, String kpName, String subject, int recentMissCount, int totalMissCount) {}
 
-  public record FailedQRaw(String questionId, String subject, int missCount) {}
+  public record FailedQRaw(String questionId, String subject, int missCount, String imageKey) {}
 
   private static final class DailyAggRow {
     final Timestamp dayTzTs;
@@ -355,5 +424,27 @@ public class WeeklyAggregateService {
       this.mastered = mastered;
       this.durationSecSum = durationSecSum;
     }
+  }
+
+  // 2026-05-18 用户决策: sparkline + masteryRate SM-2 ease 折算 raw row
+  private static final class DailyEaseRow {
+    final Timestamp dayTzTs;
+    final java.math.BigDecimal avgEase;
+    final long cnt;
+
+    DailyEaseRow(Timestamp dayTzTs, java.math.BigDecimal avgEase, long cnt) {
+      this.dayTzTs = dayTzTs;
+      this.avgEase = avgEase;
+      this.cnt = cnt;
+    }
+  }
+
+  /**
+   * 2026-05-18 用户决策: SM-2 ease 折算 0..1 fraction · 与 P07 复习页 computeMasteryPct 一致.
+   * 公式: (avg_ease - 1.3) / 1.7 · clamp [0,1].
+   * 1.3 = SM-2 floor → 0% · 2.5 = init → 70.6% · 3.0 = cap → 100%
+   */
+  private static double clampEaseToFraction(double avgEase) {
+    return Math.max(0.0, Math.min(1.0, (avgEase - 1.3) / 1.7));
   }
 }

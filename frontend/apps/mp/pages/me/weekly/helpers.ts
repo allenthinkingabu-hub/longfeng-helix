@@ -148,20 +148,46 @@ export function buildSubjectRadarSvg(
     );
   }
 
-  // 数据多边形
-  const dataPts: string[] = [];
-  for (let i = 0; i < subjects.length; i++) {
-    const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-    const rD = R * Math.max(0, Math.min(1, subjects[i].masteryRate));
+  // 数据可视化 (2026-05-18 fix · 单/双 subject 时 polygon 无形状)
+  // - subjects.length ≥ 3 → 标准 polygon
+  // - subjects.length = 1 → 用 circle 标记该 subject 的 mastery 位置 + center 连线
+  // - subjects.length = 2 → 用 line + 两端 circle
+  // - subjects.length = 0 → 不画 (页面已用 wx:if 守 · 但防御)
+  let dataShape = '';
+  if (subjects.length === 1) {
+    const angle = -Math.PI / 2; // 顶部 (12 点方向)
+    const rD = R * Math.max(0, Math.min(1, subjects[0].masteryRate));
     const x = CX + rD * Math.cos(angle);
     const y = CY + rD * Math.sin(angle);
-    dataPts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+    dataShape =
+        `<line x1="${CX}" y1="${CY}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#007AFF" stroke-width="1.5"/>`
+      + `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="#007AFF"/>`;
+  } else if (subjects.length === 2) {
+    const pts: Array<{x: number; y: number}> = [];
+    for (let i = 0; i < 2; i++) {
+      const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
+      const rD = R * Math.max(0, Math.min(1, subjects[i].masteryRate));
+      pts.push({ x: CX + rD * Math.cos(angle), y: CY + rD * Math.sin(angle) });
+    }
+    dataShape =
+        `<line x1="${pts[0].x.toFixed(1)}" y1="${pts[0].y.toFixed(1)}" `
+      + `x2="${pts[1].x.toFixed(1)}" y2="${pts[1].y.toFixed(1)}" stroke="#007AFF" stroke-width="1.5"/>`
+      + pts.map((p) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="5" fill="#007AFF"/>`).join('');
+  } else if (subjects.length >= 3) {
+    const dataPts: string[] = [];
+    for (let i = 0; i < subjects.length; i++) {
+      const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
+      const rD = R * Math.max(0, Math.min(1, subjects[i].masteryRate));
+      const x = CX + rD * Math.cos(angle);
+      const y = CY + rD * Math.sin(angle);
+      dataPts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+    }
+    dataShape = `<polygon points="${dataPts.join(' ')}" fill="rgba(0,122,255,0.20)" stroke="#007AFF" stroke-width="1.5"/>`;
   }
-  const dataPolygon = `<polygon points="${dataPts.join(' ')}" fill="rgba(0,122,255,0.20)" stroke="#007AFF" stroke-width="1.5"/>`;
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${SIZE} ${SIZE}">
   ${gridLayers.join('\n  ')}
-  ${dataPolygon}
+  ${dataShape}
 </svg>`;
 }

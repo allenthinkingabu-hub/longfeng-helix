@@ -164,6 +164,32 @@ export function formatMasteryPctFromWeekSummary(rate: number | null | undefined)
 }
 
 /**
+ * 2026-05-18 sparkline 下方 day bar 标签 · ISO 周一→周日 7 桶 ·
+ * 今天对应 ISO 索引位置贴 "今天" 字面 · 其他位置贴 "周一"/"周二"/...
+ *
+ * 例: 今天=周一 → ["今天","周二","周三","周四","周五","周六","周日"]
+ *     今天=周三 → ["周一","周二","今天","周四","周五","周六","周日"]
+ *     今天=周日 → ["周一","周二","周三","周四","周五","周六","今天"]
+ *
+ * 修旧 bug: wxml 原写死 ["周一",...,"周六","今天"] 假设今天=周日 → 错位.
+ */
+export function buildWeekDayLabels(now: Date): string[] {
+  const todayIdx = computeIsoTodayIdx(now);
+  // 项目 ISO 周 (周一=0..周日=6) 字面: 周一/周二/周三/周四/周五/周六/周日
+  const isoNames = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+  return isoNames.map((name, i) => (i === todayIdx ? '今天' : name));
+}
+
+/**
+ * 今天在 ISO 周 (周一=0..周日=6) 的索引位置.
+ * JS getDay(): 0=Sunday..6=Saturday · 转 ISO: Sun=6 · 其余 -1.
+ */
+export function computeIsoTodayIdx(now: Date): number {
+  const jsDay = now.getDay();
+  return jsDay === 0 ? 6 : jsDay - 1;
+}
+
+/**
  * sparkline (Array<number | null> 长度 7) → svg data URI 字符串
  * - null 索引在 path M/L 命令断笔 (不 forward-fill · 不打底 0)
  * - viewBox 300×40 · 与既有 SPARKLINE_SVG_URI 同尺寸 (vrt baseline 复用)
@@ -179,32 +205,27 @@ export function buildSparklineSvgFromWeekSummary(
   const H = 40;
   const step = W / Math.max(1, sparkline.length - 1);
 
-  const segments: string[] = [];
-  let current: string[] = [];
+  // 2026-05-18 用户决策: null (没复习的天) → 画在 0% 底部 + 连成线 ·
+  // 视觉上一条完整折线更直观 (替代旧"断笔"行为).
+  // 若全周 null (本周 0 复习) → 返 '' · wx:if 隐藏整个 sparkline.
+  const allNull = sparkline.every((v) => v === null || v === undefined || !Number.isFinite(v));
+  if (allNull) return '';
 
+  const path: string[] = [];
+  const dots: string[] = [];
   for (let i = 0; i < sparkline.length; i++) {
-    const v = sparkline[i];
-    if (v === null || v === undefined || !Number.isFinite(v)) {
-      if (current.length > 0) {
-        segments.push(current.join(' '));
-        current = [];
-      }
-      continue;
-    }
+    const raw = sparkline[i];
+    const v = raw === null || raw === undefined || !Number.isFinite(raw) ? 0 : (raw as number);
     const y = Math.max(0, Math.min(H, (1 - v) * H));
     const x = i * step;
-    if (current.length === 0) {
-      current.push(`M${x.toFixed(1)},${y.toFixed(1)}`);
-    } else {
-      current.push(`L${x.toFixed(1)},${y.toFixed(1)}`);
-    }
+    path.push(i === 0 ? `M${x.toFixed(1)},${y.toFixed(1)}` : `L${x.toFixed(1)},${y.toFixed(1)}`);
+    dots.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.4" fill="#34C759"/>`);
   }
-  if (current.length > 0) segments.push(current.join(' '));
 
-  const path = segments.join(' ');
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
-  <path d="${path}" stroke="#34C759" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="${path.join(' ')}" stroke="#34C759" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  ${dots.join('')}
 </svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }

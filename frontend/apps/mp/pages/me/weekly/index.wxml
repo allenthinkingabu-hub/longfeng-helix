@@ -157,7 +157,15 @@
     </view>
     <scroll-view scroll-x class="failscroller" data-test-id="{{testIds.failedScroller}}">
       <view wx:for="{{failedTop}}" wx:key="questionId" class="fcard" data-qid="{{item.questionId}}" bind:tap="onFailedQTap">
-        <view class="fcard-thumb"></view>
+        <!-- 2026-05-18 加 image · thumbnailUrl 空时走 wx:else 灰底占位 -->
+        <image
+          wx:if="{{item.thumbnailUrl}}"
+          class="fcard-thumb"
+          src="{{item.thumbnailUrl}}"
+          mode="aspectFill"
+          lazy-load
+        />
+        <view wx:else class="fcard-thumb fcard-thumb-empty"></view>
         <view class="fcard-meta">
           <text class="fcard-subject">{{item.subjectLabel}}</text>
           <text class="fcard-miss">错 {{item.missCount}} 次</text>

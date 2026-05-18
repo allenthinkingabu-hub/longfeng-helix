@@ -128,13 +128,19 @@ class WeeklyAggregateServiceTest extends IntegrationTestBase {
     assertThat(raw.masteryRate).isNull();
   }
 
+  // 2026-05-18 用户决策: masteryRate 改 SM-2 ease 折算 (avg-1.3)/1.7 clamp [0,1] ·
+  // 测试 fixture 改 seed review_outcome.ease_factor_after (新数据源) ·
+  // wb_review_record 仍 seed (供 reviewedCount + duration + streak + weakKPs · 旧字段).
+
   @Test
-  @DisplayName("masteryRate corner #2.2 · 28 全对 → 1.0 严格 ==")
+  @DisplayName("masteryRate corner #2.2 · 28 outcomes ease=3.0 (SM-2 cap) → 1.0")
   void masteryRate_all_mastered_returns_1_0() {
     long sid = uniqueSid();
     long qid = seedQuestion(sid);
     for (int i = 0; i < 28; i++) {
-      insertRecord(sid, qid, Instant.parse("2026-05-12T04:00:00Z").plusSeconds(60L * i), "MASTERED", 60);
+      Instant ts = Instant.parse("2026-05-12T04:00:00Z").plusSeconds(60L * i);
+      insertRecord(sid, qid, ts, "MASTERED", 60);
+      insertOutcome(sid, qid, ts, 5, 3.0); // ease cap = 1.0 fraction
     }
     WeeklyAggregateService.WeeklyAggregateRaw raw = service.aggregate(sid, SH);
     assertThat(raw.masteryRate).isEqualTo(1.0);
@@ -142,12 +148,14 @@ class WeeklyAggregateServiceTest extends IntegrationTestBase {
   }
 
   @Test
-  @DisplayName("masteryRate corner #2.3 · 28 全错 → 0.0 严格 ==")
+  @DisplayName("masteryRate corner #2.3 · 28 outcomes ease=1.3 (SM-2 floor) → 0.0")
   void masteryRate_all_forgot_returns_0_0() {
     long sid = uniqueSid();
     long qid = seedQuestion(sid);
     for (int i = 0; i < 28; i++) {
-      insertRecord(sid, qid, Instant.parse("2026-05-12T04:00:00Z").plusSeconds(60L * i), "FORGOT", 60);
+      Instant ts = Instant.parse("2026-05-12T04:00:00Z").plusSeconds(60L * i);
+      insertRecord(sid, qid, ts, "FORGOT", 60);
+      insertOutcome(sid, qid, ts, 0, 1.3); // ease floor = 0.0 fraction
     }
     WeeklyAggregateService.WeeklyAggregateRaw raw = service.aggregate(sid, SH);
     assertThat(raw.masteryRate).isEqualTo(0.0);
@@ -155,26 +163,34 @@ class WeeklyAggregateServiceTest extends IntegrationTestBase {
   }
 
   @Test
-  @DisplayName("masteryRate corner #2.4 · 1 GRADED 1 MASTERED → 1.0")
+  @DisplayName("masteryRate corner #2.4 · 1 outcome ease=3.0 → 1.0")
   void masteryRate_single_mastered_returns_1_0() {
     long sid = uniqueSid();
     long qid = seedQuestion(sid);
-    insertRecord(sid, qid, Instant.parse("2026-05-12T04:00:00Z"), "MASTERED", 60);
+    Instant ts = Instant.parse("2026-05-12T04:00:00Z");
+    insertRecord(sid, qid, ts, "MASTERED", 60);
+    insertOutcome(sid, qid, ts, 5, 3.0);
     WeeklyAggregateService.WeeklyAggregateRaw raw = service.aggregate(sid, SH);
     assertThat(raw.masteryRate).isEqualTo(1.0);
   }
 
   @Test
-  @DisplayName("masteryRate corner #2.5 · 27/28 浮点 = 0.9642857142857143 (Java double 精度)")
+  @DisplayName("masteryRate corner #2.5 · 27 ease=3.0 + 1 ease=1.3 → (avg-1.3)/1.7 浮点精度")
   void masteryRate_27_over_28_double_precision() {
     long sid = uniqueSid();
     long qid = seedQuestion(sid);
     for (int i = 0; i < 27; i++) {
-      insertRecord(sid, qid, Instant.parse("2026-05-12T04:00:00Z").plusSeconds(60L * i), "MASTERED", 60);
+      Instant ts = Instant.parse("2026-05-12T04:00:00Z").plusSeconds(60L * i);
+      insertRecord(sid, qid, ts, "MASTERED", 60);
+      insertOutcome(sid, qid, ts, 5, 3.0);
     }
-    insertRecord(sid, qid, Instant.parse("2026-05-12T06:00:00Z"), "FORGOT", 60);
+    Instant lastTs = Instant.parse("2026-05-12T06:00:00Z");
+    insertRecord(sid, qid, lastTs, "FORGOT", 60);
+    insertOutcome(sid, qid, lastTs, 0, 1.3);
     WeeklyAggregateService.WeeklyAggregateRaw raw = service.aggregate(sid, SH);
-    assertThat(raw.masteryRate).isEqualTo(27.0 / 28.0);
+    // avg ease = (27*3.0 + 1.3) / 28 · clamp 后 fraction = (avg - 1.3) / 1.7
+    double expected = (((27 * 3.0 + 1.3) / 28.0) - 1.3) / 1.7;
+    assertThat(raw.masteryRate).isCloseTo(expected, org.assertj.core.data.Offset.offset(1e-9));
   }
 
   // ---------- helpers ----------
@@ -196,6 +212,10 @@ class WeeklyAggregateServiceTest extends IntegrationTestBase {
 
   private void insertGraded(long sid, long qid, Instant ts) {
     insertRecord(sid, qid, ts, "MASTERED", 60);
+    // 2026-05-18 service streak + reviewedCount + sparkline + subjectRadar + failedTop
+    // 全切到 review_outcome · helper 必须双 seed 让旧测试继续 work (wb_review_record 仍 seed
+    // 给老 invariant 兜底 · review_outcome 是 service 新真实数据源).
+    insertOutcome(sid, qid, ts, 5, 3.0);
   }
 
   private void insertRecord(long sid, long qid, Instant ts, String grade, int durationSec) {
@@ -204,5 +224,18 @@ class WeeklyAggregateServiceTest extends IntegrationTestBase {
         "INSERT INTO wb_review_record (id, student_id, question_id, reviewed_at, grade, duration_sec) "
             + "VALUES (?, ?, ?, ?, ?, ?)",
         id, sid, qid, java.sql.Timestamp.from(ts), grade, durationSec);
+  }
+
+  // 2026-05-18 用户决策: masteryRate + sparkline 切 review_outcome.ease_factor_after ·
+  // 测试 fixture 同步写 outcome 行驱动 SM-2 折算.
+  private void insertOutcome(long sid, long qid, Instant ts, int quality, double easeAfter) {
+    long id = idGen.nextId();
+    // plan_id 设为 qid (测试简化 · plan 与 question 1:1 映射) · wrong_item_id = qid
+    jdbc.update(
+        "INSERT INTO review_outcome (id, plan_id, wrong_item_id, user_id, quality, "
+            + "ease_factor_before, ease_factor_after, interval_days_before, interval_days_after, completed_at, created_at, updated_at) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        id, qid, qid, sid, quality, easeAfter, easeAfter, 1, 1,
+        java.sql.Timestamp.from(ts), java.sql.Timestamp.from(ts), java.sql.Timestamp.from(ts));
   }
 }

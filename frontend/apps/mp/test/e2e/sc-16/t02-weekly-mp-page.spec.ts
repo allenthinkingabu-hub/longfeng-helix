@@ -318,7 +318,11 @@ describe('SC-16-T02 · P-WEEKLY-REVIEW MP page (Phase 3 Coder)', () => {
       const g = globalThis as unknown as { __mockCalls?: { weekly: number; today: number } };
       g.__mockCalls = g.__mockCalls || { weekly: 0, today: 0 };
       const url = options.url || '';
-      if (url.indexOf('/api/home/weekly') >= 0) {
+      // 注意 endpoint 区分: /api/home/weekly (full review · INV-6 禁) ≠
+      //                    /api/home/weekly-stats (P-HOME 4 stat · 允许)
+      // 用 regex 严格匹配 /weekly 后必须紧跟 ?/$/末尾 · 避开 weekly-stats substring 撞车
+      const isFullWeekly = /\/api\/home\/weekly($|\?)/.test(url);
+      if (isFullWeekly) {
         g.__mockCalls.weekly++;
         return { statusCode: 200, data: { code: 0, message: 'ok', data: {
           week: '2026-W20',
@@ -373,20 +377,23 @@ describe('SC-16-T02 · P-WEEKLY-REVIEW MP page (Phase 3 Coder)', () => {
       const streakChips = await homePage.$$('[data-test-id="p-home-streak-chip"]');
       expect(streakChips.length).toBe(0);
 
-      // (d) newCount=0 时仍渲染 "+0"
+      // (d) newCount stat exists · 用户 2026-05-18 决策恢复旧 4 维度无 "+" 前缀 ·
+      //     绑 weekStats.newItems (BE /api/home/weekly-stats 真值) · 0 时显纯 "0"
       const newCountNode = await homePage.$('[data-test-id="p-home-week-new-count"]');
       expect(newCountNode, 'p-home-week-new-count exists').toBeTruthy();
       if (newCountNode) {
         const txt = (await newCountNode.text()) || '';
-        expect(txt).toMatch(/\+0/);
+        // mock 没拦 weekly-stats endpoint · 真 BE 返 newItems · 验为数字字符即可
+        expect(txt).toMatch(/^\d+$/);
       }
 
-      // mastery num exists + 文本 "—%"
+      // mastery rate stat exists · 绑 weekStats.masteryRate (旧 4 维度复活) ·
+      // 数字 + "%" 后缀 (不再 SC-16-T02 的 "—%" em dash · 真 BE 整数百分比)
       const masteryNum = await homePage.$('[data-test-id="p-home-week-mastery-num"]');
       expect(masteryNum, 'p-home-week-mastery-num exists').toBeTruthy();
       if (masteryNum) {
         const txt = (await masteryNum.text()) || '';
-        expect(txt).toMatch(/—%/);
+        expect(txt).toMatch(/\d+%/);
       }
 
       // (e) INV-6: P-HOME mount 后 0 个 /weekly 请求 + ≥1 个 /today 请求

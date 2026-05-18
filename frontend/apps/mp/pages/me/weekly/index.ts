@@ -93,10 +93,15 @@ Page({
   },
 
   // 内部 raw data (跨页一致性 verify 用 · spec.md TC-6(f))
+  // 字段声明 (init=null/undefined · 非 simple value 必须 onLoad 内赋值 ·
+  // 否则 WeChat MP 框架 deep clone page instance 时报警 + 在 canary 3.16.0
+  // lib 下偶发触 navigateTo timeout · spec 锚 onLoad 后初始化)
   _rawData: null as WeeklyReviewData | null,
-  _viewedWeakKps: new Set<string>(),
+  _viewedWeakKps: null as Set<string> | null,
 
   onLoad() {
+    // Set 是 non-simple value · 必须 onLoad 起始处赋值 (非 page-level 字面初始化)
+    this._viewedWeakKps = new Set<string>();
     void this._fetchWeekly('home-banner');
   },
 
@@ -119,8 +124,18 @@ Page({
       const data = await getWeeklyReview(MVP_STUDENT_ID);
       this._rawData = data;
 
-      // §6 状态转移: reviewedCount === 0 → EMPTY · 否则 READY
-      const isEmpty = data.stats.reviewedCount === 0;
+      // §6 状态转移 (2026-05-18 用户决策修):
+      // 旧: reviewedCount === 0 → EMPTY · 但 reviewedCount 来自 wb_review_record
+      //     (我 SC-16-T01 加的并行表 · 生产真数据在 review_outcome 表里)
+      //     → 用户有真复习记录但页面误判 EMPTY · 跟复习页 49% / P-HOME 42% 矛盾
+      // 新: 任一活动信号 (reviewedCount > 0 OR masteryRate != null OR newCount > 0)
+      //     都认为有数据 · 进 READY · 让 hero (masteryRate + sparkline 真值已 wire)
+      //     正常显示 · 其他 section 暂时可能空 (待 backend 全表切到 review_outcome)
+      const hasActivity =
+          data.stats.reviewedCount > 0
+          || data.hero.masteryRate !== null
+          || (data.stats.newCount ?? 0) > 0;
+      const isEmpty = !hasActivity;
       const nextState: PageState = isEmpty ? 'EMPTY' : 'READY';
 
       if (isEmpty) {
@@ -166,6 +181,8 @@ Page({
       // §12 weekly_weak_kp_view · 3 个 KP 卡 IntersectionObserver 触发
       // MP 无 IntersectionObserver 标准 · 用 wx.createIntersectionObserver
       // 简化: mount 后即时触发 3 条 (spec.ts Case 1 Then (i) 期望 length === 3)
+      // 防御: _viewedWeakKps 在 onLoad 赋值 · 若意外为 null 则懒初始化
+      if (!this._viewedWeakKps) this._viewedWeakKps = new Set<string>();
       for (const wk of weakKpsVm) {
         if (!this._viewedWeakKps.has(wk.kpId)) {
           this._viewedWeakKps.add(wk.kpId);
@@ -241,12 +258,15 @@ Page({
     subject: string;
     subjectLabel: string;
     missCount: number;
+    thumbnailUrl: string;
   }> {
     return data.failedTop.slice(0, 5).map((q) => ({
       questionId: q.questionId,
       subject: q.subject,
       subjectLabel: SUBJECT_LABELS[q.subject] || q.subject,
       missCount: q.missCount,
+      // 2026-05-18 thumbnail wire · 空时给空串让 wxml wx:if 走 fallback 灰底
+      thumbnailUrl: q.thumbnailUrl || '',
     }));
   },
 

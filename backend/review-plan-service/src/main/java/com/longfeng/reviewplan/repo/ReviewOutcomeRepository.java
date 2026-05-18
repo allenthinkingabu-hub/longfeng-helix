@@ -101,4 +101,52 @@ public interface ReviewOutcomeRepository extends JpaRepository<ReviewOutcome, Lo
               + "ORDER BY plan_id, completed_at DESC",
         nativeQuery = true)
     List<Object[]> findLatestEaseByPlanIds(@Param("planIds") List<Long> planIds);
+
+    /**
+     * P-HOME weekly-stats masteryRate + SC-16 sparkline · 本周整 avg ease_factor_after.
+     *
+     * <p>2026-05-18 用户决策: 与 P07 复习页 masteryPct 算法统一 (SM-2 ease 折算).
+     * 公式: AVG(ease_factor_after) 跨本周所有 outcome events · 映射 [1.3,3.0]→[0,100].
+     * 不做 "latest per plan" 过滤 · 用事件级 avg (与 sparkline 每日 avg 自然一致).
+     *
+     * <p>返 {@code [avg_ease (BigDecimal), outcome_count (Long)]} · 空周 avg=null count=0.
+     */
+    @Query(
+        value = "SELECT AVG(ease_factor_after) AS avg_ease, COUNT(*) AS cnt "
+              + "FROM review_outcome "
+              + "WHERE user_id = :userId "
+              + "AND completed_at >= :weekStart "
+              + "AND completed_at < :weekEnd "
+              + "AND ease_factor_after IS NOT NULL",
+        nativeQuery = true)
+    List<Object[]> aggregateWeeklyAvgEase(
+        @Param("userId") Long userId,
+        @Param("weekStart") java.time.Instant weekStart,
+        @Param("weekEnd") java.time.Instant weekEnd);
+
+    /**
+     * SC-16 sparkline · 每日 avg ease_factor_after · 按 student_tz 切日.
+     *
+     * <p>2026-05-18 用户决策: sparkline 算法和 P07 + weekly-stats masteryRate 统一 ·
+     * 每日 avg ease · 映射 [1.3,3.0]→[0,100]. 空日 = 该日 0 outcome → sparkline[i]=null
+     * (调用方 group 7 桶 · 缺 day_tz 桶赋 null · 不 forward-fill 不打底 0).
+     *
+     * <p>返 {@code [day_tz (Timestamp), avg_ease (BigDecimal), cnt (Long)]} · 每天 1 行.
+     */
+    @Query(
+        value = "SELECT date_trunc('day', completed_at AT TIME ZONE :tz) AS day_tz, "
+              + "       AVG(ease_factor_after) AS avg_ease, "
+              + "       COUNT(*) AS cnt "
+              + "FROM review_outcome "
+              + "WHERE user_id = :userId "
+              + "AND completed_at >= :weekStart "
+              + "AND completed_at < :weekEnd "
+              + "AND ease_factor_after IS NOT NULL "
+              + "GROUP BY 1",
+        nativeQuery = true)
+    List<Object[]> aggregateDailyAvgEase(
+        @Param("userId") Long userId,
+        @Param("weekStart") java.time.Instant weekStart,
+        @Param("weekEnd") java.time.Instant weekEnd,
+        @Param("tz") String tz);
 }

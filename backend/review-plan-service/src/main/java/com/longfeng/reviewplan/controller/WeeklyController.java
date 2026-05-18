@@ -120,7 +120,13 @@ public class WeeklyController {
     }
     List<WeeklyReviewResp.FailedQ> failedTop = new ArrayList<>();
     for (WeeklyAggregateService.FailedQRaw f : raw.failedTop) {
-      failedTop.add(new WeeklyReviewResp.FailedQ(f.questionId(), f.subject(), f.missCount()));
+      // 2026-05-18: imageKey → MinIO public URL · MVP 用 localhost:9000 (dev/IDE 模拟器同机)
+      // production 应改 file-service presign + CDN domain.
+      String thumbnailUrl = f.imageKey() == null || f.imageKey().isBlank()
+          ? null
+          : "http://localhost:9000/wrongbook-dev/" + f.imageKey();
+      failedTop.add(new WeeklyReviewResp.FailedQ(
+          f.questionId(), f.subject(), f.missCount(), thumbnailUrl));
     }
 
     WeeklyReviewResp.AiInsight ai = new WeeklyReviewResp.AiInsight(
