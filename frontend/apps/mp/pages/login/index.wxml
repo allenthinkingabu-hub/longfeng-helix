@@ -1,1 +1,72 @@
-<view class="placeholder">登录 placeholder · awaiting team A fill</view>
+<!--
+  P00 登录页 · MP
+  trace: biz §SC-01 / 决策树节点 1 · design/mockups/wrongbook/00_login.html
+  状态机: IDLE → VERIFYING → SUCCESS (跳 /pages/home/index) / FAILED (error-banner)
+-->
+<view class="root" data-test-id="p00-root">
+  <view class="hero" data-test-id="p00-logo-zone">
+    <view class="logo">日</view>
+    <view class="title">日历</view>
+    <view class="subtitle">统一 学习 · 任务 · 提醒 · 备忘</view>
+  </view>
+
+  <view class="card">
+    <view class="field {{errorMsg ? 'field-error' : ''}}">
+      <input
+        class="input phone-input"
+        data-test-id="p00-phone-input"
+        type="number"
+        maxlength="11"
+        placeholder="手机号"
+        value="{{phone}}"
+        bindinput="onPhoneInput"
+        confirm-type="next"
+      />
+    </view>
+    <view class="field {{errorMsg ? 'field-error' : ''}}">
+      <input
+        class="input password-input"
+        data-test-id="p00-password-input"
+        password="{{true}}"
+        placeholder="密码"
+        value="{{password}}"
+        bindinput="onPasswordInput"
+        confirm-type="done"
+      />
+    </view>
+
+    <view
+      wx:if="{{errorMsg}}"
+      class="error-banner"
+      data-test-id="p00-error-banner"
+      role="alert"
+    >{{errorMsg}}</view>
+
+    <button
+      class="login-cta {{loading ? 'is-loading' : ''}}"
+      data-test-id="p00-login-submit-btn"
+      bindtap="onLogin"
+      disabled="{{loading}}"
+    >{{loading ? '登录中…' : '登录'}}</button>
+  </view>
+
+  <view class="divider" data-test-id="p00-divider">
+    <view class="divider-line"></view>
+    <view class="divider-text">或</view>
+    <view class="divider-line"></view>
+  </view>
+
+  <button
+    class="wechat-cta"
+    data-test-id="p00-wechat-cta-btn"
+    bindtap="onWechatLogin"
+    disabled="{{loading}}"
+  >使用微信一键登录</button>
+
+  <view class="foot" data-test-id="p00-consent-bar">
+    <text class="foot-text">登录即表示同意</text>
+    <text class="foot-link" data-test-id="p00-consent-bar-link-tos">服务条款</text>
+    <text class="foot-text">与</text>
+    <text class="foot-link" data-test-id="p00-consent-bar-link-privacy">隐私政策</text>
+  </view>
+</view>
