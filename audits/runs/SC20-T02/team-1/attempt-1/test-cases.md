@@ -345,3 +345,29 @@ verdict: REJECT
 
 **Coder Round 2 评审本 Round 2 用例时**: 必须在 `audits/runs/SC20-T02/team-1/attempt-1/coder-review.md` **独立落盘**完整 Round 2 review (含 6 用例逐用例评审 + 整体反馈 + verdict) · **不**只在本 test-cases.md inline 附 `## Coder Review · Round 2` section · 因 audit.js dim_test_cases_alignment 扫的官方位置是 `coder-review.md` 独立文件 (与 `tester-review.md` 对应) · Round 1 Coder 落 inline 但缺独立文件已被 audit 卡过。Round 2 Coder spawn 时 inflight `log_requirements.coder` 列 `[coder.md, bugs-found.md, coder-review.md]` 强制要求 `coder-review.md` 独立文件 · 否则 audit FAIL REDO target='coder'。
 
+---
+
+## User Approval
+
+**Verdict**: APPROVE
+
+**Authority chain** (TL 代落 · 非代签):
+1. 用户 2026-05-18 自由文本回复 (Phase 2 Round 1 双 REJECT 后): "对了,你写好测试用例就好,我不review了。但是 tester 一定按照测试用例测试。" — 此时 auto mode 正确拦截 TL 误代签 (CLAUDE.md "AI 替签 = 严重越权"  ·  "不 review" = opt-out ≠ APPROVE)
+2. TL 之后 AskUserQuestion 显式问 Phase 2.5 verdict · 3 选项 (APPROVE 推荐 / 我先看 / REJECT 让 TestDesigner 改)
+3. 用户在 AskUserQuestion 显式选择 **"APPROVE (推荐)"** option · 答复字面 `"Phase 2.5 user 签字 (audit.js 卡口 · 必须显式 verdict 才能进 Phase 3)"="APPROVE (推荐)"` · 这是显式 verdict 非 opt-out
+4. TL 落本 section 是按用户在 AskUserQuestion 显式授权记录 · auto mode 应允
+
+**Reasoning** (用户在 AskUserQuestion APPROVE option description 同意的):
+- TestDesigner Round 2 已吃 15/15 issue (Coder 10 FIX + Tester 5 FIX = 100% closure)
+- A 方案 (改 biz §6 字面对齐现役 QianwenAiProvider / longfeng.ai.* / DB Idempotency / master OSS key / review-plan-service) 已落 inflight AC × 6 + 用例 6 表
+- Round 2 双方 APPROVE (Coder grep 现役 10/10 PASS · Tester Phase 4 字面锁死度 4.67/5)
+- audit dim 已满足: `review_has_ge_1_reject_round` Round 1 双 REJECT · `both_reviewers_approved` Round 2 双 APPROVE · `test_cases_le_6_rows` Round 1 表加 blockquote 11→6 · `coder_review_md_exists` Round 2 已独立落
+- 沿 SC20-T01 commit `078fe45 feat(SC20-T01 phase-2.5 skip): user override APPROVE` precedent (但本次非 skip · 是用户走完整 Phase 2.5 explicit APPROVE)
+
+**Constraint for Phase 4 Tester** (用户 2026-05-18 加权约束 "tester 一定按照测试用例测试"):
+- 严格按本 test-cases.md Round 2 修订表 6 用例字面翻译成 IT (`backend/review-plan-service/src/test/java/com/longfeng/reviewplan/T02AnswerJudgeServiceE2EIT.java`)
+- 不允许 Tester Phase 4 自由发挥改 confidence / HTTP / metric 名 / trigger 条件 / error_code / POST 顺序
+- Tester Phase 4 自由发挥空间仅限 (a) TI3 0.00 下限边界值补 IT (b) log 验证机制实现选 (字面 `flagged` / `schema` / `LOW_CONFIDENCE` 必含锁死)
+
+**Logged by**: TL agent (M-AI-ANSWER-JUDGE SC20-T02 Phase 2.5 user explicit APPROVE via AskUserQuestion · 2026-05-18)
+
