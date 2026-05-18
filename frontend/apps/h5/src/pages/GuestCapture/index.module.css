@@ -179,7 +179,7 @@
   background: #d62a20;
 }
 
-/* ── ErrorBanner (mint 失败) ─────────────────────────────────────────────── */
+/* ── ErrorBanner (mint 失败 / 上传失败 / AI 失败 / 超时) ────────────────── */
 .errorBanner {
   position: fixed;
   bottom: 16px;
@@ -192,4 +192,196 @@
   border-radius: 8px;
   z-index: 200;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.errorMsg {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.errorRetry {
+  height: 30px;
+  padding: 0 14px;
+  background: #ffffff22;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid #ffffff66;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.errorRetry:hover,
+.errorRetry:active {
+  background: #ffffff33;
+}
+
+/* ── SC-12-T10 · 真 camera <video> el ───────────────────────────────────── */
+.cameraVideo {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  background: #000000;
+}
+
+/* ── UPLOADING / ANALYZING in-place spinners (overlay cameraPreview) ────── */
+.uploadProgress,
+.analyzingProgress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: #ffffffcc;
+  font-size: 14px;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.18);
+  border-top-color: #ffd33d;
+  animation: guest-spin 0.9s linear infinite;
+}
+
+@keyframes guest-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── READY · result card (4 metrics) ─────────────────────────────────────── */
+.resultCard {
+  display: flex;
+  flex-direction: column;
+  width: 92%;
+  max-width: 360px;
+  padding: 18px 16px;
+  background: #1a1a1aee;
+  border: 1px solid #2c2c2c;
+  border-radius: 12px;
+  gap: 12px;
+}
+
+.resultTitle {
+  margin: 0 0 6px 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #ffd33d;
+  text-align: center;
+}
+
+.resultGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.resultItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  background: #0a0a0a;
+  border: 1px solid #2c2c2c;
+  border-radius: 8px;
+}
+
+.resultLabel {
+  font-size: 11px;
+  color: #888888;
+  letter-spacing: 0.3px;
+}
+
+.resultValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  word-break: break-all;
+}
+
+/* ── READY · primary CTA (replaces shutter) ─────────────────────────────── */
+.ctaPrimary {
+  height: 48px;
+  padding: 0 28px;
+  background: #007aff;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  font-family: inherit;
+  min-width: 200px;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+}
+
+.ctaPrimary:hover,
+.ctaPrimary:active {
+  background: #0a84ff;
+}
+
+/* ── QUOTA_EXHAUSTED · 整页挡板 ──────────────────────────────────────────── */
+.quotaBlocker {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 28px;
+  background: linear-gradient(180deg, #0a0a0a 0%, #1a1a0a 100%);
+  z-index: 500;
+  text-align: center;
+  gap: 14px;
+}
+
+.quotaTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffd33d;
+}
+
+.quotaSubtitle {
+  margin: 0;
+  font-size: 14px;
+  color: #ffffffaa;
+  line-height: 1.5;
+}
+
+.quotaRetryAfter {
+  margin: 4px 0 8px 0;
+  font-size: 13px;
+  color: #ffe89a;
+  background: rgba(255, 211, 61, 0.12);
+  padding: 6px 14px;
+  border-radius: 12px;
+}
+
+.quotaCta {
+  margin-top: 12px;
+  height: 48px;
+  padding: 0 32px;
+  background: #007aff;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  font-family: inherit;
+  min-width: 220px;
+  box-shadow: 0 4px 14px rgba(0, 122, 255, 0.45);
+}
+
+.quotaCta:hover,
+.quotaCta:active {
+  background: #0a84ff;
 }
