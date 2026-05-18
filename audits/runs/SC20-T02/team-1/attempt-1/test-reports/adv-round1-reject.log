@@ -1,0 +1,183 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< com.longfeng:review-plan-service >------------------
+[INFO] Building review-plan-service 1.0.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-failsafe-plugin:3.1.2:integration-test (default-cli) @ review-plan-service ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.longfeng.reviewplan.T02AnswerJudgeAdversarialIT
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+19:30:28.649 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.longfeng.reviewplan.T02AnswerJudgeAdversarialIT]: T02AnswerJudgeAdversarialIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+19:30:28.957 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.longfeng.reviewplan.Application for test class com.longfeng.reviewplan.T02AnswerJudgeAdversarialIT
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-05-18T19:30:30.408+04:00  INFO 36005 --- [review-plan-service] [           main] c.l.r.T02AnswerJudgeAdversarialIT        : Starting T02AnswerJudgeAdversarialIT using Java 17.0.13 with PID 36005 (started by allen in /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/backend/review-plan-service)
+2026-05-18T19:30:30.411+04:00  INFO 36005 --- [review-plan-service] [           main] c.l.r.T02AnswerJudgeAdversarialIT        : No active profile set, falling back to 1 default profile: "default"
+2026-05-18T19:30:32.699+04:00  INFO 36005 --- [review-plan-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-18T19:30:32.770+04:00  INFO 36005 --- [review-plan-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 63 ms. Found 5 JPA repository interfaces.
+2026-05-18T19:30:34.400+04:00  INFO 36005 --- [review-plan-service] [           main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=01c3adb4-ef73-3540-8c8b-614308fb2f37
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-05-18T19:30:37.550+04:00  WARN 36005 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.apache.rocketmq.spring.autoconfigure.ListenerContainerConfiguration' of type [org.apache.rocketmq.spring.autoconfigure.ListenerContainerConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T19:30:37.580+04:00  WARN 36005 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.apache.rocketmq.spring.autoconfigure.MessageConverterConfiguration' of type [org.apache.rocketmq.spring.autoconfigure.MessageConverterConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T19:30:37.657+04:00  WARN 36005 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'createRocketMQMessageConverter' of type [org.apache.rocketmq.spring.support.RocketMQMessageConverter] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T19:30:37.683+04:00  WARN 36005 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration' of type [org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T19:30:37.706+04:00  WARN 36005 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T19:30:37.718+04:00  WARN 36005 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'loadBalancerClientsDefaultsMappingsProvider' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration$$Lambda$1119/0x000000013a70ebc8] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T19:30:37.732+04:00  WARN 36005 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'defaultsBindHandlerAdvisor' of type [org.springframework.cloud.commons.config.DefaultsBindHandlerAdvisor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T19:30:37.751+04:00  WARN 36005 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration' of type [org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T19:30:37.768+04:00  WARN 36005 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'stringOrNumberMigrationVersionConverter' of type [org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration$StringOrNumberToMigrationVersionConverter] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T19:30:37.834+04:00  WARN 36005 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'rocketmq-org.apache.rocketmq.spring.autoconfigure.RocketMQProperties' of type [org.apache.rocketmq.spring.autoconfigure.RocketMQProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T19:30:37.849+04:00  WARN 36005 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'rocketMQMessageListenerContainerRegistrar' of type [org.apache.rocketmq.spring.support.RocketMQMessageListenerContainerRegistrar] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T19:30:38.645+04:00  INFO 36005 --- [review-plan-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+2026-05-18T19:30:38.665+04:00  INFO 36005 --- [review-plan-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-18T19:30:38.666+04:00  INFO 36005 --- [review-plan-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-05-18T19:30:38.823+04:00  INFO 36005 --- [review-plan-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-18T19:30:38.832+04:00  INFO 36005 --- [review-plan-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 7900 ms
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+2026-05-18T19:30:40.052+04:00  INFO 36005 --- [review-plan-service] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://127.0.0.1:15436/wrongbook (PostgreSQL 15.17)
+2026-05-18T19:30:40.213+04:00  INFO 36005 --- [review-plan-service] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 1.0.084
+2026-05-18T19:30:40.214+04:00  WARN 36005 --- [review-plan-service] [           main] o.f.core.internal.command.DbMigrate      : outOfOrder mode is active. Migration of schema "public" may not be reproducible.
+2026-05-18T19:30:40.215+04:00  WARN 36005 --- [review-plan-service] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" has a version (1.0.084) that is newer than the latest available migration (1.0.082) !
+2026-05-18T19:30:40.221+04:00  INFO 36005 --- [review-plan-service] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-05-18T19:30:40.766+04:00  INFO 36005 --- [review-plan-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-18T19:30:40.840+04:00  INFO 36005 --- [review-plan-service] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-05-18T19:30:40.880+04:00  INFO 36005 --- [review-plan-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-18T19:30:41.019+04:00  INFO 36005 --- [review-plan-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-18T19:30:41.067+04:00  INFO 36005 --- [review-plan-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-18T19:30:41.125+04:00  INFO 36005 --- [review-plan-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@683218c8
+2026-05-18T19:30:41.130+04:00  INFO 36005 --- [review-plan-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-18T19:30:42.560+04:00  INFO 36005 --- [review-plan-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-18T19:30:42.566+04:00  INFO 36005 --- [review-plan-service] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-18T19:30:43.718+04:00  INFO 36005 --- [review-plan-service] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-05-18T19:30:45.912+04:00  INFO 36005 --- [review-plan-service] [           main] c.a.c.sentinel.SentinelWebMvcConfigurer  : [Sentinel Starter] register SentinelWebInterceptor with urlPatterns: [/**].
+2026-05-18T19:30:47.987+04:00  INFO 36005 --- [review-plan-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring TestDispatcherServlet ''
+2026-05-18T19:30:47.989+04:00  INFO 36005 --- [review-plan-service] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-05-18T19:30:48.007+04:00  INFO 36005 --- [review-plan-service] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-05-18T19:30:48.057+04:00  INFO 36005 --- [review-plan-service] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 68 ms
+2026-05-18T19:30:48.517+04:00  INFO 36005 --- [review-plan-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 59409 (http) with context path ''
+2026-05-18T19:30:48.580+04:00  INFO 36005 --- [review-plan-service] [           main] c.l.r.T02AnswerJudgeAdversarialIT        : Started T02AnswerJudgeAdversarialIT in 18.851 seconds (process running for 21.471)
+INFO: Sentinel log output type is: file
+INFO: Sentinel log charset is: utf-8
+INFO: Sentinel log base directory is: /Users/allen/logs/csp/
+INFO: Sentinel log name use pid is: false
+INFO: Sentinel log level is: INFO
+2026-05-18T19:30:50.044+04:00  WARN 36005 --- [review-plan-service] [           main] c.l.r.service.AnswerJudgeService         : Judge provider qianwen failed: primary timeout adv02
+2026-05-18T19:30:50.050+04:00  INFO 36005 --- [review-plan-service] [           main] c.l.r.service.AnswerJudgeService         : Fallback: qianwen -> qianwen-fallback-stub
+2026-05-18T19:30:50.051+04:00  WARN 36005 --- [review-plan-service] [           main] c.l.r.service.AnswerJudgeService         : Judge provider qianwen-fallback-stub failed: fallback failed adv02
+2026-05-18T19:30:50.075+04:00  WARN 36005 --- [review-plan-service] [           main] c.l.r.controller.JudgeController         : AI judge 503 AI_SERVICE_UNAVAILABLE: AI providers all failed / timeout
+2026-05-18T19:30:50.246+04:00  WARN 36005 --- [review-plan-service] [           main] c.l.r.service.AnswerJudgeService         : Judge provider qianwen failed: primary failed for adv01
+2026-05-18T19:30:50.246+04:00  INFO 36005 --- [review-plan-service] [           main] c.l.r.service.AnswerJudgeService         : Fallback: qianwen -> qianwen-fallback-stub
+2026-05-18T19:30:50.250+04:00  WARN 36005 --- [review-plan-service] [           main] c.l.r.service.AnswerJudgeService         : Judge provider qianwen-fallback-stub failed: fallback failed for adv01
+2026-05-18T19:30:50.270+04:00  WARN 36005 --- [review-plan-service] [           main] c.l.r.controller.JudgeController         : AI judge 503 AI_SERVICE_UNAVAILABLE: AI providers all failed / timeout
+
+MockHttpServletRequest:
+      HTTP Method = POST
+      Request URI = /api/review/nodes/314786919894503424/judge
+       Parameters = {}
+          Headers = [Content-Type:"application/json;charset=UTF-8", Authorization:"Bearer student-12345-jwt", X-User-Id:"12345", X-Idempotency-Key:"idem-adv01-503-cache", Content-Length:"74"]
+             Body = {"user_answer_image_key":"wrongbook/T01/202605/12345/snowflake_adv01.jpg"}
+    Session Attrs = {}
+
+Handler:
+             Type = com.longfeng.reviewplan.controller.JudgeController
+           Method = com.longfeng.reviewplan.controller.JudgeController#judge(Long, String, Long, String, JudgeReq)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = com.longfeng.reviewplan.exception.JudgeExceptions$AiServiceUnavailable
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 503
+    Error message = null
+          Headers = [Content-Type:"application/json"]
+     Content type = application/json
+             Body = {"error_code":"AI_SERVICE_UNAVAILABLE","message":"AI providers all failed / timeout"}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+
+MockHttpServletRequest:
+      HTTP Method = POST
+      Request URI = /api/review/nodes/314786919894503424/judge
+       Parameters = {}
+          Headers = [Content-Type:"application/json;charset=UTF-8", Authorization:"Bearer student-12345-jwt", X-User-Id:"12345", X-Idempotency-Key:"idem-adv01-503-cache", Content-Length:"74"]
+             Body = {"user_answer_image_key":"wrongbook/T01/202605/12345/snowflake_adv01.jpg"}
+    Session Attrs = {}
+
+Handler:
+             Type = com.longfeng.reviewplan.controller.JudgeController
+           Method = com.longfeng.reviewplan.controller.JudgeController#judge(Long, String, Long, String, JudgeReq)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Content-Type:"application/json"]
+     Content type = application/json
+             Body = {"verdict":null,"confidence":null,"reason":null,"status":"TIMEOUT","matched_steps":[],"missed_steps":[]}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+[ERROR] Tests run: 3, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 22.08 s <<< FAILURE! -- in com.longfeng.reviewplan.T02AnswerJudgeAdversarialIT
+[ERROR] com.longfeng.reviewplan.T02AnswerJudgeAdversarialIT.adv01_503_replay_should_stay_503_not_return_stale_200 -- Time elapsed: 0.240 s <<< FAILURE!
+java.lang.AssertionError: Status expected:<503> but was:<200>
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+	at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.longfeng.reviewplan.T02AnswerJudgeAdversarialIT.adv01_503_replay_should_stay_503_not_return_stale_200(T02AnswerJudgeAdversarialIT.java:216)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   T02AnswerJudgeAdversarialIT.adv01_503_replay_should_stay_503_not_return_stale_200:216 Status expected:<503> but was:<200>
+[INFO] 
+[ERROR] Tests run: 3, Failures: 1, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  39.222 s
+[INFO] Finished at: 2026-05-18T19:31:02+04:00
+[INFO] ------------------------------------------------------------------------
