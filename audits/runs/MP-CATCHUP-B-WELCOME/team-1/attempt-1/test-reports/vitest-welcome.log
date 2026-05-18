@@ -1,0 +1,41 @@
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v1.6.1 /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/frontend/apps/mp
+
+ ✓ test/unit/welcome-helpers.spec.ts > deriveLandingState · §6 状态机 happy path > samples+kpi both OK → phase=READY · all sections visible · no banner
+ ✓ test/unit/welcome-helpers.spec.ts > deriveLandingState · §6 状态机 happy path > KPI 千分化字段: 12.5M / 84K / 320K (用户视角"累计" 可读)
+ ✓ test/unit/welcome-helpers.spec.ts > deriveLandingState · §6 状态机 降级路径 > samples reject + kpi OK → DEGRADED-samples · 仍显 KPI · banner 文案聚焦"样例"
+ ✓ test/unit/welcome-helpers.spec.ts > deriveLandingState · §6 状态机 降级路径 > samples OK + kpi reject → DEGRADED-kpi · samples 仍渲染 (主诱因) · KPI 隐藏
+ ✓ test/unit/welcome-helpers.spec.ts > deriveLandingState · §6 状态机 降级路径 > samples + kpi 双 reject → DEGRADED-both · banner 提示 CTA 仍可点
+ ✓ test/unit/welcome-helpers.spec.ts > deriveLandingState · 边界 / 防御性 (Tester 视角) > samples 数组为空仍算 OK · phase=READY · 但 samples.length=0
+ ✓ test/unit/welcome-helpers.spec.ts > deriveLandingState · 边界 / 防御性 (Tester 视角) > sample 缺 knowledgePoints 字段 → 派生为空数组 (防 wxml undefined.length 渲染错)
+ ✓ test/unit/welcome-helpers.spec.ts > deriveLandingState · 边界 / 防御性 (Tester 视角) > KPI 0 值 → 字段 "0.0" / "0" / "0" (用户视角"暂无数据"非"NaN")
+ ✓ test/api/landing.integration.spec.ts > SC-11 · landing API integration (真 :8090 · 0 mock) > GET /api/landing/samples?bucket=default returns 3 samples or soft-skips
+ ✓ test/api/landing.integration.spec.ts > SC-11 · landing API integration (真 :8090 · 0 mock) > GET /api/landing/kpi returns 3 vanity counters or soft-skips
+ ✓ test/api/landing.integration.spec.ts > SC-11 · landing API integration (真 :8090 · 0 mock) > GET /api/landing/samples?bucket=variant_b returns variant_b array (or soft-skips)
+ ✓ test/api/landing.integration.spec.ts > SC-11 · landing API integration (真 :8090 · 0 mock) > GET /api/landing/samples?bucket=unknown falls back to default (whitelist)
+ ✓ test/unit/api-modules.spec.ts > api/file.ts exports > exports presign function
+ ✓ test/unit/api-modules.spec.ts > api/wrongbook.ts exports > exports createQuestion function
+ ✓ test/unit/api-modules.spec.ts > api/wrongbook.ts exports > exports getQuestionById function
+ ✓ test/unit/api-modules.spec.ts > api/wrongbook.ts exports > exports listWrongQuestions function (T07)
+ ✓ test/unit/api-modules.spec.ts > api/ai.ts exports > exports getAnswerByQid function
+ ✓ test/unit/api-modules.spec.ts > api/ai.ts exports > exports startAnalyze function
+ ✓ test/unit/api-modules.spec.ts > api/ai.ts exports > exports pollAnalyzeStatus function
+ ✓ test/unit/api-modules.spec.ts > api/home.ts exports > exports getHomeTodayCount function
+ ✓ test/unit/api-modules.spec.ts > api/landing.ts exports (MP-CATCHUP-B-WELCOME) > exports getSamples function (SC-11 /api/landing/samples)
+ ✓ test/unit/api-modules.spec.ts > api/landing.ts exports (MP-CATCHUP-B-WELCOME) > exports getKpi function (SC-11 /api/landing/kpi)
+ ✓ test/unit/api-modules.spec.ts > api/review.ts exports > exports completeSession function (T13)
+ ✓ test/unit/api-modules.spec.ts > api/review.ts exports > exports createSession function (SC-01-C05 #1)
+ ✓ test/unit/api-modules.spec.ts > api/review.ts exports > exports getToday function (SC-01-C05 #2 · T09 P07)
+ ✓ test/unit/api-modules.spec.ts > api/review.ts exports > exports getNode function (SC-01-C05 #3)
+ ✓ test/unit/api-modules.spec.ts > api/review.ts exports > exports openNode function (SC-01-C05 #4)
+ ✓ test/unit/api-modules.spec.ts > api/review.ts exports > exports revealNode function (SC-01-C05 #5)
+ ✓ test/unit/api-modules.spec.ts > api/review.ts exports > exports gradeNode function (SC-01-C05 #6)
+ ✓ test/unit/api-modules.spec.ts > api/review.ts exports > exports nextInSession function (SC-01-C05 #7)
+ ✓ test/unit/api-modules.spec.ts > api/review.ts exports > exports nodeResult function (SC-01-C05 #8)
+
+ Test Files  3 passed (3)
+      Tests  31 passed (31)
+   Start at  18:25:54
+   Duration  411ms (transform 64ms, setup 0ms, collect 76ms, tests 132ms, environment 0ms, prepare 69ms)
+

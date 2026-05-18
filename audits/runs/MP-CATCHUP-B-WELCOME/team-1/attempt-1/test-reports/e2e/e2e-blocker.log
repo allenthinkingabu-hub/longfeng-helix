@@ -1,0 +1,29 @@
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v1.6.1 /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/frontend/apps/mp
+
+ ❯ test/e2e/mp-welcome/welcome.spec.ts  (4 tests) 16ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  test/e2e/mp-welcome/welcome.spec.ts > MP-CATCHUP-B-WELCOME · P-LANDING MP page
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/mp-welcome/welcome.spec.ts:38:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests   (4)
+   Start at  18:21:44
+   Duration  426ms (transform 29ms, setup 0ms, collect 227ms, tests 16ms, environment 0ms, prepare 63ms)
+

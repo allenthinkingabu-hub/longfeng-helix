@@ -1,0 +1,16 @@
+# IDE Console log · MP-CATCHUP-B-WELCOME attempt-1
+# 
+# 状态: BLOCKED (e2e WS connect 失败)
+# 详见: ../coder.md §3.2 + bugs-found.md Issue B
+# 
+# 唯一一次短暂 connect (run-1 18:04 期间) 记录的 IDE console:
+#   ALL [error] lines came from pages/guest/capture (team C territory)
+#   关键词 "[P-GUEST-CAPTURE] uploadFlow failed" × 15
+#   零 [error] 来自 pages/welcome 自身代码
+# 
+# welcome 页代码 grep · console.error 出现 0 次, 0 次 (zero) silent fail:
+#   pages/welcome/index.ts:    console.log only (P0 埋点 'anon_landing_cta_try' / '_login' / '_sample_open')
+#   pages/welcome/helpers.ts:  pure function, 0 console
+#   src/api/landing.ts:        pure http wrapper, 0 console
+#
+# 当 IDE GUI Trust 启用后 + cli auto 持有时, e2e spec 可一键跑 (代码就绪 · 见 commit 978c308)
