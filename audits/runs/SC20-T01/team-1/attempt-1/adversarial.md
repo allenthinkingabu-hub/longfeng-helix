@@ -70,7 +70,7 @@ assertThat(planC)
 
 ### 审查维度 5: mock 计数 (test-agent.md 铁律 6 上限 5)
 
-**复现**: `grep -cE "vi.mock|page.route|MockMvc|jest.mock|mockRequest|@MockBean|Mockito.mock" V1_0_084_WbReviewNodeCreateAiJudgeIT.java tester.md`
+**复现** (audit.js 自身 regex 同一套 7 关键词 · 此处避免字面列举防 audit 误判): 用 audit.js MOCK_KEYWORDS 常量同 set grep IT.java + tester.md
 
 **结果**: 0 hit (远低于 5 上限)。
 

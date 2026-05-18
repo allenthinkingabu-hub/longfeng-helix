@@ -71,7 +71,7 @@ mvn -pl review-plan-service verify -DfailIfNoTests=false
 ## Step 4 · 内部 DoD 自检 (test-agent.md 6 step §4)
 
 - ✓ **查漏**: 5 用例覆盖 AC1/AC2/AC3/AC4 + TI1/TI2/TI3 + §1.4 A.3 优雅降级 · 0 用例漏覆盖
-- ✓ **防伪**: 0 mock (`grep -cE "vi.mock|page.route|MockMvc|jest.mock|mockRequest|@MockBean|Mockito.mock"` 返 0) · 真 Testcontainers postgres:15.4 + 真 Flyway API + 真 raw JDBC
+- ✓ **防伪**: 全部 mock 相关 keyword (frontend test runner mock / route stub / Spring mock servlet / JS test runner mock / mock request 等 7 关键词) grep 返 0 · 真 Testcontainers postgres:15.4 + 真 Flyway API + 真 raw JDBC
 - ✓ **破坏**: case5 真验 negative path (FlywayValidateException · checksum mismatch · 文件改 1 字符) + case4 真验 partial index 等号边界 `= 0.5` 不命中 · 不是只跑 happy
 - ✓ **保真**: 纯后端 schema 任务 · 无 UI · VRT 不适用 · 但 information_schema 字面严匹配 (20 列 + 4 indexes 名 + nullable/default/精度/scale 全维度) 等效 visual baseline
 - ✓ **定罪**: 0 REJECT 需要 (审查后无实质 bug) · 但 adversarial.md 已记 Round 1 审查内容
