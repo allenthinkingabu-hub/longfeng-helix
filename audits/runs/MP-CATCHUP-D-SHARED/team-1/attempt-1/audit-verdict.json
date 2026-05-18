@@ -2,7 +2,7 @@
   "task_id": "MP-CATCHUP-D-SHARED",
   "attempt": 1,
   "team_id": "team-1",
-  "audited_at": "2026-05-18T14:30:26.937Z",
+  "audited_at": "2026-05-18T14:31:31.239Z",
   "audited_by": "audit.js v3 (deterministic · 7 dims · +test_cases_alignment)",
   "pass": true,
   "checks": [
@@ -94,7 +94,7 @@
       "dimension": "bug_reality",
       "name": "all_git_commits_verified",
       "pass": true,
-      "evidence": "4/4 hash(es) git cat-file -e PASS"
+      "evidence": "5/5 hash(es) git cat-file -e PASS"
     },
     {
       "dimension": "test_validity",
