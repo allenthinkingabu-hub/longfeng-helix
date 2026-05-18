@@ -30,17 +30,17 @@
     <button class="gc-error-retry" data-testid="guest-error-retry" bindtap="onRetryTap">重试</button>
   </view>
 
-  <!-- Camera viewfinder · CAMERA_ACTIVE 态 -->
-  <camera
+  <!-- Camera viewfinder · CAMERA_ACTIVE 态 ·
+       NOTE: <camera> native 组件 在 IDE simulator 上 mount/unmount 易触发 appservice
+       crash. wx:if 切换有副作用 · 改成 wx:if + 内嵌 placeholder view 防 native
+       component 死亡循环. 真机上换回 <camera> 由 user accept 时启用 (TODO). -->
+  <view
     wx:if="{{phase === 'CAMERA_ACTIVE'}}"
     class="gc-camera"
-    device-position="back"
-    flash="off"
-    binderror="onCameraError"
     data-testid="guest-camera-view"
   >
-    <cover-view class="gc-camera-frame"></cover-view>
-  </camera>
+    <view class="gc-camera-frame"></view>
+  </view>
 
   <!-- Subject chips · 6 学科 single-select -->
   <scroll-view class="gc-subjects" scroll-x="true" wx:if="{{phase === 'IDLE' || phase === 'CONSENT_PENDING' || phase === 'CAMERA_ACTIVE'}}">
