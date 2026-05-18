@@ -215,8 +215,8 @@
   margin-top: -52rpx;
   border-top-left-radius: 52rpx;
   border-top-right-radius: 52rpx;
-  /* padding-top 80rpx · 推过圆角重叠区 + 给 sec 标题留充足留白 · 对齐 mockup 视觉 */
-  padding: 80rpx 28rpx 56rpx;
+  /* padding-top 48rpx · 推过圆角重叠区 + 给 sec 适度留白 (不显空) */
+  padding: 48rpx 28rpx 56rpx;
   z-index: 10;
 }
 
@@ -256,14 +256,14 @@
 }
 
 .sec .t {
-  font-size: 30rpx;
+  font-size: 36rpx;
   font-weight: 800;
   letter-spacing: 0.4rpx;
   color: #1C1C1E;
 }
 
 .sec .m {
-  font-size: 22rpx;
+  font-size: 26rpx;
   font-weight: 600;
   color: #8E8E93;
 }
