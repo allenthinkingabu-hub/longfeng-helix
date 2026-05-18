@@ -309,6 +309,39 @@ class SC12T05AnonQuestionsE2EIT extends IntegrationTestBase {
     }
 
     // ──────────────────────────────────────────────────────────────────────
+    // (j) Consent gate runs BEFORE prefix gate · ordering lock · Tester REJECT Round 1 fix
+    // ──────────────────────────────────────────────────────────────────────
+    // Tester REJECT Round 1 · 2026-05-18 · the initial 9-case suite covered
+    // consent-required AND prefix-mismatch independently but never pinned
+    // their RELATIVE ORDER inside the service. A future refactor that swaps
+    // the two checks (e.g. for "fail-fast on cheaper validation") would
+    // change the error code returned for a request that violates both —
+    // breaking the wire contract silently. The spec implies consent is the
+    // top-priority gate (biz §13 minor protection · the row must not even
+    // be probed for foreign-prefix attacks until consent is recorded). This
+    // testcase locks that priority: no-consent + foreign-prefix → 412
+    // (CONSENT_REQUIRED), NOT 403 (PREFIX_MISMATCH).
+    @Test
+    void questions_no_consent_and_foreign_prefix_returns_412_consent_takes_precedence()
+            throws Exception {
+        MintResult m = mint("fpT05-010");
+        // Intentionally skip PATCH consent · row's consent_at IS NULL.
+        // Also send a foreign-prefix objectKey · two violations at once.
+        String foreignKey = "guest-tmp/88888888/double-bad.jpg";
+        HttpResponse<String> resp = postQuestion(m.anonToken, "key-010",
+                Map.of("objectKey", foreignKey, "subject", "biology"));
+        // Service contract: consent gate runs FIRST · returns 412 even though
+        // the prefix would also fail. Locks the gate order.
+        assertThat(resp.statusCode())
+                .as("consent gate must take precedence over prefix gate · biz §13 minor protection priority")
+                .isEqualTo(412);
+        JsonNode body = objectMapper.readTree(resp.body());
+        assertThat(body.path("code").asText())
+                .as("the 412 path must surface CONSENT_REQUIRED, not OBJECT_KEY_PREFIX_MISMATCH")
+                .isEqualTo("CONSENT_REQUIRED");
+    }
+
+    // ──────────────────────────────────────────────────────────────────────
     // Helpers
     // ──────────────────────────────────────────────────────────────────────
 
