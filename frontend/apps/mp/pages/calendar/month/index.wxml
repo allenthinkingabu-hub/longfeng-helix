@@ -1,0 +1,125 @@
+<!-- P10 日历月视图 · 1:1 mirror design/mockups/wrongbook/10_calendar_month.html -->
+<!-- trace: design/system/pages/P10-calendar-month.spec.md · TEST_IDS.p10.* -->
+
+<view class="p10-page" data-test-id="{{testIds.root}}">
+
+  <!-- ── Navbar ─────────────────────────────────────── -->
+  <!-- 锚 mockup L122-L147 .navbar · padding-top 用真 statusBarHeight (env() simulator 不可靠) -->
+  <view class="navbar" style="padding-top: {{navTopPx + 6}}px;" data-test-id="{{testIds.monthNav}}">
+    <view class="nav-top">
+      <view class="back" bind:tap="onBackTap">
+        <van-icon name="arrow-left" size="16px" color="#007AFF" />
+        <text>首页</text>
+      </view>
+      <view class="center">
+        <text class="t" data-test-id="{{testIds.monthNavTitle}}">{{monthTitle}}</text>
+        <text class="s">{{weekdayLabel}}</text>
+      </view>
+      <view class="btn-icn" bind:tap="onTodayTap" data-test-id="{{testIds.monthNavToday}}">
+        <van-icon name="aim" size="16px" color="#1C1C1E" />
+      </view>
+    </view>
+    <view class="sub-nav">
+      <!-- 上/下月切换 · spec §13 testid p10-month-nav-prev/next -->
+      <view class="seg">
+        <text class="seg-btn" bind:tap="onPrevMonth" data-test-id="{{testIds.monthNavPrev}}">‹</text>
+        <text class="seg-btn seg-on">月</text>
+        <text class="seg-btn" bind:tap="onNextMonth" data-test-id="{{testIds.monthNavNext}}">›</text>
+      </view>
+      <view class="grow"></view>
+      <!-- v1 暂缓: 显示复习 filter chip · 留 DOM 占位 但 disabled · 后续 task 实装 PATCH /me/preferences -->
+      <view class="filter filter-disabled" data-test-id="{{testIds.filterStudy}}">
+        <van-icon name="filter-o" size="11px" color="#007AFF" />
+        <text>显示复习 · 开</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ── Body (month grid) ─────────────────────────── -->
+  <view class="body" style="margin-top: {{navTopPx + 120}}px;">
+    <!-- Weekday header · 锚 mockup L151 · 周一首列 + 周六/日红 -->
+    <view class="weekdays" data-test-id="{{testIds.weekHeader}}">
+      <text>一</text><text>二</text><text>三</text><text>四</text><text>五</text>
+      <text class="we">六</text><text class="we">日</text>
+    </view>
+
+    <!-- LOADING skeleton -->
+    <view wx:if="{{pageState === 'LOADING'}}" class="grid-skeleton" data-test-id="{{testIds.skeletonRoot}}">
+      <view wx:for="{{42}}" wx:key="*this" class="cell cell-skeleton"></view>
+    </view>
+
+    <!-- ERROR banner -->
+    <view wx:elif="{{pageState === 'ERROR'}}" class="error-banner" bind:tap="onRetryTap">
+      <text>加载失败，点击重试</text>
+    </view>
+
+    <!-- READY / EMPTY 都渲染 grid · EMPTY 时 grid 是空格但仍可视化 -->
+    <block wx:else>
+      <view class="grid" data-test-id="{{testIds.monthGrid}}">
+        <view
+          wx:for="{{cells}}"
+          wx:key="date"
+          class="cell {{item.inCurrentMonth ? '' : 'mute'}} {{item.isWeekend ? 'weekend' : ''}} {{item.isToday ? 'today' : ''}} {{item.isSelected ? 'selected' : ''}}"
+          data-date="{{item.date}}"
+          bind:tap="onCellTap"
+        >
+          <text class="d">{{item.day}}</text>
+          <text wx:if="{{item.eventCount > 0}}" class="bar">{{item.eventCount}}</text>
+          <view wx:if="{{item.dotClasses.length > 0}}" class="dots">
+            <view wx:for="{{item.dotClasses}}" wx:for-item="dotCls" wx:key="*this" class="dot {{dotCls}}"></view>
+            <text wx:if="{{item.overflow > 0}}" class="overflow">+{{item.overflow}}</text>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <!-- ── Day list sheet ───────────────────────────── -->
+  <view wx:if="{{pageState === 'READY' || pageState === 'EMPTY'}}" class="list">
+    <view class="list-head">
+      <view class="list-head-l">
+        <text class="lh-t">{{dayTitle}}</text>
+        <text class="lh-sub">{{daySummary}}</text>
+      </view>
+      <view wx:if="{{dayEvents.length > 0}}" class="lh-more" bind:tap="onSheetAllTap">
+        <text>全部</text>
+        <van-icon name="arrow" size="11px" color="#007AFF" />
+      </view>
+    </view>
+
+    <!-- EMPTY 态: 当日无事件时显当日空提示; 月空时显大空 CTA -->
+    <view wx:if="{{pageState === 'EMPTY' && dayEvents.length === 0}}" class="empty-month">
+      <text class="em-title">本月无安排</text>
+      <text class="em-hint">拍一道新错题 · 排期就会出现在这里</text>
+      <view class="em-btn" bind:tap="onCaptureTap">去拍一道</view>
+    </view>
+
+    <view wx:elif="{{dayEvents.length === 0}}" class="empty-day">
+      <text>当日无事件</text>
+    </view>
+
+    <view wx:else class="rows">
+      <view
+        wx:for="{{dayEvents}}"
+        wx:key="eventId"
+        class="row"
+        data-eid="{{item.eventId}}"
+        bind:tap="onEventTap"
+      >
+        <view class="bar3" style="background: {{item.rowBarColor}};"></view>
+        <view class="content">
+          <view class="ti">
+            <text class="ti-title">{{item.title}}</text>
+            <text wx:if="{{item.studyTag}}" class="studytag">{{item.studyTag}}</text>
+            <text wx:elif="{{item.tagText}}" class="tag" style="background: {{item.tagBg}}; color: {{item.tagFg}};">{{item.tagText}}</text>
+          </view>
+          <view class="meta">
+            <text>{{item.subLabel}}</text>
+          </view>
+        </view>
+        <view class="time">{{item.timeLabel}}</view>
+      </view>
+    </view>
+  </view>
+
+</view>

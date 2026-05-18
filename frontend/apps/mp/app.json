@@ -9,7 +9,8 @@
     "pages/review-exec/index",
     "pages/review-done/index",
     "pages/me/index",
-    "pages/me/weekly/index"
+    "pages/me/weekly/index",
+    "pages/calendar/month/index"
   ],
   "window": {
     "navigationStyle": "custom",

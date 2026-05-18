@@ -24,13 +24,18 @@ describe('apiBase URL construction (pure)', () => {
     expect(apiBase('review')).toBe('http://localhost:8085');
   });
 
+  it('returns calendar-core URL with port 18080 (P10 task)', () => {
+    expect(apiBase('calendar')).toBe('http://localhost:18080');
+  });
+
   it('all prefixes resolve to distinct ports', () => {
     const urls = new Set([
       apiBase('file'),
       apiBase('wb'),
       apiBase('ai'),
       apiBase('review'),
+      apiBase('calendar'),
     ]);
-    expect(urls.size).toBe(4);
+    expect(urls.size).toBe(5);
   });
 });
