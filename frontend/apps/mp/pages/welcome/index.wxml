@@ -1,1 +1,121 @@
-<view class="placeholder">AI 错题本 welcome placeholder · awaiting team B fill</view>
+<!-- MP-CATCHUP-B-WELCOME · P-LANDING 真页 wxml
+     trace:
+       design/system/pages/P-LANDING-landing.spec.md §2 布局 + §13 testid
+       design/mockups/wrongbook/14_landing.html (视觉锚)
+       biz §2A.3.2 (Hero + ThreeStepComic + SampleChips + KPI + DualCTA + ConsentBar + ParentHint)
+     状态机: phase ∈ {LOADING, READY, DEGRADED-samples, DEGRADED-kpi, DEGRADED-both} (页 §6) -->
+<view class="landing-page" data-test-id="landing-page">
+
+  <!-- Hero 极光区 (永远显示 · 即使 LOADING / DEGRADED · biz 关键断言: 1s TTI) -->
+  <view class="hero" data-test-id="landing-hero">
+    <view class="hero-eyebrow">0 注册成本 · 先看看值不值</view>
+    <view class="hero-title" data-test-id="landing-hero-headline">错题不再错过</view>
+    <view class="hero-sub">拍一张错题 · AI 给你一条记忆曲线 · 自动排 6 次艾宾浩斯复习</view>
+    <view class="hero-illustration">
+      <view class="hero-illust-placeholder">[ AI 错题分析示意 ]</view>
+    </view>
+  </view>
+
+  <!-- LOADING skeleton -->
+  <view wx:if="{{phase === 'LOADING'}}" class="skeleton" data-test-id="landing-skeleton">
+    <view class="sk-bar sk-wide"></view>
+    <view class="sk-bar sk-mid"></view>
+    <view class="sk-bar sk-short"></view>
+  </view>
+
+  <!-- DEGRADED banner -->
+  <view wx:if="{{showDegradedBanner}}" class="degraded-banner" data-test-id="landing-degraded-banner">
+    {{degradedMsg}}
+  </view>
+
+  <!-- 3 Step 漫画 (§3 ThreeStepComic) -->
+  <view wx:if="{{phase !== 'LOADING'}}" class="three-step" data-test-id="landing-three-step">
+    <view class="section-heading">三步搞定一道错题</view>
+    <view class="step-row">
+      <view class="step-card" data-test-id="landing-step-1">
+        <view class="step-num">1</view>
+        <view class="step-icon">📷</view>
+        <view class="step-label">拍题</view>
+        <view class="step-desc">多模态 OCR · 题干一秒识别</view>
+      </view>
+      <view class="step-card" data-test-id="landing-step-2">
+        <view class="step-num">2</view>
+        <view class="step-icon">🤖</view>
+        <view class="step-label">AI 诊断</view>
+        <view class="step-desc">P95 4.2s · 找出真正错因</view>
+      </view>
+      <view class="step-card" data-test-id="landing-step-3">
+        <view class="step-num">3</view>
+        <view class="step-icon">📅</view>
+        <view class="step-label">排期复习</view>
+        <view class="step-desc">7 节点艾宾浩斯 · 触达 98%</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Samples chips (§3 SampleChips · §5 GET /api/landing/samples) -->
+  <view wx:if="{{showSamples && samples.length > 0}}" class="samples" data-test-id="landing-samples">
+    <view class="section-heading">看看 AI 怎么帮你分析</view>
+    <view class="sample-row">
+      <view
+        wx:for="{{samples}}"
+        wx:key="subject"
+        class="sample-chip"
+        data-test-id="landing-sample-chip"
+        data-idx="{{index}}"
+        bindtap="openSample"
+      >
+        <view class="sample-subject">{{item.subject}}</view>
+        <view class="sample-stem">{{item.stemText}}</view>
+        <view class="sample-err">错因: {{item.errorReason}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- KPI 行 (§3 §5 GET /api/landing/kpi) -->
+  <view wx:if="{{showKpi && kpi}}" class="kpi-row" data-test-id="landing-kpi">
+    <view class="kpi-cell" data-test-id="landing-kpi-questions">
+      <view class="kpi-value">{{kpiQuestionsM}}M</view>
+      <view class="kpi-label">累计分析题量</view>
+    </view>
+    <view class="kpi-cell" data-test-id="landing-kpi-daily">
+      <view class="kpi-value">{{kpiDailyK}}K</view>
+      <view class="kpi-label">日均分析</view>
+    </view>
+    <view class="kpi-cell" data-test-id="landing-kpi-users">
+      <view class="kpi-value">{{kpiUsersK}}K</view>
+      <view class="kpi-label">累计用户</view>
+    </view>
+  </view>
+
+  <!-- ParentHint (§3 · P1 入口占位) -->
+  <view class="parent-hint" data-test-id="landing-parent-hint" bindtap="onParentHint">
+    家长查看孩子进度? ›
+  </view>
+
+  <!-- ConsentBar (§3 · 底部小字 · P0 国内桶静态) -->
+  <view class="consent-bar" data-test-id="landing-consent-bar">
+    点击「试试看」即表示同意 &lt;未成年人保护条款&gt; · 结果保留 24 小时
+  </view>
+
+  <!-- 双 CTA dock · sticky (§3 DualCTA · 永远可点 · biz CTA 1.5s 内可点) -->
+  <view class="cta-dock" data-test-id="landing-cta-bottom">
+    <button
+      class="cta-btn cta-primary"
+      data-test-id="landing-cta-try"
+      bindtap="onTryGuest"
+    >
+      试试看 · 无需注册
+    </button>
+    <button
+      class="cta-btn cta-secondary"
+      data-test-id="landing-cta-login"
+      bindtap="onLogin"
+    >
+      已有账号? 直接登录
+    </button>
+  </view>
+
+  <!-- 底部 spacer · 防 cta-dock 遮挡 ConsentBar -->
+  <view class="cta-spacer"></view>
+</view>

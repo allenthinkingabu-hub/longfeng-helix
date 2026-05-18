@@ -1,1 +1,273 @@
-.placeholder { padding: 40rpx; color: #999; font-size: 28rpx; text-align: center; }
+/* MP-CATCHUP-B-WELCOME · P-LANDING wxss
+   trace: design/mockups/wrongbook/14_landing.html · 极光 hero + 圆角 scroll 区 + sticky CTA dock */
+
+.landing-page {
+  min-height: 100vh;
+  background: #F2F2F7;
+  padding-bottom: 0;
+}
+
+/* ── Hero · 极光渐变 #0F1A3D → #8B87F6 ───────────────────────── */
+.hero {
+  background: linear-gradient(160deg, #0F1A3D 0%, #5A4FCF 55%, #8B87F6 100%);
+  padding: 80rpx 40rpx 60rpx;
+  color: #FFFFFF;
+  border-bottom-left-radius: 52rpx;
+  border-bottom-right-radius: 52rpx;
+}
+
+.hero-eyebrow {
+  display: inline-block;
+  font-size: 22rpx;
+  color: #C9C5FF;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 6rpx 18rpx;
+  border-radius: 999rpx;
+  margin-bottom: 20rpx;
+}
+
+.hero-title {
+  font-size: 56rpx;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 16rpx;
+}
+
+.hero-sub {
+  font-size: 26rpx;
+  line-height: 1.55;
+  color: #E0DEFF;
+  margin-bottom: 32rpx;
+}
+
+.hero-illustration {
+  height: 200rpx;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-illust-placeholder {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ── Skeleton ────────────────────────────────────────────────── */
+.skeleton {
+  padding: 30rpx 40rpx;
+}
+
+.sk-bar {
+  height: 32rpx;
+  background: #E5E5EA;
+  border-radius: 8rpx;
+  margin-bottom: 18rpx;
+}
+
+.sk-wide { width: 100%; }
+.sk-mid { width: 70%; }
+.sk-short { width: 40%; }
+
+/* ── DEGRADED banner ─────────────────────────────────────────── */
+.degraded-banner {
+  margin: 24rpx 32rpx;
+  padding: 20rpx 24rpx;
+  background: #FFF8E1;
+  color: #8B6914;
+  border-radius: 16rpx;
+  font-size: 24rpx;
+  border-left: 6rpx solid #F1C40F;
+}
+
+/* ── Section heading 通用 ────────────────────────────────────── */
+.section-heading {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1C1C1E;
+  margin: 36rpx 40rpx 20rpx;
+}
+
+/* ── Three step 漫画 ─────────────────────────────────────────── */
+.three-step {
+  padding-top: 12rpx;
+}
+
+.step-row {
+  display: flex;
+  flex-direction: row;
+  gap: 16rpx;
+  padding: 0 32rpx;
+}
+
+.step-card {
+  flex: 1;
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 28rpx 16rpx;
+  text-align: center;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.step-num {
+  display: inline-block;
+  width: 36rpx;
+  height: 36rpx;
+  line-height: 36rpx;
+  background: #5A4FCF;
+  color: #FFFFFF;
+  font-size: 22rpx;
+  border-radius: 50%;
+  margin-bottom: 12rpx;
+}
+
+.step-icon {
+  font-size: 48rpx;
+  margin-bottom: 8rpx;
+}
+
+.step-label {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1C1C1E;
+  margin-bottom: 4rpx;
+}
+
+.step-desc {
+  font-size: 20rpx;
+  color: #8E8E93;
+  line-height: 1.4;
+}
+
+/* ── Samples chip 区 ─────────────────────────────────────────── */
+.samples {
+  padding-bottom: 16rpx;
+}
+
+.sample-row {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  padding: 0 32rpx;
+}
+
+.sample-chip {
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 24rpx 28rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.sample-subject {
+  display: inline-block;
+  font-size: 22rpx;
+  color: #5A4FCF;
+  background: #EEEBFF;
+  padding: 4rpx 14rpx;
+  border-radius: 999rpx;
+  margin-bottom: 10rpx;
+}
+
+.sample-stem {
+  font-size: 26rpx;
+  line-height: 1.5;
+  color: #1C1C1E;
+  margin-bottom: 8rpx;
+}
+
+.sample-err {
+  font-size: 22rpx;
+  color: #8E8E93;
+  line-height: 1.4;
+}
+
+/* ── KPI row ─────────────────────────────────────────────────── */
+.kpi-row {
+  display: flex;
+  flex-direction: row;
+  gap: 12rpx;
+  padding: 24rpx 32rpx;
+  margin-top: 8rpx;
+}
+
+.kpi-cell {
+  flex: 1;
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 24rpx 12rpx;
+  text-align: center;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.kpi-value {
+  font-size: 38rpx;
+  font-weight: 700;
+  color: #5A4FCF;
+  margin-bottom: 6rpx;
+}
+
+.kpi-label {
+  font-size: 20rpx;
+  color: #8E8E93;
+}
+
+/* ── ParentHint ──────────────────────────────────────────────── */
+.parent-hint {
+  margin: 16rpx 40rpx;
+  font-size: 24rpx;
+  color: #5A4FCF;
+  text-align: center;
+  padding: 16rpx;
+}
+
+/* ── ConsentBar ──────────────────────────────────────────────── */
+.consent-bar {
+  margin: 8rpx 40rpx 16rpx;
+  font-size: 20rpx;
+  color: #8E8E93;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* ── CTA dock (sticky bottom) ────────────────────────────────── */
+.cta-dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #FFFFFF;
+  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
+  z-index: 100;
+}
+
+.cta-btn {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 20rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  border: none;
+  margin: 0;
+}
+
+.cta-primary {
+  background: linear-gradient(135deg, #5A4FCF 0%, #8B87F6 100%);
+  color: #FFFFFF;
+}
+
+.cta-secondary {
+  background: #F2F2F7;
+  color: #5A4FCF;
+}
+
+button.cta-btn::after { border: none; }
+
+.cta-spacer {
+  height: 260rpx;
+}

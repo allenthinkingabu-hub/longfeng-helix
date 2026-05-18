@@ -1,3 +1,5 @@
 {
-  "navigationBarTitleText": "AI 错题本"
+  "navigationBarTitleText": "AI 错题本",
+  "navigationBarBackgroundColor": "#7B6FE8",
+  "navigationBarTextStyle": "white"
 }

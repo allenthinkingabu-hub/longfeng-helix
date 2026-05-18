@@ -12,6 +12,7 @@ import * as wrongbookApi from '../../src/api/wrongbook';
 import * as aiApi from '../../src/api/ai';
 import * as reviewApi from '../../src/api/review';
 import * as homeApi from '../../src/api/home';
+import * as landingApi from '../../src/api/landing';
 
 describe('api/file.ts exports', () => {
   it('exports presign function', () => {
@@ -46,6 +47,15 @@ describe('api/ai.ts exports', () => {
 describe('api/home.ts exports', () => {
   it('exports getHomeTodayCount function', () => {
     expect(typeof homeApi.getHomeTodayCount).toBe('function');
+  });
+});
+
+describe('api/landing.ts exports (MP-CATCHUP-B-WELCOME)', () => {
+  it('exports getSamples function (SC-11 /api/landing/samples)', () => {
+    expect(typeof landingApi.getSamples).toBe('function');
+  });
+  it('exports getKpi function (SC-11 /api/landing/kpi)', () => {
+    expect(typeof landingApi.getKpi).toBe('function');
   });
 });
 
