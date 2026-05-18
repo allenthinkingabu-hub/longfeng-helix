@@ -1,0 +1,197 @@
+<!-- P-WEEKLY-REVIEW 本周回顾详情页 (SC-16-T02) -->
+<!-- trace: design/mockups/wrongbook/14_weekly_review.html · @longfeng/testids weekly -->
+<!-- 状态机 §6: LOADING → READY | EMPTY | ERROR -->
+
+<view class="weekly-page" data-test-id="{{testIds.root}}">
+
+  <!-- ── Topbar ──────────────────────────────────────────── -->
+  <view class="topbar">
+    <view class="back" bind:tap="onBackTap" data-test-id="{{testIds.back}}">
+      <van-icon name="arrow-left" size="16px" color="#1C1C1E" />
+    </view>
+    <view class="titlecol">
+      <text class="t">本周回顾</text>
+      <text class="s" data-test-id="{{testIds.range}}">{{week}} · {{rangeLabel}}</text>
+    </view>
+    <view class="share" bind:tap="onShareTap">
+      <van-icon name="share" size="16px" color="#1C1C1E" />
+    </view>
+  </view>
+
+  <!-- ── ERROR banner (顶部黄条 · §9 · TC-3) ────────────── -->
+  <view wx:if="{{pageState === 'ERROR'}}" class="error-banner" data-test-id="{{testIds.errorBanner}}">
+    <text class="error-title">数据加载失败</text>
+    <text class="error-sub">网络异常或服务繁忙</text>
+    <view class="retry-btn" bind:tap="onRetryTap" data-test-id="{{testIds.retryBtn}}">
+      <text>重试</text>
+    </view>
+  </view>
+
+  <!-- ── EMPTY hero (整页换 · §9 · TC-4) ───────────────── -->
+  <view wx:if="{{pageState === 'EMPTY'}}" class="empty-hero" data-test-id="{{testIds.empty}}">
+    <view class="empty-icon">
+      <van-icon name="info-o" size="48px" color="#8E8E93" />
+    </view>
+    <view class="empty-title">本周还没开始</view>
+    <view class="empty-desc">复习数据为空 · 拍一道新题或开始今日复习,下周这里就会有你的回顾报告</view>
+    <view class="empty-cta" bind:tap="onEmptyCtaTap" data-test-id="{{testIds.emptyCta}}">
+      <text>去拍一道题</text>
+    </view>
+  </view>
+
+  <!-- ── LOADING skeleton (§6) ────────────────────────── -->
+  <view wx:if="{{pageState === 'LOADING'}}" class="skeleton">
+    <view class="skeleton-card skeleton-hero"></view>
+    <view class="skeleton-card skeleton-radar"></view>
+    <view class="skeleton-card skeleton-weakkp"></view>
+    <view class="skeleton-card skeleton-stat"></view>
+    <view class="skeleton-card skeleton-failed"></view>
+    <view class="skeleton-card skeleton-insight"></view>
+  </view>
+
+  <!-- ── READY: 6 数据块顺序淡入 ───────────────────────── -->
+  <block wx:if="{{pageState === 'READY'}}">
+
+    <!-- HERO 暗卡 (掌握率 + delta chip + sparkline) -->
+    <view class="hero" data-test-id="{{testIds.hero}}">
+      <view class="hero-kicker">MASTERY RATE · VS LAST WEEK</view>
+      <view class="hero-display">
+        <view class="hero-num">{{hero.masteryRateText}}</view>
+        <view
+          wx:if="{{hero.deltaText}}"
+          class="delta-chip delta-chip-{{hero.deltaDirection}}"
+          data-test-id="{{testIds.delta}}"
+          data-a11y-delta-direction="{{hero.deltaDirection}}"
+        >
+          <text wx:if="{{hero.deltaDirection === 'up'}}" class="delta-arrow">↑</text>
+          <text wx:if="{{hero.deltaDirection === 'down'}}" class="delta-arrow">↓</text>
+          <text class="delta-num">{{hero.deltaText}}</text>
+          <text class="delta-unit">pts</text>
+          <!-- A11Y · sr-only 文本节点 · spec §3 DeltaChip srText prop -->
+          <text class="sr-only">{{hero.deltaSrText}}</text>
+        </view>
+      </view>
+      <view class="hero-sub">本周比上周稳步变化 · 过去 7 天表现</view>
+      <view class="hero-spark" data-test-id="{{testIds.sparkline}}">
+        <!-- svg path d 字符串 · null 索引断笔 (helpers.buildSparklinePath) -->
+        <!-- MP 不支持原生 svg 标签 · 用 data URI 嵌入 svg -->
+        <image
+          class="hero-spark-svg"
+          src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='{{hero.sparklineViewBox}}' preserveAspectRatio='none'%3E%3Cpath d='{{hero.sparklinePath}}' stroke='%23FDBA74' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"
+          mode="scaleToFill"
+        />
+      </view>
+    </view>
+
+    <!-- 学科分布 雷达 -->
+    <view class="sec">
+      <text class="sec-t">学科分布 · BY SUBJECT</text>
+      <text class="sec-m">展开详情 ›</text>
+    </view>
+    <view class="radar-card" data-test-id="{{testIds.radar}}">
+      <image class="radar-svg" src="{{radarSvgUri}}" mode="aspectFit" />
+      <view class="radar-legend">
+        <view wx:for="{{radarLegend}}" wx:key="subject" class="radar-legend-item">
+          <view class="radar-legend-dot" style="background: {{item.color}};"></view>
+          <text class="radar-legend-name">{{item.subject}}</text>
+          <text class="radar-legend-rate">{{item.masteryRate}}%</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 薄弱 KP top 3 -->
+    <view class="sec">
+      <text class="sec-t">薄弱 KP top 3 · WEAK POINTS</text>
+      <text class="sec-m">立即专练 →</text>
+    </view>
+    <view class="weakcol">
+      <view
+        wx:for="{{weakKps}}"
+        wx:key="kpId"
+        class="wkp wkp-rank-{{item.rank}} {{item.highlight ? 'wkp-highlight' : ''}}"
+        data-test-id="weekly-weak-kp-{{item.rank}}"
+        data-kpid="{{item.kpId}}"
+        data-rank="{{item.rank}}"
+        bind:tap="onWeakKpTap"
+      >
+        <view class="wkp-head">
+          <text class="wkp-rank">{{item.rank}}</text>
+          <text class="wkp-name">{{item.kpName}}</text>
+        </view>
+        <view class="wkp-meta">
+          <text class="wkp-subject">{{item.subject}}</text>
+          <text class="wkp-miss">最近 {{item.recentMissCount}} 次都错</text>
+        </view>
+        <view class="wkp-cta {{item.highlight ? 'wkp-cta-primary' : 'wkp-cta-outline'}}">
+          <text>{{item.ctaLabel}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 本周节奏 · stat3 三联 -->
+    <view class="sec">
+      <text class="sec-t">本周节奏 · PACE</text>
+      <text class="sec-m">vs 上周</text>
+    </view>
+    <view class="stat3" data-test-id="{{testIds.statsTrio}}">
+      <view class="stat3-item">
+        <text class="stat3-n stat-green">{{stats.reviewedCount}}</text>
+        <text class="stat3-l">已复习题</text>
+      </view>
+      <view class="stat3-sep"></view>
+      <view class="stat3-item">
+        <text class="stat3-n stat-blue">{{stats.reviewedDurationMin}}</text>
+        <text class="stat3-l">累计分钟</text>
+      </view>
+      <view class="stat3-sep"></view>
+      <view class="stat3-item">
+        <text class="stat3-n stat-orange">+{{stats.newCount}}</text>
+        <text class="stat3-l">本周新增</text>
+      </view>
+    </view>
+
+    <!-- 本周失败题 top 5 · 横滑 -->
+    <view class="sec">
+      <text class="sec-t">本周失败题 top 5 · HARDEST</text>
+      <text class="sec-m">看全部 ›</text>
+    </view>
+    <scroll-view scroll-x class="failscroller" data-test-id="{{testIds.failedScroller}}">
+      <view wx:for="{{failedTop}}" wx:key="questionId" class="fcard" data-qid="{{item.questionId}}" bind:tap="onFailedQTap">
+        <!-- 2026-05-18 加 image · thumbnailUrl 空时走 wx:else 灰底占位 -->
+        <image
+          wx:if="{{item.thumbnailUrl}}"
+          class="fcard-thumb"
+          src="{{item.thumbnailUrl}}"
+          mode="aspectFill"
+          lazy-load
+        />
+        <view wx:else class="fcard-thumb fcard-thumb-empty"></view>
+        <view class="fcard-meta">
+          <text class="fcard-subject">{{item.subjectLabel}}</text>
+          <text class="fcard-miss">错 {{item.missCount}} 次</text>
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- AI 一句话复盘 -->
+    <view class="sec">
+      <text class="sec-t">AI 复盘 · ONE-LINE INSIGHT</text>
+      <text class="sec-m">智能体生成</text>
+    </view>
+    <view class="insight" data-test-id="{{testIds.aiInsight}}">
+      <view class="insight-head">
+        <view class="insight-dot"></view>
+        <text class="insight-label">WEEKLY INSIGHT · 智能体复盘</text>
+      </view>
+      <view wx:if="{{aiInsight}}" class="insight-body">
+        <text class="insight-text">{{aiInsight.text}}</text>
+        <text class="insight-meta">{{aiInsight.insightId}} · {{aiInsight.generatedAt}}</text>
+      </view>
+      <view wx:else class="insight-body insight-loading">
+        <text class="insight-text">AI 复盘生成中 · 稍后刷新可见</text>
+      </view>
+    </view>
+
+  </block>
+
+</view>

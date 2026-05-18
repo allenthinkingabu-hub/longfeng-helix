@@ -338,11 +338,117 @@ export interface HomeTodayResume {
   nextNid?: string | null;
 }
 
+/**
+ * SC-16-T01 · weekSummary 4 字段 (P-HOME Bento 投影)
+ * trace: biz §10.13 / P-HOME.spec.md §5.2 / P-WEEKLY-REVIEW.spec.md §5.3
+ *
+ * 空值语义 (用户 2026-05-16 决策 · biz §10.14):
+ * - masteryRate: null = 空周 0 GRADED · 前端显 "—%"
+ * - sparkline[i]: null = 该日 0 复习 · path M/L 命令断开 (新 path tag)
+ * - streak: integer ≥ 0 · 0 时 chip 整体隐藏
+ * - newCount: integer ≥ 0 · 0 时仍显 "+0" (区别于 streak 兜底语义)
+ */
+export interface WeekSummary {
+  /** ISO 8601 week e.g. "2026-W20" · 永不为 null */
+  week: string;
+  /** null = 空周 (0 GRADED · 不为 0) */
+  masteryRate: number | null;
+  /** 长度恒 7 · null 索引 = 该日 0 复习 · 不 forward-fill */
+  sparkline: Array<number | null>;
+  /** Streak yesterday-back · integer ≥ 0 */
+  streak: number;
+  /** 本周新增错题数 · integer ≥ 0 · 0 也渲染 */
+  newCount: number;
+}
+
 export interface HomeTodayResp {
   tz: string;
   today: HomeTodayCard;
   /** B02 决策：当前阶段恒 null（前端隐藏 Resume Banner） */
   resume?: HomeTodayResume | null;
+  /** SC-16-T01 · 本周 Bento 4 字段投影 (P-HOME 必须仅从此字段消费 · INV-6) */
+  weekSummary?: WeekSummary | null;
+}
+
+// ==================== SC-16-T01 · GET /api/home/weekly · P-WEEKLY-REVIEW 完整聚合 ====================
+// 对齐 backend dto: WeeklyReviewResp
+// trace: biz §10.12 字面 + design/system/pages/P-WEEKLY-REVIEW-weekly-review.spec.md §5.1
+// 学生端脱敏 (INV-2): 不含 student_id_hash / parent_id / device_fp
+
+export type SubjectCode =
+  | 'math'
+  | 'physics'
+  | 'english'
+  | 'chinese'
+  | 'chemistry'
+  | 'biology';
+
+export interface WeeklyHero {
+  /** 0..1 · 本周掌握率 (空周 null) */
+  masteryRate: number | null;
+  /** vs 上周 pt 差 · 可负 · 空周 null */
+  masteryDelta: number | null;
+  /** 长度 7 · 7 天每日掌握率 · null 索引断笔 */
+  sparkline: Array<number | null>;
+}
+
+export interface WeeklySubjectRadar {
+  subject: SubjectCode | string;
+  masteryRate: number;
+  /** 本周该学科复习题数 */
+  sampleSize: number;
+}
+
+export interface WeeklyWeakKp {
+  kpId: string;
+  kpName: string;
+  subject: SubjectCode | string;
+  /** 排序键 · 最近 N 次错 · INV-4: 不按 totalMissCount 排 */
+  recentMissCount: number;
+  totalMissCount: number;
+}
+
+export interface WeeklyStats {
+  reviewedCount: number;
+  reviewedDurationMin: number;
+  newCount: number;
+}
+
+export interface WeeklyFailedQ {
+  /** 后端字段名 questionId (与 H5 spec 用的 qid 不同 · 以 backend 为准) */
+  questionId: string;
+  subject: SubjectCode | string;
+  missCount: number;
+}
+
+export interface WeeklyAiInsight {
+  insightId: string;
+  /** ≤ 50 字 · Spring AI 生成 */
+  text: string;
+  /** ISO timestamp */
+  generatedAt: string;
+}
+
+export interface WeeklyRange {
+  /** ISO date 周一 */
+  from: string;
+  /** ISO date 周日 */
+  to: string;
+}
+
+export interface WeeklyReviewResp {
+  /** ISO 8601 week e.g. "2026-W20" */
+  week: string;
+  range: WeeklyRange;
+  hero: WeeklyHero;
+  subjectRadar: WeeklySubjectRadar[];
+  /** 最多 3 个 · recentMissCount DESC */
+  weakKPs: WeeklyWeakKp[];
+  stats: WeeklyStats;
+  /** 最多 5 题 */
+  failedTop: WeeklyFailedQ[];
+  /** null = AI 生成超时 · 前端显 "AI 复盘生成中" */
+  aiInsight: WeeklyAiInsight | null;
 }
 
 // ==================== SC-01-C05 · review-plan-service · POST /api/review/sessions ====================

@@ -131,14 +131,38 @@ public class QuestionAggregateService {
 
         // P05-LIST: 批量取每个 wrong_item 的 next-due active plan ·
         // 单条 HTTP POST · review-plan-service down 时降级 (空 map) 不 hang.
-        Map<Long, NextDueInfo> nextDueMap = fetchNextDueByItems(
-                result.getContent().stream().map(WrongItem::getId).toList());
+        List<Long> itemIds = result.getContent().stream().map(WrongItem::getId).toList();
+        Map<Long, NextDueInfo> nextDueMap = fetchNextDueByItems(itemIds);
+        // 2026-05-18 P05 fix: wrong_item.stem_text 长期 null (AI OCR 写到 analysis_result 没回写) ·
+        // 批量 JOIN analysis_result 拿 latest stem · 让列表显示真题干 (P08 detail 已做 · list 没做).
+        Map<Long, String> stemMap = fetchLatestStemByItems(itemIds);
 
         return new QuestionListResp(
                 result.getContent().stream()
-                        .map(it -> toListItem(it, nextDueMap.get(it.getId())))
+                        .map(it -> toListItem(it, nextDueMap.get(it.getId()), stemMap.get(it.getId())))
                         .toList(),
                 page, size, result.getTotalElements());
+    }
+
+    /** 2026-05-18 · 批量拿 wrong_item 的 latest AI stem · 单 SQL (DISTINCT ON) · 不 N+1. */
+    private Map<Long, String> fetchLatestStemByItems(List<Long> itemIds) {
+        if (itemIds == null || itemIds.isEmpty()) return Map.of();
+        try {
+            List<Object[]> rows = wrongItemService.findLatestStemByWrongItemIds(itemIds);
+            Map<Long, String> out = new java.util.HashMap<>();
+            for (Object[] row : rows) {
+                if (row.length < 2 || row[0] == null) continue;
+                Long itemId = ((Number) row[0]).longValue();
+                String stem = row[1] == null ? null : row[1].toString();
+                if (stem != null && !stem.isBlank()) {
+                    out.put(itemId, stem);
+                }
+            }
+            return out;
+        } catch (Exception e) {
+            LOG.warn("findLatestStemByWrongItemIds failed (列表降级空 stem): {}", e.toString());
+            return Map.of();
+        }
     }
 
     /** 内部 holder · 不暴露给外面 · review-plan response shape. */
@@ -248,23 +272,35 @@ public class QuestionAggregateService {
     }
 
     private QuestionListItem toListItem(WrongItem item) {
-        return toListItem(item, null);
+        return toListItem(item, null, null);
     }
 
     /**
-     * Overload: 注入 review-plan next-due 字段.
+     * Overload: 注入 review-plan next-due + AI 回填 stem.
      * info=null (没 active plan / review-plan-service down) 走 null 字段 ·
      * FE WrongQuestionListItem.nextDueAt='' + helpers.formatDueLabel 输出 "暂未安排".
+     * aiStem=null 时 fallback wrong_item.stem_text (旧老数据通路 · 多数为 null).
      */
-    private QuestionListItem toListItem(WrongItem item, NextDueInfo info) {
+    private QuestionListItem toListItem(WrongItem item, NextDueInfo info, String aiStem) {
         String nextDueAt = info == null ? null : info.nextDueAt();
         // nodeIndex 0-based (T0..T6) · FE 习惯 T1.. 标签 · +1 落到 nodeStage.
         // info=null 时 nodeStage=null (FE 落 default 1 = "T1 · 暂未安排" 不显怪).
         Integer nodeStage = info == null ? null : info.nodeIndex() + 1;
+        // 2026-05-18 P05 fix: stem 真值优先级 wrong_item.stem_text > AI analysis_result.stem ·
+        // 因数据现实是 stem_text 多 null · 实际靠 aiStem.
+        String stem = item.getStemText();
+        if ((stem == null || stem.isBlank()) && aiStem != null && !aiStem.isBlank()) {
+            stem = aiStem;
+        }
+        // 2026-05-18 thumbnail wire: origin_image_key → MinIO public URL · 同 SC-16 failedTop 一致.
+        // MVP dev 用 localhost:9000 · production 应改 file-service presign + CDN.
+        String thumbnailUrl = (item.getOriginImageKey() == null || item.getOriginImageKey().isBlank())
+                ? null
+                : "http://localhost:9000/wrongbook-dev/" + item.getOriginImageKey();
         return new QuestionListItem(
                 toQid(item.getId()), item.getSubject(), item.getSourceType(),
                 item.getStatus(), item.getMastery(), item.getDifficulty(),
-                item.getStemText(), item.getOriginImageKey(), item.getCreatedAt(),
+                stem, item.getOriginImageKey(), thumbnailUrl, item.getCreatedAt(),
                 nextDueAt, nodeStage);
     }
 }

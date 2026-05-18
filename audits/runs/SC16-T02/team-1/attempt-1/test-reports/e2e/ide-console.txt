@@ -1,0 +1,17 @@
+# SC-16-T02 attempt-1 · ide-console.txt
+#
+# 本文件状态: Coder Phase 3 attempt-1 IDE GUI 阻塞 · automator.connect() ws://127.0.0.1:9420
+# 全部 fail (含历史标杆 home.spec.ts / automator-smoke.spec.ts) · 与 SC01-MP-MENU-FIX
+# attempt-1 bugs-found.md Bug 10 同因 (IDE GUI handshake 需要人工 launch / 启用自动化测试).
+#
+# 不是 spec.ts 代码问题:
+# - lint + typecheck + unit (185/185) 全过
+# - spec.ts 用 _helpers 三件套 (connectMp + assertConsoleClean + assertPageRenders)
+# - 6 用例一对一 covers test-cases.md Round 3 终态
+#
+# 缓解 (与 SC01-MP-MENU-FIX 同模式 · 该 task 仍 PASS 关闭):
+# - Coder Phase 3 已完成: 代码 + spec.ts + unit 全过 + lint 全过 + commit
+# - Tester Phase 4: 用户启动 IDE GUI 后 · cli auto · 再跑 spec.ts (历史标杆同样依赖)
+# - VRT baseline: 待 Tester Phase 4 IDE 可用后用 --update-snapshot 生成
+#
+# 0 [error] · 0 [warn] · 无可观察 IDE Console error (因为 spec.ts 没真跑 · 不是 error 漏报)

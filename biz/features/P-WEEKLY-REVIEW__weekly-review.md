@@ -132,7 +132,8 @@
 
 ```
 GET  /api/home/weekly
-Headers: Authorization: Bearer <STUDENT JWT>
+Headers: X-User-Id: <student_id>                  // MVP 简化 · 与既有 /api/home/today 一致 · 登录 (SC-00) 上线时双 endpoint 同步升 JWT
+         X-User-Timezone: <IANA tz e.g. Asia/Shanghai>  // 可选 · 缺省读 user_setting.timezone
 Query:   (none · 默认 current ISO week · P2 预留 ?week=YYYY-Www)
 Resp:    200 WeeklyReviewResp
          {
@@ -176,6 +177,153 @@ SLA:     P95 ≤ 400ms · P99 ≤ 800ms
 **复用说明**:
 - 后端服务复用 master §10.10 P-OBSERVER `weekly_aggregate` service 的同一段 SQL 聚合代码 · 学生端 + 家长端共享 service · **唯一区别在脱敏层**: 学生端不返回 `student_id_hash` / `parent_id` / `device_fp` · 家长端不返回原始 `qid` (master §10.10 已 mask 为 `kpTagsMasked`)
 - 复用 master §6 Spring AI 链路生成 `aiInsight.text` · 提示词模板挂 master §6.2 的同一 `QuestionAnalyzer` interface 的兄弟 prompt
+
+### 10.13 P-HOME 共享投影 (P1 · SC-16 关联 · 用户 2026-05-16 决策)
+
+**背景**: master P-HOME spec.md L151 注明 `weekSparkline / streak / newCount / masteryRate` 等 9 字段在 MVP 不下发, 前端 hardcoded。本 satellite 落地时**顺便补齐**其中 4 字段 (`masteryRate / sparkline / streak / newCount`) · 防止学生在 P-HOME 看 hardcoded 68% / Tap 进 P-WEEKLY-REVIEW 看真值 65% 的 spec drift。
+
+**扩展**: 既有 `GET /api/home/today` response 新增 `weekSummary` 对象 (向后兼容 · 既有 today.{total,done,circleProgress} 子集不动):
+
+```
+GET  /api/home/today?tz=Asia/Shanghai
+Headers: X-User-Id: <student_id>              // P-HOME spec §5 既定 · MVP 简化 · 登录 (SC-00) 上线时升 JWT
+         X-User-Timezone: <IANA tz>            // 可选
+Resp:    200 (新增 weekSummary 字段)
+         {
+           tz: "Asia/Shanghai",
+           today: { total: 8, done: 3, circleProgress: 0.375 },   // 既有 · 不动
+           resume: null,                                          // 既有 · 不动
+           weekSummary: {                                         // 新增
+             week: "2026-W20",
+             masteryRate: 0.68 | null,                            // 空周时 null · 不为 0
+             sparkline: [0.55, null, 0.60, 0.62, null, 0.66, 0.68],  // 长度 7 · 空日 null · 不 forward-fill
+             streak: 5,                                           // 整数 ≥ 0 · 从昨天起往回数
+             newCount: 8                                          // 整数 ≥ 0 · 不为 null
+           }
+         }
+```
+
+**强制约束**:
+1. **同源不变量** (System Invariant #6): `GET /api/home/weekly.hero.masteryRate` ≡ `GET /api/home/today.weekSummary.masteryRate` · 同一 `weekly_aggregate` service 投影 · 不允许 controller 内嵌独立 SQL · contract test 双调对比浮点容差 0
+2. **P-HOME 不调 /weekly**: P-HOME 不允许调 `GET /api/home/weekly` 拿 hero 子集 (冗余 payload + 重复 RTT · 违反 Simplicity First) · grep `frontend/apps/mp/pages/home/` 0 命中 `/api/home/weekly` 字符串
+
+### 10.14 聚合计算逻辑 (weekly_aggregate service · AI 开发必读)
+
+> 本节是后端 `weekly_aggregate` service 的**确定性规约** · Coder 落 backend/review-plan-service 实现时**字面照此** · TestDesigner 写 test-cases.md 时**字面照此** · Tester 跑 adversarial 时**字面照此**。任何"我觉得应该这样算"的偏离都视为 spec drift。
+
+**公共前提**:
+- **数据源**: `wb_review_record` (复习记录 · master §4.6) join `wb_question` (错题 · master §4.2) · join `wb_review_node` (艾宾浩斯节点 · master §4.5)
+- **周边界**: ISO 8601 week · 周一 00:00 → 周日 23:59 · 用学生 tz (`user_setting.timezone` · 跨时区走 master §2B.9 SC-08) · UTC 存储 · 学生 tz 转换
+- **复用规则**: 同一 service 同一次 SQL 调用 · 投影出 `WeeklyReviewResp.hero` (供 /weekly) + `weekSummary` (供 /today) · **禁止两套 SQL**
+
+#### 字段 1 · `masteryRate` (本周掌握率)
+
+```sql
+-- 伪 SQL · 实际由 weekly_aggregate service 拼装
+SELECT
+  CASE
+    WHEN COUNT(*) FILTER (WHERE grade IS NOT NULL) = 0 THEN NULL   -- 空周返 null 不返 0
+    ELSE COUNT(*) FILTER (WHERE grade = 'MASTERED')::float
+       / COUNT(*) FILTER (WHERE grade IS NOT NULL)
+  END AS mastery_rate
+FROM wb_review_record
+WHERE student_id = :sid
+  AND reviewed_at >= :weekStartUtc   -- 周一 00:00 student_tz → UTC
+  AND reviewed_at <  :weekEndUtc;    -- 下周一 00:00 student_tz → UTC (左闭右开)
+```
+
+**语义**:
+- 空周 (0 GRADED 记录) → `null` (不返 0 · "没复习过" ≠ "掌握率 0%" · 用户 2026-05-16 决策)
+- 类型 `number | null` · 范围 `[0.0, 1.0]`
+- 前端约定: `null` 时 P-HOME 显 "—%" · P-WEEKLY-REVIEW Hero 走 EMPTY 态 (但 EMPTY 触发条件是 `stats.reviewedCount === 0` · 不是 `masteryRate === null` · 两者通常同步但语义独立)
+
+#### 字段 2 · `sparkline[7]` (7 天每日掌握率折线)
+
+```sql
+WITH days AS (                                     -- 周内 7 天预生成
+  SELECT generate_series(:weekStartUtc, :weekEndUtc - interval '1 day', '1 day'::interval) AS day_utc
+),
+daily AS (
+  SELECT date_trunc('day', reviewed_at AT TIME ZONE :studentTz) AS day_tz,
+         COUNT(*) FILTER (WHERE grade IS NOT NULL) AS graded,
+         COUNT(*) FILTER (WHERE grade = 'MASTERED') AS mastered
+  FROM wb_review_record
+  WHERE student_id = :sid AND reviewed_at >= :weekStartUtc AND reviewed_at < :weekEndUtc
+  GROUP BY 1
+)
+SELECT d.day_utc,
+       CASE WHEN daily.graded IS NULL OR daily.graded = 0 THEN NULL  -- 空日返 null
+            ELSE daily.mastered::float / daily.graded END AS rate
+FROM days d LEFT JOIN daily ON daily.day_tz = date_trunc('day', d.day_utc AT TIME ZONE :studentTz)
+ORDER BY d.day_utc;                                 -- 索引 0 = 周一 · 索引 6 = 周日
+```
+
+**语义**:
+- 长度严格 = 7 · 索引 `0..6` 对应**学生 tz** 的**周一到周日** (不是 server tz · 不是 UTC)
+- 某天 0 GRADED → `sparkline[i] = null` (不是 0 · 不 forward-fill 前一日值 · 用户 2026-05-16 决策)
+- 类型 `Array<number | null>`
+- 前端约定: `null` 索引在 SVG path `M/L` 命令处断开 (新 path tag 起笔) · 不允许折线下探到 0 误导学生
+
+#### 字段 3 · `streak` (Streak 天数 · 连续打卡)
+
+```pseudo
+def compute_streak(studentId, studentTz):
+    # 从昨天起往回数 · 连续 N 天每日 ≥ 1 GRADED (用户 2026-05-16 决策 · Duolingo/Streaks 模式)
+    streak = 0
+    cursor = yesterday_in_tz(studentTz)            # 关键: 起点是昨天不是今天
+    while True:
+        graded_count = count(wb_review_record
+                             where student_id = studentId
+                               and date(reviewed_at AT studentTz) = cursor
+                               and grade IS NOT NULL)
+        if graded_count == 0: break
+        streak += 1
+        cursor -= 1 day
+    # 今天若也有 GRADED · streak 包含今天 (+1)
+    today_graded = count(... where date(reviewed_at AT studentTz) = today_in_tz(studentTz)
+                                and grade IS NOT NULL)
+    if today_graded > 0:
+        streak += 1
+    return streak                                  # integer ≥ 0
+```
+
+**语义**:
+- 起点 = **昨天** · 不是今天 (用户 2026-05-16 决策 · 今天没复习不破坏 streak · 学生上午看不会出 0 沮丧)
+- 今天若有 ≥ 1 GRADED · 总 streak 包含今天 (+1 · 学生当天即时获得反馈)
+- 类型 `integer ≥ 0` · 学生注册首日且今日无复习 → `streak = 0`
+- 前端约定: `streak === 0` 时整个 `.streakchip` 隐藏 · 不显 "Streak 0 天" (UX 兜底)
+
+#### 字段 4 · `newCount` (本周新增错题数)
+
+```sql
+SELECT COUNT(*)
+FROM wb_question
+WHERE owner_id = :sid
+  AND created_at >= :weekStartUtc
+  AND created_at <  :weekEndUtc;
+```
+
+**语义**:
+- 类型严格 `integer ≥ 0` · 空周 → `0` (**不**为 null · 计数字段与语义字段语义不同 · 与 masteryRate 区别对待)
+- 前端约定: `0` 时显 "+0" · 不隐藏 (区别于 streak=0 的隐藏兜底)
+
+#### `delta` 与 `range` 派生字段
+
+- **`masteryDelta`** = 本周 `masteryRate` - 上周 `masteryRate` · 两边都 null → delta = null · 一边 null → delta = null (无法对比 · 不返回 ±100%) · 仅当两边都有值才返实数
+- **`range.from / range.to`**: ISO 8601 date string · `from` = 周一 (student tz) · `to` = 周日 (student tz) · 日期纯字面 (无时区后缀)
+
+#### 投影规则: 同一次聚合 · 两 endpoint
+
+| endpoint | 投影字段 (取自 weekly_aggregate 全集) |
+|---|---|
+| `GET /api/home/weekly` | `hero.{masteryRate,masteryDelta,sparkline}` + `subjectRadar[]` + `weakKPs[]` + `stats.{reviewedCount,reviewedDurationMin,newCount}` + `failedTop[]` + `aiInsight` (完整集) |
+| `GET /api/home/today` (扩展) | `weekSummary.{masteryRate,sparkline,streak,newCount}` (4 字段投影 · 不含 radar / weakKPs / failedTop / aiInsight · 不含 delta · 不含 reviewedDurationMin) |
+
+**Coder 实现提示** (T01):
+1. 把聚合做成一次 service 调用 `weeklyAggregateService.aggregate(studentId, weekIso)` → 返回内部 `WeeklyAggregateRaw` POJO 含所有可能字段
+2. `WeeklyController.getWeekly()` 把 raw → `WeeklyReviewResp` DTO (含 hero/radar/weakKPs/stats/failedTop/aiInsight)
+3. `HomeAggregatorController.getToday()` 已有的 today 子集**不动**, 在 response 中**追加** `weekSummary` 字段 · 也调 `weeklyAggregateService.aggregate(...)` (同一 service 同一参数) · 把 raw → `WeekSummaryDto` (4 字段)
+4. **不允许**两个 controller 各拼一段独立 SQL (违反 INV-1 + INV-6) · audit grep 验证 `review-plan-service` 仓库内 weekly 聚合 SQL/JPQL 字面只出现 1 处
 
 ---
 

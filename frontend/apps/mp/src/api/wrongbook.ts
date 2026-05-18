@@ -243,6 +243,9 @@ interface WrongQuestionListItemWire {
   stem_text?: string | null;
   stemSnippet?: string | null;
   origin_image_key?: string | null;
+  /** 2026-05-18 BE 拼 MinIO public URL · 前端不构造 · 直接消费. */
+  thumbnail_url?: string | null;
+  thumbnailUrl?: string | null;
   thumb?: string | null;
   mastery?: number | null;
   masteryLabel?: string;
@@ -278,7 +281,8 @@ function normalizeListItem(w: WrongQuestionListItemWire): WrongQuestionListItem 
     kp: w.kp ?? w.knowledge_points ?? [],
     // stem_text 可为 null (OCR 未跑完时) · 走空串 · enrichItem.slice 安全
     stemSnippet: stemRaw ?? '',
-    thumb: w.thumb ?? w.origin_image_key ?? '',
+    // 2026-05-18 thumb 优先 BE 拼好的 URL (thumbnail_url) · fallback 老 thumb/origin_image_key
+    thumb: w.thumbnail_url ?? w.thumbnailUrl ?? w.thumb ?? w.origin_image_key ?? '',
     masteryPct: typeof w.mastery === 'number' ? w.mastery : 0,
     masteryLabel: (w.masteryLabel as 'NOT_MASTERED' | 'PARTIAL' | 'MASTERED') ?? masteryLabelFromNum(w.mastery),
     nextDueAt: w.nextDueAt ?? w.next_due_at ?? '',

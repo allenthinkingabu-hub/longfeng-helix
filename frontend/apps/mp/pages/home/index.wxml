@@ -104,12 +104,19 @@
     <!-- ── 始终渲染 sections (LOADING/READY/EMPTY/ERROR 共用 home framework) ─── -->
     <block>
 
-      <!-- ── Weekly summary (B3 · sparkline SVG + days bar) ──── -->
+      <!-- ── Weekly summary (SC-16-T02 · weekSummary 4 数字 wire to today.weekSummary · INV-6) -->
       <view class="sec">
         <text class="sec-t">本周回顾</text>
-        <text class="sec-m">查看全部 ›</text>
+        <text
+          class="sec-m"
+          data-test-id="{{testIds.weeklyHomeLink}}"
+          bind:tap="onWeeklyHomeTap"
+        >查看全部 ›</text>
       </view>
       <view class="weekly" data-test-id="p-home-weekly-sparkline">
+        <!-- 4 维度 stat (mastered/newItems/forgotten/masteryRate) · 真值走
+             /api/home/weekly-stats (不再 hardcode 23/8/2/68%) ·
+             用户 2026-05-18 决策: 恢复 4 维度但喂真值 + 保 sparkline 曲线 -->
         <view class="weekly-row">
           <view class="stat">
             <text class="stat-n stat-green">{{weekStats.mastered}}</text>
@@ -117,7 +124,12 @@
           </view>
           <view class="stat-sep"></view>
           <view class="stat">
-            <text class="stat-n stat-blue">{{weekStats.newItems}}</text>
+            <!-- 复用 SC-16-T02 testid p-home-week-new-count: newItems 语义同
+                 "本周新增" · TC-6 E2E + unit 仍命中 -->
+            <text
+              class="stat-n stat-blue"
+              data-test-id="{{testIds.weekSummary.newCountNum}}"
+            >{{weekStats.newItems}}</text>
             <text class="stat-l">新增</text>
           </view>
           <view class="stat-sep"></view>
@@ -127,24 +139,36 @@
           </view>
           <view class="stat-sep"></view>
           <view class="stat">
-            <text class="stat-n stat-indigo">{{weekStats.masteryRate}}%</text>
+            <!-- 复用 SC-16-T02 testid p-home-week-mastery-num: masteryRate 语义同
+                 "掌握率" · TC-6 E2E + unit 仍命中 -->
+            <text
+              class="stat-n stat-indigo"
+              data-test-id="{{testIds.weekSummary.masteryRateNum}}"
+            >{{weekStats.masteryRate}}%</text>
             <text class="stat-l">掌握率</text>
           </view>
         </view>
-        <!-- (B3) sparkline SVG · 7 日趋势折线 + 今日端点 高亮 -->
-        <!-- MP 不支持原生 <svg> 标签 · 用 <image src="data:image/svg+xml;..."> 兜底 -->
-        <view class="spark" data-test-id="p-home-weekly-spark-svg">
-          <image class="spark-svg" src="{{sparklineSvgUri}}" mode="scaleToFill" />
+        <!-- Sparkline 曲线: 严格真值 (B 方案 2026-05-18 用户决策) ·
+             仅 BE /today.weekSummary.sparkline 有真值时渲染 · 空周不画
+             (防 mockup 假曲线穿透 · 与 P03/P04 治理同根) ·
+             日期 bar 仍渲染让"周一→今天"标尺继续可视 -->
+        <view class="spark" data-test-id="{{testIds.weekSummary.sparklineSvg}}">
+          <image
+            wx:if="{{weekSummarySparklineUri}}"
+            class="spark-svg"
+            src="{{weekSummarySparklineUri}}"
+            mode="scaleToFill"
+          />
         </view>
-        <!-- (B3) days bar · 周一→周日 标签 + 今日高亮 -->
+        <!-- 2026-05-18 用户决策修: day bar 标签动态化 ·
+             "今天"贴在 ISO 周对应位置 (周一=index 0 ... 周日=index 6) ·
+             之前写死 [周一,周二,...,周六,今天] 假设今天=周日 → 错位 bug -->
         <view class="days" data-test-id="p-home-weekly-days">
-          <text class="day">周一</text>
-          <text class="day">周二</text>
-          <text class="day">周三</text>
-          <text class="day">周四</text>
-          <text class="day">周五</text>
-          <text class="day">周六</text>
-          <text class="day day-today">今天</text>
+          <text
+            wx:for="{{weekDayLabels}}"
+            wx:key="*this"
+            class="day {{index === todayIdx ? 'day-today' : ''}}"
+          >{{item}}</text>
         </view>
       </view>
 

@@ -87,9 +87,20 @@
       >
         <view class="left-bar left-bar-{{item.masteryColor}}"></view>
         <view class="thumb">
-          <text class="qno">{{item.questionNo}}</text>
-          <text class="thumb-h3">{{item.stemShort}}</text>
-          <view class="strk"></view>
+          <!-- 2026-05-18 加 · BE 拼的 MinIO public URL (item.thumb) · 真图缩略 ·
+               空时显灰底 + 题号 + stem 短摘要 fallback -->
+          <image
+            wx:if="{{item.thumb}}"
+            class="thumb-img"
+            src="{{item.thumb}}"
+            mode="aspectFill"
+            lazy-load
+          />
+          <block wx:else>
+            <text class="qno">{{item.questionNo}}</text>
+            <text class="thumb-h3">{{item.stemShort}}</text>
+            <view class="strk"></view>
+          </block>
         </view>
         <view class="body">
           <view class="h">
