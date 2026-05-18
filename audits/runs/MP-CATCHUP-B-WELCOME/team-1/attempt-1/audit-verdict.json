@@ -2,7 +2,7 @@
   "task_id": "MP-CATCHUP-B-WELCOME",
   "attempt": 1,
   "team_id": "team-1",
-  "audited_at": "2026-05-18T14:31:37.421Z",
+  "audited_at": "2026-05-18T15:08:01.047Z",
   "audited_by": "audit.js v3 (deterministic · 7 dims · +test_cases_alignment)",
   "pass": true,
   "checks": [
@@ -100,7 +100,7 @@
       "dimension": "test_validity",
       "name": "tester_md_testcase_count_matches_xml",
       "pass": true,
-      "evidence": "no explicit testcase count in tester.md — skip (advisory)"
+      "evidence": "claimed=4 == xml<testcase>=4"
     },
     {
       "dimension": "test_validity",

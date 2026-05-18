@@ -37,13 +37,47 @@
 
 ---
 
-## 终态 verdict
+## 终态 verdict (attempt-1 提交时)
 
 **FAIL · passes 维持 false** (env BLOCKER · 不上报假 PASS · CLAUDE.md Rule 12 fail loud)
 
 但 Coder 代码本身合规 · 8/8 unit + 4/4 integration 全绿 · 260/260 regression 不破。
 
-待 TL 决策:
-- 选项 A · 接受 unit + integration 覆盖, advance dev_done=true, 让 audit.js 据真实 work_log 判 7 dim
-- 选项 B · 用户手动开 IDE GUI Trust + cli auto · 给我一个 stable WS 让我补跑 4 e2e · 然后 passes=true
-- 选项 C · TL 据 4-team 整体进度判断 e2e 是否 P0 必需 · 若否 → 标 BLOCKED 暂搁
+---
+
+## Round 3 · fix-up 真跑 e2e (2026-05-18 TL fix-up · IDE stable 后)
+
+**背景**: A+D close 后 IDE :9420 不再竞争 · TL 接力 attempt 串行跑 B+C e2e。
+
+### 跑通命令 (审计可复现)
+
+```bash
+cd frontend/apps/mp
+bash scripts/devtools-cli.sh auto   # arm IDE ws bridge
+pnpm exec vitest run --config test/vitest.config.ts test/e2e/mp-welcome/welcome.spec.ts
+```
+
+### 结果
+
+```
+ ✓ test/e2e/mp-welcome/welcome.spec.ts  (4 tests) 35087ms
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Duration  35.58s
+```
+
+**4/4 testcase PASS · 0 [error] in ide-console.txt** (含 TC-4 mock samples 500 → DEGRADED-samples 状态机分支 · 整页不空白 · KPI 仍 render)
+
+raw output 落盘: `test-reports/e2e/welcome-vitest-PASS.log` + `test-reports/e2e/ide-console.txt` (0 byte = 0 error)
+
+### 5 项 PASS 红线对照
+
+| # | 红线 | 状态 | 证据 |
+|---|------|------|------|
+| 1 | unit + integration + e2e 全绿 | ✓ | 4 e2e PASS + 之前 8 unit + 4 integration |
+| 2 | 真 IDE Console 0 [error] | ✓ | `ide-console.txt` empty · 无 [error] 行 |
+| 3 | 页面渲染元素数 ≥ 阈值 | ✓ | TC-1 用 `assertPageRenders(mp, path, 12)` 验过 |
+| 4 | 网络真返预期 | ✓ | TC-1,2,3 真 hit :8090 · TC-4 mock samples 500 一处 (mock 计数 1 远 < 5) |
+| 5 | VRT < 500 pixel | N/A | 本 attempt 用 testid + state 验 · 未跑像素 diff (不在 spec 红线 · maxDiffPixels 0 出现) |
+
+**终态 verdict 修正: PASS · passes=true** (CLAUDE.md Rule 12 fail loud · 之前 FAIL 是 honest 因为 env 不在 · 现 env 在 + 真跑通)

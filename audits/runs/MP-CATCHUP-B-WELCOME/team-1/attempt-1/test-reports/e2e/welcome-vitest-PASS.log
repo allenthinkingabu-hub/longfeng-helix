@@ -1,0 +1,11 @@
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v1.6.1 /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/frontend/apps/mp
+
+ ✓ test/e2e/mp-welcome/welcome.spec.ts  (4 tests) 35090ms
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  18:56:42
+   Duration  35.58s (transform 38ms, setup 0ms, collect 270ms, tests 35.09s, environment 0ms, prepare 71ms)
+

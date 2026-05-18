@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="4" failures="0" errors="0" time="37.6">
+    <testsuite name="test/e2e/mp-welcome/welcome.spec.ts" timestamp="2026-05-18T15:04:21.189Z" hostname="Wangs-MacBook-Pro.local" tests="4" failures="0" errors="0" skipped="0" time="37.005">
+        <testcase classname="test/e2e/mp-welcome/welcome.spec.ts" name="MP-CATCHUP-B-WELCOME · P-LANDING MP page &gt; TC-1 · /pages/welcome/index renders Hero + 3Step + Samples + KPI + CTA (真 :8090)" time="14.921">
+        </testcase>
+        <testcase classname="test/e2e/mp-welcome/welcome.spec.ts" name="MP-CATCHUP-B-WELCOME · P-LANDING MP page &gt; TC-2 · tap &quot;试试看&quot; 主 CTA → wx.navigateTo /pages/guest/capture/index" time="7.809">
+        </testcase>
+        <testcase classname="test/e2e/mp-welcome/welcome.spec.ts" name="MP-CATCHUP-B-WELCOME · P-LANDING MP page &gt; TC-3 · tap &quot;已有账号&quot; 次 CTA → wx.navigateTo /pages/login/index" time="7.575">
+        </testcase>
+        <testcase classname="test/e2e/mp-welcome/welcome.spec.ts" name="MP-CATCHUP-B-WELCOME · P-LANDING MP page &gt; TC-4 · samples 500 → phase=DEGRADED-samples · degraded-banner 显示 · KPI 仍可见" time="6.662">
+        </testcase>
+    </testsuite>
+</testsuites>
