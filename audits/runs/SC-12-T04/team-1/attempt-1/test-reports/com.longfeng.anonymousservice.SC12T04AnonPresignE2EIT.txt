@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.longfeng.anonymousservice.SC12T04AnonPresignE2EIT
+-------------------------------------------------------------------------------
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.223 s -- in com.longfeng.anonymousservice.SC12T04AnonPresignE2EIT
