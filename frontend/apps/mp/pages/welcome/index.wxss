@@ -198,8 +198,8 @@
 }
 
 .mchip .l {
-  margin-top: 8rpx;
-  font-size: 19rpx;
+  margin-top: 10rpx;
+  font-size: 22rpx;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.72);
   letter-spacing: 0.6rpx;
@@ -406,28 +406,28 @@
   border-bottom: 0;
 }
 
-/* SVG 图标 · 直接 inline base64 (mockup line 200/209/218 同款 stroke icon) · 36rpx
-   置中 · 叠在 .ico-{a,b,c} 各自渐变底之上 (background stack) */
+/* SVG 图标 · filled-style (实心 · 比 stroke-only 视觉重) · 56rpx 置中 · 96rpx 渐变方框
+   尺寸放大 (72→96 / 36→56) 以匹配 mockup 在真机视觉比重 */
 .feat .ico {
-  width: 72rpx;
-  height: 72rpx;
-  border-radius: 20rpx;
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 24rpx;
   flex: none;
   background-position: center;
   background-repeat: no-repeat;
-  background-size: 36rpx 36rpx;
+  background-size: 56rpx 56rpx;
 }
 
 .feat .ico.ico-a {
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzNiIgaGVpZ2h0PSIzNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTE0LjUgNGgtNUw3IDdINGEyIDIgMCAwIDAtMiAydjlhMiAyIDAgMCAwIDIgMmgxNmEyIDIgMCAwIDAgMi0yVjlhMiAyIDAgMCAwLTItMmgtM2wtMi41LTN6Ii8+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMyIgcj0iNCIvPjwvc3ZnPgo="), linear-gradient(135deg, #4C9BFF, #5856D6);
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1NiIgaGVpZ2h0PSI1NiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+PHBhdGggZD0iTTE0LjUgNGgtNUw3IDdINGEyIDIgMCAwIDAtMiAydjlhMiAyIDAgMCAwIDIgMmgxNmEyIDIgMCAwIDAgMi0yVjlhMiAyIDAgMCAwLTItMmgtM2wtMi41LTN6TTEyIDE4YTUgNSAwIDEgMSAwLTEwIDUgNSAwIDAgMSAwIDEwem0wLTJhMyAzIDAgMSAwIDAtNiAzIDMgMCAwIDAgMCA2eiIvPjwvc3ZnPgo="), linear-gradient(135deg, #4C9BFF, #5856D6);
 }
 
 .feat .ico.ico-b {
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzNiIgaGVpZ2h0PSIzNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iOSIvPjxwb2x5bGluZSBwb2ludHM9IjEyIDcgMTIgMTIgMTUgMTQiLz48L3N2Zz4K"), linear-gradient(135deg, #FF9500, #FF3B30);
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1NiIgaGVpZ2h0PSI1NiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+PHBhdGggZD0iTTEyIDJhMTAgMTAgMCAxIDAgMCAyMCAxMCAxMCAwIDAgMCAwLTIwem0wIDE4YTggOCAwIDEgMSAwLTE2IDggOCAwIDAgMSAwIDE2em0xLTEzaC0ydjZsNSAzIDEtMS43LTQtMi4zVjd6Ii8+PC9zdmc+Cg=="), linear-gradient(135deg, #FF9500, #FF3B30);
 }
 
 .feat .ico.ico-c {
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzNiIgaGVpZ2h0PSIzNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTE4IDhBNiA2IDAgMCAwIDYgOGMwIDctMyA5LTMgOWgxOHMtMy0yLTMtOSIvPjxwYXRoIGQ9Ik0xMy43IDIxYTIgMiAwIDAgMS0zLjQgMCIvPjwvc3ZnPgo="), linear-gradient(135deg, #34C759, #30B0C7);
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1NiIgaGVpZ2h0PSI1NiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+PHBhdGggZD0iTTEyIDIyYTIgMiAwIDAgMCAyLTJoLTRhMiAyIDAgMCAwIDIgMnptNi02VjExYTYgNiAwIDAgMC01LTUuOVY0YTEgMSAwIDEgMC0yIDB2MS4xQTYgNiAwIDAgMCA2IDExdjVsLTIgMnYxaDE2di0xbC0yLTJ6Ii8+PC9zdmc+Cg=="), linear-gradient(135deg, #34C759, #30B0C7);
 }
 
 .feat .feat-text {
@@ -435,17 +435,17 @@
 }
 
 .feat .feat-text .t {
-  font-size: 27rpx;
+  font-size: 32rpx;
   font-weight: 700;
   letter-spacing: 0.2rpx;
   color: #1C1C1E;
 }
 
 .feat .feat-text .d {
-  font-size: 23rpx;
+  font-size: 26rpx;
   color: #636366;
-  margin-top: 6rpx;
-  line-height: 1.45;
+  margin-top: 8rpx;
+  line-height: 1.5;
 }
 
 /* ────────────────────────────────────────────────────────────
@@ -500,10 +500,11 @@
 }
 
 .social .txt {
-  font-size: 23rpx;
+  font-size: 26rpx;
   font-weight: 600;
   color: #1C1C1E;
   flex: 1;
+  line-height: 1.4;
 }
 
 .social .txt .em {
@@ -524,11 +525,11 @@
 }
 
 .how-title {
-  font-size: 24rpx;
+  font-size: 28rpx;
   font-weight: 800;
   color: #8E8E93;
   letter-spacing: 0.4rpx;
-  margin-bottom: 20rpx;
+  margin-bottom: 24rpx;
   text-transform: uppercase;
 }
 
@@ -564,23 +565,23 @@
 }
 
 .how-step .step-ic {
-  font-size: 40rpx;
+  font-size: 52rpx;
   margin-top: 16rpx;
 }
 
 .how-step .step-lb {
-  font-size: 20rpx;
+  font-size: 24rpx;
   font-weight: 700;
   color: #1C1C1E;
-  margin-top: 6rpx;
+  margin-top: 8rpx;
 }
 
 /* ParentHint */
 .parent-hint {
   margin-top: 28rpx;
-  padding: 18rpx 0;
+  padding: 20rpx 0;
   text-align: center;
-  font-size: 24rpx;
+  font-size: 28rpx;
   font-weight: 600;
   color: #007AFF;
 }
