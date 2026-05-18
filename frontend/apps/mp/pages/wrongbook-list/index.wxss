@@ -260,6 +260,16 @@ page {
   color: #8E8E93;
   padding: 0 8rpx 16rpx;
 }
+/* 2026-05-18 真功能 · sort 可点选 · tap 弹 ActionSheet */
+.sort-tappable {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 8rpx 4rpx;
+}
+.sort-tappable:active {
+  opacity: 0.6;
+}
 
 .sort-strong {
   color: #3C3C43;

@@ -89,9 +89,12 @@
         </view>
       </view>
 
-      <!-- Sort hint -->
+      <!-- Sort selector · 2026-05-18 真功能 · tap 弹 ActionSheet 6 模式 -->
       <view class="sort" data-test-id="{{testIds['sort-bar']}}">
-        <text class="sort-l">按 <text class="sort-strong">下次复习时间</text> · 升序</text>
+        <view class="sort-l sort-tappable" bind:tap="onSortTap">
+          <text>按 <text class="sort-strong">{{sortLabel}}</text></text>
+          <van-icon name="arrow-down" size="12px" color="#8E8E93" />
+        </view>
         <text>共 <text class="sort-strong">{{items.length}}</text> 条</text>
       </view>
 

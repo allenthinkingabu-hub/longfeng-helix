@@ -120,8 +120,11 @@ public class QuestionAggregateService {
     public QuestionListResp listQuestions(Long studentId, String subject, Short mastery,
                                           String q,
                                           int page, int size, String sort) {
+        // 2026-05-18 sort 扩展: due_asc/desc · mastery_asc/desc · created_asc/desc.
+        // due_* + mastery_* 因依赖 next-due 注入 / mastery 应用层映射 · 用应用层后排 ·
+        // SQL 阶段统一 created_at DESC · 后面 application-level sort 覆盖.
         Sort s = Sort.by(Sort.Direction.DESC, "created_at");
-        if ("oldest".equals(sort)) {
+        if ("oldest".equals(sort) || "created_asc".equals(sort)) {
             s = Sort.by(Sort.Direction.ASC, "created_at");
         }
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), size, s);
@@ -156,7 +159,44 @@ public class QuestionAggregateService {
             filtered = rawItems;
             total = result.getTotalElements();
         }
-        return new QuestionListResp(filtered, page, size, total);
+        // 2026-05-18 应用层排序 · due_* + mastery_* 走这里 (SQL 阶段已 created_at 排过 ·
+        // 这层仅对 due/mastery 模式覆盖 · 用 stable sort 保 created tie-break).
+        java.util.List<QuestionListItem> sorted = applyAppSort(filtered, sort);
+        return new QuestionListResp(sorted, page, size, total);
+    }
+
+    /**
+     * 2026-05-18 应用层 sort · 跨 wrong_item 列 + 注入字段 (next_due_at).
+     * - due_asc/desc: next_due_at 升/降 · null 列尾
+     * - mastery_asc: 未掌握 → 已掌握 (0,1,2)
+     * - mastery_desc: 倒序
+     * - 其他 (含 null / "oldest" / "created_*"): 保留 SQL 层排序 · 直接返
+     */
+    private java.util.List<QuestionListItem> applyAppSort(
+            java.util.List<QuestionListItem> items, String sort) {
+        if (sort == null || sort.isBlank()) return items;
+        java.util.Comparator<QuestionListItem> cmp;
+        switch (sort) {
+            case "due_asc":
+                cmp = java.util.Comparator.comparing(
+                        QuestionListItem::nextDueAt,
+                        java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                break;
+            case "due_desc":
+                cmp = java.util.Comparator.comparing(
+                        QuestionListItem::nextDueAt,
+                        java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder()));
+                break;
+            case "mastery_asc":
+                cmp = java.util.Comparator.comparingInt(QuestionListItem::mastery);
+                break;
+            case "mastery_desc":
+                cmp = java.util.Comparator.comparingInt(QuestionListItem::mastery).reversed();
+                break;
+            default:
+                return items; // SQL 层已排过 · 跳过
+        }
+        return items.stream().sorted(cmp).toList();
     }
 
     /**

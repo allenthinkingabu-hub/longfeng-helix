@@ -26,6 +26,9 @@ interface PageData {
   navTopPx: number;
   // 2026-05-18 修 search 不可用: 改 input 真值 · debounce 300ms 触发 _fetchList.
   searchQuery: string;
+  // 2026-05-18 sort 可点选 · ActionSheet · 默认 due_asc (下次复习时间近→远)
+  sortMode: 'due_asc' | 'due_desc' | 'created_desc' | 'created_asc' | 'mastery_asc' | 'mastery_desc';
+  sortLabel: string; // wxml 展示 "下次复习时间 · 升序"
 }
 
 // ─── Page ────────────────────────────────────────────────────
@@ -43,6 +46,8 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
     masteryCounts: { notMastered: 0, partial: 0, mastered: 0 },
     navTopPx: 44,    // 默认值 · onLoad 用 wx.getSystemInfoSync 真值覆盖
     searchQuery: '', // 用户输入搜索关键词
+    sortMode: 'due_asc',
+    sortLabel: '下次复习时间 · 升序',
   },
 
   // 防抖句柄 · search debounce 300ms · Page-level 非 data
@@ -92,6 +97,10 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
       const q = (this.data.searchQuery || '').trim();
       if (q) {
         (params as Record<string, string>).q = q;
+      }
+      // 2026-05-18 sort 真值透传
+      if (this.data.sortMode) {
+        (params as Record<string, string>).sort = this.data.sortMode;
       }
 
       const resp = await listWrongQuestions(params as Parameters<typeof listWrongQuestions>[0]);
@@ -146,6 +155,31 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
     this.setData({ searchQuery: '' });
     if (this._searchDebounceTimer) clearTimeout(this._searchDebounceTimer);
     this._fetchList();
+  },
+
+  /**
+   * 2026-05-18 sort 切换 · ActionSheet 6 选项 · 选完触发 _fetchList.
+   * 文案与 sortMode 一一对应 · BE 应用层 sort 应付 due/mastery (跨表注入).
+   */
+  onSortTap() {
+    const options: Array<{ mode: PageData['sortMode']; label: string }> = [
+      { mode: 'due_asc', label: '下次复习时间 · 升序' },
+      { mode: 'due_desc', label: '下次复习时间 · 降序' },
+      { mode: 'created_desc', label: '最新入库 · 降序' },
+      { mode: 'created_asc', label: '最旧入库 · 升序' },
+      { mode: 'mastery_asc', label: '掌握度 · 升序 (未掌握优先)' },
+      { mode: 'mastery_desc', label: '掌握度 · 降序' },
+    ];
+    wx.showActionSheet({
+      itemList: options.map((o) => o.label),
+      success: (res) => {
+        const picked = options[res.tapIndex];
+        if (!picked) return;
+        this.setData({ sortMode: picked.mode, sortLabel: picked.label });
+        this._fetchList();
+      },
+      fail: () => { /* 用户取消 · ignore */ },
+    });
   },
 
   onSubjectTap(e: WechatMiniprogram.TouchEvent) {
