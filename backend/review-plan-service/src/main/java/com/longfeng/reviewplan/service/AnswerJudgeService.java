@@ -186,7 +186,12 @@ public class AnswerJudgeService {
         wbNodeRepo.save(wbNode);
 
         // Step 8: 写 idem_key (payload=nid JSON) 供 5 min 内重放命中
-        if (idempotencyKey != null && !idempotencyKey.isBlank()) {
+        // **Tester Round 1 REJECT fix · 2026-05-18** (audits/.../tester.md + adversarial.md adv01):
+        // 503 transient failure **不写 idem_key** · 因为客户端重试有意义 (AI 服务可能恢复) ·
+        // 若写 idem_key 会导致后续同 (key, nid) 重放命中 cache · service.judge() Step 3 buildRespFromDb
+        // 从 wb_review_node 读 metadata.status='TIMEOUT' 返 200 + body{status:'TIMEOUT'} · 与第 1 次 503 inconsistent.
+        // 仅 happy path (200 / LOW_CONFIDENCE) 写 idem_key.
+        if (!outcome.is503 && idempotencyKey != null && !idempotencyKey.isBlank()) {
             String payloadJson = "{\"nid\":" + nid + ",\"image_key\":\"" + imageKey + "\"}";
             try {
                 idempotency.claim(IdempotencyService.SCOPE_AI_JUDGE, idempotencyKey, nid, payloadJson);
