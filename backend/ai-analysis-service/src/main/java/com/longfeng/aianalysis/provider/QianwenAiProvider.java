@@ -105,6 +105,60 @@ public class QianwenAiProvider implements AiProvider {
     }
 
     @Override
+    public WeeklyInsightResponse generateWeeklyInsight(WeeklyInsightInput input) {
+        // 2026-05-18 SC-16-T03 · 用 chat-model 生成周复盘 ≤ 50 字
+        // 不用 response_format json_object · 直接拿 content 文本
+        try {
+            // 构 prompt user content
+            StringBuilder userMsg = new StringBuilder(120);
+            userMsg.append("本周(").append(input.week()).append("):\n");
+            if (input.masteryRate() != null) {
+                userMsg.append("- 掌握率: ").append(Math.round(input.masteryRate() * 100)).append("%");
+                if (input.masteryDelta() != null) {
+                    int deltaPts = (int) Math.round(input.masteryDelta() * 100);
+                    userMsg.append(" (").append(deltaPts >= 0 ? "+" : "").append(deltaPts).append("pts vs 上周)");
+                }
+                userMsg.append('\n');
+            }
+            userMsg.append("- 已复习: ").append(input.reviewedCount()).append(" 题\n");
+            userMsg.append("- 本周新增错题: ").append(input.newCount()).append(" 题\n");
+            if (input.weakKpName() != null && !input.weakKpName().isBlank()) {
+                userMsg.append("- 薄弱知识点: ").append(input.weakKpName())
+                       .append(" (错 ").append(input.weakKpMissCount()).append(" 次)\n");
+            }
+            userMsg.append("\n请给出 1 句话点评 (≤ 50 字 · 鼓励 + 具体建议 · 不用 emoji).");
+
+            ObjectNode body = json.createObjectNode();
+            body.put("model", cfg.getChatModel());
+            ArrayNode messages = body.putArray("messages");
+            messages.addObject()
+                    .put("role", "system")
+                    .put("content",
+                            "你是初中生学习复盘助手 · 用 50 字以内 1 句话点评本周学习 · "
+                                    + "要点: (1) 客观看数据 (2) 鼓励正向 (3) 给具体行动建议 · "
+                                    + "不要 markdown · 不要 emoji · 直接出文本.");
+            messages.addObject()
+                    .put("role", "user")
+                    .put("content", userMsg.toString());
+
+            JsonNode resp = call("/chat/completions", body);
+            String content = resp.path("choices").path(0).path("message").path("content").asText("").trim();
+            if (content.isEmpty()) {
+                throw new AiProviderException("qianwen.insight: empty completion");
+            }
+            // 截断 60 字 (≤50 + 误差) · 防模型超出
+            if (content.length() > 60) content = content.substring(0, 60);
+
+            int tokens = resp.path("usage").path("total_tokens").asInt(0);
+            return new WeeklyInsightResponse(content, NAME, cfg.getChatModel(), tokens);
+        } catch (AiProviderException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new AiProviderException("qianwen.insight failed: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
     public AnalysisResponse analyze(String stem, String subject) {
         if (stem == null || stem.isBlank()) {
             throw new AiProviderException("qianwen.analyze: stem is blank");

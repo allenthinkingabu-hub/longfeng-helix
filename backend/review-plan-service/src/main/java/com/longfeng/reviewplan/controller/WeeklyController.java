@@ -3,6 +3,7 @@ package com.longfeng.reviewplan.controller;
 import com.longfeng.common.dto.ApiResult;
 import com.longfeng.common.exception.BusinessException;
 import com.longfeng.common.exception.ErrCode;
+import com.longfeng.reviewplan.client.AiInsightClient;
 import com.longfeng.reviewplan.dto.WeeklyReviewResp;
 import com.longfeng.reviewplan.service.WeeklyAggregateService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,10 +50,15 @@ public class WeeklyController {
 
   private final WeeklyAggregateService aggregateService;
   private final Clock clock;
+  private final AiInsightClient aiInsightClient;
 
-  public WeeklyController(WeeklyAggregateService aggregateService, Clock clock) {
+  public WeeklyController(
+      WeeklyAggregateService aggregateService,
+      Clock clock,
+      AiInsightClient aiInsightClient) {
     this.aggregateService = aggregateService;
     this.clock = clock;
+    this.aiInsightClient = aiInsightClient;
   }
 
   @Operation(summary = "P-WEEKLY-REVIEW 完整聚合 (SC-16-T01)")
@@ -68,7 +74,7 @@ public class WeeklyController {
     ZoneId tz = resolveZone(tzHeader);
 
     WeeklyAggregateService.WeeklyAggregateRaw raw = aggregateService.aggregate(studentId, tz);
-    WeeklyReviewResp resp = projectToWeeklyReviewResp(raw, studentId, clock);
+    WeeklyReviewResp resp = projectToWeeklyReviewResp(raw, studentId, clock, aiInsightClient);
     return ApiResult.ok(resp);
   }
 
@@ -108,7 +114,8 @@ public class WeeklyController {
 
   /** raw POJO → WeeklyReviewResp DTO · 学生端脱敏在 DTO 字段集层天然生效 (INV-2). */
   private static WeeklyReviewResp projectToWeeklyReviewResp(
-      WeeklyAggregateService.WeeklyAggregateRaw raw, long studentId, Clock clock) {
+      WeeklyAggregateService.WeeklyAggregateRaw raw, long studentId, Clock clock,
+      AiInsightClient aiInsightClient) {
     List<WeeklyReviewResp.SubjectRadar> radar = new ArrayList<>();
     for (WeeklyAggregateService.SubjectRadarRaw r : raw.subjectRadar) {
       radar.add(new WeeklyReviewResp.SubjectRadar(r.subject(), r.masteryRate(), r.sampleSize()));
@@ -129,13 +136,28 @@ public class WeeklyController {
           f.questionId(), f.subject(), f.missCount(), thumbnailUrl));
     }
 
-    WeeklyReviewResp.AiInsight ai = new WeeklyReviewResp.AiInsight(
-        "WI-" + raw.weekLabel + "-stu" + studentId,
-        // MVP: 简单 fallback 文本 · master §6 Spring AI 链路待 SC-16-T03 (P2) 接入
-        // biz §10.12 字段 aiInsight ≤ 50 字 · 此处不引入真 AI 依赖避免外部不确定性
-        buildInsightText(raw),
-        clock.instant().toString()); // 反 wall-clock · 用注入 Clock (INV-3 audit grep 0 命中)
-    // 注意: insightId/generatedAt 仅占位 · production 应挂 §6 QuestionAnalyzer (P2 task)
+    // SC-16-T03 (2026-05-18) · 兑现 wxml "WEEKLY INSIGHT · 智能体复盘" 承诺.
+    // 调 ai-analysis-service 拿真 AI 文案 · 失败 fall back 旧 if/else 模板 ·
+    // UI 永远有内容. Cache TTL 7 天在 AiInsightClient 内部处理.
+    String weakKpName = raw.weakKps.isEmpty() ? null : raw.weakKps.get(0).kpName();
+    int weakKpMiss = raw.weakKps.isEmpty() ? 0 : raw.weakKps.get(0).recentMissCount();
+    AiInsightClient.WeeklyInsightInput insightInput = new AiInsightClient.WeeklyInsightInput(
+        raw.weekLabel, studentId,
+        raw.masteryRate, raw.masteryDelta,
+        weakKpName, weakKpMiss,
+        raw.reviewedCount, raw.newCount);
+    AiInsightClient.Insight aiResp = aiInsightClient.fetchWeekly(insightInput);
+
+    WeeklyReviewResp.AiInsight ai;
+    if (aiResp != null && aiResp.text() != null && !aiResp.text().isBlank()) {
+      ai = new WeeklyReviewResp.AiInsight(aiResp.insightId(), aiResp.text(), aiResp.generatedAt());
+    } else {
+      // AI 不可用 (服务挂 / timeout / 5xx) · 回 if/else 模板 · UI 永远有内容
+      ai = new WeeklyReviewResp.AiInsight(
+          "WI-" + raw.weekLabel + "-stu" + studentId,
+          buildInsightTextFallback(raw),
+          clock.instant().toString());
+    }
 
     return new WeeklyReviewResp(
         raw.weekLabel,
@@ -148,8 +170,8 @@ public class WeeklyController {
         ai);
   }
 
-  /** MVP fallback insight 文本 · ≤ 50 字 · 不引入 Spring AI 依赖 (留 P2). */
-  private static String buildInsightText(WeeklyAggregateService.WeeklyAggregateRaw raw) {
+  /** AI 不可用时的 fallback 模板 · ≤ 50 字 · 保 UI 永远有内容 (SC-16-T03 fallback path). */
+  private static String buildInsightTextFallback(WeeklyAggregateService.WeeklyAggregateRaw raw) {
     if (raw.reviewedCount == 0) {
       return "本周还没开始 · 拍一道题或开始今日复习";
     }
