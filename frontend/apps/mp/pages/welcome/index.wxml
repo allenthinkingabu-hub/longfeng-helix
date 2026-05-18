@@ -1,121 +1,217 @@
-<!-- MP-CATCHUP-B-WELCOME · P-LANDING 真页 wxml
+<!-- MP-CATCHUP-B-WELCOME · P-LANDING 真页 wxml · 严格按 mockup + spec 重写 (2026-05-18)
      trace:
-       design/system/pages/P-LANDING-landing.spec.md §2 布局 + §13 testid
-       design/mockups/wrongbook/14_landing.html (视觉锚)
-       biz §2A.3.2 (Hero + ThreeStepComic + SampleChips + KPI + DualCTA + ConsentBar + ParentHint)
-     状态机: phase ∈ {LOADING, READY, DEGRADED-samples, DEGRADED-kpi, DEGRADED-both} (页 §6) -->
-<view class="landing-page" data-test-id="landing-page">
+       design/mockups/wrongbook/14_landing.html  (视觉真相 · 字符级)
+       design/system/pages/P-LANDING-landing.spec.md §2 布局 + §3 组件 + §13 testid
+       biz §2A.3.2 (AnonShell + HeroDemo + SampleChips + features + social + ThreeStepComic + DualCTA + ConsentBar)
+     状态机: phase ∈ {LOADING, READY, DEGRADED-samples, DEGRADED-kpi, DEGRADED-both} (spec §6)
+     KPI 语义: 静态性能信号 (4.2s P95 / T0-T6 / 触达 98%) — 不绑后端 KPI · 业务规模 KPI 不渲染 (spec §3) -->
+<view class="landing-page" data-test-id="landing-page" style="padding-top: {{statusBarHeight}}px;">
 
-  <!-- Hero 极光区 (永远显示 · 即使 LOADING / DEGRADED · biz 关键断言: 1s TTI) -->
+  <!-- ── Hero 极光区 · 含 AnonShell nav (内嵌 · 让原生胶囊 + 登录共存 · mockup 131-154) ── -->
   <view class="hero" data-test-id="landing-hero">
-    <view class="hero-eyebrow">0 注册成本 · 先看看值不值</view>
-    <view class="hero-title" data-test-id="landing-hero-headline">错题不再错过</view>
-    <view class="hero-sub">拍一张错题 · AI 给你一条记忆曲线 · 自动排 6 次艾宾浩斯复习</view>
-    <view class="hero-illustration">
-      <view class="hero-illust-placeholder">[ AI 错题分析示意 ]</view>
+    <view class="hero-blob blob-1"></view>
+    <view class="hero-blob blob-2"></view>
+    <view class="hero-blob blob-3"></view>
+
+    <!-- AnonShell nav · 内嵌 · padding-right 让出 WeChat 原生胶囊菜单 -->
+    <view class="anon-nav" data-test-id="anon-shell-nav">
+      <view class="brand">
+        <view class="logo" data-test-id="landing-hero-logo">AI</view>
+        <text class="nm">AI 错题本</text>
+      </view>
+      <view class="signin" data-test-id="anon-shell-login-btn" bindtap="onLogin">登录</view>
     </view>
-  </view>
 
-  <!-- LOADING skeleton -->
-  <view wx:if="{{phase === 'LOADING'}}" class="skeleton" data-test-id="landing-skeleton">
-    <view class="sk-bar sk-wide"></view>
-    <view class="sk-bar sk-mid"></view>
-    <view class="sk-bar sk-short"></view>
-  </view>
-
-  <!-- DEGRADED banner -->
-  <view wx:if="{{showDegradedBanner}}" class="degraded-banner" data-test-id="landing-degraded-banner">
-    {{degradedMsg}}
-  </view>
-
-  <!-- 3 Step 漫画 (§3 ThreeStepComic) -->
-  <view wx:if="{{phase !== 'LOADING'}}" class="three-step" data-test-id="landing-three-step">
-    <view class="section-heading">三步搞定一道错题</view>
-    <view class="step-row">
-      <view class="step-card" data-test-id="landing-step-1">
-        <view class="step-num">1</view>
-        <view class="step-icon">📷</view>
-        <view class="step-label">拍题</view>
-        <view class="step-desc">多模态 OCR · 题干一秒识别</view>
+    <view class="hero-copy">
+      <view class="eyebrow">
+        <view class="dot"></view>
+        <text>0 注册成本 · 先看看值不值</text>
       </view>
-      <view class="step-card" data-test-id="landing-step-2">
-        <view class="step-num">2</view>
-        <view class="step-icon">🤖</view>
-        <view class="step-label">AI 诊断</view>
-        <view class="step-desc">P95 4.2s · 找出真正错因</view>
+      <view class="hero-title" data-test-id="landing-hero-headline">
+        <text>拍一张错题</text>
+        <view class="hero-title-row2">
+          <text>AI 给你一条</text>
+          <text class="em">记忆曲线</text>
+        </view>
       </view>
-      <view class="step-card" data-test-id="landing-step-3">
-        <view class="step-num">3</view>
-        <view class="step-icon">📅</view>
-        <view class="step-label">排期复习</view>
-        <view class="step-desc">7 节点艾宾浩斯 · 触达 98%</view>
-      </view>
+      <view class="hero-sub">多模态识别题干 · 诊断错因 · 自动排 6 次艾宾浩斯复习 · 到点全平台提醒。无需登录即可试一次。</view>
     </view>
-  </view>
 
-  <!-- Samples chips (§3 SampleChips · §5 GET /api/landing/samples) -->
-  <view wx:if="{{showSamples && samples.length > 0}}" class="samples" data-test-id="landing-samples">
-    <view class="section-heading">看看 AI 怎么帮你分析</view>
-    <view class="sample-row">
-      <view
-        wx:for="{{samples}}"
-        wx:key="subject"
-        class="sample-chip"
-        data-test-id="landing-sample-chip"
-        data-idx="{{index}}"
-        bindtap="openSample"
-      >
-        <view class="sample-subject">{{item.subject}}</view>
-        <view class="sample-stem">{{item.stemText}}</view>
-        <view class="sample-err">错因: {{item.errorReason}}</view>
+    <!-- KPI mchip 3 个 · 静态性能信号 (mockup line 150-154 · spec §3 HeroDemo kpiList) -->
+    <view class="metrics" data-test-id="landing-kpi">
+      <view class="mchip" data-test-id="landing-kpi-total">
+        <view class="n">4.2<text class="unit">s</text></view>
+        <view class="l">AI 分析 P95</view>
+      </view>
+      <view class="mchip">
+        <view class="n">T0–T6</view>
+        <view class="l">7 节点自动排期</view>
+      </view>
+      <view class="mchip" data-test-id="landing-kpi-retention">
+        <view class="n">98<text class="unit">%</text></view>
+        <view class="l">到点触达率</view>
       </view>
     </view>
   </view>
 
-  <!-- KPI 行 (§3 §5 GET /api/landing/kpi) -->
-  <view wx:if="{{showKpi && kpi}}" class="kpi-row" data-test-id="landing-kpi">
-    <view class="kpi-cell" data-test-id="landing-kpi-questions">
-      <view class="kpi-value">{{kpiQuestionsM}}M</view>
-      <view class="kpi-label">累计分析题量</view>
+  <!-- ── Scroll 区 · 圆角 + 业务 BG (mockup line 54 / 156) ── -->
+  <view class="scroll">
+
+    <!-- DEGRADED banner (samples 或 kpi fetch 挂时显) -->
+    <view wx:if="{{showDegradedBanner}}" class="degraded-banner" data-test-id="landing-degraded-banner">
+      {{degradedMsg}}
     </view>
-    <view class="kpi-cell" data-test-id="landing-kpi-daily">
-      <view class="kpi-value">{{kpiDailyK}}K</view>
-      <view class="kpi-label">日均分析</view>
+
+    <!-- §样例 chips 横滑 (spec §3 SampleChips · mockup line 156-195) -->
+    <view wx:if="{{showSamples && samples.length > 0}}" class="samples-block">
+      <view class="sec">
+        <view class="t">真实样例 · 匿名脱敏</view>
+        <view class="m">滑动查看 →</view>
+      </view>
+      <scroll-view scroll-x="{{true}}" enhanced="{{true}}" show-scrollbar="{{false}}" class="samples" data-test-id="landing-samples">
+        <view
+          wx:for="{{samples}}"
+          wx:key="subject"
+          class="sample"
+          data-test-id="landing-sample-chip"
+          data-idx="{{index}}"
+          bindtap="openSample"
+        >
+          <view class="thumb thumb-{{item.subjectKey}}">
+            <text class="chip">{{item.subjectLabel}}</text>
+            <view class="formula">{{item.stemText}}</view>
+          </view>
+          <view class="body">
+            <view class="err">错因：{{item.errorReason}}</view>
+            <view class="kp">知识点 · {{item.kpJoined}}</view>
+            <view class="t0">{{item.tnLabel}}</view>
+          </view>
+        </view>
+      </scroll-view>
     </view>
-    <view class="kpi-cell" data-test-id="landing-kpi-users">
-      <view class="kpi-value">{{kpiUsersK}}K</view>
-      <view class="kpi-label">累计用户</view>
+
+    <!-- LOADING skeleton (放 samples 位置) -->
+    <view wx:if="{{phase === 'LOADING'}}" class="skeleton" data-test-id="landing-skeleton">
+      <view class="sk-bar sk-wide"></view>
+      <view class="sk-bar sk-mid"></view>
+      <view class="sk-bar sk-short"></view>
     </view>
+
+    <!-- §features 3 行 (spec §3 features · mockup line 197-225) -->
+    <view class="features">
+      <view class="feat">
+        <view class="ico ico-a">📷</view>
+        <view class="feat-text">
+          <view class="t">拍照即识别，多模态同时在线</view>
+          <view class="d">qwen-vl-max / gpt-4o-mini 双模热备 · 支持公式、手写、几何图形</view>
+        </view>
+      </view>
+      <view class="feat">
+        <view class="ico ico-b">⏱</view>
+        <view class="feat-text">
+          <view class="t">艾宾浩斯 6 次复习自动排期</view>
+          <view class="d">T1 1h · T2 1d · T3 3d · T4 7d · T5 15d · T6 30d · 自评驱动自适应推进</view>
+        </view>
+      </view>
+      <view class="feat">
+        <view class="ico ico-c">🔔</view>
+        <view class="feat-text">
+          <view class="t">到点多渠道触达，不再遗忘</view>
+          <view class="d">微信订阅消息 / APP / 邮件 / 站内 · 免打扰时段 · 跨端进度同步</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- §social proof (spec §3 · mockup line 227-233) -->
+    <view class="social">
+      <view class="stack">
+        <view class="av av-1"></view>
+        <view class="av av-2"></view>
+        <view class="av av-3"></view>
+        <view class="av av-4">+2.4k</view>
+      </view>
+      <view class="txt">本周已有 <text class="em">2,471</text> 位同学用 AI 错题本巩固知识</view>
+    </view>
+
+    <!-- §how 三步漫画 (spec §3 ThreeStepComic · mockup line 235-242) -->
+    <view class="how" data-test-id="landing-three-step">
+      <view class="how-title">三步 · 看清曲线</view>
+      <view class="how-row">
+        <view class="how-step" data-test-id="landing-step-1">
+          <view class="step-n">1</view>
+          <view class="step-ic">📸</view>
+          <view class="step-lb">拍一题</view>
+        </view>
+        <view class="how-step" data-test-id="landing-step-2">
+          <view class="step-n">2</view>
+          <view class="step-ic">🧠</view>
+          <view class="step-lb">AI 诊断</view>
+        </view>
+        <view class="how-step" data-test-id="landing-step-3">
+          <view class="step-n">3</view>
+          <view class="step-ic">📅</view>
+          <view class="step-lb">自动排期</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ParentHint (spec §3 · P1 入口占位) -->
+    <view class="parent-hint" data-test-id="landing-parent-hint" bindtap="onParentHint">
+      家长查看孩子进度? ›
+    </view>
+
+    <!-- 底部 spacer · 防 cta-dock 遮挡内容 -->
+    <view class="cta-spacer"></view>
   </view>
 
-  <!-- ParentHint (§3 · P1 入口占位) -->
-  <view class="parent-hint" data-test-id="landing-parent-hint" bindtap="onParentHint">
-    家长查看孩子进度? ›
-  </view>
-
-  <!-- ConsentBar (§3 · 底部小字 · P0 国内桶静态) -->
-  <view class="consent-bar" data-test-id="landing-consent-bar">
-    点击「试试看」即表示同意 &lt;未成年人保护条款&gt; · 结果保留 24 小时
-  </view>
-
-  <!-- 双 CTA dock · sticky (§3 DualCTA · 永远可点 · biz CTA 1.5s 内可点) -->
+  <!-- ── Sticky CTA dock (spec §2.1 + mockup line 246-257) ── -->
   <view class="cta-dock" data-test-id="landing-cta-bottom">
     <button
-      class="cta-btn cta-primary"
+      class="cta-try"
       data-test-id="landing-cta-try"
       bindtap="onTryGuest"
     >
-      试试看 · 无需注册
+      <text class="cta-ico">📷</text>
+      <text class="cta-main">试一次 · 无需注册</text>
+      <text class="k">免费 · 1 题</text>
     </button>
     <button
-      class="cta-btn cta-secondary"
+      class="cta-login"
       data-test-id="landing-cta-login"
       bindtap="onLogin"
     >
-      已有账号? 直接登录
+      <text>已有账号? </text>
+      <text class="login-link">直接登录</text>
     </button>
+    <view class="cta-hint" data-test-id="landing-consent-bar">
+      点击「试一次」即表示同意 <text class="hint-link">未成年人保护条款</text> · 结果保留 24 小时
+    </view>
   </view>
 
-  <!-- 底部 spacer · 防 cta-dock 遮挡 ConsentBar -->
-  <view class="cta-spacer"></view>
+  <!-- ── P-SAMPLE 半屏浮层 (spec §3 SampleChips onOpen · 替原 wx.showModal) ── -->
+  <view wx:if="{{sampleOverlayOpen}}" class="sample-overlay-backdrop" bindtap="closeSample" data-test-id="landing-sample-overlay">
+    <view class="sample-overlay" catchtap="_noop">
+      <view class="so-header">
+        <view class="so-title">{{sampleOpen.subjectLabel}} · 真实样例</view>
+        <view class="so-close" bindtap="closeSample">×</view>
+      </view>
+      <view class="so-card so-stem">
+        <view class="so-h">题干</view>
+        <view class="so-b">{{sampleOpen.stemText}}</view>
+      </view>
+      <view class="so-card so-err">
+        <view class="so-h">错因</view>
+        <view class="so-b">{{sampleOpen.errorReason}}</view>
+      </view>
+      <view class="so-card so-fix">
+        <view class="so-h">正解</view>
+        <view class="so-b">{{sampleOpen.correction}}</view>
+      </view>
+      <view class="so-card so-kp">
+        <view class="so-h">知识点</view>
+        <view class="so-b">{{sampleOpen.kpJoined}}</view>
+      </view>
+      <button class="so-cta" bindtap="onTryGuest">📷 试一次同款分析 · 无需注册</button>
+    </view>
+  </view>
 </view>

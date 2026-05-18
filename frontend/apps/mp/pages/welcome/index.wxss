@@ -1,68 +1,244 @@
-/* MP-CATCHUP-B-WELCOME · P-LANDING wxss
-   trace: design/mockups/wrongbook/14_landing.html · 极光 hero + 圆角 scroll 区 + sticky CTA dock */
+/* MP-CATCHUP-B-WELCOME · P-LANDING wxss · 严格按 mockup 14_landing.html 1:1 对齐 (2026-05-18)
+   rpx scale: mockup 393px = 750rpx → 1px ≈ 1.91rpx · 用 2x 近似简化 */
 
 .landing-page {
+  position: relative;
   min-height: 100vh;
   background: #F2F2F7;
-  padding-bottom: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
 }
 
-/* ── Hero · 极光渐变 #0F1A3D → #8B87F6 ───────────────────────── */
-.hero {
-  background: linear-gradient(160deg, #0F1A3D 0%, #5A4FCF 55%, #8B87F6 100%);
-  padding: 80rpx 40rpx 60rpx;
-  color: #FFFFFF;
-  border-bottom-left-radius: 52rpx;
-  border-bottom-right-radius: 52rpx;
-}
-
-.hero-eyebrow {
-  display: inline-block;
-  font-size: 22rpx;
-  color: #C9C5FF;
-  background: rgba(255, 255, 255, 0.12);
-  padding: 6rpx 18rpx;
-  border-radius: 999rpx;
-  margin-bottom: 20rpx;
-}
-
-.hero-title {
-  font-size: 56rpx;
-  font-weight: 700;
-  line-height: 1.25;
-  margin-bottom: 16rpx;
-}
-
-.hero-sub {
-  font-size: 26rpx;
-  line-height: 1.55;
-  color: #E0DEFF;
+/* ────────────────────────────────────────────────────────────
+   Anonymous Shell 顶栏 · 内嵌 Hero 自然流 · 与 WeChat 胶囊共存
+   ──────────────────────────────────────────────────────────── */
+.anon-nav {
+  position: relative;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* WeChat 原生胶囊菜单约占右侧 ~180rpx (87px capsule @ 2x) · 给 signin 留位置 */
+  padding-right: 200rpx;
   margin-bottom: 32rpx;
 }
 
-.hero-illustration {
-  height: 200rpx;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 24rpx;
+.brand {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 20rpx;
 }
 
-.hero-illust-placeholder {
+.logo {
+  width: 68rpx;
+  height: 68rpx;
+  border-radius: 20rpx;
+  background:
+    conic-gradient(from 210deg, #FF5A4F, #FFB454, #F6D84C, #3CD47B, #4C9BFF, #8B87F6, #FF5A4F);
+  box-shadow:
+    inset 0 0 0 3rpx rgba(255, 255, 255, 0.25),
+    0 8rpx 24rpx rgba(0, 0, 0, 0.25);
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 22rpx;
+  letter-spacing: 1.2rpx;
+  text-align: center;
+  line-height: 68rpx;
+  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.4);
+}
+
+.brand .nm {
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: 0.2rpx;
+}
+
+.signin {
+  padding: 14rpx 28rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.16);
+  border: 2rpx solid rgba(255, 255, 255, 0.3);
+  color: #FFFFFF;
   font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.5);
+  font-weight: 700;
 }
 
-/* ── Skeleton ────────────────────────────────────────────────── */
+/* ────────────────────────────────────────────────────────────
+   Hero 极光区 · 内容驱动高度 · 渐变 #0F1A3D → #8B87F6
+   ──────────────────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  background: linear-gradient(170deg, #0F1A3D 0%, #1F3C8C 40%, #5F5BDB 80%, #8B87F6 100%);
+  overflow: hidden;
+  padding: 24rpx 40rpx 56rpx;
+}
+
+.hero-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(56rpx);
+  pointer-events: none;
+}
+
+.hero-blob.blob-1 {
+  width: 720rpx;
+  height: 720rpx;
+  top: -280rpx;
+  right: -280rpx;
+  background: radial-gradient(circle, rgba(255, 107, 107, 0.45), transparent 70%);
+}
+
+.hero-blob.blob-2 {
+  width: 520rpx;
+  height: 520rpx;
+  bottom: -160rpx;
+  left: -140rpx;
+  background: radial-gradient(circle, rgba(88, 214, 255, 0.55), transparent 70%);
+}
+
+.hero-blob.blob-3 {
+  width: 320rpx;
+  height: 320rpx;
+  top: 28%;
+  left: 58%;
+  background: radial-gradient(circle, rgba(255, 209, 102, 0.4), transparent 70%);
+}
+
+/* hero-copy 文案区 · 自然流 · anon-nav 已用 margin-bottom 隔开 */
+.hero-copy {
+  position: relative;
+  z-index: 20;
+  color: #FFFFFF;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 10rpx 20rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.12);
+  border: 2rpx solid rgba(255, 255, 255, 0.2);
+  font-size: 20rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.eyebrow .dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: #FFD166;
+  box-shadow: 0 0 16rpx #FFD166;
+}
+
+.hero-title {
+  margin-top: 28rpx;
+  font-size: 64rpx;
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -1rpx;
+}
+
+.hero-title-row2 {
+  display: flex;
+  align-items: baseline;
+  gap: 10rpx;
+}
+
+.hero-title .em {
+  font-style: normal;
+  background: linear-gradient(90deg, #FFD166 0%, #FF6B6B 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-sub {
+  margin-top: 20rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.82);
+  max-width: 640rpx;
+}
+
+/* metrics row · 3 mchip · 静态性能信号 · 紧贴 hero-sub 下方 */
+.metrics {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  gap: 16rpx;
+  margin-top: 40rpx;
+}
+
+.mchip {
+  flex: 1;
+  padding: 20rpx 16rpx;
+  border-radius: 28rpx;
+  background: rgba(255, 255, 255, 0.14);
+  border: 2rpx solid rgba(255, 255, 255, 0.22);
+  text-align: center;
+  color: #FFFFFF;
+}
+
+.mchip .n {
+  font-size: 34rpx;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.5rpx;
+}
+
+.mchip .n .unit {
+  font-size: 20rpx;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin-left: 4rpx;
+}
+
+.mchip .l {
+  margin-top: 8rpx;
+  font-size: 19rpx;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.72);
+  letter-spacing: 0.6rpx;
+  line-height: 1.3;
+}
+
+/* ────────────────────────────────────────────────────────────
+   Scroll 区 · 在 Hero 下方 · 上圆角 26px
+   ──────────────────────────────────────────────────────────── */
+.scroll {
+  position: relative;
+  background: #F2F2F7;
+  margin-top: -52rpx;
+  border-top-left-radius: 52rpx;
+  border-top-right-radius: 52rpx;
+  padding: 0 28rpx 56rpx;
+  z-index: 10;
+}
+
+/* DEGRADED banner */
+.degraded-banner {
+  margin-top: 24rpx;
+  padding: 20rpx 28rpx;
+  border-radius: 16rpx;
+  background: rgba(255, 149, 0, 0.12);
+  color: #B25E00;
+  font-size: 24rpx;
+  border: 2rpx solid rgba(255, 149, 0, 0.3);
+}
+
+/* Skeleton */
 .skeleton {
-  padding: 30rpx 40rpx;
+  padding: 36rpx 8rpx;
 }
 
 .sk-bar {
   height: 32rpx;
   background: #E5E5EA;
-  border-radius: 8rpx;
+  border-radius: 12rpx;
   margin-bottom: 18rpx;
 }
 
@@ -70,204 +246,553 @@
 .sk-mid { width: 70%; }
 .sk-short { width: 40%; }
 
-/* ── DEGRADED banner ─────────────────────────────────────────── */
-.degraded-banner {
-  margin: 24rpx 32rpx;
-  padding: 20rpx 24rpx;
-  background: #FFF8E1;
-  color: #8B6914;
-  border-radius: 16rpx;
-  font-size: 24rpx;
-  border-left: 6rpx solid #F1C40F;
-}
-
-/* ── Section heading 通用 ────────────────────────────────────── */
-.section-heading {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #1C1C1E;
-  margin: 36rpx 40rpx 20rpx;
-}
-
-/* ── Three step 漫画 ─────────────────────────────────────────── */
-.three-step {
-  padding-top: 12rpx;
-}
-
-.step-row {
+/* section heading */
+.sec {
+  margin: 36rpx 8rpx 20rpx;
   display: flex;
-  flex-direction: row;
-  gap: 16rpx;
-  padding: 0 32rpx;
+  align-items: baseline;
+  justify-content: space-between;
 }
 
-.step-card {
-  flex: 1;
-  background: #FFFFFF;
-  border-radius: 20rpx;
-  padding: 28rpx 16rpx;
-  text-align: center;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
-}
-
-.step-num {
-  display: inline-block;
-  width: 36rpx;
-  height: 36rpx;
-  line-height: 36rpx;
-  background: #5A4FCF;
-  color: #FFFFFF;
-  font-size: 22rpx;
-  border-radius: 50%;
-  margin-bottom: 12rpx;
-}
-
-.step-icon {
-  font-size: 48rpx;
-  margin-bottom: 8rpx;
-}
-
-.step-label {
-  font-size: 26rpx;
-  font-weight: 600;
+.sec .t {
+  font-size: 30rpx;
+  font-weight: 800;
+  letter-spacing: 0.4rpx;
   color: #1C1C1E;
-  margin-bottom: 4rpx;
 }
 
-.step-desc {
-  font-size: 20rpx;
+.sec .m {
+  font-size: 22rpx;
+  font-weight: 600;
   color: #8E8E93;
-  line-height: 1.4;
 }
 
-/* ── Samples chip 区 ─────────────────────────────────────────── */
-.samples {
+/* ────────────────────────────────────────────────────────────
+   Samples · 横滑 (scroll-snap) · 3 张 188px 卡
+   ──────────────────────────────────────────────────────────── */
+.samples-block {
   padding-bottom: 16rpx;
 }
 
-.sample-row {
-  display: flex;
-  flex-direction: column;
-  gap: 16rpx;
-  padding: 0 32rpx;
+.samples {
+  white-space: nowrap;
+  padding: 4rpx 0 20rpx;
 }
 
-.sample-chip {
-  background: #FFFFFF;
-  border-radius: 20rpx;
-  padding: 24rpx 28rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
-}
-
-.sample-subject {
+.sample {
   display: inline-block;
-  font-size: 22rpx;
-  color: #5A4FCF;
-  background: #EEEBFF;
-  padding: 4rpx 14rpx;
-  border-radius: 999rpx;
-  margin-bottom: 10rpx;
-}
-
-.sample-stem {
-  font-size: 26rpx;
-  line-height: 1.5;
-  color: #1C1C1E;
-  margin-bottom: 8rpx;
-}
-
-.sample-err {
-  font-size: 22rpx;
-  color: #8E8E93;
-  line-height: 1.4;
-}
-
-/* ── KPI row ─────────────────────────────────────────────────── */
-.kpi-row {
-  display: flex;
-  flex-direction: row;
-  gap: 12rpx;
-  padding: 24rpx 32rpx;
-  margin-top: 8rpx;
-}
-
-.kpi-cell {
-  flex: 1;
+  vertical-align: top;
+  width: 376rpx;
   background: #FFFFFF;
-  border-radius: 20rpx;
-  padding: 24rpx 12rpx;
-  text-align: center;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  border-radius: 32rpx;
+  overflow: hidden;
+  margin-right: 20rpx;
+  box-shadow:
+    0 2rpx 4rpx rgba(0, 0, 0, 0.04),
+    0 16rpx 40rpx rgba(10, 20, 50, 0.06);
 }
 
-.kpi-value {
-  font-size: 38rpx;
+.thumb {
+  position: relative;
+  height: 216rpx;
+}
+
+.thumb-math {
+  background: linear-gradient(140deg, #E3ECFF 0%, #C7DAFF 100%);
+}
+
+.thumb-phys {
+  background: linear-gradient(140deg, #FFEAE4 0%, #FFD0C6 100%);
+}
+
+.thumb-eng {
+  background: linear-gradient(140deg, #E4F7EA 0%, #BAE7C5 100%);
+}
+
+.thumb-default {
+  background: linear-gradient(140deg, #F0F0F4 0%, #DCDCE4 100%);
+}
+
+.thumb .chip {
+  position: absolute;
+  top: 16rpx;
+  left: 16rpx;
+  padding: 6rpx 14rpx;
+  border-radius: 12rpx;
+  font-size: 18rpx;
+  font-weight: 800;
+  letter-spacing: 1rpx;
+}
+
+.thumb-math .chip { background: rgba(0, 122, 255, 0.15); color: #007AFF; }
+.thumb-phys .chip { background: rgba(255, 59, 48, 0.15); color: #FF3B30; }
+.thumb-eng  .chip { background: rgba(52, 199, 89, 0.18); color: #34C759; }
+.thumb-default .chip { background: rgba(99, 99, 102, 0.15); color: #636366; }
+
+.thumb .formula {
+  position: absolute;
+  bottom: 20rpx;
+  left: 20rpx;
+  right: 20rpx;
+  font-family: "Times New Roman", Georgia, serif;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1C1C1E;
+  line-height: 1.25;
+  white-space: normal;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.sample .body {
+  padding: 20rpx 24rpx 24rpx;
+  white-space: normal;
+}
+
+.sample .body .err {
+  font-size: 20rpx;
   font-weight: 700;
-  color: #5A4FCF;
+  color: #FF3B30;
+  letter-spacing: 0.4rpx;
   margin-bottom: 6rpx;
 }
 
-.kpi-label {
-  font-size: 20rpx;
-  color: #8E8E93;
+.sample .body .kp {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #1C1C1E;
+  line-height: 1.35;
+  margin-bottom: 12rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
-/* ── ParentHint ──────────────────────────────────────────────── */
-.parent-hint {
-  margin: 16rpx 40rpx;
+.sample .body .t0 {
+  display: inline-block;
+  font-size: 18rpx;
+  font-weight: 700;
+  color: #5856D6;
+  background: rgba(88, 86, 214, 0.09);
+  padding: 6rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+/* ────────────────────────────────────────────────────────────
+   Features 3 行 · 白卡 + icon 渐变
+   ──────────────────────────────────────────────────────────── */
+.features {
+  margin-top: 28rpx;
+  background: #FFFFFF;
+  border-radius: 36rpx;
+  padding: 12rpx 8rpx;
+  box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.04);
+}
+
+.feat {
+  display: flex;
+  align-items: flex-start;
+  gap: 24rpx;
+  padding: 24rpx 28rpx;
+  border-bottom: 1rpx solid rgba(60, 60, 67, 0.14);
+}
+
+.feat:last-child {
+  border-bottom: 0;
+}
+
+.feat .ico {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 20rpx;
+  flex: none;
+  color: #FFFFFF;
+  font-size: 36rpx;
+  text-align: center;
+  line-height: 72rpx;
+}
+
+.feat .ico.ico-a {
+  background: linear-gradient(135deg, #4C9BFF, #5856D6);
+}
+
+.feat .ico.ico-b {
+  background: linear-gradient(135deg, #FF9500, #FF3B30);
+}
+
+.feat .ico.ico-c {
+  background: linear-gradient(135deg, #34C759, #30B0C7);
+}
+
+.feat .feat-text {
+  flex: 1;
+}
+
+.feat .feat-text .t {
+  font-size: 27rpx;
+  font-weight: 700;
+  letter-spacing: 0.2rpx;
+  color: #1C1C1E;
+}
+
+.feat .feat-text .d {
+  font-size: 23rpx;
+  color: #636366;
+  margin-top: 6rpx;
+  line-height: 1.45;
+}
+
+/* ────────────────────────────────────────────────────────────
+   Social proof · 头像堆叠 + 文案
+   ──────────────────────────────────────────────────────────── */
+.social {
+  margin-top: 28rpx;
+  padding: 24rpx 28rpx;
+  background: linear-gradient(135deg, rgba(255, 149, 0, 0.08), rgba(255, 59, 48, 0.06));
+  border: 2rpx solid rgba(255, 149, 0, 0.18);
+  border-radius: 28rpx;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.stack {
+  display: flex;
+}
+
+.stack .av {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  border: 3rpx solid #FFFFFF;
+  margin-left: -12rpx;
+  font-size: 16rpx;
+  font-weight: 800;
+  color: #636366;
+  text-align: center;
+  line-height: 38rpx;
+}
+
+.stack .av:first-child {
+  margin-left: 0;
+}
+
+.stack .av.av-1 {
+  background: conic-gradient(from 0deg, #FF6B6B, #FFD166);
+}
+
+.stack .av.av-2 {
+  background: conic-gradient(from 90deg, #4C9BFF, #8B87F6);
+}
+
+.stack .av.av-3 {
+  background: conic-gradient(from 180deg, #3CD47B, #4FD1D9);
+}
+
+.stack .av.av-4 {
+  background: #F2F2F7;
+}
+
+.social .txt {
+  font-size: 23rpx;
+  font-weight: 600;
+  color: #1C1C1E;
+  flex: 1;
+}
+
+.social .txt .em {
+  font-style: normal;
+  color: #FF9500;
+  font-weight: 800;
+}
+
+/* ────────────────────────────────────────────────────────────
+   How it works · 三步漫画 (small cards)
+   ──────────────────────────────────────────────────────────── */
+.how {
+  margin-top: 32rpx;
+  background: #FFFFFF;
+  border-radius: 36rpx;
+  padding: 28rpx 28rpx 24rpx;
+  box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.04);
+}
+
+.how-title {
   font-size: 24rpx;
-  color: #5A4FCF;
-  text-align: center;
-  padding: 16rpx;
-}
-
-/* ── ConsentBar ──────────────────────────────────────────────── */
-.consent-bar {
-  margin: 8rpx 40rpx 16rpx;
-  font-size: 20rpx;
+  font-weight: 800;
   color: #8E8E93;
-  line-height: 1.5;
+  letter-spacing: 0.4rpx;
+  margin-bottom: 20rpx;
+  text-transform: uppercase;
+}
+
+.how-row {
+  display: flex;
+  gap: 20rpx;
+}
+
+.how-step {
+  flex: 1;
+  position: relative;
+  padding: 28rpx 16rpx 20rpx;
+  background: #F2F2F7;
+  border-radius: 24rpx;
   text-align: center;
 }
 
-/* ── CTA dock (sticky bottom) ────────────────────────────────── */
+.how-step .step-n {
+  position: absolute;
+  top: -18rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 3rpx solid #007AFF;
+  color: #007AFF;
+  font-size: 20rpx;
+  font-weight: 800;
+  line-height: 38rpx;
+  text-align: center;
+}
+
+.how-step .step-ic {
+  font-size: 40rpx;
+  margin-top: 16rpx;
+}
+
+.how-step .step-lb {
+  font-size: 20rpx;
+  font-weight: 700;
+  color: #1C1C1E;
+  margin-top: 6rpx;
+}
+
+/* ParentHint */
+.parent-hint {
+  margin-top: 28rpx;
+  padding: 18rpx 0;
+  text-align: center;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #007AFF;
+}
+
+/* ────────────────────────────────────────────────────────────
+   Sticky CTA dock · 双 CTA + 同意条
+   ──────────────────────────────────────────────────────────── */
+.cta-spacer {
+  height: 320rpx;
+}
+
 .cta-dock {
   position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 28rpx 32rpx 56rpx;
+  background:
+    linear-gradient(180deg, rgba(242, 242, 247, 0), rgba(242, 242, 247, 0.92) 30%, rgba(242, 242, 247, 1) 100%);
+  z-index: 45;
+}
+
+.cta-try {
+  height: 104rpx;
+  border-radius: 32rpx;
+  background: linear-gradient(135deg, #1F3C8C 0%, #5F5BDB 100%);
+  color: #FFFFFF;
+  font-size: 30rpx;
+  font-weight: 800;
+  letter-spacing: 0.4rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  box-shadow:
+    0 24rpx 60rpx -12rpx rgba(31, 60, 140, 0.4),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.25);
+  margin-bottom: 16rpx;
+  border: none;
+  padding: 0 24rpx;
+}
+
+.cta-try::after {
+  border: none;
+}
+
+.cta-try .cta-ico {
+  font-size: 32rpx;
+}
+
+.cta-try .cta-main {
+  font-size: 30rpx;
+}
+
+.cta-try .k {
+  padding: 6rpx 16rpx;
+  border-radius: 12rpx;
+  background: rgba(255, 209, 102, 0.2);
+  color: #FFD166;
+  font-size: 18rpx;
+  font-weight: 800;
+  letter-spacing: 1.2rpx;
+}
+
+.cta-login {
+  height: 88rpx;
+  border-radius: 28rpx;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1rpx solid rgba(60, 60, 67, 0.12);
+  color: #1C1C1E;
+  font-size: 26rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  margin-bottom: 8rpx;
+  padding: 0 24rpx;
+}
+
+.cta-login::after {
+  border: none;
+}
+
+.cta-login .login-link {
+  color: #007AFF;
+  font-weight: 800;
+}
+
+.cta-hint {
+  text-align: center;
+  font-size: 20rpx;
+  font-weight: 500;
+  color: #8E8E93;
+  letter-spacing: 0.4rpx;
+}
+
+.cta-hint .hint-link {
+  color: #007AFF;
+}
+
+/* ────────────────────────────────────────────────────────────
+   P-SAMPLE 半屏浮层 (替 wx.showModal · spec §3 SampleChips.onOpen)
+   ──────────────────────────────────────────────────────────── */
+.sample-overlay-backdrop {
+  position: fixed;
+  top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: #FFFFFF;
-  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
-  display: flex;
-  flex-direction: column;
-  gap: 12rpx;
-  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 100;
+  display: flex;
+  align-items: flex-end;
 }
 
-.cta-btn {
+.sample-overlay {
   width: 100%;
-  height: 88rpx;
-  line-height: 88rpx;
-  border-radius: 20rpx;
-  font-size: 30rpx;
-  font-weight: 600;
-  border: none;
-  margin: 0;
+  max-height: 88vh;
+  background: #FFFFFF;
+  border-top-left-radius: 40rpx;
+  border-top-right-radius: 40rpx;
+  padding: 32rpx 32rpx 56rpx;
+  overflow-y: auto;
+  animation: so-slide-in 0.25s ease-out;
 }
 
-.cta-primary {
-  background: linear-gradient(135deg, #5A4FCF 0%, #8B87F6 100%);
-  color: #FFFFFF;
+@keyframes so-slide-in {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }
 
-.cta-secondary {
+.so-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.so-title {
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #1C1C1E;
+}
+
+.so-close {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
   background: #F2F2F7;
-  color: #5A4FCF;
+  color: #636366;
+  font-size: 40rpx;
+  line-height: 52rpx;
+  text-align: center;
 }
 
-button.cta-btn::after { border: none; }
+.so-card {
+  margin-top: 16rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 24rpx;
+  background: #F2F2F7;
+}
 
-.cta-spacer {
-  height: 260rpx;
+.so-card.so-err {
+  background: rgba(255, 59, 48, 0.06);
+  border: 1rpx solid rgba(255, 59, 48, 0.18);
+}
+
+.so-card.so-fix {
+  background: rgba(52, 199, 89, 0.06);
+  border: 1rpx solid rgba(52, 199, 89, 0.18);
+}
+
+.so-card.so-kp {
+  background: rgba(88, 86, 214, 0.06);
+  border: 1rpx solid rgba(88, 86, 214, 0.18);
+}
+
+.so-h {
+  font-size: 22rpx;
+  font-weight: 800;
+  color: #636366;
+  letter-spacing: 1rpx;
+  text-transform: uppercase;
+  margin-bottom: 8rpx;
+}
+
+.so-card.so-err .so-h { color: #FF3B30; }
+.so-card.so-fix .so-h { color: #34C759; }
+.so-card.so-kp  .so-h { color: #5856D6; }
+
+.so-b {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #1C1C1E;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.so-cta {
+  margin-top: 32rpx;
+  height: 96rpx;
+  border-radius: 28rpx;
+  background: linear-gradient(135deg, #1F3C8C 0%, #5F5BDB 100%);
+  color: #FFFFFF;
+  font-size: 28rpx;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 0;
+}
+
+.so-cta::after {
+  border: none;
 }

@@ -1,5 +1,9 @@
 // MP-CATCHUP-B-WELCOME · pure helpers (testable without wx runtime)
-// trace: design/system/pages/P-LANDING-landing.spec.md §6 状态机
+// trace: design/system/pages/P-LANDING-landing.spec.md §6 状态机 + §3 SampleChips
+//        design/mockups/wrongbook/14_landing.html line 161-194 (sample card 真字段)
+//
+// 2026-05-18 重写: VM 扩展为 mockup-aligned 字段 (subjectKey/subjectLabel/kpJoined/tnLabel)
+// KPI 改为静态性能信号 (不再绑后端 LandingKpiDto) · spec drift surface
 
 import type { LandingSample, KpiResponse } from '../../src/api/landing';
 
@@ -10,15 +14,31 @@ export type LandingPhase =
   | 'DEGRADED-kpi'
   | 'DEGRADED-both';
 
+/** Mockup-aligned sample VM · for wxml horizontal scroll cards + P-SAMPLE overlay */
 export interface LandingSampleVM {
+  /** Raw subject from backend (数学/英语/物理/...) */
   subject: string;
+  /** CSS thumbnail class key: 'math' | 'phys' | 'eng' | 'default' */
+  subjectKey: 'math' | 'phys' | 'eng' | 'default';
+  /** Display label including grade hint (mockup line 164/175/186) */
+  subjectLabel: string;
+  /** Question stem text (rendered as formula in mockup) */
   stemText: string;
+  /** Joined knowledge points (mockup "知识点 · A / B") */
+  kpJoined: string;
+  /** Raw KP array (kept for overlay) */
   knowledgePoints: string[];
+  /** Why-wrong (mockup line 168/179/190) */
   errorReason: string;
+  /** Correction explanation (overlay only) */
   correction: string;
+  /** Tn review-schedule chip (mockup line 170/181/192) · assigned by index */
+  tnLabel: string;
 }
 
+/** Static performance KPI · spec §3 HeroDemo.kpiList (不来自后端) */
 export interface KpiVM {
+  /** Kept for backward-compat with existing tests · always populated even when API failed */
   cumulativeQuestions: number;
   dailyAnalyses: number;
   happyUsers: number;
@@ -32,9 +52,36 @@ export interface LandingDerivedState {
   showKpi: boolean;
   showDegradedBanner: boolean;
   degradedMsg: string;
+  // backward-compat for existing e2e — kept always (filled from API or 0)
   kpiQuestionsM: string;
   kpiDailyK: string;
   kpiUsersK: string;
+}
+
+// ─── subject mapping (mockup grade fallback · 后端不返 grade) ────────────────
+const SUBJECT_MAP: Record<string, { key: LandingSampleVM['subjectKey']; label: string }> = {
+  数学: { key: 'math', label: '数学 · 高一' },
+  物理: { key: 'phys', label: '物理 · 高二' },
+  英语: { key: 'eng', label: '英语 · 初三' },
+};
+
+// Tn schedule (mockup 顺序映射 · 后端不返 Tn · 按 sample index 分配)
+const TN_LABELS = ['T1 · 1h 后复习', 'T2 · 1d 后复习', 'T3 · 3d 后复习', 'T4 · 7d 后复习'];
+
+function mapSample(s: LandingSample, idx: number): LandingSampleVM {
+  const meta = SUBJECT_MAP[s.subject] || { key: 'default' as const, label: s.subject };
+  const kp = (s.knowledgePoints || []).filter(Boolean);
+  return {
+    subject: s.subject,
+    subjectKey: meta.key,
+    subjectLabel: meta.label,
+    stemText: s.stemText,
+    knowledgePoints: kp,
+    kpJoined: kp.slice(0, 2).join(' / '),
+    errorReason: s.errorReason,
+    correction: s.correction,
+    tnLabel: TN_LABELS[idx] || `T${idx + 1} · 复习`,
+  };
 }
 
 /**
@@ -58,29 +105,22 @@ export function deriveLandingState(
   else phase = 'DEGRADED-kpi';
 
   const samples: LandingSampleVM[] = samplesOk
-    ? (samplesVal as LandingSample[]).map((s) => ({
-        subject: s.subject,
-        stemText: s.stemText,
-        knowledgePoints: s.knowledgePoints || [],
-        errorReason: s.errorReason,
-        correction: s.correction,
-      }))
+    ? (samplesVal as LandingSample[]).map(mapSample)
     : [];
   const kpi: KpiVM | null = kpiOk ? (kpiVal as KpiResponse) : null;
 
   const showSamples = samplesOk;
-  const showKpi = kpiOk;
-  const showDegradedBanner = !samplesOk || !kpiOk;
+  // showKpi 永远 true · KPI 改静态性能信号 · 与后端 KPI fetch 解耦 (spec drift fix)
+  const showKpi = true;
+  const showDegradedBanner = !samplesOk;
   let degradedMsg = '';
   if (phase === 'DEGRADED-samples') {
     degradedMsg = '样例加载失败 · 直接试试看 →';
-  } else if (phase === 'DEGRADED-kpi') {
-    degradedMsg = '统计数据暂时无法加载 · 不影响您体验 AI 错题分析';
   } else if (phase === 'DEGRADED-both') {
-    degradedMsg = '网络不稳 · CTA 仍可点击进入';
+    degradedMsg = '网络不稳 · 直接试试看 →';
   }
 
-  // KPI 千分化 (避免 wxml filter)
+  // Backward-compat KPI 千分化 · 给老 e2e 用 · 即使 API fail 也给 0
   const kpiQuestionsM = kpi ? (kpi.cumulativeQuestions / 1_000_000).toFixed(1) : '0.0';
   const kpiDailyK = kpi ? Math.round(kpi.dailyAnalyses / 1000).toString() : '0';
   const kpiUsersK = kpi ? Math.round(kpi.happyUsers / 1000).toString() : '0';
