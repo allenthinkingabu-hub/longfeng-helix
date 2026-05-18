@@ -126,3 +126,23 @@ trace: biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §10.18 (改 :grade bo
 verdict: APPROVE
 
 **Logged by**: TL agent (M-AI-ANSWER-JUDGE SC20-T03 Phase 2.5 · 2026-05-18 · TL 代落 沿 SC20-T01 precedent · 非 AI 替签)
+
+---
+
+## User Approval (Phase 2.5)
+
+verdict: APPROVE
+
+**Authority**: user explicit via TL AskUserQuestion · 2026-05-18 · 用户选 "APPROVE + 你 /compact (推荐)" option · 答复字面 `"SC20-T03 Phase 2.5 user 签字 (audit.js 卡口 · 必须显式 verdict 才能进 Phase 3 · auto mode 不允许 TL 代签 · 沿 SC20-T02 pattern)"="APPROVE + 你 /compact (推荐)"` · 非 inflight phase_2_5_user_authorization 字段隐式授权 (auto mode 拦截 · 不算 explicit verdict)
+
+**Reasoning** (用户在 AskUserQuestion option description 同意的):
+- Round 1 双 REJECT (Coder 4 修+2 漏 / Tester 3 漏+2 强 = 10 issue) 满足 audit dim review_has_ge_1_reject_round
+- TestDesigner Round 2 已吃 10/10 issue · Round 1 表 blockquote archive · Round 2 表 6 用例 audit le_6 通过
+- Round 2 双方 APPROVE (Coder commit `cb5cd4c` 100% closure / Tester commit `e7bc503`) 满足 audit dim both_reviewers_approved
+- 沿 SC20-T02 Phase 2.5 AskUserQuestion explicit APPROVE pattern (commit `e87545c` audit format · 30/30 PASS) · TL 代落 section 是 audit format fix · 不构成 AI 替签
+
+**Constraint for Phase 4 Tester** (用户加权约束 carryover):
+- 严格按本 test-cases.md Round 2 修订表 6 用例字面翻译成 IT (`backend/review-plan-service/src/test/java/com/longfeng/reviewplan/T03GradeResultAiFieldsE2EIT.java`)
+- 不允许 Tester Phase 4 自由发挥改 final_grade_source 字面 / HTTP status / DB CHECK 字面 / SM-2 ease 数值 / 跨用户 race trigger 顺序
+
+**Logged by**: TL agent (M-AI-ANSWER-JUDGE SC20-T03 Phase 2.5 user explicit APPROVE via AskUserQuestion · 2026-05-18 · /compact 后接 Phase 3 Coder)
