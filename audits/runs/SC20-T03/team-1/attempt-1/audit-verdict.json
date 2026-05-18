@@ -1,0 +1,138 @@
+{
+  "task_id": "SC20-T03",
+  "attempt": 1,
+  "team_id": "team-1",
+  "audited_at": "2026-05-18T16:36:00.943Z",
+  "audited_by": "audit.js v3 (deterministic · 7 dims · +test_cases_alignment)",
+  "pass": false,
+  "checks": [
+    {
+      "dimension": "coder_compliance",
+      "name": "coder_md_exists",
+      "pass": false,
+      "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/coder.md"
+    },
+    {
+      "dimension": "coder_compliance",
+      "name": "bugs_found_md_exists",
+      "pass": false,
+      "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/bugs-found.md"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "tester_md_exists",
+      "pass": false,
+      "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/tester.md"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "adversarial_md_exists",
+      "pass": false,
+      "evidence": "missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/adversarial.md"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "test_reports_nonempty",
+      "pass": false,
+      "evidence": "empty or missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/test-reports"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "mock_total_le_5",
+      "pass": true,
+      "evidence": "mock=0/5 (none)"
+    },
+    {
+      "dimension": "tester_compliance",
+      "name": "maxDiffPixels_le_500",
+      "pass": true,
+      "evidence": "max=500/500"
+    },
+    {
+      "dimension": "bug_reality",
+      "name": "git_commits_present",
+      "pass": false,
+      "evidence": "task.git_commits[] is empty — Coder must record at least one commit"
+    },
+    {
+      "dimension": "spec_alignment",
+      "name": "dor_e2e_required",
+      "pass": true,
+      "evidence": "inflight.physical_verification.dor_c1_to_c6_required=false — DoR skipped (P0 audit task)"
+    },
+    {
+      "dimension": "ide_smoke",
+      "name": "ide_smoke_required_by_team",
+      "pass": true,
+      "evidence": "team_id=team-1 · not UI team · IDE smoke skipped"
+    },
+    {
+      "dimension": "test_cases_alignment",
+      "name": "test_cases_md_exists",
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/test-cases.md"
+    },
+    {
+      "dimension": "test_cases_alignment",
+      "name": "coder_review_md_exists",
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/coder-review.md"
+    },
+    {
+      "dimension": "test_cases_alignment",
+      "name": "tester_review_md_exists",
+      "pass": true,
+      "evidence": "/Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/tester-review.md"
+    },
+    {
+      "dimension": "test_cases_alignment",
+      "name": "test_cases_ge_3_rows",
+      "pass": true,
+      "evidence": "6 case(s)"
+    },
+    {
+      "dimension": "test_cases_alignment",
+      "name": "test_cases_le_6_rows",
+      "pass": true,
+      "evidence": "6/6 max"
+    },
+    {
+      "dimension": "test_cases_alignment",
+      "name": "test_cases_6_required_cols",
+      "pass": true,
+      "evidence": "header [#|Given|When|Then|Console|View|API] OK"
+    },
+    {
+      "dimension": "test_cases_alignment",
+      "name": "test_cases_has_trace",
+      "pass": true,
+      "evidence": "trace 行已写"
+    },
+    {
+      "dimension": "test_cases_alignment",
+      "name": "review_has_ge_1_reject_round",
+      "pass": true,
+      "evidence": "16 REJECT keyword(s) in review chain"
+    },
+    {
+      "dimension": "test_cases_alignment",
+      "name": "both_reviewers_approved",
+      "pass": true,
+      "evidence": "coder=APPROVE · tester=APPROVE"
+    },
+    {
+      "dimension": "test_cases_alignment",
+      "name": "user_approval_section_present",
+      "pass": true,
+      "evidence": "has \"## User Approval\" section"
+    },
+    {
+      "dimension": "test_cases_alignment",
+      "name": "user_verdict_approve",
+      "pass": true,
+      "evidence": "user verdict: APPROVE"
+    }
+  ],
+  "redo_target": "coder",
+  "redo_reason": "[coder_compliance.coder_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/coder.md · [coder_compliance.bugs_found_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/bugs-found.md · [tester_compliance.tester_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/tester.md · [tester_compliance.adversarial_md_exists] missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/adversarial.md · [tester_compliance.test_reports_nonempty] empty or missing: /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/audits/runs/SC20-T03/team-1/attempt-1/test-reports · [bug_reality.git_commits_present] task.git_commits[] is empty — Coder must record at least one commit"
+}
