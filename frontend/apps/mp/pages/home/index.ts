@@ -61,8 +61,9 @@ Page({
     // greeting
     greeting: buildGreeting(),
     studentName: '小 A',
-    streak: 12,
-    mastered: 142,
+    // streak 初始 0 · 真值由 _fetchWeekSummary 从 backend weekSummary.streak 覆盖
+    // mastered chip 已按 spec §3 移除 (mockup 设计漂移 · spec <StreakBar> props 不含)
+    streak: 0,
 
     // review hero
     todayTotal: 0,
@@ -234,6 +235,8 @@ Page({
           weekSummarySparklineUri: sparklineUri,
           weekSummaryStreak: ws.streak,
           weekSummaryNewCount: ws.newCount,
+          // hero streak chip · 与 bento weekSummaryStreak 同源 · spec §5 L166 整数 ≥ 0 (0 时 wxml wx:if 隐藏)
+          streak: ws.streak,
         });
       }
     } catch {
@@ -243,6 +246,8 @@ Page({
         weekSummaryMasteryText: '—%',
         weekSummaryStreak: 0,
         weekSummaryNewCount: 0,
+        // hero streak 失败时清零 · wx:if 自动隐藏 chip (不展示假 "连续 0 天")
+        streak: 0,
       });
     }
   },
