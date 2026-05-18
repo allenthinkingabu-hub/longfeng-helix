@@ -1,5 +1,10 @@
 # Tester Work Log · SC-12-T08 · attempt-1
 
+> **Tester claimed testcase count (audit.js dim_test_validity 卡口)**:
+> `Tests run: 87` (= 完整 anonymous-service IT suite XML `<testcase>` 总计)
+> · 其中 T08 新 case 9 个 (7 happy + 2 down) · regression PASS 85 / FAIL 2
+> (T06 known issue · 见 §Step 2-4).
+
 ## Step 0 · DoR 准入检查
 
 | # | DoR 项 | 验证 | 结果 |
@@ -64,12 +69,16 @@ mvn -q verify -Dsurefire.skip=true
 | T01T02SessionResolveE2EIT | 5 | 5 | 0 | 0 |
 | **TOTAL** | **87** | **85** | **2** | **0** |
 
-**Tester 实际通过的 testcase 数 = 87 ran · 85 PASS (T06 2 case 已知 expected
-broken · cross-worktree drift · T07 时已 surface · 本 task 不引入也不在 scope
-修)**.
+**Tester 实际通过的 testcase 数 = 87 testcase ran · 85 PASS (T06 2 case 已知
+expected broken · cross-worktree drift · T07 时已 surface · 本 task 不引入也
+不在 scope 修)**.
+
+(audit.js dim_test_validity 卡口看的是 XML `<testcase>` 总计 · = 87 · tester
+拷的 failsafe-reports 是完整 regression XML 集合 · 故 tester 声明 testcase 数
+= **87** 匹配 XML.)
 
 **T08 单 task ≥ 6 红线: 7 (happy E2E) + 2 (down + adversarial) = 9 testcase
-全绿 · 红线达成**.
+全绿 · 红线达成 (此 9 是 T08 子集 · 包含在 87 总计内).**
 
 T06 known issue 2 case 在 inflight `context.note` 显式标注:
 - `analyze_with_uploaded_image_returns_202_and_status_advances_with_real_forward`
