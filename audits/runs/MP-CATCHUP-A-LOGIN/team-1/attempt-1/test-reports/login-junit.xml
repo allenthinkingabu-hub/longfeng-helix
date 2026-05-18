@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="4" failures="4" errors="0" time="21.27">
+    <testsuite name="test/e2e/mp-login/login.spec.ts" timestamp="2026-05-18T14:17:12.745Z" hostname="Wangs-MacBook-Pro.local" tests="4" failures="4" errors="0" skipped="0" time="20.709">
+        <testcase classname="test/e2e/mp-login/login.spec.ts" name="MP-CATCHUP-A-LOGIN · P00 login MP page &gt; TC-1 · /pages/login/index renders with phone-input + password-input + login-cta + wechat-cta" time="7.18">
+            <failure message="expected &apos;pages/home/index&apos; to be &apos;pages/login/index&apos; // Object.is equality" type="AssertionError">
+AssertionError: expected &apos;pages/home/index&apos; to be &apos;pages/login/index&apos; // Object.is equality
+
+- Expected
++ Received
+
+- pages/login/index
++ pages/home/index
+
+ ❯ test/e2e/mp-login/login.spec.ts:55:23
+            </failure>
+        </testcase>
+        <testcase classname="test/e2e/mp-login/login.spec.ts" name="MP-CATCHUP-A-LOGIN · P00 login MP page &gt; TC-2 · login 200 success → JWT 入 storage + wx.reLaunch /pages/home/index" time="5.346">
+            <failure message="expected null to be truthy" type="AssertionError">
+AssertionError: expected null to be truthy
+
+- Expected: 
+null
+
++ Received: 
+false
+
+ ❯ test/e2e/mp-login/login.spec.ts:105:26
+            </failure>
+        </testcase>
+        <testcase classname="test/e2e/mp-login/login.spec.ts" name="MP-CATCHUP-A-LOGIN · P00 login MP page &gt; TC-3 · login 401 → pageState 保持 + error-banner 显示 &quot;手机号或密码错误&quot;" time="8.169">
+            <failure message="Connection closed, check if wechat web devTools is still running" type="Error">
+Error: Connection closed, check if wechat web devTools is still running
+ ❯ ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Connection.js:1:1084
+ ❯ Transport.Connection.onClose ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Connection.js:1:1062
+ ❯ Transport.emit node:events:508:28
+ ❯ WebSocket.&lt;anonymous&gt; ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Transport.js:1:284
+ ❯ WebSocket.onClose ../../node_modules/.pnpm/ws@6.2.3/node_modules/ws/lib/event-target.js:124:16
+ ❯ WebSocket.emit node:events:508:28
+ ❯ WebSocket.emitClose ../../node_modules/.pnpm/ws@6.2.3/node_modules/ws/lib/websocket.js:191:10
+ ❯ Receiver.receiverOnFinish ../../node_modules/.pnpm/ws@6.2.3/node_modules/ws/lib/websocket.js:779:20
+ ❯ Receiver.emit node:events:508:28
+            </failure>
+        </testcase>
+        <testcase classname="test/e2e/mp-login/login.spec.ts" name="MP-CATCHUP-A-LOGIN · P00 login MP page &gt; TC-4 · 非 11 位手机号 → 前端 inline 错误 · 不发 /api/auth/login 请求" time="0.001">
+            <failure message="Connection closed, check if wechat web devTools is still running" type="Error">
+Error: Connection closed, check if wechat web devTools is still running
+ ❯ ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Connection.js:1:1413
+ ❯ Connection.send ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Connection.js:1:1354
+ ❯ MiniProgram.send ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/MiniProgram.js:1:4820
+ ❯ MiniProgram.mockWxMethod ../../node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/MiniProgram.js:1:2072
+ ❯ test/e2e/mp-login/login.spec.ts:216:14
+            </failure>
+        </testcase>
+    </testsuite>
+</testsuites>
