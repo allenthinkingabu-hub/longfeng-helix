@@ -90,29 +90,60 @@ public class AnonAnalyzeService {
     private final AnonPresignService presignService;
     private final RestTemplate restTemplate;
     private final AiAnalysisProperties aiProps;
+    private final AnonQuotaService quotaService;
 
     public AnonAnalyzeService(
             GuestSessionRepository repo,
             AnonPresignService presignService,
             @Qualifier(AnonRestTemplateConfig.BEAN_NAME) RestTemplate restTemplate,
-            AiAnalysisProperties aiProps) {
+            AiAnalysisProperties aiProps,
+            AnonQuotaService quotaService) {
         this.repo = repo;
         this.presignService = presignService;
         this.restTemplate = restTemplate;
         this.aiProps = aiProps;
+        this.quotaService = quotaService;
     }
 
     /**
-     * Kick off analysis for a guest session.
+     * Legacy 3-arg overload — preserved so SC-12-T06's ITs (which pre-date
+     * the T09 rate-limit slice) compile unchanged. Equivalent to passing
+     * {@code clientIp=null} which routes the quota check through the
+     * {@code _no_ip_} sentinel bucket. Production controller always calls
+     * the 4-arg form; only legacy IT fixtures take this path.
+     */
+    public AnalyzeOutcome startAnalysis(
+            long anonSessionId, String subject, String requestedImageUrl) {
+        return startAnalysis(anonSessionId, subject, requestedImageUrl, null);
+    }
+
+    /**
+     * Kick off analysis for a guest session — with per-device + per-IP quota
+     * gate (SC-12-T09 · biz §2A.3.2 + §2B.13).
+     *
+     * <p>Order matters:
+     * <ol>
+     *   <li>{@code image_tmp_url} gate (T06 — guest must have completed T05).</li>
+     *   <li>Quota check (T09 — short-circuit 429 before burning AI credits).</li>
+     *   <li>Upstream forward to ai-analysis-service.</li>
+     *   <li>On 202 only · {@link AnonQuotaService#increment} (biz §2A.7 L660 —
+     *       AI failure does not consume quota).</li>
+     *   <li>Status 0→1 ANALYZING + persist.</li>
+     * </ol>
      *
      * @param anonSessionId      filter-injected, NOT trusted from request body
      * @param subject            already pattern-validated upstream (six-subject whitelist)
      * @param requestedImageUrl  optional client-supplied GET URL; service mints
      *                           one from {@code image_tmp_url} when this is null/blank
-     * @return outcome the controller maps to an HTTP status
+     * @param clientIp           {@code HttpServletRequest#getRemoteAddr} — hashed
+     *                           via {@link AnonQuotaService#hashIp(String)} before
+     *                           hitting Redis. May be null in legacy callers (see
+     *                           the 3-arg overload).
+     * @return outcome the controller maps to an HTTP status (including 429 with
+     *         retryAfterSec populated when quota exhausted)
      */
     public AnalyzeOutcome startAnalysis(
-            long anonSessionId, String subject, String requestedImageUrl) {
+            long anonSessionId, String subject, String requestedImageUrl, String clientIp) {
 
         Optional<GuestSession> opt = repo.findById(anonSessionId);
         if (opt.isEmpty()) {
@@ -129,6 +160,26 @@ public class AnonAnalyzeService {
         if (g.getImageTmpUrl() == null || g.getImageTmpUrl().isBlank()) {
             LOG.info("anon_analyze image_not_uploaded session_id={}", anonSessionId);
             return new AnalyzeOutcome(AnalyzeOutcome.Kind.IMAGE_NOT_UPLOADED, null);
+        }
+
+        // (1.5) T09 · quota gate. biz §2A.3.2 (1/device/day) + §2B.13 (10/IP/day).
+        //       Runs BEFORE the upstream forward · refusal here costs zero AI
+        //       tokens. deviceFp comes from the persisted guest_session column,
+        //       NOT a client-supplied header — a stolen anonToken cannot
+        //       launder a fresh fp to bypass the gate.
+        String ipHash = AnonQuotaService.hashIp(clientIp);
+        AnonQuotaService.QuotaCheckResult quota = quotaService.check(g.getDeviceFp(), ipHash);
+        if (quota.getKind() == AnonQuotaService.QuotaCheckResult.Kind.DEVICE_EXHAUSTED) {
+            LOG.info("anon_analyze quota_exhausted_device session_id={} deviceFp={} retryAfter={}s",
+                    anonSessionId, g.getDeviceFp(), quota.getRetryAfterSec());
+            return new AnalyzeOutcome(
+                    AnalyzeOutcome.Kind.QUOTA_EXHAUSTED_DEVICE, null, quota.getRetryAfterSec());
+        }
+        if (quota.getKind() == AnonQuotaService.QuotaCheckResult.Kind.IP_EXHAUSTED) {
+            LOG.info("anon_analyze quota_exhausted_ip session_id={} ipHash={} retryAfter={}s",
+                    anonSessionId, ipHash, quota.getRetryAfterSec());
+            return new AnalyzeOutcome(
+                    AnalyzeOutcome.Kind.QUOTA_EXHAUSTED_IP, null, quota.getRetryAfterSec());
         }
 
         // (2) Mint or accept image URL. Frontend MAY pre-mint one for advanced
@@ -187,6 +238,13 @@ public class AnonAnalyzeService {
         //     advance status; T06 is the only writer of state=1).
         g.setStatus((short) 1);
         repo.save(g);
+
+        // (6) T09 · INCR quota only AFTER upstream success (biz §2A.7 L660
+        //     "AI failure does not consume quota"). If this throws, it's
+        //     caught inside increment() and logged — the guest still gets
+        //     their SUCCESS response; the bucket heals on the next call.
+        quotaService.increment(g.getDeviceFp(), ipHash);
+
         LOG.info("anon_analyze success session_id={} task_id={} subject={}",
                 anonSessionId, taskId, subject);
 
@@ -196,7 +254,7 @@ public class AnonAnalyzeService {
     /** Result discriminator · controller maps {@link Kind} to HTTP status. */
     public static final class AnalyzeOutcome {
 
-        /** Discriminator for the four legal outcomes of {@link #startAnalysis}. */
+        /** Discriminator for the six legal outcomes of {@link #startAnalysis}. */
         public enum Kind {
             /** Session id from token's sub no longer exists (concurrent sweep). */
             NOT_FOUND,
@@ -204,19 +262,38 @@ public class AnonAnalyzeService {
             IMAGE_NOT_UPLOADED,
             /** Upstream ai-analysis-service connection refused / timeout / non-202. */
             AI_SERVICE_FAILURE,
+            /** T09 · device bucket {@code >= 1} · controller maps to 429 +
+             *  {@code code=QUOTA_EXHAUSTED_DEVICE} + Retry-After header. */
+            QUOTA_EXHAUSTED_DEVICE,
+            /** T09 · IP bucket {@code >= 10} · controller maps to 429 +
+             *  {@code code=QUOTA_EXHAUSTED_IP} + Retry-After header. */
+            QUOTA_EXHAUSTED_IP,
             /** Forward succeeded; status advanced 0→1; task id ready for FE polling. */
             SUCCESS,
         }
 
         private final Kind kind;
         private final String taskId;
+        private final long retryAfterSec;
 
         public AnalyzeOutcome(Kind kind, String taskId) {
+            this(kind, taskId, 0L);
+        }
+
+        /**
+         * T09 constructor — used by the QUOTA_EXHAUSTED_* paths so the
+         * controller can populate the HTTP {@code Retry-After} header with
+         * the seconds-to-midnight value computed inside the service. Other
+         * Kinds always pass {@code retryAfterSec=0}.
+         */
+        public AnalyzeOutcome(Kind kind, String taskId, long retryAfterSec) {
             this.kind = kind;
             this.taskId = taskId;
+            this.retryAfterSec = retryAfterSec;
         }
 
         public Kind getKind() { return kind; }
         public String getTaskId() { return taskId; }
+        public long getRetryAfterSec() { return retryAfterSec; }
     }
 }

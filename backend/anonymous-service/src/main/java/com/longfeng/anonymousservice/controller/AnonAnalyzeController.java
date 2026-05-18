@@ -77,6 +77,10 @@ public class AnonAnalyzeController {
     static final String ERR_SESSION_MISMATCH = "ANON_SESSION_MISMATCH";
     static final String ERR_IMAGE_NOT_UPLOADED = "IMAGE_NOT_UPLOADED";
     static final String ERR_AI_SERVICE_FAILURE = "AI_SERVICE_FAILURE";
+    /** T09 · biz §2A.3.2 device bucket exhausted (1/device/day). */
+    static final String ERR_QUOTA_EXHAUSTED_DEVICE = "QUOTA_EXHAUSTED_DEVICE";
+    /** T09 · biz §2B.13 IP bucket exhausted (10/IP/day). */
+    static final String ERR_QUOTA_EXHAUSTED_IP     = "QUOTA_EXHAUSTED_IP";
 
     /** FE polling cadence, milliseconds. Pinned by biz §2B.13 F04. */
     private static final int POLL_EVERY_MS = 1000;
@@ -118,11 +122,20 @@ public class AnonAnalyzeController {
                             "anonQid in body does not match verified session"));
         }
 
-        LOG.info("anon_analyze_start session_id={} subject={} has_image_url={}",
-                anonSessionId, req.subject(), req.imageUrl() != null && !req.imageUrl().isBlank());
+        // T09 · capture client IP from the servlet request. Using
+        // getRemoteAddr() (not X-Forwarded-For) is intentional for P0 — the
+        // gateway-aware path is P1; P0 trusts the direct connection peer.
+        // Hashing happens inside AnonQuotaService so the raw IP never leaves
+        // this method.
+        String clientIp = httpReq.getRemoteAddr();
+
+        LOG.info("anon_analyze_start session_id={} subject={} has_image_url={} clientIp_present={}",
+                anonSessionId, req.subject(),
+                req.imageUrl() != null && !req.imageUrl().isBlank(),
+                clientIp != null);
 
         AnalyzeOutcome outcome = service.startAnalysis(
-                anonSessionId, req.subject(), req.imageUrl());
+                anonSessionId, req.subject(), req.imageUrl(), clientIp);
 
         return switch (outcome.getKind()) {
             case NOT_FOUND -> ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -134,6 +147,18 @@ public class AnonAnalyzeController {
             case AI_SERVICE_FAILURE -> ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                     .body(new AnonErrorResponse(ERR_AI_SERVICE_FAILURE,
                             "ai-analysis-service upstream unreachable or non-202"));
+            // T09 · 429 + Retry-After. RFC 7231 §7.1.3 allows seconds-as-int
+            // for Retry-After; we use the seconds-to-midnight value so the
+            // FE has a deterministic countdown anchor (the bucket actually
+            // resets at that moment).
+            case QUOTA_EXHAUSTED_DEVICE -> ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .header("Retry-After", String.valueOf(outcome.getRetryAfterSec()))
+                    .body(new AnonErrorResponse(ERR_QUOTA_EXHAUSTED_DEVICE,
+                            "Daily limit 1/device exceeded; resets at next Asia/Shanghai midnight"));
+            case QUOTA_EXHAUSTED_IP -> ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .header("Retry-After", String.valueOf(outcome.getRetryAfterSec()))
+                    .body(new AnonErrorResponse(ERR_QUOTA_EXHAUSTED_IP,
+                            "Daily limit 10/IP exceeded; resets at next Asia/Shanghai midnight"));
             case SUCCESS -> ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body(new AnonAnalyzeResponse(
                             outcome.getTaskId(), POLL_EVERY_MS, STATUS_ANALYZING));
