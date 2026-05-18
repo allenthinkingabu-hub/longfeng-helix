@@ -406,27 +406,28 @@
   border-bottom: 0;
 }
 
+/* SVG 图标 · 直接 inline base64 (mockup line 200/209/218 同款 stroke icon) · 36rpx
+   置中 · 叠在 .ico-{a,b,c} 各自渐变底之上 (background stack) */
 .feat .ico {
   width: 72rpx;
   height: 72rpx;
   border-radius: 20rpx;
   flex: none;
-  color: #FFFFFF;
-  font-size: 36rpx;
-  text-align: center;
-  line-height: 72rpx;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 36rpx 36rpx;
 }
 
 .feat .ico.ico-a {
-  background: linear-gradient(135deg, #4C9BFF, #5856D6);
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzNiIgaGVpZ2h0PSIzNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTE0LjUgNGgtNUw3IDdINGEyIDIgMCAwIDAtMiAydjlhMiAyIDAgMCAwIDIgMmgxNmEyIDIgMCAwIDAgMi0yVjlhMiAyIDAgMCAwLTItMmgtM2wtMi41LTN6Ii8+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMyIgcj0iNCIvPjwvc3ZnPgo="), linear-gradient(135deg, #4C9BFF, #5856D6);
 }
 
 .feat .ico.ico-b {
-  background: linear-gradient(135deg, #FF9500, #FF3B30);
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzNiIgaGVpZ2h0PSIzNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iOSIvPjxwb2x5bGluZSBwb2ludHM9IjEyIDcgMTIgMTIgMTUgMTQiLz48L3N2Zz4K"), linear-gradient(135deg, #FF9500, #FF3B30);
 }
 
 .feat .ico.ico-c {
-  background: linear-gradient(135deg, #34C759, #30B0C7);
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzNiIgaGVpZ2h0PSIzNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTE4IDhBNiA2IDAgMCAwIDYgOGMwIDctMyA5LTMgOWgxOHMtMy0yLTMtOSIvPjxwYXRoIGQ9Ik0xMy43IDIxYTIgMiAwIDAgMS0zLjQgMCIvPjwvc3ZnPgo="), linear-gradient(135deg, #34C759, #30B0C7);
 }
 
 .feat .feat-text {

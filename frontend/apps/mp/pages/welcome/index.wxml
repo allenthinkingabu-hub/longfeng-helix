@@ -97,24 +97,24 @@
       <view class="sk-bar sk-short"></view>
     </view>
 
-    <!-- §features 3 行 (spec §3 features · mockup line 197-225) -->
+    <!-- §features 3 行 (spec §3 features · mockup line 197-225 · SVG 烧入 ico-{a,b,c} 背景) -->
     <view class="features">
       <view class="feat">
-        <view class="ico ico-a">📷</view>
+        <view class="ico ico-a"></view>
         <view class="feat-text">
           <view class="t">拍照即识别，多模态同时在线</view>
           <view class="d">qwen-vl-max / gpt-4o-mini 双模热备 · 支持公式、手写、几何图形</view>
         </view>
       </view>
       <view class="feat">
-        <view class="ico ico-b">⏱</view>
+        <view class="ico ico-b"></view>
         <view class="feat-text">
           <view class="t">艾宾浩斯 6 次复习自动排期</view>
           <view class="d">T1 1h · T2 1d · T3 3d · T4 7d · T5 15d · T6 30d · 自评驱动自适应推进</view>
         </view>
       </view>
       <view class="feat">
-        <view class="ico ico-c">🔔</view>
+        <view class="ico ico-c"></view>
         <view class="feat-text">
           <view class="t">到点多渠道触达，不再遗忘</view>
           <view class="d">微信订阅消息 / APP / 邮件 / 站内 · 免打扰时段 · 跨端进度同步</view>
