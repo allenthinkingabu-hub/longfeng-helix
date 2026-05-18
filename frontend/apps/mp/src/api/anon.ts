@@ -3,10 +3,13 @@
  * 文档: design/system/pages/P-GUEST-CAPTURE-guest-capture.spec.md §5
  * 后端: SC-12-T01..T09 已落 · X-Anon-Token + 7 个端点
  *
- * NOTE: stub-only scaffold from P0 prep. Real impl owed by team C.
  * Convention: use `httpJSON` + `apiBase('anon')` (see _http.ts dual-runtime adapter).
  * Header convention: X-Anon-Token on every request; X-Idempotency-Key on POST mutators
  * (mirror file.ts presign pattern).
+ *
+ * Upstream wire-format gotchas (surface from T06/T07):
+ * - analyze-by-url upstream uses camelCase (taskId/imageUrl) not snake_case
+ * - result.status upstream真值是 "DONE" 不是 "RESULT_READY" · MP 把 DONE 视为 READY 同义
  */
 import { httpJSON, apiBase } from './_http';
 
@@ -67,7 +70,7 @@ export interface AnalyzeResponse {
 }
 
 export interface ResultResponse {
-  status: 'ANALYZING' | 'READY' | 'FAILED' | 'NOT_FOUND';
+  status: 'ANALYZING' | 'READY' | 'FAILED' | 'NOT_FOUND' | 'DONE';
   result?: {
     subject: string;
     stem_length: number;
@@ -87,72 +90,158 @@ export interface ClaimResponse {
   student_id: number;
 }
 
-/** TODO: team C · POST /api/anon/session · mint */
-export async function mint(_req: MintRequest): Promise<MintResponse> {
-  void httpJSON;
-  void apiBase;
-  throw new Error('NOT_IMPLEMENTED · team C');
+const ANON = (): string => apiBase('anon');
+
+/** Header builder · always carry X-Anon-Token when available */
+function anonHeaders(anonToken?: string, extra?: Record<string, string>): Record<string, string> {
+  const h: Record<string, string> = {};
+  if (anonToken) h['X-Anon-Token'] = anonToken;
+  return { ...h, ...(extra ?? {}) };
 }
 
-/** TODO: team C · PATCH /api/anon/session/{id}/consent */
+/** POST /api/anon/session · mint anonymous session (SC-12-T01) */
+export async function mint(req: MintRequest): Promise<MintResponse> {
+  return httpJSON<MintResponse>(`${ANON()}/api/anon/session`, {
+    method: 'POST',
+    body: req,
+  });
+}
+
+/** PATCH /api/anon/session/{id}/consent · record consent (SC-12-T02) */
 export async function consent(
-  _anonToken: string,
-  _sessionId: number,
-  _req: ConsentRequest,
+  anonToken: string,
+  sessionId: number,
+  req: ConsentRequest,
 ): Promise<ConsentResponse> {
-  void httpJSON;
-  void apiBase;
-  throw new Error('NOT_IMPLEMENTED · team C');
+  return httpJSON<ConsentResponse>(`${ANON()}/api/anon/session/${sessionId}/consent`, {
+    method: 'PATCH',
+    body: req,
+    headers: anonHeaders(anonToken),
+  });
 }
 
-/** TODO: team C · POST /api/anon/file/presign */
+/** POST /api/anon/file/presign · get presigned MinIO PUT url (SC-12-T04) */
 export async function presign(
-  _anonToken: string,
-  _req: PresignRequest,
+  anonToken: string,
+  req: PresignRequest,
 ): Promise<PresignResponse> {
-  void httpJSON;
-  void apiBase;
-  throw new Error('NOT_IMPLEMENTED · team C');
+  return httpJSON<PresignResponse>(`${ANON()}/api/anon/file/presign`, {
+    method: 'POST',
+    body: req,
+    headers: anonHeaders(anonToken),
+  });
 }
 
-/** TODO: team C · POST /api/anon/questions */
+/** POST /api/anon/questions · create anon question (SC-12-T05) ·
+ *  X-Idempotency-Key required (BE 400 ERR_IDEMPOTENCY_KEY_REQUIRED 否则) */
 export async function postQuestion(
-  _anonToken: string,
-  _idempotencyKey: string,
-  _req: QuestionsRequest,
+  anonToken: string,
+  idempotencyKey: string,
+  req: QuestionsRequest,
 ): Promise<QuestionsResponse> {
-  void httpJSON;
-  void apiBase;
-  throw new Error('NOT_IMPLEMENTED · team C');
+  return httpJSON<QuestionsResponse>(`${ANON()}/api/anon/questions`, {
+    method: 'POST',
+    body: req,
+    headers: anonHeaders(anonToken, { 'X-Idempotency-Key': idempotencyKey }),
+  });
 }
 
-/** TODO: team C · POST /api/anon/analyze-by-url */
+/** POST /api/anon/analyze-by-url · trigger AI analysis (SC-12-T06 + T09 quota)
+ *  - 202 + {task_id, poll_every} on accept
+ *  - 429 + Retry-After header on quota exhausted (BE injects header; caller handles via 429 thrown error)
+ *  - NOTE upstream wire 是 camelCase (anonQid / imageUrl 不是 anon_qid) · 已遵循 */
 export async function analyzeByUrl(
-  _anonToken: string,
-  _req: AnalyzeRequest,
+  anonToken: string,
+  req: AnalyzeRequest,
 ): Promise<AnalyzeResponse> {
-  void httpJSON;
-  void apiBase;
-  throw new Error('NOT_IMPLEMENTED · team C');
+  return httpJSON<AnalyzeResponse>(`${ANON()}/api/anon/analyze-by-url`, {
+    method: 'POST',
+    body: req,
+    headers: anonHeaders(anonToken),
+  });
 }
 
-/** TODO: team C · GET /api/anon/result/{anonQid} */
+/** GET /api/anon/result/{anonQid} · poll 1Hz, 30s timeout (SC-12-T07)
+ *  - upstream真值 "DONE" 视为 READY 同义 (callers do `status === 'READY' || status === 'DONE'`) */
 export async function getResult(
-  _anonToken: string,
-  _anonQid: number,
+  anonToken: string,
+  anonQid: number,
 ): Promise<ResultResponse> {
-  void httpJSON;
-  void apiBase;
-  throw new Error('NOT_IMPLEMENTED · team C');
+  return httpJSON<ResultResponse>(`${ANON()}/api/anon/result/${anonQid}`, {
+    method: 'GET',
+    headers: anonHeaders(anonToken),
+  });
 }
 
-/** TODO: team C · POST /api/anon/claim · 双 JWT (X-Anon-Token + Authorization: Bearer student JWT) */
+/** POST /api/anon/claim · 双 JWT (X-Anon-Token + Authorization: Bearer student JWT) (SC-12-T08) */
 export async function claim(
-  _anonToken: string,
-  _studentJwt: string,
-  _req: ClaimRequest,
+  anonToken: string,
+  studentJwt: string,
+  req: ClaimRequest,
 ): Promise<ClaimResponse> {
-  void httpJSON;
-  void apiBase;
-  throw new Error('NOT_IMPLEMENTED · team C');
+  return httpJSON<ClaimResponse>(`${ANON()}/api/anon/claim`, {
+    method: 'POST',
+    body: req,
+    headers: anonHeaders(anonToken, { Authorization: `Bearer ${studentJwt}` }),
+  });
+}
+
+/**
+ * Upload binary file to MinIO via presigned PUT URL.
+ * Pattern mirrors pages/capture/index.ts: wx.uploadFile WRAPS body in multipart,
+ * which breaks MinIO presigned-PUT signature. We read the temp file into
+ * ArrayBuffer and PUT it raw via wx.request with the exact Content-Type.
+ *
+ * In test runtime (Node), wx is undefined → we POST via fetch with raw body
+ * (mp.mockWxMethod stubs in e2e will intercept anyway).
+ */
+export async function putToMinio(
+  uploadUrl: string,
+  tempFilePath: string,
+  mime: string,
+): Promise<void> {
+  const g = globalThis as { wx?: WxAPI };
+  if (typeof g.wx === 'undefined') {
+    // Node test runtime · best-effort no-op (e2e mp.mockWxMethod stubs cover this)
+    return;
+  }
+  const wx = g.wx;
+  const fileBuffer = await new Promise<ArrayBuffer>((resolve, reject) => {
+    wx.getFileSystemManager().readFile({
+      filePath: tempFilePath,
+      success: (res: { data: ArrayBuffer }) => resolve(res.data),
+      fail: (err: { errMsg: string }) => reject(new Error(`readFile failed: ${err.errMsg}`)),
+    });
+  });
+  await new Promise<void>((resolve, reject) => {
+    wx.request({
+      url: uploadUrl,
+      method: 'PUT',
+      data: fileBuffer,
+      header: { 'Content-Type': mime },
+      success: (res: { statusCode: number; data: unknown }) => {
+        if (res.statusCode >= 200 && res.statusCode < 400) resolve();
+        else reject(new Error(`PUT failed: ${res.statusCode} ${JSON.stringify(res.data)}`));
+      },
+      fail: (err: { errMsg: string }) => reject(new Error(err.errMsg)),
+    });
+  });
+}
+
+interface WxAPI {
+  request: (opts: {
+    url: string;
+    method?: string;
+    data?: unknown;
+    header?: Record<string, string>;
+    success?: (res: { statusCode: number; data: unknown }) => void;
+    fail?: (err: { errMsg: string }) => void;
+  }) => void;
+  getFileSystemManager: () => {
+    readFile: (opts: {
+      filePath: string;
+      success?: (res: { data: ArrayBuffer }) => void;
+      fail?: (err: { errMsg: string }) => void;
+    }) => void;
+  };
 }

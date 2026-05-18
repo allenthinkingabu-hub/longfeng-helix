@@ -1,1 +1,306 @@
-.placeholder { padding: 40rpx; color: #999; font-size: 28rpx; text-align: center; }
+/*
+  P-SHARED · 分享链只读预览
+  trace: design/mockups/wrongbook/16_shared.html (hero teal-indigo + 圆角上翻 + cta-dock)
+         spec.md §2.1 布局分区
+  视觉简化: P0 不做 statusbar / 复杂 conic-gradient avatar / 完整磨砂层
+            P1 由 design team 二次像素 diff 再做精确视觉对齐
+*/
+
+page {
+  background: #1a1d2e;          /* 深灰 indigo · hero 收尾 */
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+  color: #1C1C1E;
+  min-height: 100vh;
+}
+
+.p-shared {
+  position: relative;
+  min-height: 100vh;
+  padding-bottom: 220rpx;       /* 留给吸底 cta-dock */
+}
+
+/* ── LOADING 骨架 ──────────────────────────────────────────── */
+.skeleton {
+  padding: 100rpx 40rpx;
+}
+.sk-banner {
+  height: 120rpx;
+  background: linear-gradient(90deg, #2a2d3e, #3a3d4e);
+  border-radius: 16rpx;
+  margin-bottom: 32rpx;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+.sk-card {
+  background: #ffffff;
+  border-radius: 26rpx;
+  padding: 32rpx;
+}
+.sk-line {
+  height: 28rpx;
+  background: #e8e8ec;
+  border-radius: 8rpx;
+  margin-bottom: 20rpx;
+}
+.sk-line-w70 { width: 70%; }
+.sk-line-w50 { width: 50%; }
+.sk-line-w60 { width: 60%; }
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1.0; }
+}
+
+/* ── 挡板 (EXPIRED / INVALID / REVOKED 共用) ──────────────── */
+.blocker {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80rpx 60rpx;
+  background: #1a1d2e;
+  color: #ffffff;
+}
+.blocker-emoji {
+  font-size: 100rpx;
+  margin-bottom: 32rpx;
+}
+.blocker-title {
+  font-size: 40rpx;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+  text-align: center;
+}
+.blocker-sub {
+  font-size: 26rpx;
+  opacity: 0.7;
+  text-align: center;
+  margin-bottom: 60rpx;
+  line-height: 1.6;
+}
+.blocker-cta {
+  padding: 24rpx 60rpx;
+  background: #4a7dff;
+  color: #ffffff;
+  border-radius: 999rpx;
+  font-size: 30rpx;
+}
+
+/* ── READY 主体 ──────────────────────────────────────────── */
+
+.anon-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(env(safe-area-inset-top, 80rpx) + 12rpx) 36rpx 16rpx;
+  color: #ffffff;
+}
+.brand {
+  font-size: 28rpx;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+}
+.signin-pill {
+  padding: 12rpx 32rpx;
+  border: 1rpx solid rgba(255,255,255,0.5);
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  color: #ffffff;
+}
+
+.sharer-banner {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 36rpx 28rpx;
+  color: #ffffff;
+}
+.avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 36rpx;
+  background: linear-gradient(135deg, #4a7dff, #b04aff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+.avatar-letter {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #ffffff;
+}
+.sharer-text {
+  display: flex;
+  flex-direction: column;
+}
+.sharer-line-1 {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+.sharer-line-2 {
+  font-size: 22rpx;
+  opacity: 0.65;
+  margin-top: 4rpx;
+}
+
+/* ── scroll body 圆角上翻 ──────────────────────────────────── */
+.ribbon {
+  margin: 0 32rpx;
+  padding: 16rpx 24rpx;
+  background: rgba(255,255,255,0.08);
+  border: 1rpx dashed rgba(255,255,255,0.4);
+  border-radius: 16rpx;
+}
+.ribbon-text {
+  font-size: 22rpx;
+  color: rgba(255,255,255,0.8);
+}
+
+.qcard {
+  margin: 32rpx 32rpx 24rpx;
+  padding: 32rpx;
+  background: #ffffff;
+  border-radius: 26rpx;
+  color: #1C1C1E;
+}
+.qimg {
+  position: relative;
+  height: 200rpx;
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+  overflow: hidden;
+  background: linear-gradient(135deg, #e8eaf0, #d0d3dc);
+}
+.qimg-blur {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(12rpx);
+  background: rgba(255,255,255,0.4);
+}
+.qimg-lock {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.lock-icon {
+  font-size: 40rpx;
+}
+.lock-text {
+  font-size: 22rpx;
+  color: #555;
+  margin-top: 8rpx;
+}
+
+.qtext {
+  font-size: 30rpx;
+  line-height: 1.6;
+  margin-bottom: 20rpx;
+}
+.stem-clear {
+  color: #1C1C1E;
+}
+.stem-mask {
+  color: #999;
+  font-style: italic;
+}
+
+.kp-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+.kp-chip {
+  padding: 8rpx 20rpx;
+  background: #f0f2f5;
+  border-radius: 16rpx;
+  font-size: 24rpx;
+  color: #4a7dff;
+}
+.kp-locked {
+  background: #f5f5f8;
+  color: #999;
+}
+
+/* ── AI teaser ───────────────────────────────────────────── */
+.ai-teaser {
+  margin: 0 32rpx 24rpx;
+  padding: 32rpx;
+  background: rgba(255,255,255,0.06);
+  border: 1rpx solid rgba(255,255,255,0.15);
+  border-radius: 26rpx;
+  color: #ffffff;
+  position: relative;
+}
+.teaser-bullets {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  margin-bottom: 32rpx;
+}
+.bullet {
+  font-size: 26rpx;
+  opacity: 0.7;
+}
+.teaser-lock-icon {
+  text-align: center;
+  padding-top: 24rpx;
+  border-top: 1rpx solid rgba(255,255,255,0.12);
+}
+.big-lock {
+  font-size: 60rpx;
+  display: block;
+  margin-bottom: 12rpx;
+}
+.lock-cta-text {
+  font-size: 24rpx;
+  opacity: 0.7;
+}
+
+/* ── audit meta ──────────────────────────────────────────── */
+.share-meta {
+  margin: 0 32rpx 32rpx;
+  padding: 24rpx 28rpx;
+  background: rgba(255,255,255,0.04);
+  border-radius: 18rpx;
+  color: rgba(255,255,255,0.6);
+}
+.meta-line {
+  display: block;
+  font-size: 22rpx;
+  line-height: 1.8;
+}
+
+/* ── cta-dock 吸底 ────────────────────────────────────────── */
+.cta-dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20rpx 32rpx calc(env(safe-area-inset-bottom, 30rpx) + 20rpx);
+  background: linear-gradient(180deg, rgba(26,29,46,0) 0%, rgba(26,29,46,0.95) 30%, #1a1d2e 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+.cta {
+  border-radius: 999rpx;
+  text-align: center;
+  padding: 26rpx 20rpx;
+}
+.cta-primary {
+  background: linear-gradient(135deg, #4a7dff, #6e5cff);
+  color: #ffffff;
+}
+.cta-secondary {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.8);
+  border: 1rpx solid rgba(255,255,255,0.18);
+}
+.cta-text {
+  font-size: 28rpx;
+  font-weight: 500;
+}

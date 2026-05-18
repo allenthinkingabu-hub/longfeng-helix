@@ -1,1 +1,128 @@
-<view class="placeholder">分享内容 shared placeholder · awaiting team D fill</view>
+<!--
+  P-SHARED · 分享链只读预览
+  trace: design/system/pages/P-SHARED-shared.spec.md §2/§13 (testid 表 16 项)
+         biz §2A.3.2 P-SHARED 规格卡 (布局分区)
+         design/mockups/wrongbook/16_shared.html (视觉真相 · DOM .sharer/.qcard/.teaser/.audit/.cta-dock)
+
+  脱敏铁律 (UI 层): 仅渲染 5 字段白名单 (type/sharerNickMasked/ttlSec/signatureValid/maskedPayload)
+  + maskedPayload 4 子字段 (stemSnippet/kpVisible/kpLockedCount/imgThumbBlurred)
+  无任何 PII 渲染 (relation_id / student_email / original_image_url)
+-->
+<view class="p-shared" data-test-id="p-shared">
+
+  <!-- ── LOADING 骨架屏 ──────────────────────────────────────── -->
+  <view wx:if="{{pageState === 'LOADING'}}" class="skeleton" data-test-id="p-shared-skeleton">
+    <view class="sk-banner"></view>
+    <view class="sk-card">
+      <view class="sk-line sk-line-w70"></view>
+      <view class="sk-line sk-line-w50"></view>
+      <view class="sk-line sk-line-w60"></view>
+    </view>
+  </view>
+
+  <!-- ── EXPIRED 全屏挡板 (410) ──────────────────────────────── -->
+  <view wx:elif="{{pageState === 'EXPIRED'}}" class="blocker" data-test-id="token-expired-screen">
+    <view class="blocker-emoji">⏰</view>
+    <text class="blocker-title">{{blockerTitle}}</text>
+    <text class="blocker-sub">分享链接最长 7 天 · 请联系分享者重新生成</text>
+    <view class="blocker-cta" bind:tap="onBlockerCta">{{blockerCta}}</view>
+  </view>
+
+  <!-- ── INVALID 全屏挡板 (404 / 5xx / network) ─────────────── -->
+  <view wx:elif="{{pageState === 'INVALID'}}" class="blocker" data-test-id="token-invalid-screen">
+    <view class="blocker-emoji">🔗</view>
+    <text class="blocker-title">{{blockerTitle}}</text>
+    <text class="blocker-sub">这个链接可能已经损坏 · 或不是有效的分享地址</text>
+    <view class="blocker-cta" bind:tap="onBlockerCta">{{blockerCta}}</view>
+  </view>
+
+  <!-- ── REVOKED 全屏挡板 (403) ──────────────────────────────── -->
+  <view wx:elif="{{pageState === 'REVOKED'}}" class="blocker" data-test-id="token-revoked-screen">
+    <view class="blocker-emoji">🚫</view>
+    <text class="blocker-title">{{blockerTitle}}</text>
+    <text class="blocker-sub">分享者已主动撤销 · 内容不再公开</text>
+    <view class="blocker-cta" bind:tap="onBlockerCta">{{blockerCta}}</view>
+  </view>
+
+  <!-- ── READY 渲染主体 ──────────────────────────────────────── -->
+  <block wx:elif="{{pageState === 'READY'}}">
+
+    <!-- AnonShell 顶部 nav (匿名态硬规则 · 无 TabBar · spec §3) -->
+    <view class="anon-nav">
+      <text class="brand">Shared · 错题预览</text>
+      <view class="signin-pill" bind:tap="onSignInTap">登录</view>
+    </view>
+
+    <!-- SharedBanner 分享者横幅 -->
+    <view class="sharer-banner" data-test-id="sharer-banner">
+      <view class="avatar" data-test-id="sharer-banner-avatar">
+        <text class="avatar-letter">Z</text>
+      </view>
+      <view class="sharer-text" data-test-id="sharer-banner-text">
+        <text class="sharer-line-1">来自 {{share.sharerNickMasked}} 的分享</text>
+        <text class="sharer-line-2">share type · {{share.type}}</text>
+      </view>
+    </view>
+
+    <!-- preview ribbon -->
+    <view class="ribbon">
+      <text class="ribbon-text">预览模式 · 已脱敏 · 加入后看完整 AI 分析</text>
+    </view>
+
+    <!-- MaskedQuestionCard -->
+    <view class="qcard" data-test-id="masked-question">
+      <!-- 题图磨砂遮罩 (imgThumbBlurred=true 时显示 lock layer) -->
+      <view wx:if="{{share.maskedPayload.imgThumbBlurred}}" class="qimg" data-test-id="masked-question-overlay">
+        <view class="qimg-blur"></view>
+        <view class="qimg-lock">
+          <text class="lock-icon">🔒</text>
+          <text class="lock-text">原图脱敏</text>
+        </view>
+      </view>
+
+      <!-- 题干前 12 字明文段 -->
+      <view class="qtext">
+        <text class="stem-clear" data-test-id="masked-question-stem-clear">{{share.maskedPayload.stemSnippet}}</text>
+        <text class="stem-mask">　…后续内容请加入错题本查看</text>
+      </view>
+
+      <!-- 知识点 chips (visible 露 · locked +N 锁) -->
+      <view class="kp-row">
+        <text wx:for="{{share.maskedPayload.kpVisible}}" wx:key="*this" class="kp-chip">{{item}}</text>
+        <text wx:if="{{share.maskedPayload.kpLockedCount > 0}}" class="kp-chip kp-locked">+ {{share.maskedPayload.kpLockedCount}} 个知识点 🔒</text>
+      </view>
+    </view>
+
+    <!-- AiTeaserLock · AI 完整分析锁层 -->
+    <view class="ai-teaser" data-test-id="ai-teaser-lock">
+      <view class="teaser-bullets">
+        <text class="bullet">· 错因 + 正解 + 变式</text>
+        <text class="bullet">· 知识点网络</text>
+        <text class="bullet">· 自动排 T0-T6 复习节点</text>
+      </view>
+      <view class="teaser-lock-icon" data-test-id="ai-teaser-lock-icon">
+        <text class="big-lock">🔐</text>
+        <text class="lock-cta-text">加入错题本查看完整 AI 分析</text>
+      </view>
+    </view>
+
+    <!-- ShareMetaRow 审计卡 (合规告知) -->
+    <view class="share-meta" data-test-id="share-meta">
+      <text class="meta-line">令牌 · 已签名</text>
+      <text class="meta-line">剩余有效期 · {{share.ttlSec}} 秒</text>
+      <text class="meta-line">已记录访问 IP · 设备指纹 (合规留痕)</text>
+    </view>
+
+    <!-- DualCtaDock 吸底双 CTA -->
+    <view class="cta-dock" data-test-id="dual-cta-dock">
+      <view class="cta cta-primary" data-test-id="upgrade-cta-fixed" bind:tap="onCtaRegister">
+        <text class="cta-text" data-test-id="cta-join">注册查看完整 · 一键加入我的错题本</text>
+      </view>
+      <view class="cta cta-secondary" bind:tap="onCtaTryGuest">
+        <text class="cta-text" data-test-id="cta-later">我也试试看 · 不登录</text>
+      </view>
+    </view>
+
+  </block>
+
+</view>

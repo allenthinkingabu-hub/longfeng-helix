@@ -1,3 +1,7 @@
 {
-  "navigationBarTitleText": "游客试用"
+  "navigationBarTitleText": "游客试用",
+  "navigationBarBackgroundColor": "#0B0D12",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#0B0D12",
+  "usingComponents": {}
 }

@@ -1,1 +1,141 @@
-<view class="placeholder">游客试用 guest-capture placeholder · awaiting team C fill</view>
+<!--
+  P-GUEST-CAPTURE · trace mockup design/mockups/wrongbook/15_guest_capture.html
+  状态机 10 态: BOOTSTRAPPING / IDLE / CONSENT_PENDING / CAMERA_ACTIVE /
+              UPLOADING / ANALYZING / READY / CLAIMING / CLAIMED /
+              FAILED · QUOTA_EXHAUSTED · ERROR
+-->
+<view class="gc-root" data-testid="p-guest-capture-root">
+
+  <!-- AnonShell nav · spec §2.2 -->
+  <view class="gc-anon-nav" data-testid="anon-shell-nav">
+    <view class="gc-anon-nav-brand">
+      <view class="gc-anon-nav-dot"></view>
+      <text class="gc-anon-nav-name">游客试用 · GUEST</text>
+    </view>
+    <view class="gc-anon-nav-signin" data-testid="anon-shell-login-btn" bindtap="onSigninTap">登录</view>
+  </view>
+
+  <!-- QuotaBanner · spec §3 GuestBanner -->
+  <view class="gc-quota" data-testid="guest-quota-banner" wx:if="{{phase !== 'QUOTA_EXHAUSTED'}}">
+    <view class="gc-quota-ico">⏱</view>
+    <view class="gc-quota-text">
+      <view class="gc-quota-title" data-testid="guest-quota-remaining">今日还剩 1 次 免费分析</view>
+      <view class="gc-quota-desc" data-testid="guest-quota-ttl">结果保留 24 小时 · 注册后可一键 claim</view>
+    </view>
+  </view>
+
+  <!-- ERROR red banner (§9 异常 + §6.1 retry · 不扣额度) -->
+  <view class="gc-error-banner" wx:if="{{phase === 'ERROR' || phase === 'FAILED'}}" data-testid="guest-error-banner">
+    <text class="gc-error-text">{{errorMsg || 'AI 暂时繁忙，建议重试'}}</text>
+    <button class="gc-error-retry" data-testid="guest-error-retry" bindtap="onRetryTap">重试</button>
+  </view>
+
+  <!-- Camera viewfinder · CAMERA_ACTIVE 态 -->
+  <camera
+    wx:if="{{phase === 'CAMERA_ACTIVE'}}"
+    class="gc-camera"
+    device-position="back"
+    flash="off"
+    binderror="onCameraError"
+    data-testid="guest-camera-view"
+  >
+    <cover-view class="gc-camera-frame"></cover-view>
+  </camera>
+
+  <!-- Subject chips · 6 学科 single-select -->
+  <scroll-view class="gc-subjects" scroll-x="true" wx:if="{{phase === 'IDLE' || phase === 'CONSENT_PENDING' || phase === 'CAMERA_ACTIVE'}}">
+    <view
+      wx:for="{{subjects}}"
+      wx:key="value"
+      class="gc-subject {{subject === item.value ? 'gc-subject-active' : ''}}"
+      data-value="{{item.value}}"
+      data-testid="subject-chip-{{item.value}}"
+      bindtap="onSubjectTap"
+    >{{item.label}}</view>
+  </scroll-view>
+
+  <!-- Consent card · spec §3 ConsentBar + ComplianceBadgeRow -->
+  <view class="gc-consent" data-testid="guest-consent-card" wx:if="{{phase === 'IDLE' || phase === 'CONSENT_PENDING' || phase === 'CAMERA_ACTIVE'}}">
+    <view class="gc-consent-row" bindtap="onConsentToggle">
+      <view class="gc-consent-check {{consent.checked ? '' : 'gc-consent-check-unchecked'}}" data-testid="guest-consent-checkbox">
+        <text wx:if="{{consent.checked}}">✓</text>
+      </view>
+      <text class="gc-consent-tx">我已阅读并同意 《未成年人保护条款》 与 《游客试用协议》。上传的图片仅用于本次 AI 分析，24 小时后自动清理。</text>
+    </view>
+    <view class="gc-badge-row">
+      <text class="gc-badge gc-badge-green" data-testid="guest-compliance-badge-encrypt">✓ 图片端到端加密</text>
+      <text class="gc-badge gc-badge-blue" data-testid="guest-compliance-badge-fingerprint">设备指纹</text>
+      <text class="gc-badge gc-badge-orange" data-testid="guest-compliance-badge-ratelimit">IP 限流</text>
+    </view>
+  </view>
+
+  <!-- UPLOADING / ANALYZING progress -->
+  <view class="gc-phase-indicator" wx:if="{{phase === 'UPLOADING'}}" data-testid="guest-upload-progress">
+    <view>● 上传中</view>
+    <view class="gc-phase-progress">{{uploadPct}}%</view>
+  </view>
+  <view class="gc-phase-indicator" wx:if="{{phase === 'ANALYZING'}}" data-testid="guest-analyzing-progress">
+    <view>● AI 分析中</view>
+    <view class="gc-phase-progress">已耗时 {{pollSecs}}s · 通常 5-10s</view>
+  </view>
+
+  <!-- READY 4 cards (subject / stem_length / chat_model / ocr_model) -->
+  <view class="gc-result" wx:if="{{phase === 'READY' || phase === 'CLAIMING' || phase === 'CLAIMED'}}" data-testid="guest-result-block">
+    <view class="gc-result-title">✓ AI 分析完成</view>
+    <view class="gc-result-card" data-testid="guest-result-card-subject">
+      <text class="gc-result-key">学科</text>
+      <text class="gc-result-val">{{result.subject || '-'}}</text>
+    </view>
+    <view class="gc-result-card" data-testid="guest-result-card-stem">
+      <text class="gc-result-key">题干长度</text>
+      <text class="gc-result-val">{{result.stem_length || 0}} 字符</text>
+    </view>
+    <view class="gc-result-card" data-testid="guest-result-card-chat">
+      <text class="gc-result-key">Chat 模型</text>
+      <text class="gc-result-val">{{result.chat_model || '-'}}</text>
+    </view>
+    <view class="gc-result-card" data-testid="guest-result-card-ocr">
+      <text class="gc-result-key">OCR 模型</text>
+      <text class="gc-result-val">{{result.ocr_model || '-'}}</text>
+    </view>
+  </view>
+
+  <!-- Controls · Shutter (always except QUOTA_EXHAUSTED / READY) -->
+  <view class="gc-controls" wx:if="{{phase === 'IDLE' || phase === 'CONSENT_PENDING' || phase === 'CAMERA_ACTIVE'}}">
+    <view class="gc-shutter-row">
+      <button
+        class="gc-shutter {{consent.checked ? '' : 'gc-shutter-disabled'}}"
+        data-testid="capture-shutter"
+        disabled="{{!consent.checked}}"
+        bindtap="onShutterTap"
+      >
+        <view class="gc-shutter-rec" wx:if="{{consent.checked}}" data-testid="guest-shutter-rec-badge">● Analyze</view>
+        <text>{{shutterLabel}}</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- Main CTA · READY 态保存到错题本 -->
+  <button
+    class="gc-cta-save"
+    wx:if="{{phase === 'READY'}}"
+    data-testid="guest-cta-save"
+    bindtap="onSaveCta"
+  >保存到我的错题本</button>
+
+  <!-- QUOTA_EXHAUSTED 整页挡板 · spec §9 + §6.1 IDLE→QUOTA_EXHAUSTED -->
+  <view class="gc-quota-blocker" wx:if="{{phase === 'QUOTA_EXHAUSTED'}}" data-testid="guest-quota-blocker">
+    <view class="gc-quota-blocker-icon">⏰</view>
+    <view class="gc-quota-blocker-title">今日额度已用完</view>
+    <view class="gc-quota-blocker-desc">每位游客每日 1 次免费分析。注册后不限次。</view>
+    <view class="gc-quota-blocker-countdown" wx:if="{{retryAfterSecs > 0}}">
+      下次可用: {{retryAfterCountdown}}
+    </view>
+    <button
+      class="gc-quota-blocker-cta"
+      data-testid="guest-quota-blocker-cta"
+      bindtap="onSigninTap"
+    >立即注册</button>
+  </view>
+
+</view>
