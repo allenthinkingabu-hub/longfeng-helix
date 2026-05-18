@@ -4,7 +4,9 @@
 <view class="wrongbook-list-page" data-test-id="{{testIds.root}}">
 
   <!-- ── Nav ──────────────────────────────────────────── -->
-  <view class="nav">
+  <!-- 2026-05-18: padding-top 用真 statusBarHeight (wx.getSystemInfoSync) ·
+       替代不可靠的 css env(safe-area-inset-top) (模拟器返 0). -->
+  <view class="nav" style="padding-top: {{navTopPx + 12}}px;">
     <view class="nav-row">
       <text class="nav-h1" data-test-id="{{testIds['page-header-title']}}">错题本</text>
       <view class="nav-actions">
@@ -12,10 +14,21 @@
       </view>
     </view>
 
-    <!-- Search -->
+    <!-- Search · 2026-05-18 改真 input · 替代 mockup 写死 "二次函数 顶点" 文本 -->
     <view class="search" data-test-id="{{testIds['page-header-search']}}">
       <van-icon name="search" color="#8E8E93" size="14px" />
-      <text class="search-text">二次函数 顶点</text>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="搜题干 / 知识点 (例: 二次函数)"
+        placeholder-class="search-placeholder"
+        value="{{searchQuery}}"
+        bindinput="onSearchInput"
+        confirm-type="search"
+      />
+      <view wx:if="{{searchQuery}}" class="search-clear" bind:tap="onSearchClear">
+        <van-icon name="clear" color="#8E8E93" size="14px" />
+      </view>
       <text class="ai-badge" data-test-id="{{testIds['page-header-semantic-badge']}}">AI 语义</text>
     </view>
 
@@ -31,7 +44,12 @@
   </view>
 
   <!-- ── Content ──────────────────────────────────────── -->
-  <scroll-view class="content" scroll-y="true">
+  <!-- 2026-05-18: margin-top = statusBar + nav 内部高度 (~140px) · 跟 nav 同步避大空隙 -->
+  <scroll-view
+    class="content"
+    scroll-y="true"
+    style="margin-top: {{navTopPx + 140}}px;"
+  >
 
     <!-- Loading -->
     <view wx:if="{{pageState === 'LOADING'}}" class="skeleton">
@@ -71,9 +89,12 @@
         </view>
       </view>
 
-      <!-- Sort hint -->
+      <!-- Sort selector · 2026-05-18 真功能 · tap 弹 ActionSheet 6 模式 -->
       <view class="sort" data-test-id="{{testIds['sort-bar']}}">
-        <text class="sort-l">按 <text class="sort-strong">下次复习时间</text> · 升序</text>
+        <view class="sort-l sort-tappable" bind:tap="onSortTap">
+          <text>按 <text class="sort-strong">{{sortLabel}}</text></text>
+          <van-icon name="arrow-down" size="12px" color="#8E8E93" />
+        </view>
         <text>共 <text class="sort-strong">{{items.length}}</text> 条</text>
       </view>
 

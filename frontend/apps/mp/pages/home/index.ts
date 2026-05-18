@@ -265,4 +265,20 @@ Page({
       wx.navigateTo({ url });
     }
   },
+
+  /**
+   * 2026-05-18 · 「月视图 ›」tap handler
+   * spec P-HOME §7 出口表 (L241): 「月视图 ›」→ P10 calendar-month (`pages/calendar/month`).
+   * biz §2A.3 L234 + §2B.6 步 2: 进 P10 触发 home_open_full_calendar{from=weekstrip}.
+   *
+   * 历史: 2026-05-18 (commit dc9602f) P10 未实装 · 暂用 toast 兜底.
+   * 现 (P10 task 完): pages/calendar/month/ 4 件套已落地 + BE /api/calendar/events?month= 通 ·
+   * 真 navigateTo 上线.
+   */
+  onMonthViewTap() {
+    // P-HOME 周条带"完整日历"入口 · 不带 anchor · P10 默认本月 + today 选中
+    wx.navigateTo({ url: '/pages/calendar/month/index' });
+    // 埋点 (spec §12 home_open_full_calendar)
+    console.log('[P-HOME] home_open_full_calendar', { from: 'weekstrip' });
+  },
 });

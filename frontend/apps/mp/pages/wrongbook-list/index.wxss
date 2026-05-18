@@ -20,10 +20,11 @@ page {
   left: 0;
   right: 0;
   /* app.json navigationStyle:custom · 全页面自管状态栏 ·
-   * 2026-05-18: WeChat 模拟器 env(safe-area-inset-top) 落 0 → 88rpx fallback 也撞 ·
-   * 用户实测「错题本」字仍被 1:42 时钟挡 · fallback 加大到 130rpx (~65pt 实测安全).
-   * iOS 真机刘海设备 env() 落 ~94rpx (47pt) 也覆盖. */
-  padding: calc(env(safe-area-inset-top, 130rpx) + 12rpx) 36rpx 20rpx;
+   * 2026-05-18 二轮修: env(safe-area-inset-top) 在 WeChat 模拟器返 0 不可靠 ·
+   * 改用 wx.getSystemInfoSync().statusBarHeight (px 真值) · 在 wxml 上 inline
+   * style="padding-top: {{navTopPx + 12}}px" · 这里 padding-top 不再设 (被 inline 覆盖).
+   * 左右 + 底 padding 仍走类. */
+  padding: 0 36rpx 20rpx;
   background: rgba(242,242,247,0.78);
   backdrop-filter: blur(22px) saturate(180%);
   border-bottom: 1rpx solid rgba(60,60,67,0.14);
@@ -64,6 +65,27 @@ page {
 
 .search-text {
   color: #3C3C43;
+}
+
+/* 2026-05-18 真 input · 替代 mockup 写死文本 */
+.search-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 28rpx;
+  color: #1C1C1E;
+  background: transparent;
+  border: none;
+  padding: 0;
+  /* line-height 跟随父 flex align-center */
+}
+.search-placeholder {
+  color: #8E8E93;
+  font-size: 28rpx;
+}
+.search-clear {
+  padding: 4rpx 8rpx;
+  display: flex;
+  align-items: center;
 }
 
 .ai-badge {
@@ -116,12 +138,9 @@ page {
 
 /* ── Content ──────────────────────────────────────── */
 .content {
-  /* 2026-05-18 修 chips 与 mastery filter 之间大空隙:
-   * .nav padding-top 用 env(safe-area-inset-top) · .content margin-top 必须同源
-   * 跟 nav 同步 · 否则 env=0 (WeChat 模拟器) 时 nav 收缩 · 而固定 margin 不变 = 大空隙.
-   * 公式: env() + 280rpx ≈ env + 12 (pad) + 72 (h1) + 78 (search 含 margin) +
-   *      78 (chips 含 margin) + 20 (pad-bot) + 20 (buffer). */
-  margin-top: calc(env(safe-area-inset-top, 130rpx) + 280rpx);
+  /* 2026-05-18 三轮修: 不在此设 margin-top · wxml inline style 用真 statusBarHeight
+   * + nav 内部高度算出 px · 模拟器/真机/Android 都自适应. */
+  margin-top: 0;
   padding: 20rpx 32rpx 32rpx;
   flex: 1;
   /* P08 同款修: scroll-view scroll-y 不会自动收敛横向 · cards (long stem 等) 撑超 viewport ·
@@ -240,6 +259,16 @@ page {
   font-size: 24rpx;
   color: #8E8E93;
   padding: 0 8rpx 16rpx;
+}
+/* 2026-05-18 真功能 · sort 可点选 · tap 弹 ActionSheet */
+.sort-tappable {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 8rpx 4rpx;
+}
+.sort-tappable:active {
+  opacity: 0.6;
 }
 
 .sort-strong {

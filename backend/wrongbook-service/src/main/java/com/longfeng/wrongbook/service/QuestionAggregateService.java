@@ -118,9 +118,13 @@ public class QuestionAggregateService {
     private static final short STATUS_CONFIRMED = 3;
 
     public QuestionListResp listQuestions(Long studentId, String subject, Short mastery,
+                                          String q,
                                           int page, int size, String sort) {
+        // 2026-05-18 sort 扩展: due_asc/desc · mastery_asc/desc · created_asc/desc.
+        // due_* + mastery_* 因依赖 next-due 注入 / mastery 应用层映射 · 用应用层后排 ·
+        // SQL 阶段统一 created_at DESC · 后面 application-level sort 覆盖.
         Sort s = Sort.by(Sort.Direction.DESC, "created_at");
-        if ("oldest".equals(sort)) {
+        if ("oldest".equals(sort) || "created_asc".equals(sort)) {
             s = Sort.by(Sort.Direction.ASC, "created_at");
         }
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), size, s);
@@ -137,11 +141,72 @@ public class QuestionAggregateService {
         // 批量 JOIN analysis_result 拿 latest stem · 让列表显示真题干 (P08 detail 已做 · list 没做).
         Map<Long, String> stemMap = fetchLatestStemByItems(itemIds);
 
-        return new QuestionListResp(
-                result.getContent().stream()
-                        .map(it -> toListItem(it, nextDueMap.get(it.getId()), stemMap.get(it.getId())))
-                        .toList(),
-                page, size, result.getTotalElements());
+        // 2026-05-18 加 search filter: q 关键词模糊匹配 stem_text + AI stem ·
+        // 应用层 filter (避 SQL 复杂 JOIN · stem 来源两表 + AI fallback 逻辑已在 toListItem) ·
+        // 数据集 ≤ 50 条 · 应用层效率 OK.
+        java.util.List<QuestionListItem> rawItems = result.getContent().stream()
+                .map(it -> toListItem(it, nextDueMap.get(it.getId()), stemMap.get(it.getId())))
+                .toList();
+        java.util.List<QuestionListItem> filtered;
+        long total;
+        if (q != null && !q.isBlank()) {
+            String needle = q.trim().toLowerCase();
+            filtered = rawItems.stream()
+                    .filter(it -> matchesSearch(it, needle))
+                    .toList();
+            total = filtered.size();
+        } else {
+            filtered = rawItems;
+            total = result.getTotalElements();
+        }
+        // 2026-05-18 应用层排序 · due_* + mastery_* 走这里 (SQL 阶段已 created_at 排过 ·
+        // 这层仅对 due/mastery 模式覆盖 · 用 stable sort 保 created tie-break).
+        java.util.List<QuestionListItem> sorted = applyAppSort(filtered, sort);
+        return new QuestionListResp(sorted, page, size, total);
+    }
+
+    /**
+     * 2026-05-18 应用层 sort · 跨 wrong_item 列 + 注入字段 (next_due_at).
+     * - due_asc/desc: next_due_at 升/降 · null 列尾
+     * - mastery_asc: 未掌握 → 已掌握 (0,1,2)
+     * - mastery_desc: 倒序
+     * - 其他 (含 null / "oldest" / "created_*"): 保留 SQL 层排序 · 直接返
+     */
+    private java.util.List<QuestionListItem> applyAppSort(
+            java.util.List<QuestionListItem> items, String sort) {
+        if (sort == null || sort.isBlank()) return items;
+        java.util.Comparator<QuestionListItem> cmp;
+        switch (sort) {
+            case "due_asc":
+                cmp = java.util.Comparator.comparing(
+                        QuestionListItem::nextDueAt,
+                        java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                break;
+            case "due_desc":
+                cmp = java.util.Comparator.comparing(
+                        QuestionListItem::nextDueAt,
+                        java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder()));
+                break;
+            case "mastery_asc":
+                cmp = java.util.Comparator.comparingInt(QuestionListItem::mastery);
+                break;
+            case "mastery_desc":
+                cmp = java.util.Comparator.comparingInt(QuestionListItem::mastery).reversed();
+                break;
+            default:
+                return items; // SQL 层已排过 · 跳过
+        }
+        return items.stream().sorted(cmp).toList();
+    }
+
+    /**
+     * 2026-05-18 search 匹配: stem_text + subject 子串模糊匹配 (lowercase).
+     * 后续可扩 KP / 错因 (analysis_result).
+     */
+    private boolean matchesSearch(QuestionListItem item, String needle) {
+        String stem = item.stemText() == null ? "" : item.stemText().toLowerCase();
+        String subject = item.subject() == null ? "" : item.subject().toLowerCase();
+        return stem.contains(needle) || subject.contains(needle);
     }
 
     /** 2026-05-18 · 批量拿 wrong_item 的 latest AI stem · 单 SQL (DISTINCT ON) · 不 N+1. */

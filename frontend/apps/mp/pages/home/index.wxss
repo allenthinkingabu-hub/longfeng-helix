@@ -375,6 +375,11 @@ page {
   color: #007AFF;
   font-weight: 600;
   letter-spacing: 0.4rpx;
+  /* 2026-05-18 tap target 视觉反馈 · 「月视图 ›」等 sec-m 链接均生效 */
+  padding: 6rpx 4rpx;
+}
+.sec-m:active {
+  opacity: 0.55;
 }
 
 .sec-m-orange {

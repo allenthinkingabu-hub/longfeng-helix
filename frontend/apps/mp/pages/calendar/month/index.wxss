@@ -1,0 +1,425 @@
+/* P10 日历月视图 · 1:1 mirror design/mockups/wrongbook/10_calendar_month.html */
+
+page {
+  background: #F2F2F7;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif;
+  color: #1C1C1E;
+}
+
+.p10-page {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Navbar ──────────────────────────────────────────── */
+/* 锚 mockup L25-L42 .navbar · 半透明 + backdrop-filter blur */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 6rpx 32rpx 20rpx;
+  background: rgba(242,242,247,0.82);
+  backdrop-filter: blur(60rpx) saturate(180%);
+  border-bottom: 1rpx solid rgba(60,60,67,0.12);
+  z-index: 20;
+}
+
+.nav-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 88rpx;
+}
+
+.back {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  color: #007AFF;
+  font-size: 32rpx;
+  font-weight: 400;
+}
+.back:active {
+  opacity: 0.5;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rpx;
+}
+.center .t {
+  font-size: 32rpx;
+  font-weight: 700;
+  letter-spacing: 0.2rpx;
+}
+.center .s {
+  font-size: 20rpx;
+  color: rgba(60,60,67,0.6);
+  font-weight: 600;
+  letter-spacing: 0.8rpx;
+}
+
+.btn-icn {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 32rpx;
+  background: rgba(120,120,128,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-icn:active {
+  opacity: 0.6;
+}
+
+.sub-nav {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 20rpx;
+  align-items: center;
+}
+
+.seg {
+  background: rgba(120,120,128,0.12);
+  border-radius: 18rpx;
+  padding: 4rpx;
+  display: flex;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1C1C1E;
+}
+.seg-btn {
+  padding: 8rpx 20rpx;
+  border-radius: 14rpx;
+  color: rgba(60,60,67,0.6);
+}
+.seg-btn:active {
+  opacity: 0.5;
+}
+.seg-on {
+  background: #fff;
+  color: #1C1C1E;
+  box-shadow: 0 2rpx 4rpx rgba(0,0,0,0.06), 0 6rpx 16rpx rgba(0,0,0,0.04);
+}
+
+.grow {
+  flex: 1;
+}
+
+.filter {
+  display: flex;
+  gap: 8rpx;
+  align-items: center;
+  padding: 8rpx 16rpx;
+  background: rgba(0,122,255,0.12);
+  border-radius: 18rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #007AFF;
+}
+.filter-disabled {
+  opacity: 0.4;
+}
+
+/* ── Body (grid) ──────────────────────────────────── */
+.body {
+  flex: 1;
+  padding: 16rpx 0 0;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 0 24rpx 8rpx;
+  color: rgba(60,60,67,0.6);
+  font-size: 24rpx;
+  font-weight: 500;
+  text-align: center;
+  letter-spacing: 1rpx;
+}
+.weekdays text {
+  text-align: center;
+}
+.weekdays .we {
+  color: #FF3B30;
+  opacity: 0.85;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4rpx;
+  padding: 0 20rpx;
+}
+
+/* 锚 mockup L49-L60 .cell · 单格高 104rpx (mockup 52px · 屏幕窄按 2x rpx) */
+.cell {
+  height: 104rpx;
+  border-radius: 20rpx;
+  padding: 10rpx 6rpx 6rpx;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent;
+}
+.cell:active {
+  background: rgba(120,120,128,0.06);
+}
+.cell .d {
+  font-size: 32rpx;
+  font-weight: 500;
+  letter-spacing: -0.4rpx;
+  color: #1C1C1E;
+}
+.cell.mute .d {
+  color: rgba(60,60,67,0.3);
+}
+.cell.weekend .d {
+  color: #FF3B30;
+}
+.cell.today {
+  background: rgba(10,132,255,0.08);
+}
+.cell.today .d {
+  background: #007AFF;
+  color: #fff;
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 26rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  box-shadow: 0 6rpx 16rpx rgba(10,132,255,0.35);
+}
+.cell.selected:not(.today) {
+  background: #fff;
+  box-shadow: 0 2rpx 4rpx rgba(0,0,0,0.04), 0 12rpx 32rpx rgba(0,0,0,0.06);
+}
+
+.cell .bar {
+  position: absolute;
+  top: 6rpx;
+  right: 8rpx;
+  font-size: 16rpx;
+  font-weight: 800;
+  color: #5856D6;
+  background: rgba(88,86,214,0.12);
+  padding: 2rpx 6rpx;
+  border-radius: 6rpx;
+  letter-spacing: 0.6rpx;
+}
+.cell.today .bar {
+  background: #fff;
+  color: #007AFF;
+}
+
+.dots {
+  margin-top: 6rpx;
+  display: flex;
+  gap: 4rpx;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 76rpx;
+  align-items: center;
+}
+.dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+}
+.d-red { background: #FF3B30; }
+.d-ora { background: #FF9500; }
+.d-grn { background: #34C759; }
+.d-ind { background: #5856D6; }
+.d-ylw { background: #FFCC00; }
+.d-pnk { background: #FF2D55; }
+.d-tea { background: #30B0C7; }
+.d-pur { background: #AF52DE; }
+.d-blu { background: #007AFF; }
+.overflow {
+  font-size: 16rpx;
+  font-weight: 700;
+  color: rgba(60,60,67,0.6);
+  margin-left: 2rpx;
+}
+
+/* Skeleton */
+.grid-skeleton {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4rpx;
+  padding: 0 20rpx;
+}
+.cell-skeleton {
+  background: rgba(120,120,128,0.08);
+  border-radius: 20rpx;
+}
+
+/* Error */
+.error-banner {
+  text-align: center;
+  padding: 80rpx 0;
+  color: #FF3B30;
+  font-size: 28rpx;
+}
+
+/* ── Day list sheet ──────────────────────────────── */
+.list {
+  background: #fff;
+  border-top-left-radius: 44rpx;
+  border-top-right-radius: 44rpx;
+  padding: 24rpx 32rpx 40rpx;
+  box-shadow: 0 -16rpx 48rpx rgba(0,0,0,0.05);
+  margin-top: 24rpx;
+}
+
+.list-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12rpx;
+}
+.list-head-l {
+  display: flex;
+  align-items: baseline;
+  gap: 12rpx;
+}
+.lh-t {
+  font-size: 36rpx;
+  font-weight: 800;
+  letter-spacing: -0.4rpx;
+}
+.lh-sub {
+  color: rgba(60,60,67,0.6);
+  font-size: 24rpx;
+  font-weight: 500;
+}
+.lh-more {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  color: #007AFF;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+.lh-more:active {
+  opacity: 0.55;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+}
+.row {
+  display: flex;
+  gap: 20rpx;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid rgba(60,60,67,0.08);
+  align-items: center;
+}
+.row:last-child {
+  border-bottom: 0;
+}
+.row:active {
+  background: rgba(120,120,128,0.04);
+}
+.bar3 {
+  width: 7rpx;
+  align-self: stretch;
+  border-radius: 4rpx;
+  flex: 0 0 7rpx;
+}
+.content {
+  flex: 1;
+  min-width: 0;
+}
+.ti {
+  font-size: 28rpx;
+  font-weight: 700;
+  letter-spacing: -0.2rpx;
+  display: flex;
+  gap: 12rpx;
+  align-items: center;
+  color: #1C1C1E;
+  flex-wrap: wrap;
+}
+.ti-title {
+  max-width: 380rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.studytag {
+  font-size: 18rpx;
+  font-weight: 800;
+  color: #5856D6;
+  background: rgba(88,86,214,0.12);
+  padding: 2rpx 12rpx;
+  border-radius: 8rpx;
+  letter-spacing: 0.6rpx;
+}
+.tag {
+  font-size: 20rpx;
+  font-weight: 700;
+  padding: 4rpx 14rpx;
+  border-radius: 10rpx;
+  letter-spacing: 0.4rpx;
+}
+.meta {
+  display: flex;
+  gap: 12rpx;
+  color: rgba(60,60,67,0.6);
+  font-size: 22rpx;
+  margin-top: 6rpx;
+  font-weight: 500;
+}
+.time {
+  font-size: 28rpx;
+  font-weight: 700;
+  letter-spacing: -0.4rpx;
+  color: #1C1C1E;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* Empty states */
+.empty-day {
+  text-align: center;
+  padding: 60rpx 0;
+  color: rgba(60,60,67,0.6);
+  font-size: 26rpx;
+}
+.empty-month {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 0 40rpx;
+  gap: 12rpx;
+}
+.em-title {
+  font-size: 36rpx;
+  font-weight: 700;
+}
+.em-hint {
+  font-size: 26rpx;
+  color: rgba(60,60,67,0.6);
+}
+.em-btn {
+  margin-top: 24rpx;
+  padding: 20rpx 48rpx;
+  background: linear-gradient(180deg,#5FA8FF,#007AFF);
+  color: #fff;
+  border-radius: 32rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+.em-btn:active {
+  opacity: 0.85;
+}

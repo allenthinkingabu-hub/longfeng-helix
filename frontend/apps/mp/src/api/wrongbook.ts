@@ -228,6 +228,18 @@ export interface ListWrongQuestionsParams {
   size?: number;
   subject?: string;
   mastery?: string;
+  /** 2026-05-18 search · q 关键词 (stem_text + subject ILIKE %q%) */
+  q?: string;
+  /**
+   * 2026-05-18 sort 模式:
+   * - due_asc: 下次复习时间近→远 (默认)
+   * - due_desc: 下次复习时间远→近
+   * - created_desc: 最新入库→最旧
+   * - created_asc: 最旧→最新 (= 旧名 "oldest" alias)
+   * - mastery_asc: 未掌握→已掌握
+   * - mastery_desc: 已掌握→未掌握
+   */
+  sort?: string;
 }
 
 // BE 实际 wire shape (snake_case + 字段缺失) · 跟 FE 类型对不上
@@ -310,6 +322,8 @@ export async function listWrongQuestions(
   if (params.size !== undefined) parts.push(`size=${params.size}`);
   if (params.subject) parts.push(`subject=${params.subject}`);
   if (params.mastery) parts.push(`mastery=${params.mastery}`);
+  if (params.q) parts.push(`q=${encodeURIComponent(params.q)}`);
+  if (params.sort) parts.push(`sort=${encodeURIComponent(params.sort)}`);
   const query = parts.join('&');
   const url = `${apiBase('wb')}/api/wb/questions${query ? `?${query}` : ''}`;
   const raw = await httpJSON<ListWrongQuestionsRespWire>(url);

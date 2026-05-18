@@ -27,6 +27,16 @@ public interface CalendarEventRepository extends JpaRepository<CalendarEvent, Lo
             @Param("from") Instant from,
             @Param("to") Instant to);
 
+    /**
+     * P10 month query · same shape as {@link #findByOwnerAndDateRange} but
+     * intent-named so call sites read clearer. JPA picks no semantic difference;
+     * we keep one impl and let the service layer choose semantically right name.
+     */
+    default List<CalendarEvent> findByOwnerAndMonthRange(
+            Long ownerId, Instant from, Instant to) {
+        return findByOwnerAndDateRange(ownerId, from, to);
+    }
+
     List<CalendarEvent> findByRelationTypeAndRelationIdStartingWith(
             String relationType, String relationIdPrefix);
 

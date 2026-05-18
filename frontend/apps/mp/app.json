@@ -13,7 +13,8 @@
     "pages/login/index",
     "pages/welcome/index",
     "pages/guest/capture/index",
-    "pages/shared/index"
+    "pages/shared/index",
+    "pages/calendar/month/index"
   ],
   "window": {
     "navigationStyle": "custom",
