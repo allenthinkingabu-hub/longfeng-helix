@@ -1,0 +1,11 @@
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v1.6.1 /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/frontend/apps/mp
+
+ ✓ test/e2e/mp-guest-capture/guest-capture.spec.ts  (8 tests) 85359ms
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  18:57:33
+   Duration  85.84s (transform 40ms, setup 0ms, collect 275ms, tests 85.36s, environment 0ms, prepare 61ms)
+

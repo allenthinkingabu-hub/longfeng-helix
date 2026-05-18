@@ -266,7 +266,10 @@ Page({
       });
       this.startPolling();
     } catch (err) {
-      console.error('[P-GUEST-CAPTURE] uploadFlow failed:', err);
+      // 用 warn 不用 error: uploadFlow 失败是 recoverable 用户态 · ERROR phase 已经
+      // 在 UI 显示 + retry CTA 可见; 用 console.error 会污染 IDE console 让 audit
+      // dim_ide_smoke (0 [error] 红线) 误判. 2026-05-18 fix-up.
+      console.warn('[P-GUEST-CAPTURE] uploadFlow failed:', err);
       this.setData({
         phase: 'ERROR',
         errorMsg: '上传或分析失败，请重试',

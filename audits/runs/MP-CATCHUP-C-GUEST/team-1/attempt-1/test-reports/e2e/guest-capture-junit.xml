@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="8" failures="0" errors="0" time="87.336">
+    <testsuite name="test/e2e/mp-guest-capture/guest-capture.spec.ts" timestamp="2026-05-18T15:06:05.265Z" hostname="Wangs-MacBook-Pro.local" tests="8" failures="0" errors="0" skipped="0" time="86.817">
+        <testcase classname="test/e2e/mp-guest-capture/guest-capture.spec.ts" name="MP-CATCHUP-C-GUEST · P-GUEST-CAPTURE MP page (Phase 3 Coder) &gt; TC-1 · /pages/guest/capture/index · onLoad mint → phase=IDLE + nav + consent rendered" time="14.064">
+        </testcase>
+        <testcase classname="test/e2e/mp-guest-capture/guest-capture.spec.ts" name="MP-CATCHUP-C-GUEST · P-GUEST-CAPTURE MP page (Phase 3 Coder) &gt; TC-2 · tap consent checkbox → PATCH consent 200 → phase=CONSENT_PENDING + Shutter enabled" time="7.689">
+        </testcase>
+        <testcase classname="test/e2e/mp-guest-capture/guest-capture.spec.ts" name="MP-CATCHUP-C-GUEST · P-GUEST-CAPTURE MP page (Phase 3 Coder) &gt; TC-3 · tap shutter → CAMERA_ACTIVE · stub takePhoto → UPLOADING (camera 真 wxml · IDE 跳长 mount)" time="9.671">
+        </testcase>
+        <testcase classname="test/e2e/mp-guest-capture/guest-capture.spec.ts" name="MP-CATCHUP-C-GUEST · P-GUEST-CAPTURE MP page (Phase 3 Coder) &gt; TC-4 · analyze-by-url 429 → phase=QUOTA_EXHAUSTED + 整页挡板 + 立即注册 CTA" time="9.937">
+        </testcase>
+        <testcase classname="test/e2e/mp-guest-capture/guest-capture.spec.ts" name="MP-CATCHUP-C-GUEST · P-GUEST-CAPTURE MP page (Phase 3 Coder) &gt; TC-5 · analyze-by-url 502 → phase=ERROR + guest-error-banner + 重试按钮" time="9.783">
+        </testcase>
+        <testcase classname="test/e2e/mp-guest-capture/guest-capture.spec.ts" name="MP-CATCHUP-C-GUEST · P-GUEST-CAPTURE MP page (Phase 3 Coder) &gt; TC-6 · poll getResult → READY · 4 卡片渲染 + 保存 CTA 可点" time="14.826">
+        </testcase>
+        <testcase classname="test/e2e/mp-guest-capture/guest-capture.spec.ts" name="MP-CATCHUP-C-GUEST · P-GUEST-CAPTURE MP page (Phase 3 Coder) &gt; TC-7 · result.status=&quot;DONE&quot; 上游真值 · MP 视同 READY (wire 差异防回归)" time="12.26">
+        </testcase>
+        <testcase classname="test/e2e/mp-guest-capture/guest-capture.spec.ts" name="MP-CATCHUP-C-GUEST · P-GUEST-CAPTURE MP page (Phase 3 Coder) &gt; TC-8 · READY 态 tap 保存 CTA (storage 无 jwt) → navigateTo login" time="8.572">
+        </testcase>
+    </testsuite>
+</testsuites>

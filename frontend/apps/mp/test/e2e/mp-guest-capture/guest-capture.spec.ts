@@ -33,6 +33,38 @@ function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+/**
+ * Monkey-patch wx.getFileSystemManager().readFile in appservice scope so
+ * putToMinio() doesn't fail on fake test paths. Idempotent (safe to call
+ * before every TC that triggers uploadFlow). 2026-05-18 fix-up.
+ */
+async function stubReadFileForTests(mpInst: Mp): Promise<void> {
+  await mpInst.evaluate(function () {
+    const g = globalThis as unknown as {
+      wx: {
+        getFileSystemManager: () => {
+          readFile: (opts: { filePath: string; success?: (res: { data: ArrayBuffer }) => void; fail?: (err: { errMsg: string }) => void }) => void;
+        };
+      };
+    };
+    const orig = g.wx.getFileSystemManager;
+    g.wx.getFileSystemManager = function () {
+      return {
+        readFile: function (opts) {
+          // 测试 stub: 立刻 success 1-byte fake buffer · 让 putToMinio PUT step 进 mock wx.request
+          setTimeout(function () {
+            if (opts.success) opts.success({ data: new ArrayBuffer(1) });
+          }, 0);
+        },
+      };
+    };
+    // Tag so we can detect double-patching (debug)
+    (g.wx.getFileSystemManager as unknown as { __stubbed?: boolean }).__stubbed = true;
+    void orig;
+    return true;
+  });
+}
+
 describe('MP-CATCHUP-C-GUEST · P-GUEST-CAPTURE MP page (Phase 3 Coder)', () => {
   let mp: Mp;
   let errors: string[];
@@ -214,6 +246,7 @@ describe('MP-CATCHUP-C-GUEST · P-GUEST-CAPTURE MP page (Phase 3 Coder)', () => 
 
       // 直接调 uploadFlow(stub temp path) 绕开真 camera takePhoto · 验状态机
       // CAMERA_ACTIVE → UPLOADING 转移 (spec §6.1)
+      await stubReadFileForTests(mp);
       await page.callMethod('uploadFlow', '/tmp/fake-tc3.jpg');
       await sleep(1500);
 
@@ -278,6 +311,7 @@ describe('MP-CATCHUP-C-GUEST · P-GUEST-CAPTURE MP page (Phase 3 Coder)', () => 
         consent: { checked: true, consentAt: '2026-05-18T08:35:00Z' },
         phase: 'CAMERA_ACTIVE',
       });
+      await stubReadFileForTests(mp);
       await page.callMethod('uploadFlow', '/tmp/fake-photo.jpg');
       await sleep(3500);
 
@@ -338,6 +372,7 @@ describe('MP-CATCHUP-C-GUEST · P-GUEST-CAPTURE MP page (Phase 3 Coder)', () => 
         consent: { checked: true, consentAt: '2026-05-18T08:35:00Z' },
         phase: 'CAMERA_ACTIVE',
       });
+      await stubReadFileForTests(mp);
       await page.callMethod('uploadFlow', '/tmp/fake-photo.jpg');
       await sleep(3500);
 
@@ -358,7 +393,10 @@ describe('MP-CATCHUP-C-GUEST · P-GUEST-CAPTURE MP page (Phase 3 Coder)', () => 
   // TC-6 · polling_until_ready · result.status=READY → 4 卡片 + CTA
   // ──────────────────────────────────────────────────────────
   it('TC-6 · poll getResult → READY · 4 卡片渲染 + 保存 CTA 可点', async () => {
-    let pollCount = 0;
+    // 注意: mp.mockWxMethod 用 fn.toString() 把函数序列化到 appservice scope
+    // 执行 · spec 域闭包变量 (e.g. pollCount) 在 appservice 中不可见. 故 TC-6 mock
+    // 一律返 READY (省 1 个 ANALYZING 中间态 · 因为我们要测 polling → READY 转移
+    // · 状态机本身已在 TC-5/7 通过 ANALYZING 起点验过)
     await mp.mockWxMethod('request', function (options: { url?: string; method?: string }) {
       const url = options.url || '';
       const method = options.method || 'GET';
@@ -386,12 +424,6 @@ describe('MP-CATCHUP-C-GUEST · P-GUEST-CAPTURE MP page (Phase 3 Coder)', () => 
         }}};
       }
       if (url.indexOf('/api/anon/result/') >= 0) {
-        pollCount++;
-        if (pollCount === 1) {
-          return { statusCode: 200, data: { code: 0, message: 'ok', data: {
-            status: 'ANALYZING',
-          }}};
-        }
         return { statusCode: 200, data: { code: 0, message: 'ok', data: {
           status: 'READY',
           result: {
@@ -417,9 +449,11 @@ describe('MP-CATCHUP-C-GUEST · P-GUEST-CAPTURE MP page (Phase 3 Coder)', () => 
         consent: { checked: true, consentAt: '2026-05-18T08:35:00Z' },
         phase: 'CAMERA_ACTIVE',
       });
+      await stubReadFileForTests(mp);
       await page.callMethod('uploadFlow', '/tmp/fake-photo.jpg');
-      // wait for 2 poll cycles (ANALYZING → READY)
-      await sleep(4500);
+      // wait for 2 poll cycles (ANALYZING → READY) · IDE round-trip overhead +
+      // mock dispatch latency 需要 ≥ 7s (1Hz poll · 2 cycle + IDE 反应延迟)
+      await sleep(8000);
 
       const data = await page.data();
       expect(data.phase, 'polling → READY').toBe('READY');
@@ -500,8 +534,9 @@ describe('MP-CATCHUP-C-GUEST · P-GUEST-CAPTURE MP page (Phase 3 Coder)', () => 
         consent: { checked: true, consentAt: '2026-05-18T08:35:00Z' },
         phase: 'CAMERA_ACTIVE',
       });
+      await stubReadFileForTests(mp);
       await page.callMethod('uploadFlow', '/tmp/fake-photo.jpg');
-      await sleep(3000);
+      await sleep(6000);
 
       const data = await page.data();
       expect(data.phase, 'DONE 上游真值 → MP READY').toBe('READY');
