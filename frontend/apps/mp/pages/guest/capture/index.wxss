@@ -141,34 +141,31 @@ page {
 }
 
 /* ── Edge ROI corners · yellow brackets (mockup line 44-49)
-   尺寸调宽 (left/right 92→72rpx · 与 paper 各侧外扩 16rpx) · border 加粗 5→6rpx
-   corners 加大 36→52rpx · 更醒目 ROI 视觉 */
+   去掉框 border · 只保留 4 个 corner L · 更接近 mockup viewfinder 视觉
+   corner 加大到 56rpx + 8rpx border · 鲜明 */
 .gc-edges {
   position: absolute;
   top: 280rpx;
-  left: 72rpx;
-  right: 72rpx;
+  left: 64rpx;
+  right: 64rpx;
   height: 800rpx;
-  border: 6rpx solid #FFD166;
-  border-radius: 20rpx;
-  box-shadow:
-    0 0 0 6rpx rgba(255, 209, 102, 0.2),
-    inset 0 0 40rpx rgba(255, 209, 102, 0.1);
+  border: 3rpx solid rgba(255, 209, 102, 0.5);
+  border-radius: 16rpx;
   z-index: 11;
   pointer-events: none;
 }
 
 .gc-edge {
   position: absolute;
-  width: 52rpx;
-  height: 52rpx;
-  border: 6rpx solid #FFD166;
+  width: 56rpx;
+  height: 56rpx;
+  border: 8rpx solid #FFD166;
 }
 
-.gc-edge-tl { top: -6rpx; left: -6rpx; border-right: none; border-bottom: none; }
-.gc-edge-tr { top: -6rpx; right: -6rpx; border-left: none; border-bottom: none; }
-.gc-edge-bl { bottom: -6rpx; left: -6rpx; border-right: none; border-top: none; }
-.gc-edge-br { bottom: -6rpx; right: -6rpx; border-left: none; border-top: none; }
+.gc-edge-tl { top: 0; left: 0; border-right: none; border-bottom: none; border-top-left-radius: 12rpx; }
+.gc-edge-tr { top: 0; right: 0; border-left: none; border-bottom: none; border-top-right-radius: 12rpx; }
+.gc-edge-bl { bottom: 0; left: 0; border-right: none; border-top: none; border-bottom-left-radius: 12rpx; }
+.gc-edge-br { bottom: 0; right: 0; border-left: none; border-top: none; border-bottom-right-radius: 12rpx; }
 
 /* ── AnonShell nav · glass back + brand chip + signin (mockup line 52-57) ── */
 .gc-anon-nav {
