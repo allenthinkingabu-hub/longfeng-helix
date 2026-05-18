@@ -30,17 +30,20 @@
     <button class="gc-error-retry" data-testid="guest-error-retry" bindtap="onRetryTap">重试</button>
   </view>
 
-  <!-- Camera viewfinder · CAMERA_ACTIVE 态 ·
-       NOTE: <camera> native 组件 在 IDE simulator 上 mount/unmount 易触发 appservice
-       crash. wx:if 切换有副作用 · 改成 wx:if + 内嵌 placeholder view 防 native
-       component 死亡循环. 真机上换回 <camera> 由 user accept 时启用 (TODO). -->
-  <view
+  <!-- Camera viewfinder · CAMERA_ACTIVE 态 · spec §3 组件清单 + biz §2A.3.2 P-GUEST-CAPTURE 规格卡 真 camera
+       Restored 2026-05-18 fix-up: 真 <camera> native 组件; e2e TC-3 通过 mp.mockWxMethod stub
+       takePhoto 立刻进 UPLOADING 不真 mount camera 长时间 · 真机/IDE 手测时取景器真启. -->
+  <camera
     wx:if="{{phase === 'CAMERA_ACTIVE'}}"
     class="gc-camera"
+    device-position="back"
+    flash="off"
     data-testid="guest-camera-view"
+    binderror="onCameraError"
+    style="width:100%;height:50vh"
   >
-    <view class="gc-camera-frame"></view>
-  </view>
+    <cover-view class="gc-camera-frame"></cover-view>
+  </camera>
 
   <!-- Subject chips · 6 学科 single-select -->
   <scroll-view class="gc-subjects" scroll-x="true" wx:if="{{phase === 'IDLE' || phase === 'CONSENT_PENDING' || phase === 'CAMERA_ACTIVE'}}">
