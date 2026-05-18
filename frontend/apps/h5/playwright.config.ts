@@ -34,6 +34,21 @@ export default defineConfig({
     video: 'retain-on-failure',
     // 浏览器视口（移动端竖屏 · P02 是 H5 拍题）
     viewport: { width: 390, height: 844 },
+    // SC-12-T10: Chromium fake camera (浏览器 capability · 用户铁律允许 · 非 mock)
+    // Provides a synthetic green-bar video stream + auto-grants camera permission
+    // (no physical webcam needed). This is a browser capability flag, NOT a mock
+    // of the application's backend or business logic.
+    launchOptions: {
+      args: [
+        '--use-fake-device-for-media-stream',
+        '--use-fake-ui-for-media-stream',
+        '--autoplay-policy=no-user-gesture-required',
+      ],
+    },
+    // Grant camera permission via Playwright (belt + suspenders with the
+    // --use-fake-ui flag above; some Playwright versions still gate
+    // navigator.permissions even when the flag is set).
+    permissions: ['camera'],
   },
   projects: [
     {

@@ -571,8 +571,22 @@ export const TEST_IDS = {
     consentCard:     'guest-consent-card',
     consentCheckbox: 'guest-consent-checkbox',
     cameraPreview:   'guest-camera-preview',
+    cameraVideo:     'guest-camera-video',     // SC-12-T10: <video> el for real getUserMedia stream
     shutter:         'guest-shutter',
     errorBanner:     'guest-error-banner',
+    // SC-12-T10 · 真页 flow 终态 + 异常态 testids (spec §13 提案)
+    uploadProgress:  'guest-upload-progress',  // UPLOADING phase spinner + text
+    analyzingProgress: 'guest-analyzing-progress',  // ANALYZING phase spinner + text
+    resultCard:      'guest-result-card',
+    resultSubject:   'guest-result-subject',
+    resultStemLength: 'guest-result-stem-length',
+    resultChatModel: 'guest-result-chat-model',
+    resultOcrModel:  'guest-result-ocr-model',
+    ctaSaveToWrongbook: 'guest-cta-save-to-wrongbook',
+    quotaBlocker:    'guest-quota-blocker',    // QUOTA_EXHAUSTED full-page blocker
+    quotaRetryAfter: 'guest-quota-retry-after',
+    quotaBlockerCta: 'guest-quota-blocker-cta',
+    errorRetryBtn:   'guest-error-retry-btn',
   },
 
   // SC-11-T01 · P-LANDING shell (replaces SC-00-T01 landing-placeholder-root)

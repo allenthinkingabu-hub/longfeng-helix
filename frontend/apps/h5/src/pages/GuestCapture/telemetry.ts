@@ -76,6 +76,21 @@ export function computeDeviceFp(): string {
   }
 }
 
+/**
+ * SC-12-T10 telemetry event names (extended).
+ * Used by GuestCapture index.tsx in the full real-page flow.
+ */
+export const GUEST_EVENTS = {
+  view: 'anon_guest_capture_view',
+  consent: 'anon_guest_consent',
+  shoot: 'anon_guest_capture_shoot',
+  analyzeStart: 'anon_guest_analyze_start',
+  analyzeDone: 'anon_guest_analyze_done',
+  quotaExhausted: 'anon_guest_quota_exhausted',
+  ctaSave: 'anon_guest_cta_save',
+  error: 'anon_guest_error',
+} as const;
+
 /** 上报 payload shape (三件套 + 自定义 props). */
 export interface GuestCaptureTelemetryPayload {
   event: string;
