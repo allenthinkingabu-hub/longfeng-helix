@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.longfeng.common.db.migration.V1_0_084_WbReviewNodeCreateAiJudgeIT
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.895 s -- in com.longfeng.common.db.migration.V1_0_084_WbReviewNodeCreateAiJudgeIT
