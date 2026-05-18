@@ -2,6 +2,7 @@ package com.longfeng.calendar.service;
 
 import com.longfeng.calendar.dto.CalendarEventCreateReq;
 import com.longfeng.calendar.dto.CalendarEventResp;
+import com.longfeng.calendar.dto.CalendarMonthResp;
 import com.longfeng.calendar.dto.CalendarSubscribeResp;
 import com.longfeng.calendar.entity.CalendarEvent;
 import com.longfeng.calendar.repo.CalendarEventRepository;
@@ -10,10 +11,13 @@ import com.longfeng.common.exception.BusinessException;
 import com.longfeng.common.exception.ErrCode;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,6 +92,33 @@ public class CalendarEventService {
         Instant to = startOfDay.plusDays(1).toInstant();
         List<CalendarEvent> events = repo.findByOwnerAndDateRange(ownerId, from, to);
         return events.stream().map(this::toResp).toList();
+    }
+
+    /**
+     * P10 spec §5 #1 · Query events for an entire calendar month, bucketed by date.
+     *
+     * <p>Range semantics: [first-day 00:00 tz, first-day-of-next-month 00:00 tz) ·
+     * matches mockup "2026 年 4 月" cell coverage. Events whose {@code start_at}
+     * falls in this half-open window are included regardless of duration.
+     * Buckets are returned in date-ASC order; days with 0 events are omitted
+     * (FE constructs the 42-cell grid layout itself · per spec §2.1).
+     */
+    @Transactional(readOnly = true)
+    public CalendarMonthResp findByOwnerAndMonth(Long ownerId, YearMonth yearMonth, ZoneId tz) {
+        ZonedDateTime startOfMonth = yearMonth.atDay(1).atStartOfDay(tz);
+        ZonedDateTime startOfNextMonth = yearMonth.plusMonths(1).atDay(1).atStartOfDay(tz);
+        List<CalendarEvent> events = repo.findByOwnerAndMonthRange(
+                ownerId, startOfMonth.toInstant(), startOfNextMonth.toInstant());
+        // LinkedHashMap 保插入顺序 · repo 已按 startAt ASC 拉 · 故 date 自然 ASC.
+        Map<LocalDate, List<CalendarEventResp>> bucketed = new LinkedHashMap<>();
+        for (CalendarEvent e : events) {
+            LocalDate date = e.getStartAt().atZone(tz).toLocalDate();
+            bucketed.computeIfAbsent(date, k -> new ArrayList<>()).add(toResp(e));
+        }
+        List<CalendarMonthResp.DayBucket> days = bucketed.entrySet().stream()
+                .map(en -> new CalendarMonthResp.DayBucket(en.getKey(), en.getValue()))
+                .toList();
+        return new CalendarMonthResp(yearMonth.toString(), days);
     }
 
     /**

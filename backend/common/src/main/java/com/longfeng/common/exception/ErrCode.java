@@ -2,6 +2,7 @@ package com.longfeng.common.exception;
 
 public enum ErrCode {
     VALIDATION_FAILED(40001, 400),
+    UNAUTHORIZED(40101, 401),
     IDEMPOTENCY_CONFLICT(40901, 409),
     RESOURCE_NOT_FOUND(40401, 404),
     INTERNAL_ERROR(50001, 500);

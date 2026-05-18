@@ -186,4 +186,17 @@ public class WrongItemService {
             return null;
         }
     }
+
+    /**
+     * P05-LIST (2026-05-18) · 批量拿 wrong_item 的 latest AI stem · 避免 N+1.
+     * 返 List<Object[]> [wrong_item_id, stem] · 异常时回空 list.
+     */
+    public java.util.List<Object[]> findLatestStemByWrongItemIds(java.util.List<Long> wrongItemIds) {
+        if (wrongItemIds == null || wrongItemIds.isEmpty()) return java.util.List.of();
+        try {
+            return repo.findLatestStemByWrongItemIds(wrongItemIds);
+        } catch (Exception e) {
+            return java.util.List.of();
+        }
+    }
 }

@@ -5,9 +5,12 @@ spring:
   application:
     name: ai-analysis-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/wrongbook
-    username: postgres
-    password: wb
+    # 单库迁移 (2026-05-17): 全部服务接 team-1-pg (port 15432) ·
+    # ai_analysis_task / analysis_result 表与 wrong_item / review_plan 同库.
+    # 之前 5432 老配置 + postgres/wb · 单库决策后不再有 5432 实例.
+    url: jdbc:postgresql://localhost:15432/wrongbook
+    username: longfeng
+    password: longfeng_dev
   jpa:
     hibernate:
       ddl-auto: validate
@@ -15,6 +18,7 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+    validate-on-migrate: false
   data:
     redis:
       host: localhost

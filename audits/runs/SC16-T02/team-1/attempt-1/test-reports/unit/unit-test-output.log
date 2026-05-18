@@ -1,0 +1,25 @@
+
+> @longfeng/mp@0.1.0 test:unit /Users/allen/workspace/longfeng/.claude/worktrees/brave-shaw-0bb0e4/frontend/apps/mp
+> vitest run --config test/vitest.config.ts test/unit
+
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v1.6.1 /Users/allen/workspace/longfeng/.claude/worktrees/brave-shaw-0bb0e4/frontend/apps/mp
+
+ ✓ test/unit/api-presign.spec.ts  (15 tests) 5ms
+ ✓ test/unit/home.tester.spec.ts  (18 tests) 8ms
+ ✓ test/unit/home.spec.ts  (28 tests) 2ms
+ ✓ test/unit/wrongbook-list.spec.ts  (19 tests) 3ms
+ ✓ test/unit/review-today.spec.ts  (24 tests) 1ms
+ ✓ test/unit/weekly/helpers.spec.ts  (34 tests) 2ms
+ ✓ test/unit/review-done-end.spec.ts  (5 tests) 2ms
+ ✓ test/unit/review-today-tap.spec.ts  (11 tests) 1ms
+ ✓ test/unit/api-modules.spec.ts  (17 tests)
+ ✓ test/unit/weekly/home-weeksummary.spec.ts  (9 tests) 1ms
+ ✓ test/unit/_http.spec.ts  (5 tests)
+
+ Test Files  11 passed (11)
+      Tests  185 passed (185)
+   Start at  21:58:06
+   Duration  563ms (transform 155ms, setup 0ms, collect 159ms, tests 25ms, environment 0ms, prepare 234ms)
+

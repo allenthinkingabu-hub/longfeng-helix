@@ -68,4 +68,21 @@ public interface WrongItemRepository extends JpaRepository<WrongItem, Long> {
               + "ORDER BY ar.created_at DESC LIMIT 1",
         nativeQuery = true)
     List<Object[]> findLatestAnalysisFullByWrongItemId(@Param("wrongItemId") Long wrongItemId);
+
+    /**
+     * P05-LIST (2026-05-18) · 批量拿一组 wrong_item 的 latest AI stem · 避免 N+1.
+     * 返 [wrong_item_id (Long), stem (String)] · 缺值的 item 不在结果集 (调用方 null fallback).
+     * DISTINCT ON 取每 task 最新 (created_at DESC).
+     */
+    @Query(
+        value = "SELECT DISTINCT ON (cast(ar.task_id as bigint)) "
+              + "       cast(ar.task_id as bigint) AS wrong_item_id, ar.stem "
+              + "FROM analysis_result ar "
+              + "WHERE ar.task_id ~ '^[0-9]+$' "
+              + "  AND cast(ar.task_id as bigint) IN (:wrongItemIds) "
+              + "  AND ar.deleted_at IS NULL "
+              + "  AND ar.stem IS NOT NULL AND length(ar.stem) > 0 "
+              + "ORDER BY cast(ar.task_id as bigint), ar.created_at DESC",
+        nativeQuery = true)
+    List<Object[]> findLatestStemByWrongItemIds(@Param("wrongItemIds") List<Long> wrongItemIds);
 }

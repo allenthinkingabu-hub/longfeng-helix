@@ -63,17 +63,19 @@ describe('B3 anti-regression · weekly card contains sparkline + days bar', () =
     expect(wxml).toContain('data-test-id="p-home-weekly-sparkline"');
   });
 
-  it('wxml has spark image bound to sparklineSvgUri (B3 · the actual SVG content)', () => {
+  it('wxml has spark image bound to weekSummarySparklineUri (B 方案 严格真值 · 2026-05-18)', () => {
     expect(wxml).toContain('class="spark-svg"');
-    expect(wxml).toMatch(/src="\{\{sparklineSvgUri\}\}"/);
+    // 旧 sparklineSvgUri (mockup 占位) 已删 · 改绑 weekSummarySparklineUri 真值 ·
+    // 空周时 wx:if 不命中 → 不画 (防 mockup 假曲线穿透 · 与 P03/P04 治理同根)
+    expect(wxml).toMatch(/src="\{\{weekSummarySparklineUri\}\}"/);
   });
 
-  it('wxml has days bar with 周一 ... 周六 + 今天 (7 day labels)', () => {
+  it('wxml has dynamic days bar bound to weekDayLabels + todayIdx (2026-05-18 fix · "今天"动态贴 ISO 今天位置)', () => {
     expect(wxml).toContain('data-test-id="p-home-weekly-days"');
-    for (const label of ['周一', '周二', '周三', '周四', '周五', '周六']) {
-      expect(wxml).toContain(label);
-    }
-    expect(wxml).toContain('今天');
+    // 旧写死 7 个 <text>周一</text> ... <text>今天</text> 已删 ·
+    // 改 wx:for {{weekDayLabels}} · helper buildWeekDayLabels 生成 (单测在 home-weeksummary.spec)
+    expect(wxml).toMatch(/wx:for="\{\{weekDayLabels\}\}"/);
+    expect(wxml).toMatch(/todayIdx/);
   });
 });
 

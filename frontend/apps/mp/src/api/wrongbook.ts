@@ -51,6 +51,18 @@ export interface GetQuestionByIdResp {
  * steps / formula) default to empty values — the AI sidecar branch in P04
  * fills `reasonMarkdown` + `steps` when the answer is available.
  */
+// BE analysis_result.steps jsonb 实际 shape · AI prompt 直出 ·
+// 之前误标 QuestionStep[] · 导致 normalizeQuestion 不映射字段 ·
+// FE wxml 渲染 {{item.idx}} / {{item.title}} 全 undefined → 圆点空 + 文字空.
+interface RawStepWire {
+  stepNo?: number;
+  step_no?: number;  // 兼容 snake_case
+  idx?: number;       // 兼容已经是 FE 形态
+  text?: string;
+  title?: string;
+  formula?: string;
+}
+
 interface QuestionDetailWire {
   qid?: string;
   id?: string;
@@ -64,7 +76,7 @@ interface QuestionDetailWire {
   my_answer?: string | null;
   correct_answer?: string | null;
   reason_markdown?: string | null;
-  steps?: QuestionStep[] | null;
+  steps?: RawStepWire[] | null;
   knowledge_points?: KnowledgePoint[] | null;
   confidence?: number | null;
   model_info?: { name: string; version: string } | null;
@@ -78,6 +90,17 @@ interface GetQuestionByIdRespWire {
 
 function normalizeQuestion(w: QuestionDetailWire | null | undefined): QuestionDetail {
   const src = w || {};
+  // BE 给的 step 是 {stepNo, text, formula?} (AI prompt 输出 jsonb 直存) ·
+  // FE wxml 渲染 {idx, title, formula?} · 这里做字段映射 · 之前漏映射 → 圆点空.
+  const stepsIn = src.steps ?? [];
+  const steps: QuestionStep[] = stepsIn.map((s, i) => ({
+    idx: typeof s.stepNo === 'number' ? s.stepNo
+       : typeof s.step_no === 'number' ? s.step_no
+       : typeof s.idx === 'number' ? s.idx
+       : i + 1,
+    title: (s.text ?? s.title ?? '').toString(),
+    formula: s.formula,
+  }));
   return {
     id: src.id ?? src.qid ?? '',
     subject: src.subject ?? '',
@@ -86,7 +109,7 @@ function normalizeQuestion(w: QuestionDetailWire | null | undefined): QuestionDe
     myAnswer: src.my_answer ?? '',
     correctAnswer: src.correct_answer ?? '',
     reasonMarkdown: src.reason_markdown ?? '',
-    steps: src.steps ?? [],
+    steps,
     knowledgePoints: src.knowledge_points ?? [],
     difficulty: typeof src.difficulty === 'number' ? src.difficulty : 3,
     confidence: typeof src.confidence === 'number' ? src.confidence : 0,
@@ -205,6 +228,18 @@ export interface ListWrongQuestionsParams {
   size?: number;
   subject?: string;
   mastery?: string;
+  /** 2026-05-18 search · q 关键词 (stem_text + subject ILIKE %q%) */
+  q?: string;
+  /**
+   * 2026-05-18 sort 模式:
+   * - due_asc: 下次复习时间近→远 (默认)
+   * - due_desc: 下次复习时间远→近
+   * - created_desc: 最新入库→最旧
+   * - created_asc: 最旧→最新 (= 旧名 "oldest" alias)
+   * - mastery_asc: 未掌握→已掌握
+   * - mastery_desc: 已掌握→未掌握
+   */
+  sort?: string;
 }
 
 // BE 实际 wire shape (snake_case + 字段缺失) · 跟 FE 类型对不上
@@ -220,6 +255,9 @@ interface WrongQuestionListItemWire {
   stem_text?: string | null;
   stemSnippet?: string | null;
   origin_image_key?: string | null;
+  /** 2026-05-18 BE 拼 MinIO public URL · 前端不构造 · 直接消费. */
+  thumbnail_url?: string | null;
+  thumbnailUrl?: string | null;
   thumb?: string | null;
   mastery?: number | null;
   masteryLabel?: string;
@@ -255,7 +293,8 @@ function normalizeListItem(w: WrongQuestionListItemWire): WrongQuestionListItem 
     kp: w.kp ?? w.knowledge_points ?? [],
     // stem_text 可为 null (OCR 未跑完时) · 走空串 · enrichItem.slice 安全
     stemSnippet: stemRaw ?? '',
-    thumb: w.thumb ?? w.origin_image_key ?? '',
+    // 2026-05-18 thumb 优先 BE 拼好的 URL (thumbnail_url) · fallback 老 thumb/origin_image_key
+    thumb: w.thumbnail_url ?? w.thumbnailUrl ?? w.thumb ?? w.origin_image_key ?? '',
     masteryPct: typeof w.mastery === 'number' ? w.mastery : 0,
     masteryLabel: (w.masteryLabel as 'NOT_MASTERED' | 'PARTIAL' | 'MASTERED') ?? masteryLabelFromNum(w.mastery),
     nextDueAt: w.nextDueAt ?? w.next_due_at ?? '',
@@ -283,6 +322,8 @@ export async function listWrongQuestions(
   if (params.size !== undefined) parts.push(`size=${params.size}`);
   if (params.subject) parts.push(`subject=${params.subject}`);
   if (params.mastery) parts.push(`mastery=${params.mastery}`);
+  if (params.q) parts.push(`q=${encodeURIComponent(params.q)}`);
+  if (params.sort) parts.push(`sort=${encodeURIComponent(params.sort)}`);
   const query = parts.join('&');
   const url = `${apiBase('wb')}/api/wb/questions${query ? `?${query}` : ''}`;
   const raw = await httpJSON<ListWrongQuestionsRespWire>(url);

@@ -1,6 +1,6 @@
 // MP HTTP client - dual runtime adapter
 // wx runtime: wx.request | Node test runtime (vitest): global fetch
-// Port map: file=8084 wb=8082 ai=8083 review=8085 s3=9000
+// Port map: file=8084 wb=8082 ai=8083 review=8085 calendar=18080 s3=9000
 
 declare const wx: any;
 declare const process: { env: Record<string, string | undefined> };
@@ -19,9 +19,11 @@ const PORT_MAP: Record<string, number> = {
   wb: 8082,
   ai: 8083,
   review: 8085,
+  // 2026-05-18 P10 task: 加 calendar 通道 · 接 calendar-core (server.port=18080).
+  calendar: 18080,
 };
 
-export function apiBase(prefix: 'file' | 'wb' | 'ai' | 'review'): string {
+export function apiBase(prefix: 'file' | 'wb' | 'ai' | 'review' | 'calendar'): string {
   return `${BACKEND_HOST}:${PORT_MAP[prefix]}`;
 }
 

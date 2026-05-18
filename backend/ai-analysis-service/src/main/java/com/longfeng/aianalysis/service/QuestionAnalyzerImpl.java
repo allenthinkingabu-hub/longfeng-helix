@@ -56,12 +56,20 @@ public class QuestionAnalyzerImpl {
 
     /**
      * Launch async 4-step analysis pipeline. Returns immediately after persisting the task.
+     *
+     * <p>Idempotent: if a task with the same {@code taskId} already exists (user retry after
+     * upstream FAILED / network error), reset its state to ANALYZING and re-run the pipeline
+     * instead of throwing duplicate-key. Fixes user-visible "500 Internal Server Error" on
+     * every retry of a once-failed AI analyze. (2026-05-17 surface)
      */
     @Transactional
     public AnalysisTask startAnalysis(String taskId, String subject, String imageUrl, Long studentId) {
-        AnalysisTask task = new AnalysisTask();
-        task.setId(idGen.nextId());
-        task.setTaskId(taskId);
+        AnalysisTask task = taskRepo.findByTaskId(taskId).orElseGet(() -> {
+            AnalysisTask t = new AnalysisTask();
+            t.setId(idGen.nextId());
+            t.setTaskId(taskId);
+            return t;
+        });
         task.setSubject(subject);
         task.setImageUrl(imageUrl);
         task.setStudentId(studentId);

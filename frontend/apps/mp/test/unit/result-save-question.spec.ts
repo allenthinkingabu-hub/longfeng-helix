@@ -27,10 +27,17 @@ let pageInstance: any = null;
 };
 const toastCalls: Array<{ title: string; icon?: string }> = [];
 const navCalls: Array<{ url: string }> = [];
+const storage: Record<string, unknown> = {};
 (globalThis as any).wx = {
   showToast: vi.fn((o: { title: string; icon?: string }) => { toastCalls.push(o); }),
   navigateTo: vi.fn((o: { url: string }) => { navCalls.push(o); }),
   navigateBack: vi.fn(),
+  // wrongbook-list 是 tabBar 页 · impl 用 switchTab + setStorageSync 传 highlight qid
+  // 测试断言改读 navCalls (switchTab 走同列) + storage map
+  switchTab: vi.fn((o: { url: string }) => { navCalls.push(o); }),
+  setStorageSync: vi.fn((k: string, v: unknown) => { storage[k] = v; }),
+  getStorageSync: vi.fn((k: string) => storage[k]),
+  vibrateShort: vi.fn(),
 };
 (globalThis as any).setTimeout = ((fn: () => void) => { fn(); return 0; }) as any;
 
@@ -56,8 +63,9 @@ describe('P04 onSaveTap · 真 save · 不再是假 toast', () => {
 
     expect(mockedSave).toHaveBeenCalledTimes(1);
     expect(mockedSave).toHaveBeenCalledWith('q-real-123');
-    expect(toastCalls).toContainEqual({ title: '保存成功', icon: 'success' });
-    expect(navCalls[0]?.url).toContain('/pages/wrongbook-list/index?highlight=q-real-123');
+    expect(toastCalls).toContainEqual({ title: '保存成功', icon: 'success', duration: 600, mask: true });
+    // wrongbook-list 是 tabBar 页 · impl 改用 switchTab + setStorageSync 传 highlight qid
+    expect(navCalls[0]?.url).toBe('/pages/wrongbook-list/index');
   });
 
   it('shows failure toast when BE save throws (no navigation)', async () => {

@@ -234,14 +234,24 @@ page {
   border: 12rpx solid rgba(255, 255, 255, 0.15);
 }
 
+/* 圆环填充率 · 跟 --progress 0..1 联动:
+   - 之前用 border-top-color + border-right-color 写死 1/4 弧 · 不读 --progress ·
+     永远视觉 ~25% 跟文字 0%/100% 对不上 (用户截图: 文字 0% 但视觉填了 1/4).
+   - 现 conic-gradient 从 -90deg 起 (12 点钟方向) 涂 (progress * 360deg) · 余下透明.
+   - radial-gradient mask 切中心圆 · 留 12rpx 弧厚 · 与外圈 .rh-circle-bg 灰底环对齐.
+   - conic-gradient + -webkit-mask 在 WeChat MP webview (Chromium) 全支持. */
 .rh-circle-track {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 12rpx solid transparent;
-  border-top-color: #FFD166;
-  border-right-color: #FF9500;
-  transform: rotate(-90deg);
+  background: conic-gradient(
+    from -90deg,
+    #FFD166 0deg,
+    #FF9500 calc(var(--progress, 0) * 360deg),
+    transparent calc(var(--progress, 0) * 360deg)
+  );
+  -webkit-mask: radial-gradient(circle, transparent 60rpx, #000 60rpx);
+          mask: radial-gradient(circle, transparent 60rpx, #000 60rpx);
 }
 
 .rh-pct {
@@ -365,6 +375,11 @@ page {
   color: #007AFF;
   font-weight: 600;
   letter-spacing: 0.4rpx;
+  /* 2026-05-18 tap target 视觉反馈 · 「月视图 ›」等 sec-m 链接均生效 */
+  padding: 6rpx 4rpx;
+}
+.sec-m:active {
+  opacity: 0.55;
 }
 
 .sec-m-orange {
@@ -601,6 +616,16 @@ page {
   border-radius: 36rpx;
   padding: 8rpx 28rpx;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
+
+.msgs-empty {
+  padding: 36rpx 28rpx;
+  text-align: center;
+}
+
+.msgs-empty-tx {
+  font-size: 26rpx;
+  color: #8E8E93;
 }
 
 .msg {

@@ -163,4 +163,39 @@ public interface ReviewPlanRepository extends JpaRepository<ReviewPlan, Long> {
               + "AND status = 0 AND deleted_at IS NULL",
       nativeQuery = true)
   int softDeleteByIds(@Param("planIds") List<Long> planIds);
+
+  /**
+   * P-HOME week-dots · 本周 [weekStart, weekEnd) 所有 active plan ·
+   * 单次 SQL 拉所有 · Java 侧按日分桶 + node_index → 颜色映射 · 比 7 次查询省.
+   *
+   * <p>返 [next_due_at Instant, node_index Short].
+   */
+  @Query(
+      value =
+          "SELECT next_due_at, node_index FROM review_plan "
+              + "WHERE student_id = :studentId AND status = 0 AND deleted_at IS NULL "
+              + "AND next_due_at >= :weekStart AND next_due_at < :weekEnd "
+              + "ORDER BY next_due_at ASC",
+      nativeQuery = true)
+  List<Object[]> findWeekDueRaw(
+      @Param("studentId") Long studentId,
+      @Param("weekStart") Instant weekStart,
+      @Param("weekEnd") Instant weekEnd);
+
+  /**
+   * P-HOME messages · 拿下一个 due 节点 (status=0, next_due_at ≥ now) · 派生消息 #1.
+   * 单 DB join wrong_item 拿 subject. 返 [next_due_at, plan_id, node_index, wrong_item_id, subject].
+   */
+  @Query(
+      value =
+          "SELECT rp.next_due_at, rp.id, rp.node_index, rp.wrong_item_id, wi.subject "
+              + "FROM review_plan rp "
+              + "LEFT JOIN wrong_item wi ON wi.id = rp.wrong_item_id AND wi.deleted_at IS NULL "
+              + "WHERE rp.student_id = :studentId AND rp.status = 0 AND rp.deleted_at IS NULL "
+              + "AND rp.next_due_at >= :now "
+              + "ORDER BY rp.next_due_at ASC LIMIT 1",
+      nativeQuery = true)
+  List<Object[]> findNextDueWithSubject(
+      @Param("studentId") Long studentId,
+      @Param("now") Instant now);
 }

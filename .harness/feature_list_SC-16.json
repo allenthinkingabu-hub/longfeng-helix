@@ -1,0 +1,313 @@
+{
+  "schema_version": "3.1",
+  "scenario_id": "SC-16",
+  "scenario_title": "学生周复盘 → 薄弱 KP 专练入口",
+  "scenario_goal": "验证学生从 P-HOME 首屏「本周」Bento 概览 → 进入 P-WEEKLY-REVIEW 深度复盘 → 自然引导到薄弱 KP 专练 (P05 filter) 的闭环。补齐 master §2A.3.3 P-HOME 留下的「查看全部 ›」link 落地页缺口。**同步补齐 P-HOME spec.md L151 标记的 weekSparkline / streak / newCount placeholder** — 这 4 数字与 P-WEEKLY-REVIEW hero 同源 (同一 weekly_aggregate service 同一次 SQL 聚合 · 不允许两套实现导致 P-HOME 看 68% / P-WEEKLY-REVIEW 看 65% 数据漂移)。前端仅做微信小程序 (frontend/apps/mp · 不做 H5)。",
+  "generated_from": "biz/features/P-WEEKLY-REVIEW__weekly-review.md §2B.17 SC-16 (7 user-action steps)",
+  "generated_at": "2026-05-16",
+  "owner": "user",
+  "scenario_biz_ref": "biz/features/P-WEEKLY-REVIEW__weekly-review.md §2B.17",
+  "scenario_spec_refs": [
+    "design/system/pages/P-WEEKLY-REVIEW-weekly-review.spec.md"
+  ],
+  "scenario_tc_ids": [
+    "TC-16.01",
+    "TC-16.02",
+    "TC-16.03"
+  ],
+  "system_invariants": [
+    "INV-1: GET /api/home/weekly + GET /api/home/today.weekSummary 必须复用 master §10.10 weekly_aggregate service 的同一段 SQL 聚合代码 · 不允许 fork 出独立实现 (防止学生端 P-HOME 与 P-WEEKLY-REVIEW 数据漂移 · 也防学生端与家长端漂移)",
+    "INV-2: 学生端响应必须脱敏 · 不返回 student_id_hash / parent_id / device_fp 等 PII (与家长端 /api/observer/overview 字段集不同)",
+    "INV-3: 周边界统一用 ISO 8601 week (周一开始 · UTC 转学生 tz) · 不允许混用美式 (周日开始) · 跨时区学生走 master §2B.9 SC-08 时区切换逻辑",
+    "INV-4: 薄弱 KP top 3 必须按 '最近 N 次错误次数' 降序 · 不允许按总错误次数排 (学生关心'最近正在错'而非'历史已经错')",
+    "INV-5: Tap 薄弱 KP 跳 P05 必须带 kpId query · P05 必须能从 URL filter (不依赖 in-memory state) · 防止用户复制链接 / 分享后 filter 丢失",
+    "INV-6: P-HOME「本周」Bento 4 数字 (masteryRate / sparkline[7] / streak / newCount) 必须从 GET /api/home/today.weekSummary 字段消费 · 不允许 P-HOME 单独发 SQL 查询 · 也不允许 P-HOME 调用 GET /api/home/weekly 拿冗余 payload (单一聚合源 + 投影子集)"
+  ],
+  "aggregation_contract": {
+    "service": "weekly_aggregate (master §10.10 P-OBSERVER 同源 service · backend/review-plan-service 落地实现)",
+    "endpoints": [
+      { "path": "GET /api/home/weekly", "scope": "P-WEEKLY-REVIEW 详情页 · 完整 WeeklyReviewResp (hero + radar + weakKPs + stats + failedTop + aiInsight)" },
+      { "path": "GET /api/home/today", "scope": "P-HOME 首屏 · 既有 today {total,done,circleProgress} 子集 + 新增 weekSummary {masteryRate,sparkline[7],streak,newCount} 投影 (用户 2026-05-16 决策 · 选项 A · 扩展现有 endpoint 而非另开 endpoint)" }
+    ],
+    "week_boundary": "ISO 8601 · Monday 00:00 student_tz → Sunday 23:59 student_tz · UTC 存 · 学生 tz 转 (master §2B.9 SC-08)",
+    "field_semantics": {
+      "masteryRate": {
+        "formula": "count(grade=MASTERED) / count(grade IS NOT NULL)",
+        "source": "wb_review_record WHERE reviewed_at ∈ [thisWeek.from, thisWeek.to]",
+        "empty_week": "null (用户 2026-05-16 决策 · 不是 0 · 前端显 '—' · '没复习过' ≠ '掌握率 0%')",
+        "range": "[0.0, 1.0] 或 null"
+      },
+      "sparkline": {
+        "formula": "同 masteryRate · GROUP BY DATE(reviewed_at AT student_tz)",
+        "length": 7,
+        "index_semantics": "index 0 = 本周 Monday · index 6 = 本周 Sunday",
+        "empty_day": "null (用户 2026-05-16 决策 · 不是 0 也不 forward-fill · 折线渲染断点 · svg path 遇 null 断开重描)",
+        "type": "Array<number|null> 长度 7"
+      },
+      "streak": {
+        "formula": "从昨天起往回数连续 N 天存在 ≥ 1 GRADED 记录 (grade != NULL · 不限 MASTERED/FORGOT)",
+        "start_day": "yesterday (用户 2026-05-16 决策 · 今天没复习不破 streak · UX 参考 Duolingo/Streaks)",
+        "today_special": "若今天已有 ≥ 1 GRADED · streak 算 N+1 (包含今天) · 若今天无 GRADED · streak 算 N (不包含今天 · 但昨天起的连续段不断)",
+        "type": "integer ≥ 0",
+        "boundary": "学生注册首日且今日无复习 → streak=0"
+      },
+      "newCount": {
+        "formula": "count(wb_question) WHERE owner=studentId AND created_at ∈ [thisWeek.from, thisWeek.to]",
+        "empty_week": "0 (不为 null · 这是计数字段 · 区别于 masteryRate 的语义字段)",
+        "type": "integer ≥ 0"
+      }
+    },
+    "anti_pattern": [
+      "❌ P-HOME 走 GET /api/home/today 内嵌一段独立 SQL 算本周掌握率 · P-WEEKLY-REVIEW 走 GET /api/home/weekly 另一段 SQL · 两段 SQL 字面不同导致结果漂移 (违反 INV-1)",
+      "❌ P-HOME 缓存 today response 10 分钟 · P-WEEKLY-REVIEW 不缓存 · 学生 Tap 进详情看到不同数字 (违反 INV-6)",
+      "❌ 空周 masteryRate 返 0.0 · 前端显 '0%' · 学生误以为'我掌握率是 0%' (违反 field_semantics.masteryRate.empty_week)",
+      "❌ sparkline[3] (周四) 0 复习返 0.0 · 折线下探到 0 · 学生误读'我周四退步到 0%' (违反 field_semantics.sparkline.empty_day)"
+    ]
+  },
+  "work_log_dir_pattern": "audits/runs/<task_id_short>/<team>/attempt-<N>/",
+  "log_requirements_template": {
+    "coder": ["coder.md", "bugs-found.md"],
+    "tester": ["tester.md", "adversarial.md", "test-reports/"],
+    "test_designer": ["test-cases.md", "coder-review.md", "tester-review.md"]
+  },
+  "audit_gate": "harness/audit.js 7 维度全过才真 PASS (含 dim_test_cases_alignment) · 任一不过 REDO · audit_retries ≥ 3 触发熔断",
+  "id_convention": {
+    "task_id": "SC-${SCN}-T${MM} · 长形 · 用于 spec 文件名 / git branch / commit message",
+    "task_id_short": "SC${SCN}-T${MM} · 短形 · 用于 .harness/inflight/<id>.json 文件名 + audits/runs/<id>/ 目录名",
+    "task_id_pascal": "T${MM}${PurposeShort} · PascalCase · 用于 Java *E2EIT.java 测试类名 (frontend MP task 此字段保留但不强制使用)"
+  },
+  "stage_1_test_case_first": {
+    "enabled": true,
+    "note": "本 SC 启用 2026-05-16 Stage 1 Test-Case-First 治理 · TestDesigner Phase 1 必须先落 test-cases.md · Coder/Tester Phase 2 互评 ≥ 1 REJECT 轮 · Phase 2.5 用户签字 · 之后才解锁 Phase 3 Coder 开发",
+    "user_review_deadlock_threshold": 3
+  },
+  "frontend_scope_constraint": {
+    "scope": "wechat_miniprogram_only",
+    "include": ["frontend/apps/mp/pages/me/weekly/", "frontend/apps/mp/pages/home/ (entry hook only · 不改 home 自身逻辑)", "frontend/packages/testids/src/ (注册 TEST_IDS.weekly.*)", "frontend/packages/telemetry/src/ (新增 weekly_* 事件)", "frontend/packages/api-contracts/src/ (新增 WeeklyReviewResp DTO)"],
+    "exclude": ["frontend/apps/h5/ (本次不动)", "H5 deeplink handler wb://weekly (P2 留)"],
+    "reason": "用户 2026-05-16 决策 · 本次只做微信小程序 · H5 落地等 P-WEEKLY-REVIEW MP 走稳后再补"
+  },
+  "total_tasks": 2,
+  "tasks": [
+    {
+      "task_id": "SC-16-T01",
+      "task_id_short": "SC16-T01",
+      "task_id_pascal": "T01WeeklyApi",
+      "task_title": "学生 weekly_aggregate service · 提供 GET /api/home/weekly (P-WEEKLY-REVIEW 完整) + 扩展 GET /api/home/today.weekSummary (P-HOME 4 数字投影) · 学生端脱敏 + 空周/断日 null 语义 + streak 昨日起算 + 5xx/504 降级",
+      "scenario": "TC-16.01 主路径 (后端 200 happy path) · 内嵌 PII 脱敏断言 (System Invariant #2) + 排序断言 (System Invariant #4) + 性能预算 (P95 ≤ 400ms) + P-HOME today.weekSummary 投影一致性断言 (System Invariant #6)",
+      "biz_step_range": "biz/features/P-WEEKLY-REVIEW__weekly-review.md §2B.17 步 3-4 (路由转场 GET /weekly trigger + weekly_aggregate service 聚合返回) + P-HOME spec.md L151 placeholder fix (扩展 today endpoint)",
+      "page": "— (pure backend · 无 UI)",
+      "page_state_machine": "— (无 UI 状态机 · 仅 HTTP 响应码 200 / 401 / 403 / 500 / 504)",
+      "branch": "feature/SC-16-T01-weekly-api-backend",
+      "owner_team": "team-1",
+      "biz_refs": [
+        "biz/features/P-WEEKLY-REVIEW__weekly-review.md §2B.17 步 3-4 (核心路径编排表)",
+        "biz/features/P-WEEKLY-REVIEW__weekly-review.md §10.12 (API 增量 · WeeklyReviewResp 字符级 schema · /api/home/weekly endpoint)",
+        "biz/features/P-WEEKLY-REVIEW__weekly-review.md §10.13 (P-HOME 共享投影 · /api/home/today.weekSummary endpoint 扩展 · 2026-05-16 SC-16 增量)",
+        "biz/features/P-WEEKLY-REVIEW__weekly-review.md §10.14 (聚合计算逻辑 · AI 开发必读 · 4 字段伪 SQL + 空值语义 + streak 算法 + 投影规则)",
+        "biz/features/P-WEEKLY-REVIEW__weekly-review.md §15.4 跨文档对照表 (§10.12 ↔ master §10.10)",
+        "biz/业务与技术解决方案_AI错题本_基于日历系统.md §10.10 P-OBSERVER /api/observer/overview.weeklyReport (后端 service 复用源 · L2220-L2241)",
+        "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2A.3.3 P-HOME 规格卡 API 触点 (L457 · 完整 GET /api/home/today 契约 · streak/weekSparkline 字段已声明但 MVP 未下发)",
+        "biz/业务与技术解决方案_AI错题本_基于日历系统.md §6 Spring AI 错题分析详设 (aiInsight 生成挂 QuestionAnalyzer 兄弟 prompt · L1857-L1934)",
+        "biz/业务与技术解决方案_AI错题本_基于日历系统.md §4.5 wb_review_node + §4.6 wb_review_record + §4.2 wb_question (数据源 · 不新建 DB 表)",
+        "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2B.9 SC-08 跨时区登录 · 时区切换逻辑 (week 边界用 student_tz · L1112-L1144)",
+        "TC-16.01"
+      ],
+      "spec_refs": [
+        "design/system/pages/P-WEEKLY-REVIEW-weekly-review.spec.md §5 API 触点",
+        "design/system/pages/P-WEEKLY-REVIEW-weekly-review.spec.md §5.1 Response WeeklyReviewResp 字段集 (字符级)",
+        "design/system/pages/P-WEEKLY-REVIEW-weekly-review.spec.md §5.2 错误码 (401/403/500/504)",
+        "design/system/pages/P-WEEKLY-REVIEW-weekly-review.spec.md §5.3 共享投影 · /today.weekSummary 扩展 (架构图 · 同 service 双 endpoint · 2026-05-16 增)",
+        "design/system/pages/P-WEEKLY-REVIEW-weekly-review.spec.md §4.2 后端 Entity 来源 (聚合 SQL 速查 + 空值语义 + streak 算法 cross-ref 到 biz §10.14)",
+        "design/system/pages/P-WEEKLY-REVIEW-weekly-review.spec.md §11 性能预算 (P95 ≤ 400ms · P99 ≤ 800ms)",
+        "design/system/pages/P-HOME.spec.md §5 API 触点 (L142 GET /api/home/today 含 weekSummary 字段 · 2026-05-16 更新)",
+        "design/system/pages/P-HOME.spec.md §5.1 Phase 1+ 待补字段 (4 字段已交付 · 5 字段仍 placeholder)",
+        "design/system/pages/P-HOME.spec.md §5.2 weekSummary 字段集 (P-HOME 视角速查表 · 2026-05-16 新增)"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": [
+        "backend/review-plan-service"
+      ],
+      "primary_apis": [
+        "GET /api/home/weekly",
+        "GET /api/home/today (扩展 · 新增 weekSummary 字段 · 不动既有 today 子集)"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC1",
+          "text": "GET /api/home/weekly 带 X-User-Id Header (MVP · 登录未开发 · 与既有 /api/home/today 一致 · 登录 SC-00 上线时升 JWT) 返 200 + WeeklyReviewResp 全字段 (week / range / hero{masteryRate,masteryDelta,sparkline[7]} / subjectRadar[] / weakKPs[≤3] / stats{reviewedCount,reviewedDurationMin,newCount} / failedTop[≤5] / aiInsight{insightId,text,generatedAt}) · 字段集字符级对齐 spec §5.1 · response body JSON schema 校验通过"
+        },
+        {
+          "id": "AC2",
+          "text": "后端 controller 调用的聚合方法必须命中 master §10.10 P-OBSERVER 同一 weekly_aggregate service (不允许 fork 出独立 SQL) · 通过 grep 验证学生端 + 家长端共享同一 service 类/方法签名 · 仅脱敏层不同 (System Invariant #1)"
+        },
+        {
+          "id": "AC3",
+          "text": "学生端 response **不**包含 student_id_hash / parent_id / device_fp 三字段 (PII 脱敏 · System Invariant #2) · JSON serializer 必须显式 exclude 或 Java DTO 不声明该字段 · contract test 断言"
+        },
+        {
+          "id": "AC4",
+          "text": "weakKPs 数组按 recentMissCount DESC 排序 · 长度 ≤ 3 · 不允许按 totalMissCount 排 (System Invariant #4) · 通过单元测试覆盖 'recentMiss < totalMiss 但仍排前' 的场景"
+        },
+        {
+          "id": "AC5",
+          "text": "P95 响应延迟 ≤ 400ms · P99 ≤ 800ms · 超时返 504 GATEWAY_TIMEOUT · 401 UNAUTHORIZED (MVP: X-User-Id Header 缺失/格式非法 · 登录上线后含义改为 JWT 缺失/过期) / 403 STUDENT_DELETED (学生注销 · MVP 阶段 reserved · 等学生 status 字段实装) / 500 INTERNAL 错误码与 spec §5.2 字符级对齐 · 通过 JMH 或 Spring Boot Test 性能用例验证 (锚 TC-16.02 后端降级)"
+        },
+        {
+          "id": "AC6",
+          "text": "GET /api/home/today response 扩展 weekSummary 对象 { masteryRate: number|null, sparkline: Array<number|null>(length=7), streak: integer≥0, newCount: integer≥0 } · 既有 today.{total,done,circleProgress} 子集不动 (向后兼容) · weekSummary 4 字段必须从同一 weekly_aggregate service 调用结果投影 (不允许 controller 内嵌独立 SQL · System Invariant #1 + #6) · contract test 断言: 同一学生同一时刻先调 GET /weekly 再调 GET /today · weekSummary.masteryRate === weekly.hero.masteryRate (浮点容差 0) · weekSummary.sparkline === weekly.hero.sparkline (数组字面相等) · 来源 master biz §2A.3.3 L457 已声明的完整契约 (用户 2026-05-16 选项 A · 扩展 today 而非 P-HOME 多发 RTT 调 weekly)"
+        },
+        {
+          "id": "AC7",
+          "text": "聚合空值与 streak 语义 (用户 2026-05-16 决策 · 必须照实现): (a) 本周 0 复习 (wb_review_record where reviewed_at in [thisWeek] 为空) → masteryRate = null · 不是 0.0 · 不是 -1; (b) sparkline[i] 对应日 0 复习 → sparkline[i] = null · 不 forward-fill 不打底 0; (c) streak 从昨天起往回数连续天数 (每天 ≥ 1 GRADED · 不限 MASTERED/FORGOT) · 今天若有 ≥ 1 GRADED 则 streak 包含今天 (+1) · 今天无 GRADED 也不破坏昨天起的连续段 · 学生注册首日且今日无复习 → streak=0; (d) newCount 始终整数 · 本周 0 新增 → 0 不为 null · 单元测试 5 个边界用例覆盖: 全空周 / 只有周三 1 题 / 连续 5 天每天 1 题 / 跨月周一周日不同月 / 学生跨时区切换后重算"
+        },
+        {
+          "id": "AC8",
+          "text": "Coder Phase 3 必须配 JUnit 单元测试 (除 T01WeeklyApiE2EIT 6 集成用例外 · 用户 2026-05-16 决策 · 6 E2E 不够抓数学/算法 corner) · 三类 corner 各 ≥ 5 个 testcase: (1) **compute_streak() 算法** (∈ WeeklyAggregateServiceTest): 跨月 streak (e.g. 4/30 周三-5/1 周四连续 6 天) / 跨年 streak (2026/12/31-2027/1/1) / 学生注册首日今日无复习 → 0 / DST 时区转换日 streak 不断 (America/Los_Angeles 3/9 春令日 23 小时) / 负数防御 (任何输入 streak ≥ 0 不返 -1); (2) **masteryRate 浮点数学边界** (∈ WeeklyAggregateServiceTest): 28 全对 → 1.0 (严格 == · 不 0.9999) / 28 全错 → 0.0 (严格 == · 不 0.0001) / 0 GRADED → null (严格 === null) / 1 GRADED 1 MASTERED → 1.0 / 27/28 边界 → 浮点容差 0 ULP (Java double 精度); (3) **ISO 8601 week 边界** (∈ WeekBoundaryUtilTest): 周一 00:00:00.001 student_tz → 本周 / 周日 23:59:59.999 student_tz → 本周 / 跨年 2026-W53 → 2027-W01 (ISO 8601 周数规则) / 闰年 2/29 → week 计算正确 / UTC vs Asia/Shanghai 8 小时差边界 (UTC 周日 16:00 = Asia/Shanghai 周一 00:00). audit grep `backend/review-plan-service/src/test/java/.../weekly/*Test.java` (排除 *E2EIT.java) ≥ 2 个文件 · grep `@Test` 命中 ≥ 15 · Coder Phase 3 work_log_dir 必须含 unit-tests 部分的 coverage 报告 (jacoco 或同等) 显示 WeeklyAggregateService + compute_streak + WeekBoundaryUtil 行覆盖 ≥ 90%"
+        }
+      ],
+      "test_invariants": [
+        "TI1: 同一学生同一 ISO week 调用 GET /weekly 两次返回相同 hero.masteryRate (聚合幂等 · 数据不变量)",
+        "TI2: X-User-Id Header 缺失/非法返 401 非 500 (MVP · 登录上线后含义改 JWT 缺失/过期) · 学生注销 403 reserved (等 student.status 字段实装) (错误码不变量)",
+        "TI3: 任意学生 token 调用 response 不含 student_id_hash / parent_id / device_fp 三字段 (PII 脱敏不变量)",
+        "TI4: weakKPs 数组 length ≤ 3 且按 recentMissCount DESC 排序 (顺序 + 容量不变量)",
+        "TI5: 周边界 range.from / range.to 始终是 ISO 8601 week 的 Monday-Sunday · 不允许 Sunday-Saturday (时区不变量 · System Invariant #3)",
+        "TI6: GET /weekly.hero.{masteryRate,sparkline} ≡ GET /today.weekSummary.{masteryRate,sparkline} (同源不变量 · System Invariant #6 · 双 endpoint 同源 SQL · contract test 双调对比)",
+        "TI7: 空周 masteryRate = null (非 0) · 空日 sparkline[i] = null (非 0 非 forward-fill) · streak 算法严格按 'yesterday-back' 不是 'today-back' (语义不变量 · 用户 2026-05-16 拍板)",
+        "TI8: Unit test 三类 corner 各 ≥ 5 · WeeklyAggregateServiceTest + WeekBoundaryUtilTest ≥ 2 文件 · @Test ≥ 15 · 行覆盖 ≥ 90% (Coder Phase 3 必落 · 用户 2026-05-16 决策 · 防 6 E2E 漏 streak/数学/ISO 边界 bug)"
+      ],
+      "key_invariants": [
+        "INV-1: 复用 master §10.10 weekly_aggregate SQL · 不 fork · weekly + today 双 endpoint 同一段聚合",
+        "INV-2: 学生端脱敏不含 PII 三字段",
+        "INV-3: ISO 8601 week (周一开始 · student_tz 边界)",
+        "INV-4: weakKPs 按 recentMissCount DESC limit 3",
+        "INV-6: P-HOME 4 数字消费 today.weekSummary · 不单独 SQL · 不调 /weekly",
+        "聚合空值语义: masteryRate/sparkline null 非 0 · streak yesterday-back · newCount 整数 (用户 2026-05-16 决策)",
+        "单测金字塔: 6 E2E IT (TestDesigner Gherkin) + N unit test (Coder Phase 3 落 · 算法/数学/边界 corner) · 不允许只写 E2E 跳过 unit (用户 2026-05-16 决策)",
+        "鉴权 MVP: X-User-Id Header (与 /today 一致) · 登录 SC-00 上线时双 endpoint 同步升 JWT (不允许 T01 单独升)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "",
+        "backend_e2e_it": "backend/review-plan-service/src/test/java/com/longfeng/reviewplan/weekly/T01WeeklyApiE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC16-T01/team-1/attempt-1/"
+    },
+    {
+      "task_id": "SC-16-T02",
+      "task_id_short": "SC16-T02",
+      "task_id_pascal": "T02WeeklyMpPage",
+      "task_title": "学生 P-HOME Tap「查看全部 ›」→ MP P-WEEKLY-REVIEW 6 数据块 READY/ERROR/EMPTY 三态 + 薄弱 KP CTA → P05 出口 + 14 testid 注册 + 7 新 MP 组件",
+      "scenario": "TC-16.01 主路径 (UI happy path) · 内嵌 TC-16.02 (ERROR retry) + TC-16.03 (EMPTY hero + CTA → P02) + A11Y delta chip ↑/↓ icon + 7 埋点事件全集",
+      "biz_step_range": "biz/features/P-WEEKLY-REVIEW__weekly-review.md §2B.17 步 1-2 (P-HOME entry) + 步 4-5 (READY 6 blocks 渲染 + 学生浏览) + 步 6-7 (KP CTA → P05 exit)",
+      "page": "P-HOME entry → P-WEEKLY-REVIEW 主体 → P05 exit (MP 路由: pages/home/index → pages/me/weekly/index → pages/wrongbook-list/index)",
+      "page_state_machine": "LOADING → READY (6 blocks · 顺序淡入 0/100/200/300/400/500ms) · LOADING → EMPTY (reviewedCount=0 · 整页换 empty-hero) · LOADING → ERROR (5xx/504 · 黄条 + retry button) · ERROR → LOADING (tap retry) · READY 内子态 aiInsight.LOADING (aiInsight=null · 单卡占位)",
+      "branch": "feature/SC-16-T02-weekly-mp-page",
+      "owner_team": "team-1",
+      "biz_refs": [
+        "biz/features/P-WEEKLY-REVIEW__weekly-review.md §2B.17 步 1-2 + 步 4-7 (核心路径编排表)",
+        "biz/features/P-WEEKLY-REVIEW__weekly-review.md §2A.4 P-WEEKLY-REVIEW 规格卡 (15 维度全集)",
+        "biz/features/P-WEEKLY-REVIEW__weekly-review.md §2A.3.1 路由表 (P-WEEKLY-REVIEW 小程序路径 pages/me/weekly)",
+        "biz/业务与技术解决方案_AI错题本_基于日历系统.md §2A.3.3 P-HOME 本周 Bento (入口锚 · L449-L463 · mockup 01_home_v2.html:291 href 待改)",
+        "TC-16.01",
+        "TC-16.02",
+        "TC-16.03"
+      ],
+      "spec_refs": [
+        "design/system/pages/P-WEEKLY-REVIEW-weekly-review.spec.md §2 布局分区 + Wireframe (含 2.2 关键视觉锚 14 selector/testid 表)",
+        "design/system/pages/P-WEEKLY-REVIEW-weekly-review.spec.md §3 核心组件 (7 新建 MP 组件 props interface)",
+        "design/system/pages/P-WEEKLY-REVIEW-weekly-review.spec.md §4.1 Page-level state (TypeScript 类型签名)",
+        "design/system/pages/P-WEEKLY-REVIEW-weekly-review.spec.md §6 状态机 (LOADING/READY/EMPTY/ERROR 转移规则)",
+        "design/system/pages/P-WEEKLY-REVIEW-weekly-review.spec.md §7 跳转 (入口 / 出口 / Tabbar)",
+        "design/system/pages/P-WEEKLY-REVIEW-weekly-review.spec.md §9 异常 & 降级 (含 TC-16.02/03 反馈矩阵)",
+        "design/system/pages/P-WEEKLY-REVIEW-weekly-review.spec.md §11 性能预算 (TTI ≤ 1.5s · Tap KP → P05 ≤ 500ms)",
+        "design/system/pages/P-WEEKLY-REVIEW-weekly-review.spec.md §12 埋点事件 (10 events · 7 核心 + 3 预留)",
+        "design/system/pages/P-WEEKLY-REVIEW-weekly-review.spec.md §13 testid 表 (14 个 · 必注册到 packages/testids)",
+        "design/system/pages/P-WEEKLY-REVIEW-weekly-review.spec.md §14 i18n key (25 个 · 中英双语)",
+        "design/system/pages/P-HOME.spec.md §5.2 weekSummary 字段集 + 前端约定 (P-HOME 4 数字 wire · AC8 主源 · 2026-05-16 新增)",
+        "design/system/pages/P-HOME.spec.md §5.1 Phase 1+ 待补字段 (placeholder fix 历史记录)",
+        "design/mockups/wrongbook/14_weekly_review.html (canonical mockup · 462 行 · 14 testid · 14 href 真路径)",
+        "design/mockups/wrongbook/01_home_v2.html (P-HOME entry · .bento 「查看全部 ›」line 291 href 待改 + .tile.mastery + .streakchip 4 数字 DOM 锚)"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": [
+        "frontend/apps/mp/pages/me/weekly (新建)",
+        "frontend/apps/mp/pages/home (改 · wire 4 数字 + 修 .bento 「查看全部 ›」link)",
+        "frontend/packages/testids (注册 TEST_IDS.weekly.* 14 个)",
+        "frontend/packages/telemetry (新增 weekly_* 事件 + 改 home weekSummary 消费)",
+        "frontend/packages/api-contracts (新增 WeeklyReviewResp + 扩展 TodayResp.weekSummary DTO)"
+      ],
+      "primary_apis": [
+        "GET /api/home/weekly (consume · contract by T01)",
+        "GET /api/home/today (consume · 新增 weekSummary 字段 · contract by T01 AC6)"
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "AC1",
+          "text": "Entry + mount: P-HOME pages/home/index 内 .bento「本周」区段右上「查看全部 ›」link 改为有效跳转 (mockup 01_home_v2.html:291 现 href='#') · Tap 后 wx.navigateTo 到 /pages/me/weekly/index · 页面 onLoad 触发 GET /api/home/weekly · state=LOADING 显示 6 块骨架占位 · 埋点 weekly_view{week, from:'home-banner'} 1 条 (锚 SC-16 步 1-3 + spec §7 入口)"
+        },
+        {
+          "id": "AC2",
+          "text": "READY 渲染: GET 200 且 stats.reviewedCount > 0 → 6 数据块按 spec §6 顺序淡入 (Hero 0ms · Radar 100ms · KP 200ms · stat 300ms · Failed 400ms · Insight 500ms · 总 ≤ 500ms) · 14 testid (root/back/range/hero/delta/sparkline/radar/weakKp1/weakKp2/weakKp3/statsTrio/failedScroller/aiInsight/empty) 全部从 TEST_IDS.weekly.* 命名空间引用 · frontend/packages/testids/src/index.ts 新增导出 · 不允许任何 MP wxml 文件裸字符串 data-testid (锚 spec §13)"
+        },
+        {
+          "id": "AC3",
+          "text": "Exit KP CTA: Tap weekly-weak-kp-1 卡 CTA → wx.navigateTo /pages/wrongbook-list/index?kpId=KP-XXX · 跳转 ≤ 500ms · 埋点 weekly_weak_kp_tap{kpId, rank} 1 条 · URL kpId 来自 weakKPs[0].kpId (System Invariant #5) · 单元测试覆盖 weakKPs 为空数组时 CTA 不渲染 (锚 SC-16 步 6-7 + spec §7 出口)"
+        },
+        {
+          "id": "AC4",
+          "text": "ERROR 态: GET 返 500/504/network-fail → 状态切到 ERROR · 骨架屏保留 + 顶部黄条显示 weekly.error.title ('数据加载失败') + 黄色 retry button · Tap retry → 重新 GET · 黄条消失 · 埋点 weekly_retry{errorCode} 1 条 · 不允许白屏 · 不允许 wx.showToast 即消 (错误必须可视化常驻直到用户操作) (锚 TC-16.02 + spec §9 异常表)"
+        },
+        {
+          "id": "AC5",
+          "text": "EMPTY 态: GET 200 且 stats.reviewedCount === 0 → 状态切到 EMPTY · 整页换 weekly-empty empty-hero (隐藏 6 数据块) · 显示 weekly.empty.title ('本周还没开始') + weekly.empty.desc + CTA 'weekly.empty.cta' ('去拍一道题') → Tap CTA wx.navigateTo /pages/capture/index · 埋点 weekly_view{week, empty:true} + weekly_empty_cta_tap 各 1 条 · 不渲染薄弱 KP / 失败题等空数据块 (锚 TC-16.03 + spec §9 异常表)"
+        },
+        {
+          "id": "AC6",
+          "text": "A11Y delta chip: weekly-delta chip 必带 ↑ (涨) 或 ↓ (跌) icon + aria-label 含 '较上周 +N pts' / '较上周 -N pts' 文案 · 不允许仅靠颜色 (绿/红) 传达涨跌 · 在 mp 渲染层通过 aria-label 属性挂载 · 单元测试断言 colorblind 用户也能从 icon 字符 + label 文字判断方向 (锚 spec §2A.4 可访问性 + WCAG AA)"
+        },
+        {
+          "id": "AC7",
+          "text": "埋点全集: 7 个事件按 spec §12 触发条件正确入 telemetry buffer · weekly_view (mount) · weekly_data_render (6 块全渲) · weekly_weak_kp_view (KP 卡进视野 IntersectionObserver) · weekly_weak_kp_tap (Tap CTA) · weekly_retry (ERROR retry) · weekly_empty_cta_tap (EMPTY CTA) · weekly_back (返回按钮) · 通过 frontend/packages/telemetry buffer mock 验证 properties payload 字段 (锚 spec §12)"
+        },
+        {
+          "id": "AC8",
+          "text": "P-HOME「本周」Bento 4 数字 wire 到 today.weekSummary (修 P-HOME spec.md L151 placeholder · 用户 2026-05-16 决策): (a) `.tile.mastery .big` (掌握率大数字) 消费 weekSummary.masteryRate · null 时显 '—%' 不显 '0%' (锚 INV-6 + 聚合空值语义); (b) `.tile.mastery .spark svg` 7 点折线消费 weekSummary.sparkline · null 索引在 svg path M/L 命令处断开 (新 path tag) 不打底 0 不 forward-fill (单元测试覆盖 [0.6, null, 0.65, null, 0.68, null, 0.72] 7 段散落用例 · path d 属性应含至少 4 个 'M' 起笔); (c) `.streakchip .n` 数字消费 weekSummary.streak · 0 时整个 chip 隐藏 不显 'Streak 0 天' (UX 兜底); (d) `本周新增` tile 数字消费 weekSummary.newCount · 0 时显 '+0' 不隐藏 (区别 streak 兜底逻辑); 不允许 P-HOME 直接调 GET /api/home/weekly 拿数据 (INV-6 强制 · 通过 grep `frontend/apps/mp/pages/home/` 验证不含 '/api/home/weekly' 字符串)"
+        }
+      ],
+      "test_invariants": [
+        "TI1: LOADING 期间不渲染陈旧数据 (上次会话 cache 隔离 · state 不变量)",
+        "TI2: GET 5xx → ERROR 态可视化常驻 · 不允许白屏 / toast 即消 (用户视觉不变量 · TC-16.02 锚)",
+        "TI3: Tap weekly-weak-kp-N 卡 CTA 跳 P05 · URL 必含 ?kpId=KP-XXX 且 kpId 来自 weakKPs[N-1].kpId (链接完整性不变量 · System Invariant #5)",
+        "TI4: UI VRT 4 态 screenshot (LOADING / READY / ERROR / EMPTY) · 每态截图与 mockup 14_weekly_review.html 像素对齐 ≥ 95% (视觉回归不变量)",
+        "TI5: 14 testid 全部从 TEST_IDS.weekly.* 引用 · grep 验证 .wxml/.ts 文件不含裸 data-testid='weekly-*' 字符串 (命名空间不变量)",
+        "TI6: P-HOME 4 数字 (mockup 01_home_v2.html mastery/sparkline/streakchip/newCount) 与 P-WEEKLY-REVIEW hero 同步同源 · contract test mock 同一 today response · P-HOME 大数字 === P-WEEKLY-REVIEW hero 大数字 (跨页一致性 · INV-6)",
+        "TI7: P-HOME 不允许调 /api/home/weekly · grep `frontend/apps/mp/pages/home/` source 文件 0 命中 'home/weekly' (架构不变量)"
+      ],
+      "key_invariants": [
+        "INV-5: Tap KP CTA URL 含 ?kpId · P05 自治 filter",
+        "INV-6: P-HOME 4 数字消费 today.weekSummary · 不单独 SQL · 不调 /weekly",
+        "14 testid 必须从 TEST_IDS.weekly.* 命名空间引用 · 不允许裸字符串",
+        "ERROR 态不白屏 · 错误必须可视化常驻",
+        "EMPTY 态整页换 empty-hero · 不混合渲染 6 数据块",
+        "P-HOME 空值兜底: masteryRate=null 显 '—%' · sparkline null 索引断点 · streak=0 chip 隐 · newCount=0 显 '+0'"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/mp/test/e2e/sc-16/t02-weekly-mp-page.spec.ts",
+        "backend_e2e_it": ""
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC16-T02/team-1/attempt-1/"
+    }
+  ]
+}

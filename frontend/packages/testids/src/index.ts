@@ -268,6 +268,39 @@ export const TEST_IDS = {
     weakKp:            'p-home-weak-kp',
     quickEntries:      'p-home-quick-entries',
     // p-home-quick-entries-item-{1..4}
+    // SC-16-T02 · P-HOME 本周 Bento 4 数字 wire to today.weekSummary (INV-6)
+    // 4 个 testid 替代原 H5 mockup `.tile.mastery .big` / `.streakchip` 等 CSS class 锚
+    weekSummary: {
+      masteryRateNum: 'p-home-week-mastery-num',
+      sparklineSvg:   'p-home-week-sparkline-svg',
+      streakChip:     'p-home-streak-chip',
+      newCountNum:    'p-home-week-new-count',
+    },
+    // SC-16-T02 · P-HOME 「查看全部 ›」入口 (Tap → P-WEEKLY-REVIEW)
+    weeklyHomeLink:    'weekly-home-link',
+  },
+
+  // P-WEEKLY-REVIEW · 本周回顾详情页 (SC-16-T02 · spec §13)
+  // 14 testid 注册到 TEST_IDS.weekly · 来源 mockup 14_weekly_review.html data-testid 命中
+  weekly: {
+    root:            'p-weekly-review-root',
+    back:            'weekly-back',
+    range:           'weekly-range',
+    hero:            'weekly-hero',
+    delta:           'weekly-delta',
+    sparkline:       'weekly-sparkline',
+    radar:           'weekly-radar',
+    weakKp1:         'weekly-weak-kp-1',
+    weakKp2:         'weekly-weak-kp-2',
+    weakKp3:         'weekly-weak-kp-3',
+    statsTrio:       'weekly-stats-trio',
+    failedScroller:  'weekly-failed-scroller',
+    aiInsight:       'weekly-ai-insight',
+    empty:           'weekly-empty',
+    // 非 mockup 14 锚但实现层必须的 testid (TC-3 ERROR / TC-4 EMPTY CTA)
+    errorBanner:     'weekly-error-banner',
+    retryBtn:        'weekly-retry-btn',
+    emptyCta:        'weekly-empty-cta',
   },
 
   // P12 · 通知中心

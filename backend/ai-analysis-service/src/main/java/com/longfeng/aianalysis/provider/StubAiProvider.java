@@ -35,4 +35,11 @@ public class StubAiProvider implements AiProvider {
                 150
         );
     }
+
+    @Override
+    public WeeklyInsightResponse generateWeeklyInsight(WeeklyInsightInput input) {
+        // Stub: 返简单文本 · 不调外部 API · 集成测试 / 离线开发用
+        String text = "本周已复习 " + input.reviewedCount() + " 题, 继续保持节奏";
+        return new WeeklyInsightResponse(text, "stub", "stub-v1", 0);
+    }
 }

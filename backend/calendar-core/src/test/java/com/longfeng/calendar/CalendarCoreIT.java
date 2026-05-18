@@ -224,6 +224,66 @@ class CalendarCoreIT extends IntegrationTestBase {
     }
 
     // ======================================================================
+    // ⑦ P10 spec §5 #1 · GET /api/calendar/events?month=YYYY-MM
+    // ======================================================================
+    @Test
+    @DisplayName("GET /api/calendar/events?month=YYYY-MM · 月范围查询 + 日 bucket")
+    void listByMonth_bucketsByDate() throws Exception {
+        // Seed: 7 Ebbinghaus events (T0..T6) · 6 in May 2026 SHA, 1 in June 2026 SHA
+        // (base 2026-05-15T08:00:00Z + {2h,1d,2d,4d,7d,14d,30d} ·
+        //  Asia/Shanghai 是 UTC+8 · 故 T6 = 2026-06-14)
+        mvc.perform(post("/internal/events/batch")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json.writeValueAsString(buildSevenReqs())))
+                .andExpect(status().isOk());
+
+        // 查 2026-05 · 期待 6 条 (T0..T5) · 跨日 ASC bucket
+        mvc.perform(get("/api/calendar/events")
+                        .param("month", "2026-05")
+                        .header("X-User-Id", String.valueOf(OWNER_ID))
+                        .header("X-User-Timezone", "Asia/Shanghai"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.month").value("2026-05"))
+                .andExpect(jsonPath("$.data.days.length()").value(6))
+                .andExpect(jsonPath("$.data.days[0].date").value("2026-05-15"))
+                .andExpect(jsonPath("$.data.days[0].events.length()").value(1))
+                .andExpect(jsonPath("$.data.days[0].events[0].relationType").value("STUDY"))
+                .andExpect(jsonPath("$.data.days[5].date").value("2026-05-29"));
+
+        // 查 2026-06 · 期待 1 条 (T6)
+        mvc.perform(get("/api/calendar/events")
+                        .param("month", "2026-06")
+                        .header("X-User-Id", String.valueOf(OWNER_ID))
+                        .header("X-User-Timezone", "Asia/Shanghai"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.month").value("2026-06"))
+                .andExpect(jsonPath("$.data.days.length()").value(1))
+                .andExpect(jsonPath("$.data.days[0].date").value("2026-06-14"));
+
+        // 查空月 · 期待 days=[]
+        mvc.perform(get("/api/calendar/events")
+                        .param("month", "2026-09")
+                        .header("X-User-Id", String.valueOf(OWNER_ID)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.month").value("2026-09"))
+                .andExpect(jsonPath("$.data.days.length()").value(0));
+
+        // 格式错 · 不 throw 400 · 返空 (controller 状态机兜底)
+        mvc.perform(get("/api/calendar/events")
+                        .param("month", "bad-format")
+                        .header("X-User-Id", String.valueOf(OWNER_ID)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.days.length()").value(0));
+
+        // 无 X-User-Id · 返空月 · 不 401
+        mvc.perform(get("/api/calendar/events")
+                        .param("month", "2026-05"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.days.length()").value(0));
+    }
+
+    // ======================================================================
     // Helpers
     // ======================================================================
     private int countActiveEvents() {

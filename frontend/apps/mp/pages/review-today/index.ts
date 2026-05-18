@@ -5,7 +5,7 @@
 
 import { TEST_IDS } from '@longfeng/testids';
 import { getToday, createSession } from '../../src/api/review';
-import { buildSlotsFromItems } from './helpers';
+import { buildSlotsFromItems, isCompletedToday } from './helpers';
 import type { SlotData } from './helpers';
 
 // ─── Types ──────────────────────────────────────────────────────
@@ -83,14 +83,15 @@ Page({
 
       const now = new Date();
       const builtSlots = buildSlotsFromItems(items, now, this.data.sortMode);
-      // P07 spec L94 严格口径: doneCount = GRADED (= completedAt != null) ·
-      // 不再用 mastered (BE ReviewPlanDto 根本不返这个字段 → undefined → 永远 0%).
-      // 任务完成度 (progressPct) 与 掌握度 (masteryPct · BE 算 · ease 聚合) 是两个独立维度.
-      // 4 题都已 grade (含 PARTIAL/FORGOT) → 进度 100%, 掌握度由 ease 反映.
-      const doneCount = items.filter(i => i.completedAt).length;
-      const waitCount = items.filter(i => !i.completedAt).length;
+      // doneCount = "今日已 grade" (= completedAt 落在今日窗口) ·
+      // 不再用 completedAt != null (因为 review_plan cyclic · 昨晚 grade 的今晚再次到期时
+      // completedAt 仍是昨晚 · 那条今天还没做过 · 应算 wait 而非 done).
+      // 业务真相: 昨晚 grade → completedAt=昨晚 + next_due_at 推到今晚 →
+      //          今天打开 P07 看到 → "未开始" (今晚还没做) → 今晚做完后 → "已完成".
+      const doneCount = items.filter(i => isCompletedToday(i.completedAt, now)).length;
+      const waitCount = total - doneCount;
       // 进行中 = OPEN 未 grade · BE 现实不返该状态 → 永远 0 · 保留 hero label 占位
-      const inProgressCount = total - doneCount - waitCount;
+      const inProgressCount = 0;
       const progressPct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
 
       // P07-A · masteryPct 直接用 BE 返值 (spec L98 · ease_factor 聚合).

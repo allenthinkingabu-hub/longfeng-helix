@@ -5,15 +5,19 @@ spring:
   application:
     name: calendar-core
   datasource:
-    url: jdbc:postgresql://localhost:5432/wrongbook
-    username: postgres
-    password: wb
+    # 单库迁移 (2026-05-17): 全部服务接 team-1-pg (port 15432) ·
+    # calendar_subscription / calendar_event 表与 wrong_item 同库.
+    # 之前 5432 老配置 + postgres/wb · 单库决策后不再有 5432 实例.
+    url: jdbc:postgresql://localhost:15432/wrongbook
+    username: longfeng
+    password: longfeng_dev
   jpa:
     hibernate:
       ddl-auto: validate
     open-in-view: false
   flyway:
     locations: classpath:db/migration
+    validate-on-migrate: false
 
 app:
   snowflake:

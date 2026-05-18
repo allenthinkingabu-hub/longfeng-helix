@@ -118,9 +118,13 @@ public class QuestionAggregateService {
     private static final short STATUS_CONFIRMED = 3;
 
     public QuestionListResp listQuestions(Long studentId, String subject, Short mastery,
+                                          String q,
                                           int page, int size, String sort) {
+        // 2026-05-18 sort 扩展: due_asc/desc · mastery_asc/desc · created_asc/desc.
+        // due_* + mastery_* 因依赖 next-due 注入 / mastery 应用层映射 · 用应用层后排 ·
+        // SQL 阶段统一 created_at DESC · 后面 application-level sort 覆盖.
         Sort s = Sort.by(Sort.Direction.DESC, "created_at");
-        if ("oldest".equals(sort)) {
+        if ("oldest".equals(sort) || "created_asc".equals(sort)) {
             s = Sort.by(Sort.Direction.ASC, "created_at");
         }
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), size, s);
@@ -131,14 +135,99 @@ public class QuestionAggregateService {
 
         // P05-LIST: 批量取每个 wrong_item 的 next-due active plan ·
         // 单条 HTTP POST · review-plan-service down 时降级 (空 map) 不 hang.
-        Map<Long, NextDueInfo> nextDueMap = fetchNextDueByItems(
-                result.getContent().stream().map(WrongItem::getId).toList());
+        List<Long> itemIds = result.getContent().stream().map(WrongItem::getId).toList();
+        Map<Long, NextDueInfo> nextDueMap = fetchNextDueByItems(itemIds);
+        // 2026-05-18 P05 fix: wrong_item.stem_text 长期 null (AI OCR 写到 analysis_result 没回写) ·
+        // 批量 JOIN analysis_result 拿 latest stem · 让列表显示真题干 (P08 detail 已做 · list 没做).
+        Map<Long, String> stemMap = fetchLatestStemByItems(itemIds);
 
-        return new QuestionListResp(
-                result.getContent().stream()
-                        .map(it -> toListItem(it, nextDueMap.get(it.getId())))
-                        .toList(),
-                page, size, result.getTotalElements());
+        // 2026-05-18 加 search filter: q 关键词模糊匹配 stem_text + AI stem ·
+        // 应用层 filter (避 SQL 复杂 JOIN · stem 来源两表 + AI fallback 逻辑已在 toListItem) ·
+        // 数据集 ≤ 50 条 · 应用层效率 OK.
+        java.util.List<QuestionListItem> rawItems = result.getContent().stream()
+                .map(it -> toListItem(it, nextDueMap.get(it.getId()), stemMap.get(it.getId())))
+                .toList();
+        java.util.List<QuestionListItem> filtered;
+        long total;
+        if (q != null && !q.isBlank()) {
+            String needle = q.trim().toLowerCase();
+            filtered = rawItems.stream()
+                    .filter(it -> matchesSearch(it, needle))
+                    .toList();
+            total = filtered.size();
+        } else {
+            filtered = rawItems;
+            total = result.getTotalElements();
+        }
+        // 2026-05-18 应用层排序 · due_* + mastery_* 走这里 (SQL 阶段已 created_at 排过 ·
+        // 这层仅对 due/mastery 模式覆盖 · 用 stable sort 保 created tie-break).
+        java.util.List<QuestionListItem> sorted = applyAppSort(filtered, sort);
+        return new QuestionListResp(sorted, page, size, total);
+    }
+
+    /**
+     * 2026-05-18 应用层 sort · 跨 wrong_item 列 + 注入字段 (next_due_at).
+     * - due_asc/desc: next_due_at 升/降 · null 列尾
+     * - mastery_asc: 未掌握 → 已掌握 (0,1,2)
+     * - mastery_desc: 倒序
+     * - 其他 (含 null / "oldest" / "created_*"): 保留 SQL 层排序 · 直接返
+     */
+    private java.util.List<QuestionListItem> applyAppSort(
+            java.util.List<QuestionListItem> items, String sort) {
+        if (sort == null || sort.isBlank()) return items;
+        java.util.Comparator<QuestionListItem> cmp;
+        switch (sort) {
+            case "due_asc":
+                cmp = java.util.Comparator.comparing(
+                        QuestionListItem::nextDueAt,
+                        java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                break;
+            case "due_desc":
+                cmp = java.util.Comparator.comparing(
+                        QuestionListItem::nextDueAt,
+                        java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder()));
+                break;
+            case "mastery_asc":
+                cmp = java.util.Comparator.comparingInt(QuestionListItem::mastery);
+                break;
+            case "mastery_desc":
+                cmp = java.util.Comparator.comparingInt(QuestionListItem::mastery).reversed();
+                break;
+            default:
+                return items; // SQL 层已排过 · 跳过
+        }
+        return items.stream().sorted(cmp).toList();
+    }
+
+    /**
+     * 2026-05-18 search 匹配: stem_text + subject 子串模糊匹配 (lowercase).
+     * 后续可扩 KP / 错因 (analysis_result).
+     */
+    private boolean matchesSearch(QuestionListItem item, String needle) {
+        String stem = item.stemText() == null ? "" : item.stemText().toLowerCase();
+        String subject = item.subject() == null ? "" : item.subject().toLowerCase();
+        return stem.contains(needle) || subject.contains(needle);
+    }
+
+    /** 2026-05-18 · 批量拿 wrong_item 的 latest AI stem · 单 SQL (DISTINCT ON) · 不 N+1. */
+    private Map<Long, String> fetchLatestStemByItems(List<Long> itemIds) {
+        if (itemIds == null || itemIds.isEmpty()) return Map.of();
+        try {
+            List<Object[]> rows = wrongItemService.findLatestStemByWrongItemIds(itemIds);
+            Map<Long, String> out = new java.util.HashMap<>();
+            for (Object[] row : rows) {
+                if (row.length < 2 || row[0] == null) continue;
+                Long itemId = ((Number) row[0]).longValue();
+                String stem = row[1] == null ? null : row[1].toString();
+                if (stem != null && !stem.isBlank()) {
+                    out.put(itemId, stem);
+                }
+            }
+            return out;
+        } catch (Exception e) {
+            LOG.warn("findLatestStemByWrongItemIds failed (列表降级空 stem): {}", e.toString());
+            return Map.of();
+        }
     }
 
     /** 内部 holder · 不暴露给外面 · review-plan response shape. */
@@ -248,23 +337,35 @@ public class QuestionAggregateService {
     }
 
     private QuestionListItem toListItem(WrongItem item) {
-        return toListItem(item, null);
+        return toListItem(item, null, null);
     }
 
     /**
-     * Overload: 注入 review-plan next-due 字段.
+     * Overload: 注入 review-plan next-due + AI 回填 stem.
      * info=null (没 active plan / review-plan-service down) 走 null 字段 ·
      * FE WrongQuestionListItem.nextDueAt='' + helpers.formatDueLabel 输出 "暂未安排".
+     * aiStem=null 时 fallback wrong_item.stem_text (旧老数据通路 · 多数为 null).
      */
-    private QuestionListItem toListItem(WrongItem item, NextDueInfo info) {
+    private QuestionListItem toListItem(WrongItem item, NextDueInfo info, String aiStem) {
         String nextDueAt = info == null ? null : info.nextDueAt();
         // nodeIndex 0-based (T0..T6) · FE 习惯 T1.. 标签 · +1 落到 nodeStage.
         // info=null 时 nodeStage=null (FE 落 default 1 = "T1 · 暂未安排" 不显怪).
         Integer nodeStage = info == null ? null : info.nodeIndex() + 1;
+        // 2026-05-18 P05 fix: stem 真值优先级 wrong_item.stem_text > AI analysis_result.stem ·
+        // 因数据现实是 stem_text 多 null · 实际靠 aiStem.
+        String stem = item.getStemText();
+        if ((stem == null || stem.isBlank()) && aiStem != null && !aiStem.isBlank()) {
+            stem = aiStem;
+        }
+        // 2026-05-18 thumbnail wire: origin_image_key → MinIO public URL · 同 SC-16 failedTop 一致.
+        // MVP dev 用 localhost:9000 · production 应改 file-service presign + CDN.
+        String thumbnailUrl = (item.getOriginImageKey() == null || item.getOriginImageKey().isBlank())
+                ? null
+                : "http://localhost:9000/wrongbook-dev/" + item.getOriginImageKey();
         return new QuestionListItem(
                 toQid(item.getId()), item.getSubject(), item.getSourceType(),
                 item.getStatus(), item.getMastery(), item.getDifficulty(),
-                item.getStemText(), item.getOriginImageKey(), item.getCreatedAt(),
+                stem, item.getOriginImageKey(), thumbnailUrl, item.getCreatedAt(),
                 nextDueAt, nodeStage);
     }
 }
