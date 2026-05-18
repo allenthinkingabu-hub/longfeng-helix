@@ -116,8 +116,12 @@ page {
 
 /* ── Content ──────────────────────────────────────── */
 .content {
-  /* 配合 .nav 加 safe-area-inset-top · margin 抬高 80rpx 避被 nav 盖 */
-  margin-top: 420rpx;
+  /* 2026-05-18 修 chips 与 mastery filter 之间大空隙:
+   * .nav padding-top 用 env(safe-area-inset-top) · .content margin-top 必须同源
+   * 跟 nav 同步 · 否则 env=0 (WeChat 模拟器) 时 nav 收缩 · 而固定 margin 不变 = 大空隙.
+   * 公式: env() + 280rpx ≈ env + 12 (pad) + 72 (h1) + 78 (search 含 margin) +
+   *      78 (chips 含 margin) + 20 (pad-bot) + 20 (buffer). */
+  margin-top: calc(env(safe-area-inset-top, 130rpx) + 280rpx);
   padding: 20rpx 32rpx 32rpx;
   flex: 1;
   /* P08 同款修: scroll-view scroll-y 不会自动收敛横向 · cards (long stem 等) 撑超 viewport ·
