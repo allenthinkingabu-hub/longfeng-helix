@@ -92,11 +92,13 @@ public class QuestionDetailController {
             @RequestParam(required = false) Short mastery,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(required = false) String sort) {
+            @RequestParam(required = false) String sort,
+            // 2026-05-18 加 search q · stem_text + AI stem 模糊匹配 (ILIKE %q%)
+            @RequestParam(required = false) String q) {
         if (studentId == null) {
             studentId = 0L; // dev fallback
         }
-        QuestionListResp resp = aggregateService.listQuestions(studentId, subject, mastery, page, size, sort);
+        QuestionListResp resp = aggregateService.listQuestions(studentId, subject, mastery, q, page, size, sort);
         return ResponseEntity.ok(ApiResult.ok(resp));
     }
 

@@ -118,6 +118,7 @@ public class QuestionAggregateService {
     private static final short STATUS_CONFIRMED = 3;
 
     public QuestionListResp listQuestions(Long studentId, String subject, Short mastery,
+                                          String q,
                                           int page, int size, String sort) {
         Sort s = Sort.by(Sort.Direction.DESC, "created_at");
         if ("oldest".equals(sort)) {
@@ -137,11 +138,35 @@ public class QuestionAggregateService {
         // 批量 JOIN analysis_result 拿 latest stem · 让列表显示真题干 (P08 detail 已做 · list 没做).
         Map<Long, String> stemMap = fetchLatestStemByItems(itemIds);
 
-        return new QuestionListResp(
-                result.getContent().stream()
-                        .map(it -> toListItem(it, nextDueMap.get(it.getId()), stemMap.get(it.getId())))
-                        .toList(),
-                page, size, result.getTotalElements());
+        // 2026-05-18 加 search filter: q 关键词模糊匹配 stem_text + AI stem ·
+        // 应用层 filter (避 SQL 复杂 JOIN · stem 来源两表 + AI fallback 逻辑已在 toListItem) ·
+        // 数据集 ≤ 50 条 · 应用层效率 OK.
+        java.util.List<QuestionListItem> rawItems = result.getContent().stream()
+                .map(it -> toListItem(it, nextDueMap.get(it.getId()), stemMap.get(it.getId())))
+                .toList();
+        java.util.List<QuestionListItem> filtered;
+        long total;
+        if (q != null && !q.isBlank()) {
+            String needle = q.trim().toLowerCase();
+            filtered = rawItems.stream()
+                    .filter(it -> matchesSearch(it, needle))
+                    .toList();
+            total = filtered.size();
+        } else {
+            filtered = rawItems;
+            total = result.getTotalElements();
+        }
+        return new QuestionListResp(filtered, page, size, total);
+    }
+
+    /**
+     * 2026-05-18 search 匹配: stem_text + subject 子串模糊匹配 (lowercase).
+     * 后续可扩 KP / 错因 (analysis_result).
+     */
+    private boolean matchesSearch(QuestionListItem item, String needle) {
+        String stem = item.stemText() == null ? "" : item.stemText().toLowerCase();
+        String subject = item.subject() == null ? "" : item.subject().toLowerCase();
+        return stem.contains(needle) || subject.contains(needle);
     }
 
     /** 2026-05-18 · 批量拿 wrong_item 的 latest AI stem · 单 SQL (DISTINCT ON) · 不 N+1. */

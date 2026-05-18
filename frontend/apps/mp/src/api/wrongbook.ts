@@ -228,6 +228,8 @@ export interface ListWrongQuestionsParams {
   size?: number;
   subject?: string;
   mastery?: string;
+  /** 2026-05-18 search · q 关键词 (stem_text + subject ILIKE %q%) */
+  q?: string;
 }
 
 // BE 实际 wire shape (snake_case + 字段缺失) · 跟 FE 类型对不上
@@ -310,6 +312,7 @@ export async function listWrongQuestions(
   if (params.size !== undefined) parts.push(`size=${params.size}`);
   if (params.subject) parts.push(`subject=${params.subject}`);
   if (params.mastery) parts.push(`mastery=${params.mastery}`);
+  if (params.q) parts.push(`q=${encodeURIComponent(params.q)}`);
   const query = parts.join('&');
   const url = `${apiBase('wb')}/api/wb/questions${query ? `?${query}` : ''}`;
   const raw = await httpJSON<ListWrongQuestionsRespWire>(url);
