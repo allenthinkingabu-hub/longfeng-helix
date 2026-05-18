@@ -76,3 +76,22 @@ anon:
 # P1: prod 由 CD pipeline 覆盖为 https://h5.longfeng.example.
 share:
   public-base-url: http://localhost:5173
+
+# SC-12-T04 · biz §2B.13 SC-12 F03 · POST /api/anon/file/presign · temporary OSS
+# bucket for guest-capture flow (5-min TTL · auto-clean after 24h via lifecycle
+# policy · not in this task). Note prefix is `anon.storage.*` deliberately
+# DISJOINT from file-service `file-service.storage.*` so the two services can
+# never accidentally trample each other's ConfigurationProperties bean.
+#
+# P0 dev defaults match the sandbox Minio at localhost:9000 (minioadmin /
+# minioadmin) — same instance file-service uses, separate bucket. P1 will
+# inject real OSS keys via Vault.
+anon:
+  storage:
+    provider: minio
+    endpoint: http://localhost:9000
+    bucket: guest-tmp
+    access-key: minioadmin
+    secret-key: minioadmin
+    presign-ttl-seconds: 300
+    max-upload-size: 10485760

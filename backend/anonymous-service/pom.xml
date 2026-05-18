@@ -21,6 +21,8 @@
     <flyway.version>10.15.0</flyway.version>
     <testcontainers.version>1.20.1</testcontainers.version>
     <jjwt.version>0.12.5</jjwt.version>
+    <!-- SC-12-T04 · OSS presign infra · same version as file-service for binary parity. -->
+    <minio.version>8.5.9</minio.version>
   </properties>
 
   <dependencies>
@@ -80,6 +82,15 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+
+    <!-- SC-12-T04 · MinIO client for guest-capture presigned PUT URLs (biz §2B.13 F03).
+         Mirrors file-service' minio dep · separate AnonStorageProperties (prefix
+         anon.storage) keeps config isolated from file-service.storage. -->
+    <dependency>
+      <groupId>io.minio</groupId>
+      <artifactId>minio</artifactId>
+      <version>${minio.version}</version>
     </dependency>
 
     <!-- PostgreSQL driver -->
