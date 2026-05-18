@@ -5,10 +5,10 @@
        biz §2A.3.2 (AnonShell + HeroDemo + SampleChips + features + social + ThreeStepComic + DualCTA + ConsentBar)
      状态机: phase ∈ {LOADING, READY, DEGRADED-samples, DEGRADED-kpi, DEGRADED-both} (spec §6)
      KPI 语义: 静态性能信号 (4.2s P95 / T0-T6 / 触达 98%) — 不绑后端 KPI · 业务规模 KPI 不渲染 (spec §3) -->
-<view wx:if="{{authChecked}}" class="landing-page" data-test-id="landing-page" style="padding-top: {{statusBarHeight}}px;">
+<view wx:if="{{authChecked}}" class="landing-page" data-test-id="landing-page">
 
-  <!-- ── Hero 极光区 · 含 AnonShell nav (内嵌 · 让原生胶囊 + 登录共存 · mockup 131-154) ── -->
-  <view class="hero" data-test-id="landing-hero">
+  <!-- ── Hero 极光区 · 含 AnonShell nav · padding-top 含 statusBar 让渐变贯穿状态栏 ── -->
+  <view class="hero" data-test-id="landing-hero" style="padding-top: {{statusBarHeight}}px;">
     <view class="hero-blob blob-1"></view>
     <view class="hero-blob blob-2"></view>
     <view class="hero-blob blob-3"></view>
