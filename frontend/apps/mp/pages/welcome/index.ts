@@ -26,6 +26,10 @@ declare const getApp: any;
 
 Page({
   data: {
+    // A+ entry guard · 默认 false · wxml wx:if 隐藏全页防闪烁
+    // 已登录: 检 jwt → reLaunch home (期间页面白屏 · 不闪 landing)
+    // 未登录: setData({authChecked:true}) 解锁渲染 landing
+    authChecked: false,
     phase: 'LOADING' as LandingPhase,
     samples: [] as LandingSampleVM[],
     kpi: null as KpiVM | null,
@@ -45,6 +49,15 @@ Page({
   },
 
   onLoad() {
+    // ─── A+ entry guard · 必须最先跑 · 已登录用户直接跳 home 不渲染 landing ───
+    const jwt = wx.getStorageSync('jwt');
+    if (jwt) {
+      wx.reLaunch({ url: '/pages/home/index' });
+      return; // 不 setData · wxml 保持空白防闪烁
+    }
+    // 未登录 · 解锁 wxml 渲染
+    this.setData({ authChecked: true });
+
     try {
       // wx.getWindowInfo() 替代 deprecated getSystemInfoSync (console warning fix)
       const sys =
