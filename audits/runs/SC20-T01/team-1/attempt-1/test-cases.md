@@ -110,3 +110,32 @@ trace: biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §4.16 v1.1 (2026-05-1
   - 不验 final_grade_source 应用层枚举校验 (§4.16 字面"应用层校验 · 不入 DB CHECK" · 那是 SC-20-T02+ Service 层 task)
   - 不验 user_answer_image_key 非 null → ai_judge_* 4 列必同时非 null 事务边界 (§4.16 字段约束第 3 条 · 同上属业务层)
   - 不验 30 天 OSS lifecycle (§4.16 字段约束第 4 条 · OPS task · 非 DB schema)
+
+---
+
+## User Approval (Phase 2.5 · Required · 2026-05-16)
+
+<!--
+TestDesigner 在 AI 互评双方 APPROVE 后 append 空模板 (verdict: <待用户填>)。
+用户编辑此 section · 把 verdict 改为 APPROVE 或 REJECT。
+audit.js dim_test_cases_alignment 检查:
+  - user_approval_section_present: 必须有此 section
+  - user_verdict_approve: section 内必须含 "verdict: APPROVE"
+两个 check 任一 FAIL → 阻塞 Coder dev · 不准进 Phase 3。
+
+Phase 2 AI 互评结果 (供用户决策参考):
+  - Coder Round 1 REJECT (e00ad65) · Round 2 APPROVE (02190c7) · 9/9 反馈吃掉
+  - Tester Round 1 REJECT (d348c37) · Round 2 APPROVE (89ee53b) · 8/8 反馈吃掉
+  - TestDesigner Round 1 (0c5bcf5) · Round 2 重写 (a9894ce · 反映用户 B 路径决策)
+  - satellite biz §4.16 v1.1 升级 (ab03dff · CREATE TABLE 14 master + 6 satellite = 20 列)
+  - audit dim_test_cases_alignment.review_has_ge_1_reject_round 红线已满足 (Round 1 双方 REJECT)
+-->
+
+Reviewed by: <user name · 例: Allen>
+Date: <YYYY-MM-DD>
+
+Comments:
+<!-- 任何用户视角反馈 · 业务边界 · 觉得不严的地方 · 也可空 -->
+-
+
+verdict: <APPROVE | REJECT · 待用户填>
