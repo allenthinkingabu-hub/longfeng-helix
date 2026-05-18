@@ -1,0 +1,195 @@
+{
+  "schema_version": "3.1",
+  "scenario_id": "SC-22",
+  "scenario_title": "AI 不确定 (confidence<0.5) · banner 退化 · 优雅降级",
+  "scenario_goal": "验证 A.3 优雅降级铁律 · AI 对学生作答把握不足 (复杂多步解答/字迹潦草/AI 不擅长题型) · confidence<0.5 / 超时 / 503 时 banner 自动退化为 'AI 不确定 · 请按你的理解自评' · 不预选自评按钮 · 学生走 master §7 纯自评路径 · 与 master sibling 现状 100% 一致",
+  "generated_from": "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §2B.22 (5 user-action steps)",
+  "generated_at": "2026-05-18",
+  "owner": "user",
+  "scenario_biz_ref": "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §2B.22",
+  "scenario_spec_refs": [
+    "design/system/pages/P08-review-exec-ai-judge.spec.md (退化态 §6.2 状态转移 + §9 异常 + §10 验收点)",
+    "design/system/pages/P08-review-exec.spec.md (master sibling · 退化后流程复用)"
+  ],
+  "scenario_tc_ids": ["TC-22.01", "TC-22.02", "TC-22.03"],
+  "system_invariants": [
+    "confidence<0.5 时 final_grade_source 必为 'self' (banner 没预选 AI verdict · 学生独立选 = 不算 ai_accepted)",
+    "ai_judge_* 5 列仍写库 (即使 confidence 低) · 用于后期分析 / 监控 / dashboard 展示 AI 不擅长题型分布",
+    "banner 不显示 reason / CTA · 避免 'AI 半生不熟' 信息干扰学生判断"
+  ],
+  "work_log_dir_pattern": "audits/runs/<task_id_short>/<team>/attempt-<N>/",
+  "log_requirements_template": {
+    "coder": ["coder.md", "bugs-found.md"],
+    "tester": ["tester.md", "adversarial.md", "test-reports/"]
+  },
+  "audit_gate": "harness/audit.js 5 维度全过才真 PASS · 任一不过 REDO · audit_retries ≥ 3 触发熔断",
+  "id_convention": {
+    "long": "SC-${N}-T${MM}",
+    "short": "SC${N}-T${MM}",
+    "pascal": "T${MM}${PurposeShort}"
+  },
+  "total_tasks": 3,
+  "tasks": [
+    {
+      "task_id": "SC-22-T01",
+      "task_id_short": "SC22-T01",
+      "task_id_pascal": "T01JudgeApiFallbackBranches",
+      "task_title": "POST :judge 接口 3 降级分支 · low_confidence + timeout + service_unavailable + metadata 全落库",
+      "scenario": "TC-22.01 (low_confidence) + TC-22.02 (timeout) + TC-22.02 变体 (503)",
+      "biz_step_range": "biz §2B.22 步 1-2 · §6.4 阈值 SLA",
+      "page": "(后端 · P08 调)",
+      "page_state_machine": "JUDGING → JUDGE_FAILED (3 子态)",
+      "branch": "feature/SC-22-T01-judge-api-fallback-branches",
+      "owner_team": "team-2",
+      "biz_refs": [
+        "biz §6.4 阈值 SLA (单题接受 / 切割 IoU / 切割总时长)",
+        "biz §2B.22 步 1 (AI 返 confidence=0.32 · 前端检测 < 0.5)",
+        "biz §10.17 错误码 503 AI_SERVICE_UNAVAILABLE · 必在 18s 内返",
+        "biz §2A.4 P08 差量卡 [异常态] AI 判超时 / confidence < 0.5 / 拍照 OSS 上传失败 3 行"
+      ],
+      "spec_refs": [
+        "design/system/pages/P08-review-exec-ai-judge.spec.md §5 API 触点 #1 错误码 4 行",
+        "design/system/pages/P08-review-exec-ai-judge.spec.md §9 异常 & 降级 新增 6 行 (OSS / 主超时 / 双超时 / low_conf / 503 / outbox)"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": ["backend/ai-analysis-service", "backend/review-plan-service"],
+      "primary_apis": ["POST /api/review/nodes/{nid}/judge"],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "JudgeController POST :judge 在 SonnetChatModel 调用结果 confidence < 0.5 时返 status='LOW_CONFIDENCE' (不切 fallback · 因为切了也是低质量 · 直接降级让学生自评) · 仍落 5 列 ai_judge_* 到 wb_review_node (含 confidence=0.xx)" },
+        { "id": "AC2", "text": "主模型 Sonnet 8s 超时触发 Resilience4j 自动切 GPT-4o (TimeLimiter + CircuitBreaker · 双 retry 不再加) · GPT-4o 10s 仍超时返 503 + status='TIMEOUT' · 总 hard timeout 18s (8+10)" },
+        { "id": "AC3", "text": "双模型 503 (e.g. API key 失效 / quota 耗尽) 时返 503 AI_SERVICE_UNAVAILABLE + status='SERVICE_UNAVAILABLE' · 监控告警 ai-judge.service.down 触发" },
+        { "id": "AC4", "text": "3 降级分支落 ai_judge_metadata JSONB: {model_used, prompt_version, token_cost_usd?, latency_ms, status: 'LOW_CONFIDENCE'|'TIMEOUT'|'SERVICE_UNAVAILABLE', fallback_attempts?: number} · verdict 字段在 LOW_CONFIDENCE 时仍写 (AI 返回的低置信度 verdict) · TIMEOUT/503 时 verdict=null" },
+        { "id": "AC5", "text": "(TC-22.03 安全) 学生拍含 PII 草稿纸时 AI 判 prompt §6.2 含 '仅看作答 · 忽略与题目无关的内容' 约束 · backend 不存原图 (仅 image_key) · OSS lifecycle 30 天自清 (satellite §17 决策 #2)" },
+        { "id": "AC6", "text": "Prometheus metrics: wrongbook_judge_low_confidence_total (Counter · 按 question.subject label) + wrongbook_judge_timeout_total + wrongbook_judge_service_unavailable_total + wrongbook_judge_duration_seconds (Histogram · 按 model_used label · 用于后期 P95/P99 分析)" }
+      ],
+      "test_invariants": [
+        "TI1: confidence=0.49 走 LOW_CONFIDENCE · confidence=0.50 走 DONE+flagged (边界值精确)",
+        "TI2: 主 7.99s 返成功 · 主 8.01s 切备 (TimeLimiter 精度)",
+        "TI3: 3 降级分支都落 metadata 5 列 (写库不 skip)",
+        "TI4: 503 时 grade 流不阻塞 (前端可降级走纯自评)"
+      ],
+      "key_invariants": [
+        "降级不阻塞学生进度 (A.3 优雅降级铁律)",
+        "降级数据完整 (ai_judge_metadata 全落库 · 用于后期分析 AI 不擅长题型)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "(无 · 后端 task · 由 T03 E2E 覆盖前端)",
+        "backend_e2e_it": "backend/ai-analysis-service/src/test/java/.../T01JudgeApiFallbackBranchesE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC22-T01/team-2/attempt-1/"
+    },
+    {
+      "task_id": "SC-22-T02",
+      "task_id_short": "SC22-T02",
+      "task_id_pascal": "T02P08AiJudgeEmptyDegrade",
+      "task_title": "<AiJudgeEmpty> 退化态组件 + banner 渲染策略 + GradeButtons preselected=null + AiHintRibbon 隐藏",
+      "scenario": "TC-22.01 主路径前端 + TC-22.02 timeout 前端",
+      "biz_step_range": "biz §2B.22 步 1-3 前端表现",
+      "page": "P08",
+      "page_state_machine": "JUDGE_FAILED 渲染退化态",
+      "branch": "feature/SC-22-T02-p08-ai-judge-empty-degrade",
+      "owner_team": "team-1",
+      "biz_refs": [
+        "biz §2A.4 P08 差量卡 [异常态] 3 退化行 (timeout / low_conf / OSS 失败)",
+        "biz §2B.22 步 2 (banner 渲染策略 · 仅 hint 文案 · 不显示 verdict/reason/CTA · 自评按钮不预选)",
+        "biz §1.4 A.3 优雅降级铁律"
+      ],
+      "spec_refs": [
+        "design/system/pages/P08-review-exec-ai-judge.spec.md §3 核心组件 <AiJudgeEmpty>",
+        "design/system/pages/P08-review-exec-ai-judge.spec.md §6.1 状态机 JUDGE_FAILED 子态 (3 status)",
+        "design/system/pages/P08-review-exec-ai-judge.spec.md §14 i18n 退化态 3 文案 (exec.judge.lowConfidence/timeout/serviceUnavailable)",
+        "design/mockups/wrongbook/20_review_exec_ai_judge.html L390-L394 (empty-hero default hidden)"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": ["frontend/apps/mp/src/pages/review-exec", "frontend/packages/ui-kit", "frontend/packages/i18n"],
+      "primary_apis": [],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "新建 <AiJudgeEmpty> 组件 (frontend/packages/ui-kit) · 接 reason: 'LOW_CONFIDENCE'|'TIMEOUT'|'SERVICE_UNAVAILABLE' prop · 视觉与 mockup L390 一致 (橙色虚线 border 框 · 居中文案 + 引导自评)" },
+        { "id": "AC2", "text": "P08 banner 渲染策略: aiJudge.status === 'DONE' → <AiJudgeBanner> · aiJudge.status ∈ {LOW_CONFIDENCE, TIMEOUT, SERVICE_UNAVAILABLE} → <AiJudgeEmpty reason={status}> · aiJudge === null → 不渲染 (master sibling 现状)" },
+        { "id": "AC3", "text": "<GradeButtons> preselected 在退化态必须为 null (即使 AI 返了低置信度 verdict 也不预选 · 满足 SC-22 关键断言 #1 confidence<0.5 必走 'self')" },
+        { "id": "AC4", "text": "退化态时 <AiHintRibbon> 必须隐藏 (rating 区上方紫色 hint 不渲染 · 避免误导学生'AI 有建议')" },
+        { "id": "AC5", "text": "退化态文案 i18n: LOW_CONFIDENCE → '🤔 AI 不太确定 · 请按你的理解自评' · TIMEOUT → 'AI 判超时 · 请用自评' · SERVICE_UNAVAILABLE → 'AI 暂不可用 · 请用自评'" },
+        { "id": "AC6", "text": "埋点: wb_judge_ai_low_confidence{nid, confidence} (TC-22.01) · wb_judge_ai_timeout{nid, ms} (TC-22.02 · ms 取决于超时点) · 503 复用 timeout 埋点 + reason='SERVICE_UNAVAILABLE' 字段" }
+      ],
+      "test_invariants": [
+        "TI1: VRT 3 退化态: confidence=0.32 / timeout 18000ms / 503 · 视觉差异明显 (不允许文案完全一致)",
+        "TI2: 退化态时 P08 仍可走纯自评流 · grade 接口 body 不带 final_grade_source (default 'self')",
+        "TI3: 退化态时学生点 tap 自评按钮速度 ≤ 1s (与 master sibling 一致 · 不被 banner 干扰)",
+        "TI4: AiHintRibbon 隐藏必须用 display:none 而非 visibility:hidden (avoid 空白占位)"
+      ],
+      "key_invariants": [
+        "退化不让学生失信于 AI (A.3 优雅降级 · 文案中性 + 引导自评)",
+        "退化路径与 master sibling 100% 一致 (不破坏现有流程)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/mp/tests/e2e/sc-22/t02-p08-ai-judge-empty-degrade.spec.ts",
+        "backend_e2e_it": "(无)"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC22-T02/team-1/attempt-1/"
+    },
+    {
+      "task_id": "SC-22-T03",
+      "task_id_short": "SC22-T03",
+      "task_id_pascal": "T03Sc22E2EDegrade",
+      "task_title": "E2E spec sc-22 退化 (TC-22.01 low_conf + TC-22.02 timeout + TC-22.03 PII 不残留)",
+      "scenario": "TC-22.01 + TC-22.02 + TC-22.03 全覆盖",
+      "biz_step_range": "biz §2B.22 全 5 步",
+      "page": "P08",
+      "page_state_machine": "JUDGING → JUDGE_FAILED → GRADED (走纯自评)",
+      "branch": "feature/SC-22-T03-e2e-degrade",
+      "owner_team": "team-1",
+      "biz_refs": [
+        "biz §2B.22 全 5 步编排 + 关键断言点 3 条",
+        "biz §2B.22 TC-22.01-03"
+      ],
+      "spec_refs": [
+        "design/system/pages/P08-review-exec-ai-judge.spec.md §10 验收点 (TC-22.01-03 行)"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": ["frontend/apps/mp", "backend/ai-analysis-service", "backend/review-plan-service"],
+      "primary_apis": [
+        "POST /api/review/nodes/{nid}/judge (mock 3 降级响应)",
+        "POST /api/review/nodes/{nid}/grade"
+      ],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "(TC-22.01 low_confidence) mock :judge 返 {confidence:0.32, verdict:'PARTIAL', status:'LOW_CONFIDENCE'} → P08 渲染 <AiJudgeEmpty reason='LOW_CONFIDENCE'> · 自评按钮无预选 · 学生独立选 PARTIAL → :grade body{grade:'PARTIAL'} (不带 final_grade_source · default 'self') → DB: final_grade_source='self', ai_judge_confidence=0.32 (落库), grade='PARTIAL' · master §7 流程不受影响" },
+        { "id": "AC2", "text": "(TC-22.02 timeout) mock Sonnet 8s + GPT-4o 10s 双超时 (总 18s) · :judge 返 503 + status='TIMEOUT' · P08 渲染 <AiJudgeEmpty reason='TIMEOUT'> 'AI 判超时 · 请用自评' · 不预选 · ai_judge_* = null (因为完全超时 · verdict 都没拿到) · final_grade_source='self' · 与 master sibling 100% 一致 · 埋点 wb_judge_ai_timeout{nid, ms:18000} 1 条" },
+        { "id": "AC3", "text": "(TC-22.03 PII 安全) 学生拍含 PII 草稿纸 (mock 角落写家庭住址) · :judge prompt 含 '仅看作答 · 忽略与题目无关的内容' 约束 · AI 不上报 PII 内容到 reason 字段 · backend 不存原图 (仅 image_key) · 验证 OSS lifecycle rule 30 天自清 (mock 时间快进验证)" },
+        { "id": "AC4", "text": "system_invariants 3 条全断言 (confidence<0.5 必走 self + ai_judge_* 仍写库 + banner 不显示 reason/CTA)" }
+      ],
+      "test_invariants": [
+        "TI1: master sibling 纯自评流 (TC-01.01 / TC-01.06) 在退化态下 100% 复用 · 不破坏",
+        "TI2: AI 判 prompt 防 PII 泄露 · 验证 reason 字段 grep 学生 PII 关键词 = 0 命中",
+        "TI3: OSS lifecycle rule 配置正确 (mock 30 天后 GET image_key 返 404)",
+        "TI4: VRT P08 3 退化态完整 screenshot (vs master sibling 纯自评态 diff 应明显 · 退化 banner 视觉清晰)"
+      ],
+      "key_invariants": [
+        "退化路径不破坏 master sibling 任何行为 (A.3 优雅降级铁律核心验证)",
+        "PII 安全 · 合规收尾 (与 master §11 NFR 一致)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/mp/tests/e2e/sc-22/t03-e2e-degrade.spec.ts",
+        "backend_e2e_it": "backend/ai-analysis-service/src/test/java/.../T03Sc22E2EDegradeE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC22-T03/team-1/attempt-1/"
+    }
+  ]
+}

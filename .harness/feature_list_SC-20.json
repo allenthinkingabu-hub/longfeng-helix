@@ -1,0 +1,350 @@
+{
+  "schema_version": "3.1",
+  "scenario_id": "SC-20",
+  "scenario_title": "拍照作答 → AI 辅助判 → 学生采纳 (happy path)",
+  "scenario_goal": "验证方案 A 辅助式完整 happy path · 学生在 P08 拍照上传手写作答 → AI 判 PARTIAL → banner 高亮 PARTIAL 自评按钮 → 学生 1 tap 采纳 → 落库 final_grade_source='ai_accepted' · 走 master §7 SM-2 PARTIAL 路径",
+  "generated_from": "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §2B.20 (7 user-action steps)",
+  "generated_at": "2026-05-18",
+  "owner": "user",
+  "scenario_biz_ref": "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §2B.20",
+  "scenario_spec_refs": [
+    "design/system/pages/P08-review-exec-ai-judge.spec.md (satellite 派生 · 486 行)",
+    "design/system/pages/P08-review-exec.spec.md (master sibling · 不动)"
+  ],
+  "scenario_tc_ids": ["TC-20.01", "TC-20.02", "TC-20.03"],
+  "system_invariants": [
+    "wb_review_node.ai_judge_verdict ∈ {'MASTERED','PARTIAL','FORGOT'} · 与最终 grade 字段独立 (可不同)",
+    "final_grade_source='ai_accepted' 时必有 ai_judge_verdict === grade",
+    "AI 判完成不代表 grade 落库 · 唯一触发点是 POST /api/review/nodes/{nid}/grade · 禁 judge API 直接落 grade (A.1 学生主体性铁律)",
+    "user_answer_image_key 非 null 时必有 ai_judge_* 5 列同时非 null (事务边界)",
+    "学生 tap 「采纳建议」CTA 与底部 grade 按钮 tap 等价 · 都落 final_grade_source='ai_accepted'"
+  ],
+  "work_log_dir_pattern": "audits/runs/<task_id_short>/<team>/attempt-<N>/",
+  "log_requirements_template": {
+    "coder": ["coder.md", "bugs-found.md"],
+    "tester": ["tester.md", "adversarial.md", "test-reports/"]
+  },
+  "audit_gate": "harness/audit.js 5 维度全过才真 PASS · 任一不过 REDO · audit_retries ≥ 3 触发熔断",
+  "id_convention": {
+    "long": "SC-${N}-T${MM} (spec / git branch / commit)",
+    "short": "SC${N}-T${MM} (.harness/inflight/ + audits/runs/)",
+    "pascal": "T${MM}${PurposeShort} (E2EIT.java 类名)"
+  },
+  "total_tasks": 6,
+  "tasks": [
+    {
+      "task_id": "SC-20-T01",
+      "task_id_short": "SC20-T01",
+      "task_id_pascal": "T01DbMigrationAiJudge",
+      "task_title": "DB migration V20260516_03 · wb_review_node 加 6 列 + 2 indexes (AI 判题字段)",
+      "scenario": "TC-20.01 主路径基础设施",
+      "biz_step_range": "biz §2B.20 前置条件 · §4.16 SQL",
+      "page": "(无 · 纯后端 schema)",
+      "page_state_machine": "n/a",
+      "branch": "feature/SC-20-T01-db-migration-ai-judge",
+      "owner_team": "team-2",
+      "biz_refs": [
+        "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §4.16 wb_review_node 加 6 列 + 2 indexes"
+      ],
+      "spec_refs": [
+        "design/system/pages/P08-review-exec-ai-judge.spec.md §4.2 涉及的后端 Entity"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": ["backend/review-plan-service"],
+      "primary_apis": [],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "落 Flyway migration V20260516_03__wb_review_node_add_ai_judge_columns.sql · 含 6 ALTER COLUMN (user_answer_image_key VARCHAR(512) / ai_judge_verdict VARCHAR(16) / ai_judge_confidence DECIMAL(3,2) / ai_judge_reason TEXT / ai_judge_metadata JSONB / final_grade_source VARCHAR(16) NOT NULL DEFAULT 'self') · 字面与 satellite §4.16 一致" },
+        { "id": "AC2", "text": "创建 2 indexes: idx_wrn_judge_source (partial · final_grade_source!='self') + idx_wrn_low_confidence (partial · ai_judge_confidence<0.5)" },
+        { "id": "AC3", "text": "向后兼容: 所有现存 wb_review_node 行 final_grade_source 默认 'self' · 其他 5 列 NULL · master sibling SC-01/02/03/04 流程 100% 不受影响" },
+        { "id": "AC4", "text": "在 PostgreSQL test 容器跑通 migration · `SELECT column_name FROM information_schema.columns WHERE table_name='wb_review_node'` 返回 6 新列" }
+      ],
+      "test_invariants": [
+        "TI1: migration 幂等 · 重跑不抛错 (Flyway checksum 校验通过)",
+        "TI2: 加列不锁表 (PostgreSQL ALTER ADD COLUMN with default 是 metadata-only 操作)",
+        "TI3: 2 partial index 创建后 EXPLAIN 命中"
+      ],
+      "key_invariants": [
+        "schema migration 不破坏 master sibling 任何现有行为 (满足 satellite §1.4 A.3 优雅降级宪法)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "(无 · 纯后端 task)",
+        "backend_e2e_it": "backend/review-plan-service/src/test/java/.../T01DbMigrationAiJudgeE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC20-T01/team-2/attempt-1/"
+    },
+    {
+      "task_id": "SC-20-T02",
+      "task_id_short": "SC20-T02",
+      "task_id_pascal": "T02AnswerJudgeService",
+      "task_title": "AnswerJudgeService + POST /api/review/nodes/{nid}/judge · 复用 ChatModel + §6.2 prompt + §6.4 阈值过滤",
+      "scenario": "TC-20.01 主路径 · 内嵌 TC-22.01 (low_confidence) / TC-22.02 (timeout)",
+      "biz_step_range": "biz §2B.20 步 4-5 · §6.1-6.4 全段 · §10.17",
+      "page": "(后端 · P08 调)",
+      "page_state_machine": "JUDGING → JUDGED_DONE / JUDGE_FAILED",
+      "branch": "feature/SC-20-T02-answer-judge-service",
+      "owner_team": "team-2",
+      "biz_refs": [
+        "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §6.1 模型选择",
+        "biz §6.2 Judge Prompt 模板 + JSON Schema",
+        "biz §6.3 同步 REST 设计决策",
+        "biz §6.4 阈值 SLA + 配置 yml",
+        "biz §10.17 POST :judge 字符级",
+        "biz §2B.20 步 5 (Sonnet ≤ 8s)"
+      ],
+      "spec_refs": [
+        "design/system/pages/P08-review-exec-ai-judge.spec.md §5 API 触点 #1 (新)"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": ["backend/ai-analysis-service", "backend/review-plan-service"],
+      "primary_apis": ["POST /api/review/nodes/{nid}/judge"],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "新建 AnswerJudgeService (Spring Service · 复用 master §15.1 Spring AI ChatModel · 配 application.yml `wrongbook.ai-judge.provider=anthropic` 主 · `fallback=openai` 备 · Resilience4j circuit breaker 主连失 5 次或 P95>8s 触发切换)" },
+        { "id": "AC2", "text": "Judge Prompt 严格按 satellite §6.2 字面写入 system prompt (固定 · 锁字面) + user prompt (per-call 动态拼装) + Spring AI StructuredOutputConverter 配 satellite §6.2 JSON Schema · response 不符 schema 时回退 status='LOW_CONFIDENCE'" },
+        { "id": "AC3", "text": "新 JudgeController POST /api/review/nodes/{nid}/judge · 接受 X-User-Id + X-Idempotency-Key + body {user_answer_image_key} · 验证 image_key 属本学生 (校验 OSS metadata) · 调 AnswerJudgeService · 落 5 列到 wb_review_node (verdict/confidence/reason/metadata/image_key) · 返 200 {verdict, confidence, reason, status, matched_steps?, missed_steps?}" },
+        { "id": "AC4", "text": "实现 §6.4 阈值过滤: confidence≥0.75 status='DONE' · 0.5-0.75 status='DONE' + ai_judge_metadata.flagged=true · <0.5 status='LOW_CONFIDENCE' · 双模型超时 18s 返 503 AI_SERVICE_UNAVAILABLE + status='TIMEOUT' (内嵌 TC-22.01-02 覆盖)" },
+        { "id": "AC5", "text": "幂等键约束: 同 X-Idempotency-Key + 同 nid 5 min 内重放返同 response (Redis cache · 防多 tap)" },
+        { "id": "AC6", "text": "错误码: 404 NODE_NOT_FOUND (nid 不存在/CANCELLED) · 409 NODE_ALREADY_GRADED · 422 IMAGE_KEY_INVALID · 503 AI_SERVICE_UNAVAILABLE (必在 18s 内返)" }
+      ],
+      "test_invariants": [
+        "TI1: idempotency · 同 key 5 min 内重放 0 二次 ChatModel 调用 (验证 token 不重复扣)",
+        "TI2: prompt 字面与 satellite §6.2 完全一致 (校验逻辑: 从 yml 模板 load + diff)",
+        "TI3: confidence 落 DECIMAL(3,2) 精度 (不丢小数)",
+        "TI4: 双模型熔断顺序 · 主 8s 内必切备 (Resilience4j metric 验证)"
+      ],
+      "key_invariants": [
+        "AI 判完成不允许直接调 :grade 落库 (A.1 学生主体性铁律 · 见 satellite §6.4 禁止行为 #4)",
+        "user_answer_image_key 非 null 时 ai_judge_* 5 列同时非 null (事务边界)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "(无 · 后端 task)",
+        "backend_e2e_it": "backend/ai-analysis-service/src/test/java/.../T02AnswerJudgeServiceE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC20-T02/team-2/attempt-1/"
+    },
+    {
+      "task_id": "SC-20-T03",
+      "task_id_short": "SC20-T03",
+      "task_id_pascal": "T03GradeResultAiFields",
+      "task_title": "改 POST :grade 加 final_grade_source + 改 GET :result 加 aiJudge (向后兼容)",
+      "scenario": "TC-20.01 主路径 · 内嵌 TC-20.02 (向后兼容 self 默认)",
+      "biz_step_range": "biz §2B.20 步 6 · §10.18 §10.19",
+      "page": "P08",
+      "page_state_machine": "JUDGED_DONE → GRADED",
+      "branch": "feature/SC-20-T03-grade-result-ai-fields",
+      "owner_team": "team-2",
+      "biz_refs": [
+        "biz §10.18 改 :grade 加 final_grade_source 字段",
+        "biz §10.19 改 :result resp 加 aiJudge 字段",
+        "biz §2B.20 步 6 (POST :grade body{grade, timeSpentMs, final_grade_source:'ai_accepted'})"
+      ],
+      "spec_refs": [
+        "design/system/pages/P08-review-exec-ai-judge.spec.md §5 #2 #3"
+      ],
+      "phase_0_audit_refs": [
+        "audits/SC-01-PHASE-0/A05-review-plan.md §2.1 #6 (master grade 接口现状)"
+      ],
+      "primary_services": ["backend/review-plan-service"],
+      "primary_apis": ["POST /api/review/nodes/{nid}/grade", "GET /api/review/nodes/{nid}/result"],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "改 GradeReq DTO 加 final_grade_source: 'self'|'ai_accepted'|'ai_overridden' (缺省 'self' · 旧客户端无感知)" },
+        { "id": "AC2", "text": "GradeController POST :grade 落 final_grade_source 列到 wb_review_node · master sibling SM-2 ease/interval/重排逻辑 100% 不变 (复用 master §7)" },
+        { "id": "AC3", "text": "改 NodeResultResp DTO 加 aiJudge 字段 (含 verdict/confidence/reason/status/matched_steps?/missed_steps?/final_grade_source) · null = AI 未判 (向后兼容 P09 旧逻辑)" },
+        { "id": "AC4", "text": "GET :result 返时从 wb_review_node 6 新列拼装 aiJudge 对象 · 5 列任一为 null 时返 aiJudge=null" },
+        { "id": "AC5", "text": "应用层 CHECK: final_grade_source='ai_accepted' 时必有 ai_judge_verdict === grade (违反返 422 GRADE_SOURCE_MISMATCH) · 'ai_overridden' 时必有 ai_judge_verdict != grade · 'self' 时不校验" }
+      ],
+      "test_invariants": [
+        "TI1: 旧客户端不传 final_grade_source · 落 'self' · master sibling SC-01/02/03/04 流程 100% 一致 (向后兼容硬性)",
+        "TI2: ai_accepted CHECK 违反返 422 非 500",
+        "TI3: GET :result 旧客户端忽略 aiJudge 字段不崩 (JSON 兼容)"
+      ],
+      "key_invariants": [
+        "改 grade 接口不破坏 master §7 艾宾浩斯 SM-2 任何分支",
+        "final_grade_source 字段是 AI 判溯源唯一证据 (满足 A.2 双信源溯源宪法)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "(无 · 后端 task)",
+        "backend_e2e_it": "backend/review-plan-service/src/test/java/.../T03GradeResultAiFieldsE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC20-T03/team-2/attempt-1/"
+    },
+    {
+      "task_id": "SC-20-T04",
+      "task_id_short": "SC20-T04",
+      "task_id_pascal": "T04P08PhotoTabUpload",
+      "task_title": "P08 加第 4 input tab (photo) + UploadedAnswerThumb + OSS upload (复用 master §10.1 presign)",
+      "scenario": "TC-20.01 主路径 · 内嵌 TC-20.03 (OSS upload 失败)",
+      "biz_step_range": "biz §2B.20 步 1-3",
+      "page": "P08",
+      "page_state_machine": "ANSWERING → (sub-state: photo.UPLOADED)",
+      "branch": "feature/SC-20-T04-p08-photo-tab-upload",
+      "owner_team": "team-1",
+      "biz_refs": [
+        "biz §2A.4 P08 差量卡 [核心组件] PhotoAnswerTab + UploadedAnswerThumb",
+        "biz §2B.20 步 1-3 (切 photo tab → 拍照 → OSS upload)",
+        "biz §0.2 增量摘要表 (新 UI 组件)"
+      ],
+      "spec_refs": [
+        "design/system/pages/P08-review-exec-ai-judge.spec.md §3 核心组件 + §4.1 state shape (answerDraft.mode 加 'photo')",
+        "design/mockups/wrongbook/20_review_exec_ai_judge.html L243-L302 (photo-thumb + tools)"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": ["frontend/apps/mp/src/pages/review-exec", "frontend/packages/ui-kit", "frontend/packages/api-contracts"],
+      "primary_apis": ["POST /api/file/presign (复用 master §10.1)", "PUT {oss-url} (OSS 直传)"],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "frontend/packages/testids/src/index.ts 加 namespace TEST_IDS.p08AiJudge.* (10 个: photoThumb/inputTabPhoto/uploadBadge/photoMeta · 4 必加 + 6 复用其他 task)" },
+        { "id": "AC2", "text": "扩展 <AnswerArea> 组件 mode prop 加第 4 值 'photo' · 加 <PhotoAnswerTab> 子组件 (active 时蓝色高亮 prime class 与 mockup L295 一致)" },
+        { "id": "AC3", "text": "新建 <UploadedAnswerThumb> 组件 (frontend/packages/ui-kit) · 接 {imageKey, sizeBytes, capturedAt} props · 120px 高 · 显示已上传 badge (绿色) + 元数据 (e.g. 487 KB · 9:41:23) · 视觉与 mockup L243-L271 一致" },
+        { "id": "AC4", "text": "拍照后调 master §10.1 POST /api/file/presign 取 OSS upload URL · PUT 直传 · 成功后落 userAnswerImageKey 到 page state · 触发自动调 POST :judge (T02 接口)" },
+        { "id": "AC5", "text": "(TC-20.03) OSS upload 失败时: toast '上传失败 · 请重试' (i18n exec.photo.uploadFailed) · 自动切回 handwrite tab · 0 wb_review_node 字段被改 · 学生可重试或走自评" }
+      ],
+      "test_invariants": [
+        "TI1: input tab 切回 handwrite/keyboard/formula 时 userAnswerImageKey 不清 (允许学生切回 photo 不重传)",
+        "TI2: photo tab active 状态下 i18n key exec.answer.photo 渲染 '拍照' (zh) / 'Photo' (en)",
+        "TI3: UploadedAnswerThumb 渲染 ≤ 100ms (P95 · 含 OSS presign URL 解析)",
+        "TI4: VRT 4 态 screenshot: photo tab inactive / active+empty / uploading 50% / uploaded"
+      ],
+      "key_invariants": [
+        "OSS upload 复用 master §10.1 presign 通道 · 不新建独立认证 (满足 satellite §10 复用说明)",
+        "photo input tab 与现有 3 mode tab 并列 · 不替换 (master sibling 流 100% 保留)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/mp/tests/e2e/sc-20/t04-p08-photo-tab-upload.spec.ts",
+        "backend_e2e_it": "(无 · OSS upload 复用 master file-service 测试)"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC20-T04/team-1/attempt-1/"
+    },
+    {
+      "task_id": "SC-20-T05",
+      "task_id_short": "SC20-T05",
+      "task_id_pascal": "T05AiJudgeBannerComponents",
+      "task_title": "<AiJudgeBanner> + 4 配套 (AiFlag/AiMetaChip/AiHintRibbon) + GradeButtons preselected prop",
+      "scenario": "TC-20.01 主路径 step 5-6 banner 渲染 + 学生采纳",
+      "biz_step_range": "biz §2B.20 步 5-6",
+      "page": "P08",
+      "page_state_machine": "JUDGED_DONE 渲染 banner · tap CTA → GRADED",
+      "branch": "feature/SC-20-T05-ai-judge-banner-components",
+      "owner_team": "team-1",
+      "biz_refs": [
+        "biz §2A.4 P08 差量卡 [核心组件] AiJudgeBanner + AiFlag + AiMetaChip + AiHintRibbon",
+        "biz §2B.20 步 5 (banner 渲染 verdict/confidence/reason/CTA · 自评 PARTIAL 按钮预选高亮)",
+        "biz §2B.20 步 6 (tap 采纳 = tap PARTIAL 等价)",
+        "biz §1.4 A.1 学生主体性 (CTA tap → :grade body{final_grade_source:'ai_accepted'})"
+      ],
+      "spec_refs": [
+        "design/system/pages/P08-review-exec-ai-judge.spec.md §3 核心组件 (7 新组件)",
+        "design/mockups/wrongbook/20_review_exec_ai_judge.html L322-L385 (aijb 容器 + 5 子区)"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": ["frontend/apps/mp/src/pages/review-exec", "frontend/packages/ui-kit", "frontend/packages/i18n"],
+      "primary_apis": ["POST /api/review/nodes/{nid}/grade (调时带 final_grade_source='ai_accepted')"],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "新建 <AiJudgeBanner> 组件 (frontend/packages/ui-kit) · 接 {verdict, confidence, reason, matchedSteps, missedSteps, status, modelUsed, latencyMs, onAccept, onOverride} props · 视觉与 mockup L322-L385 一致 (紫色 linear-gradient + radial blur 装饰 + 5 子区: head/verdict/reason/steps/actions)" },
+        { "id": "AC2", "text": "新建 4 配套组件: <AiFlag> (nav center 紫色 chip · L189) · <AiMetaChip> (metarow 第 4 chip · L220) · <AiHintRibbon> (rating 上方紫色 hint · L401-L404) · <AiJudgeEmpty> (默认 hidden · 失败/超时退化态)" },
+        { "id": "AC3", "text": "扩展 <GradeButtons> 加 preselected prop ('MASTERED'|'PARTIAL'|'FORGOT'|null) · preselected 对应按钮渲染双 border + box-shadow + <AiMark> 角标 (mockup L156-L160 + L417)" },
+        { "id": "AC4", "text": "P08 page state 加 aiJudge object + finalGradeSource · JUDGED_DONE 时 banner 渲染 + GradeButtons preselected=aiJudge.verdict · 学生 tap 采纳 CTA 或对应自评按钮等价 (都调 POST :grade body{final_grade_source: computeSource(grade, aiJudge)})" },
+        { "id": "AC5", "text": "i18n 加 14 key (exec.flag.aiJudged / exec.chip.aiConfidence / exec.judge.thinking / exec.judge.verdict.{mastered,partial,forgot} / exec.judge.cta.accept / exec.judge.cta.override / exec.judge.lowConfidence / exec.judge.timeout / exec.judge.serviceUnavailable / exec.rating.aiHint + 4 photo 相关复用 T04)" },
+        { "id": "AC6", "text": "埋点: wb_judge_ai_done{nid, verdict, confidence, ms, model_used} 在 banner 渲染时上报 · wb_judge_user_accept{nid, ai_verdict} 在 tap CTA/对应按钮时上报" }
+      ],
+      "test_invariants": [
+        "TI1: tap CTA 与 tap 对应自评按钮调相同 :grade 请求 (body 字面 diff = 0 · idempotency_key 一致)",
+        "TI2: preselected 视觉 ring 必须满足色盲友好 (aria-label '当前选择: PARTIAL · AI 建议' · 不仅靠颜色)",
+        "TI3: VRT 4 态: confidence=0.95 (双层 ring 强烈) / 0.55 (普通 ring) / null (无预选) / status='LOW_CONFIDENCE' (banner 退化)",
+        "TI4: banner 渲染 ≤ 150ms P95 (从 :judge 200 到完整可见 · 含 5 子区)"
+      ],
+      "key_invariants": [
+        "tap accept CTA = tap 对应自评按钮 (满足 satellite §2B.20 关键断言)",
+        "preselected ring 不允许误导学生 (色盲友好 + 明确 aria-label · A.1 学生主体性)"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/mp/tests/e2e/sc-20/t05-ai-judge-banner-components.spec.ts",
+        "backend_e2e_it": "(无)"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC20-T05/team-1/attempt-1/"
+    },
+    {
+      "task_id": "SC-20-T06",
+      "task_id_short": "SC20-T06",
+      "task_id_pascal": "T06Sc20E2EHappyPath",
+      "task_title": "E2E spec sc-20 happy path (TC-20.01) + 向后兼容 (TC-20.02) + OSS 失败 (TC-20.03)",
+      "scenario": "TC-20.01 + TC-20.02 + TC-20.03 全覆盖",
+      "biz_step_range": "biz §2B.20 步 1-7 (全流程)",
+      "page": "P08",
+      "page_state_machine": "READING → ANSWERING → REVEALED → JUDGING → JUDGED_DONE → GRADED",
+      "branch": "feature/SC-20-T06-e2e-happy-path",
+      "owner_team": "team-1",
+      "biz_refs": [
+        "biz §2B.20 全 7 步编排 + 关键断言点 6 条",
+        "biz §2B.20 TC-20.01 (happy) · TC-20.02 (向后兼容) · TC-20.03 (OSS 失败)"
+      ],
+      "spec_refs": [
+        "design/system/pages/P08-review-exec-ai-judge.spec.md §10 验收点 (TC-20.01-03 行)"
+      ],
+      "phase_0_audit_refs": [],
+      "primary_services": ["frontend/apps/mp", "backend/review-plan-service", "backend/ai-analysis-service"],
+      "primary_apis": [
+        "POST /api/file/presign",
+        "PUT {oss-url}",
+        "POST /api/review/nodes/{nid}/judge",
+        "POST /api/review/nodes/{nid}/grade",
+        "GET /api/review/nodes/{nid}/result"
+      ],
+      "acceptance_criteria": [
+        { "id": "AC1", "text": "(TC-20.01) E2E 拍照→AI→采纳 happy path: 学生在 P08 nid=500 REVEALED → 切 photo tab → mock 拍照 → upload OSS → :judge 返 PARTIAL 75% → banner 渲染 + PARTIAL 预选 → tap 「采纳建议」 → :grade body{grade:'PARTIAL', final_grade_source:'ai_accepted'} → DB 落 ai_judge_* 5 列 + final_grade_source='ai_accepted' + master §7 SM-2 PARTIAL 执行 (ease-0.2) → 跳 P09 ≤ 15s 总时长" },
+        { "id": "AC2", "text": "(TC-20.02 向后兼容) 学生选 handwrite mode (不拍照) → 揭示后直接 tap PARTIAL → :grade body{grade:'PARTIAL'} (不带 final_grade_source) → 后端 default 'self' · DB: ai_judge_*=null, final_grade_source='self' · 与 master sibling 现状 100% 一致" },
+        { "id": "AC3", "text": "(TC-20.03 OSS 失败) mock OSS PUT 500 → toast '上传失败 · 请重试' · 自动切回 handwrite tab · 0 wb_review_node 字段被改 · 学生可重试 (重试成功后继续 happy path)" },
+        { "id": "AC4", "text": "system_invariants 6 条全断言 (event-by-event grep DB + outbox + log)" }
+      ],
+      "test_invariants": [
+        "TI1: idempotency · 学生重复 tap 「采纳建议」5 次 = 1 个 :grade 请求 (X-Idempotency-Key 一致)",
+        "TI2: 视觉 VRT P08 完整态 screenshot · 与 mockup 20_review_exec_ai_judge.html 像素级 diff < 2%",
+        "TI3: banner 渲染时序: :judge resp 收到 → 150ms 内完整可见 (含 fade-in 动画)",
+        "TI4: master sibling t10/t11/t12 (master P08 E2E) 不受本 satellite 影响 · 并行跑通"
+      ],
+      "key_invariants": [
+        "AI 判完成不代表 grade 落库 (验证: tap 采纳前查 DB wb_review_node.status = ACTIVE · tap 后才 GRADED)",
+        "向后兼容铁律 (TC-20.02): 旧客户端无感知 · master sibling 流 100% 不受影响"
+      ],
+      "physical_verification": {
+        "frontend_e2e": "frontend/apps/mp/tests/e2e/sc-20/t06-e2e-happy-path.spec.ts",
+        "backend_e2e_it": "backend/review-plan-service/src/test/java/.../T06Sc20E2EHappyPathE2EIT.java"
+      },
+      "dev_done": false,
+      "passes": false,
+      "retries": 0,
+      "audit_retries": 0,
+      "git_commits": [],
+      "current_status": "NOT_STARTED",
+      "work_log_dir": "audits/runs/SC20-T06/team-1/attempt-1/"
+    }
+  ]
+}

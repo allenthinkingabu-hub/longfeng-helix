@@ -436,3 +436,9 @@ page {
   border-radius: 999rpx;
 }
 
+/* ALL_DONE 态 CTA · 绿色调 · 与 hero 蓝色调 + 庆祝 banner 绿色调统一 */
+.cta--done {
+  background: linear-gradient(180deg, #5FD480, #34C759);
+  box-shadow: 0 32rpx 68rpx rgba(52,199,89,0.32), 0 8rpx 24rpx rgba(52,199,89,0.22);
+}
+

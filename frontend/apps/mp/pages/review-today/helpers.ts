@@ -32,6 +32,11 @@ export interface ItemData {
 
 // ─── Pure helpers ───────────────────────────────────────────────
 
+// "今日已 grade" 判定的源 · 抽到 src/utils/today.ts 让 P07 + P-HOME 共享 ·
+// 保证两页 "已完成" / progress / 角标 口径永远一致 · re-export 让现有 import 不破.
+import { isCompletedToday } from '../../src/utils/today';
+export { isCompletedToday };
+
 export function buildCountdown(diffMin: number): { state: 'now' | 'soon' | 'wait'; label: string } {
   if (diffMin <= 15) {
     return { state: 'now', label: `${Math.max(0, diffMin)} 分钟` };
@@ -110,18 +115,17 @@ export function buildSlotsFromItems(items: ReviewPlanDto[], now: Date, sortMode:
     const color = SUBJECT_COLOR_MAP[subjectKey] || 'blue';
     const stem = (item.stem && item.stem.trim()) || '题干暂未识别 · OCR 待补';
 
-    // Progress 与 hero 计数同口径 (index.ts: doneCount/waitCount/inProgressCount)
+    // Progress · "今日已 grade" 才算 done · 不是"曾经 grade 过".
+    // review_plan cyclic 模型: 昨晚 grade 留下 completedAt=昨晚 + next_due_at=今晚 ·
+    // 今天看到这一条 → 该是 "未开始" (今天还没 grade), 不是 "已完成" (昨晚那次).
     let progress: 'done' | 'inprogress' | 'wait';
     let progressLabel: string;
-    if (item.mastered) {
+    if (isCompletedToday(item.completedAt, now)) {
       progress = 'done';
       progressLabel = '已完成';
-    } else if (!item.completedAt) {
+    } else {
       progress = 'wait';
       progressLabel = '未开始';
-    } else {
-      progress = 'inprogress';
-      progressLabel = '进行中';
     }
 
     const itemData: ItemData = {

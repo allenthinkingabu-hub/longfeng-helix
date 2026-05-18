@@ -5,7 +5,7 @@
 
 import { TEST_IDS } from '@longfeng/testids';
 import { getToday, createSession } from '../../src/api/review';
-import { buildSlotsFromItems } from './helpers';
+import { buildSlotsFromItems, isCompletedToday } from './helpers';
 import type { SlotData } from './helpers';
 
 // ─── Types ──────────────────────────────────────────────────────
@@ -83,10 +83,15 @@ Page({
 
       const now = new Date();
       const builtSlots = buildSlotsFromItems(items, now, this.data.sortMode);
-      const completed = items.filter(i => i.mastered);
-      const doneCount = completed.length;
-      const waitCount = items.filter(i => !i.mastered && !i.completedAt).length;
-      const inProgressCount = total - doneCount - waitCount;
+      // doneCount = "今日已 grade" (= completedAt 落在今日窗口) ·
+      // 不再用 completedAt != null (因为 review_plan cyclic · 昨晚 grade 的今晚再次到期时
+      // completedAt 仍是昨晚 · 那条今天还没做过 · 应算 wait 而非 done).
+      // 业务真相: 昨晚 grade → completedAt=昨晚 + next_due_at 推到今晚 →
+      //          今天打开 P07 看到 → "未开始" (今晚还没做) → 今晚做完后 → "已完成".
+      const doneCount = items.filter(i => isCompletedToday(i.completedAt, now)).length;
+      const waitCount = total - doneCount;
+      // 进行中 = OPEN 未 grade · BE 现实不返该状态 → 永远 0 · 保留 hero label 占位
+      const inProgressCount = 0;
       const progressPct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
 
       // P07-A · masteryPct 直接用 BE 返值 (spec L98 · ease_factor 聚合).
@@ -123,6 +128,12 @@ Page({
 
   onBackTap() {
     wx.navigateBack();
+  },
+
+  // P07 ALL_DONE 态 CTA · spec §6 状态机 ALL_DONE → 跳 P-HOME ·
+  // P07 是 tabBar 页 · 不能 navigateBack · 用 switchTab.
+  onBackHome() {
+    wx.switchTab({ url: '/pages/home/index' });
   },
 
   // P07-D · 右上 "排序 · {mode}" tap · ActionSheet 3 选项

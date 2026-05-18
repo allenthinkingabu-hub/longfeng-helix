@@ -32,9 +32,17 @@
         <text>{{dateStr}} · {{weekday}} · GMT+8</text>
       </view>
 
+      <!-- hero h2 · LIST 显 "N 题待复习" · ALL_DONE 显 "今日复习已完成 🎉"
+           文案借 P09 spec L48 跨页统一 · spec P07 L193 "Hero 切换庆祝升级态" -->
       <view class="hero-h2">
-        <text class="hero-total" data-test-id="today-review-card-total">{{totalCount}} 题待复习</text>
-        <text class="hero-sz" data-test-id="today-review-card-est-min">预计 {{estMinutes}} 分钟</text>
+        <block wx:if="{{pageState === 'today.ALL_DONE'}}">
+          <text class="hero-total" data-test-id="today-review-card-total">今日复习已完成 🎉</text>
+          <text class="hero-sz" data-test-id="today-review-card-est-min">共 {{totalCount}} 题</text>
+        </block>
+        <block wx:else>
+          <text class="hero-total" data-test-id="today-review-card-total">{{totalCount}} 题待复习</text>
+          <text class="hero-sz" data-test-id="today-review-card-est-min">预计 {{estMinutes}} 分钟</text>
+        </block>
       </view>
 
       <view class="stats-row">
@@ -67,8 +75,8 @@
       <text class="empty-sub">还没有待复习的题目</text>
     </view>
 
-    <!-- ── Slot groups (仅 LIST 态 · 否则 EMPTY/ALL_DONE 会和 mock cards 同屏渲染) ── -->
-    <block wx:if="{{pageState === 'today.LIST'}}" wx:for="{{slots}}" wx:key="key">
+    <!-- ── Slot groups (LIST + ALL_DONE 都渲染 · 之前仅 LIST · ALL_DONE 态卡片消失变白屏) -->
+    <block wx:if="{{pageState === 'today.LIST' || pageState === 'today.ALL_DONE'}}" wx:for="{{slots}}" wx:key="key">
       <view class="slot">
         <view class="slot-icon {{item.iconClass}}">
           <van-icon wx:if="{{item.key === 'now'}}" name="clock-o" size="12px" />
@@ -111,11 +119,18 @@
     <view style="height: 140rpx;"></view>
   </scroll-view>
 
-  <!-- ── Floating CTA ────────────────────────────── -->
-  <view wx:if="{{pageState !== 'today.EMPTY' && pageState !== 'today.ALL_DONE'}}" class="cta" bind:tap="onStartAllTap" data-test-id="p07-bottom-cta-start-all-btn">
+  <!-- ── Floating CTA · LIST 态 · 全部开始 ── -->
+  <view wx:if="{{pageState === 'today.LIST'}}" class="cta" bind:tap="onStartAllTap" data-test-id="p07-bottom-cta-start-all-btn">
     <van-icon name="play" color="#fff" size="20px" />
     <text>全部开始</text>
     <text class="cta-sz">{{totalCount}} 题 · {{estMinutes}} min</text>
+  </view>
+
+  <!-- ── ALL_DONE CTA · 跳回首页 (spec §6 状态机 ALL_DONE → 跳 P-HOME) ── -->
+  <view wx:if="{{pageState === 'today.ALL_DONE'}}" class="cta cta--done" bind:tap="onBackHome" data-test-id="p07-all-done-cta">
+    <van-icon name="success" color="#fff" size="20px" />
+    <text>回到首页</text>
+    <text class="cta-sz">今日全部完成</text>
   </view>
 
 </view>
