@@ -175,7 +175,7 @@
       <!-- ── Week schedule ───────────────────────────── -->
       <view class="sec">
         <text class="sec-t">本周日程</text>
-        <text class="sec-m">月视图 ›</text>
+        <text class="sec-m" bind:tap="onMonthViewTap">月视图 ›</text>
       </view>
       <view class="weekcard" data-test-id="week-strip">
         <view class="wc-head">

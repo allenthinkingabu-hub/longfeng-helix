@@ -265,4 +265,22 @@ Page({
       wx.navigateTo({ url });
     }
   },
+
+  /**
+   * 2026-05-18 · 「月视图 ›」tap handler
+   * spec P-HOME §7 出口表 (L241): 「月视图 ›」→ P10 calendar-month (`pages/calendar/month`).
+   * biz §2A.3 L234 + §2B.6 步 2: 进 P10 触发 home_open_full_calendar{from=weekstrip}.
+   *
+   * 现状 RC: P10 spec + mockup (10_calendar_month.html) 已就绪 · MP 端 pages/calendar/month
+   * 尚未实装 (app.json 无注册 · 目录不存在) · 故先给 tap 真反馈 + 埋点占位 ·
+   * 避免 wxml line 178 静默 "<text class='sec-m'>月视图 ›</text>" 点击无响应误导用户.
+   * 完整 P10 实装应单开 task (新增 wxml/wxss/ts + 月历 42 格 + 后端 /api/calendar/events?month=).
+   */
+  onMonthViewTap() {
+    wx.showToast({
+      title: '月视图开发中',
+      icon: 'none',
+      duration: 1800,
+    });
+  },
 });
