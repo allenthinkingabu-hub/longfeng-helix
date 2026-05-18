@@ -105,6 +105,6 @@ $ pnpm vitest run --config test/vitest.config.ts test/e2e/mp-shared/shared.spec.
 - ✓ tester.md 落盘 (本文)
 - ✓ adversarial.md 落盘 (见同目录)
 - ✓ test-reports/ 非空 (share-junit.xml 9 testcase + share-vitest.log + e2e-attempt.log)
-- ✓ mock_total ≤ 5: tester.md + adversarial.md + test-reports/ 全扫 · vi.mock / page.route / jest.mock / wx.cloud.mock / mockRequest / miniprogram-simulate / MockMvc / wx.request.mock 计数 = 0 (用 globalThis.fetch swap 不计入)
+- ✓ mock_total ≤ 5: tester.md + adversarial.md + test-reports/ 全扫 · 8 个 audit-tracked mock pattern (见 `.harness/audit.js` MOCK_PATTERNS) 在本 task 测试代码中计数 = 0 (用 globalThis.fetch swap 不计入)
 - ✓ maxDiffPixels ≤ 500: 不涉及
 - ✓ git_commits 数组含 attempt-1 真 hash (3cbf0e4 + 本 commit)

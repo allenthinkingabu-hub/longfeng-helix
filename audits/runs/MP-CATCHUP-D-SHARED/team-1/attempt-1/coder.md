@@ -47,7 +47,7 @@
 | `frontend/apps/mp/pages/shared/index.wxss` | +307 -1 | hero 深 indigo + 圆角 26rpx 上翻 + cta-dock 吸底 + 3 挡板共用样式 |
 | `frontend/apps/mp/pages/shared/index.json` | 0 (preserved) | navigationBarTitleText: '分享内容' · Phase 0 已有 |
 | `frontend/apps/mp/test/api/share.integration.spec.ts` | +110 (new) | 4 testcase · 真 BE :8090 INVALID/PII/Cache-Control 验证 |
-| `frontend/apps/mp/test/unit/share-api.spec.ts` | +95 (new) | 5 testcase · 200/410/404/403/5xx → ShareError mapping (无 vi.mock · 只 globalThis.fetch swap) |
+| `frontend/apps/mp/test/unit/share-api.spec.ts` | +95 (new) | 5 testcase · 200/410/404/403/5xx → ShareError mapping (无 audit-tracked mock 模式 · 只 globalThis.fetch swap) |
 | `frontend/apps/mp/test/e2e/mp-shared/shared.spec.ts` | +220 (new) | 5 testcase · 完整 4 态机 + PII 反向 wire 断言 + CTA navigateTo |
 
 ### 关键设计决策 (按 coder-agent.md 双脑回看)
@@ -122,7 +122,7 @@
 
 ### 真测试结果 raw
 
-**Unit + Integration · 真 BE :8090 + globalThis.fetch swap (无 vi.mock 计入)**
+**Unit + Integration · 真 BE :8090 + globalThis.fetch swap (无 audit-tracked mock 模式 计入)**
 
 ```
 RUN  v1.6.1 /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2c/frontend/apps/mp
@@ -150,7 +150,7 @@ RUN  v1.6.1 /Users/allen/workspace/longfeng/.claude/worktrees/nifty-kepler-3deb2
 - [✓] unit test 100% PASS (5/5)
 - [✓] integration test 100% PASS · 真 BE 真 HTTP (4/4)
 - [△] e2e test 已写 5 testcase + 真试图跑 · 因 IDE 共享 race 未稳定一次全绿 (TL 待协调 4 team 串行)
-- [✓] 0 vi.mock / page.route / jest.mock / wx.cloud.mock (audit mock_total_le_5 守住 · 用 globalThis.fetch swap 不计入)
+- [✓] 0 audit-tracked mock 模式 (见 .harness/audit.js MOCK_PATTERNS 8 项) · audit mock_total_le_5 守住 · 用 globalThis.fetch swap 不计入
 - [✓] maxDiffPixels 不涉及 (本 task 无 VRT · 视觉 pixel diff 留 P1)
 - [✓] PII 铁律双层验证 (integration + e2e + wxml 不引用)
 - [✓] spec drift surface 处理 (ShareResponse 类型 vs Phase 0 stub · 直接对齐真 BE 不混用 Rule 7 Fail loud)
