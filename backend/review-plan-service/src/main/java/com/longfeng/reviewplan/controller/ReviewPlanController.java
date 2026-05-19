@@ -20,6 +20,7 @@ import com.longfeng.reviewplan.exception.PlanNotFoundException;
 import com.longfeng.reviewplan.repo.ReviewOutcomeRepository;
 import com.longfeng.reviewplan.repo.ReviewPlanRepository;
 import com.longfeng.reviewplan.repo.WbReviewNodeRepository;
+import com.longfeng.reviewplan.service.JudgeOutboxService;
 import com.longfeng.reviewplan.service.NodeLifecycleTracker;
 import com.longfeng.reviewplan.service.ReviewPlanService;
 import com.longfeng.reviewplan.service.ReviewPlanService.CompleteResult;
@@ -68,6 +69,8 @@ public class ReviewPlanController {
     // SC20-T03 · wb_review_node 5 satellite 列读 + final_grade_source 列写
     private final WbReviewNodeRepository wbNodeRepo;
     private final ObjectMapper jsonMapper;
+    // SC21-T01 · RLHF override outbox 写入 (final_grade_source='ai_overridden' 时同事务 INSERT)
+    private final JudgeOutboxService judgeOutboxService;
 
     // SC20-T03 §4.16 · final_grade_source 枚举值 (Round 2 用例 #6 子断言 #a 4 子情况 422 校验)
     private static final Set<String> VALID_FINAL_GRADE_SOURCES =
@@ -81,7 +84,8 @@ public class ReviewPlanController {
             ReviewPlanRepository planRepo,
             ReviewOutcomeRepository outcomeRepo,
             WbReviewNodeRepository wbNodeRepo,
-            ObjectMapper jsonMapper) {
+            ObjectMapper jsonMapper,
+            JudgeOutboxService judgeOutboxService) {
         this.planService = planService;
         this.sessionService = sessionService;
         this.lifecycleTracker = lifecycleTracker;
@@ -89,6 +93,7 @@ public class ReviewPlanController {
         this.outcomeRepo = outcomeRepo;
         this.wbNodeRepo = wbNodeRepo;
         this.jsonMapper = jsonMapper;
+        this.judgeOutboxService = judgeOutboxService;
     }
 
     // =======================================================================
@@ -516,10 +521,24 @@ public class ReviewPlanController {
         // === SC20-T03 落 wb_review_node.final_grade_source 列 (INSERT-only 决策 · 行存在才 UPDATE) ===
         // 决策: wb_review_node-row-not-created · 沿 master §10.5 现役行为 · :grade endpoint 不创建 wb_review_node 行
         // 仅在 wb_review_node 行已存在时 (e.g. SC20-T02 judge 已落 5 satellite 列) · UPDATE final_grade_source 列
-        wbNodeRepo.findById(nid).ifPresent(wbNode -> {
+        Optional<WbReviewNode> updatedWbOpt = wbNodeRepo.findById(nid);
+        updatedWbOpt.ifPresent(wbNode -> {
             wbNode.setFinalGradeSource(finalGradeSource);
             wbNodeRepo.save(wbNode);
         });
+
+        // === SC21-T01 · RLHF override outbox INSERT (同事务 · TI2 grade 抛错时一起回滚) ===
+        // biz §2B.21 步 5 + §12 S5.6.5 · final_grade_source='ai_overridden' 时入 outbox 表
+        // 字段 snapshot 自 wb_review_node 6 satellite 列 (TC-21.03 中间值 PARTIAL 也入 · 任何 ai_verdict != grade)
+        if ("ai_overridden".equals(finalGradeSource) && updatedWbOpt.isPresent()) {
+            WbReviewNode wb = updatedWbOpt.get();
+            judgeOutboxService.enqueueOverride(
+                nid,
+                wb.getAiJudgeVerdict(),
+                grade,
+                wb.getUserAnswerImageKey(),
+                wb.getAiJudgeReason());
+        }
 
         return ApiResult.ok(result);
     }

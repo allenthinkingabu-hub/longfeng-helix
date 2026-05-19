@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "SC21-T01",
+    "team_id": "team-1",
+    "title": "RLHF outbox: wb_judge_outbox 表 + grade 触发 INSERT + 5min @Scheduled relay 投递 ai-judge.overridden topic",
+    "attempt": 1,
+    "phase": "coder",
+    "dev_done": false,
+    "passes": false,
+    "retries": 0,
+    "audit_retries": 0,
+    "git_commits": []
+  },
+  "feature_id": "M-AI-ANSWER-JUDGE",
+  "branch": "feature/M-AI-ANSWER-JUDGE-team-1",
+  "work_log_dir": "audits/runs/SC21-T01/team-1/attempt-1",
+  "log_requirements": {
+    "must_write": ["coder.md", "bugs-found.md"],
+    "coder": ["coder.md", "bugs-found.md"],
+    "tester": ["tester.md", "adversarial.md", "test-reports/"]
+  },
+  "audit_gate": ".harness/audit.js 7 维度全过 (test_cases_alignment 整维跳 because user explicit skip · 2026-05-19)",
+
+  "test_case_first_required": false,
+  "platform_priority": "mp_only",
+  "phase_2_5_skipped_by_user": true,
+  "user_approval_verdict": "SKIP (user 2026-05-19 explicit '不用设计测试用例 · 直接进入交付阶段' · test_case_first_required=false · audit dim_test_cases_alignment 整维跳)",
+
+  "biz_refs": [
+    "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §2B.21 SC-21 步 5 (后台异步 backend 把 (ai_verdict, user_verdict, image_key, reason) 推 RLHF 训练队列 · RocketMQ ai-judge.overridden topic)",
+    "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §2B.21 TC-21.02 (异常: RLHF 队列推送失败 → outbox 加重试标记 + 5 分钟后重试 + 监控告警 ai-judge.outbox.fail)",
+    "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §12 S5.6.5 RLHF 数据 outbox · RocketMQ topic ai-judge.overridden + outbox 表 + 5 分钟重试 (master §11 NFR 一致)",
+    "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §17 决策 #3 override 数据用于 RLHF prompt 优化 · 沿默认 是"
+  ],
+  "spec_refs": [],
+  "primary_services": ["backend/review-plan-service"],
+  "primary_apis": [
+    "POST /api/review/nodes/{nid}/grade (改造 · 同事务追加 wb_judge_outbox INSERT 当 final_grade_source='ai_overridden')"
+  ],
+
+  "acceptance_criteria": [
+    {"id": "AC1", "text": "创建 wb_judge_outbox 表 (V1.0.088 Flyway migration · 字段 id BIGINT PK, nid BIGINT NOT NULL, ai_verdict VARCHAR(16) NOT NULL, user_verdict VARCHAR(16) NOT NULL, image_key VARCHAR(512), reason TEXT, retry_count SMALLINT NOT NULL DEFAULT 0, status VARCHAR(16) NOT NULL DEFAULT 'PENDING' · CHECK in (PENDING,SENT,FAILED), created_at TIMESTAMPTZ NOT NULL DEFAULT now(), last_retry_at TIMESTAMPTZ) · 沿现役 review_plan_outbox pattern · 加索引 idx_wb_judge_outbox_status_created_at"},
+    {"id": "AC2", "text": "ReviewPlanController.gradeNode() 检测 final_grade_source='ai_overridden' 时同事务 INSERT wb_judge_outbox 1 行 (同 @Transactional · grade 抛错时 outbox 回滚 · 不留 zombie) · 不影响 grade 主链 200 OK · master §11 NFR 一致"},
+    {"id": "AC3", "text": "新 JudgeOutboxRelayService @Scheduled(fixedDelayString=${review.judge-outbox.relay-interval-ms:300000}) 每 5min 扫 status='PENDING' AND retry_count<5 行 → 投递 RocketMQ topic ai-judge.overridden (payload JSON {nid, ai_verdict, user_verdict, image_key, reason, ts}) · 成功 status='SENT' · 失败 retry_count++ + last_retry_at=now · 第 5 次失败 'FAILED' + 监控告警"},
+    {"id": "AC4", "text": "监控埋点 Micrometer: gauge wb_judge_outbox_pending_total (扫表时 size) + counter wb_judge_outbox_dispatched_total + counter wb_judge_outbox_fail_total (沿 CalendarOutboxRelayJob 现役 pattern)"},
+    {"id": "AC5", "text": "错误码处理: RocketMQ 不可用时 (RocketMQTemplate 抛 RuntimeException) 不抛 5xx 给 user (grade 200 OK · outbox 表行 retry_count++ · 第 6 次失败 status='FAILED' + alert) · 主 grade 链解耦"}
+  ],
+  "test_invariants": [
+    "TI1: idempotency · 同 nid 同 ai_verdict 同 user_verdict 5min 内不重复 outbox · UNIQUE INDEX (nid, ai_verdict, user_verdict)",
+    "TI2: outbox INSERT 跟 grade DB write 必须同事务 (验证: grade 抛错时 outbox row 也 rollback · 不留 zombie)",
+    "TI3: relay 串行 FIFO by id · 避免乱序"
+  ],
+  "key_invariants": [
+    "改 grade 接口不破坏 SC20-T03 已落地 5 CHECK 块 (向后兼容 · master sibling SC-01/02/03/04 + SC20-T01..T06 IT 全绿 DoD)",
+    "RocketMQ 失败必走 outbox 兜底重试 · 不阻塞用户体验 (master §11 NFR 一致)"
+  ],
+  "physical_verification": {
+    "frontend_e2e": "(无 · 后端 task)",
+    "backend_e2e_it": "backend/review-plan-service/src/test/java/com/longfeng/reviewplan/T01Sc21OverrideOutboxE2EIT.java",
+    "dor_c1_to_c6_required": false
+  },
+
+  "current_status": "NOT_STARTED",
+  "previous_audit_verdict": null,
+  "agent_md_required": {
+    "coder": ".harness/agents/coder-agent.md",
+    "tester": ".harness/agents/test-agent.md",
+    "tl": ".harness/agents/tl-agent.md"
+  },
+  "written_by": "TL agent (M-AI-ANSWER-JUDGE SC21-T01 kickoff · 2026-05-19 · user 显式 skip Phase 0-2.5 · TL+Coder+Tester 单 sub-agent 兼任)"
+}

@@ -45,6 +45,12 @@ review:
   algorithm:
     ease-init: 2.500
     ease-min: 1.300
+  # SC21-T01 · RLHF override outbox relay
+  # 生产部署时打开: review.judge-outbox.enabled=true · review.judge-outbox.dispatcher=rocketmq
+  judge-outbox:
+    enabled: false              # 本地 dev 关 (本任务 IT 直接调 execute() 不依赖 @Scheduled)
+    dispatcher: stub            # rocketmq | stub · 本地 dev 用 stub 防 RocketMQ 真发
+    relay-interval-ms: 300000   # 5 min · biz §12 S5.6.5 一致
 
 app:
   snowflake:
