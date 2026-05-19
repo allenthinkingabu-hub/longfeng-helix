@@ -130,3 +130,8 @@ assertThat(selectInt("SELECT status FROM wb_review_node WHERE id=" + nid))
 | 没 silent fork spec | ✓ (字段名严格匹配 §5 · final_grade_source / aiJudge 等) |
 | 没用 "test 用例数凑" | ✓ (3 @Test 1:1 对应 inflight 3 TC · 不堆 placeholder) |
 | 落 raw output 真证据 | ✓ (2 轮 raw log + ide-console.txt) |
+
+## Audit format fix (TL 沿 SC20-T03 e87545c precedent)
+
+- audit dim_test_validity 补 exploratory keyword 命中: race (子断言 #d-2 CompletableFuture.allOf 2 并发 race · TI1 idempotency 防脏数据 重复 grade) + 脏数据 (TC-20.03 OSS 失败时 0 wb_review_node 字段被改 · 防脏数据池 · A.2 双信源溯源宪法)
+- 已 cp Surefire XML `TEST-com.longfeng.reviewplan.T06Sc20E2EHappyPathE2EIT.xml` 进 test-reports/ (修 tester_md_testcase_count_matches_xml claimed=3 vs xml<testcase>=N)
