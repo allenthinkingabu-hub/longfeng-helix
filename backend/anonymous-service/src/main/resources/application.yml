@@ -98,6 +98,12 @@ anon:
     base-url: http://localhost:8083
     connect-timeout-ms: 2000
     read-timeout-ms: 5000
+  # SC-12-T09 · biz §2A.3.2 + §2B.13 · 游客每日配额. 改这两个值后重启 service 即可
+  # 生效, 不需改代码. 单 Redis bucket: rate:guest:device:* + rate:guest:ip:*.
+  # 生产值: device=1, ip=10. 当前 dev 用 100/1000 方便测试 · 上线前改回.
+  quota:
+    device-limit-per-day: 100
+    ip-limit-per-day: 1000
   # SC-12-T08 · biz §2B.13 F08 · POST /api/anon/claim forwards to wrongbook-service:8082
   # POST /api/wb/questions to create the wb_question row + assign qid for the
   # newly-registered student. Same shared sandbox the registered-user flow uses;

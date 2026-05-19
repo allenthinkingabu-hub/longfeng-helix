@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import com.longfeng.anonymousservice.config.AnonQuotaProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -81,20 +82,21 @@ public class AnonQuotaService {
      */
     public static final ZoneId TZ = ZoneId.of("Asia/Shanghai");
 
-    /** biz §2A.3.2 "单设备单日硬上限 1 次". */
-    public static final long DEVICE_LIMIT_PER_DAY = 1L;
-
-    /** biz §2B.13 "IP bucket 10/day". */
-    public static final long IP_LIMIT_PER_DAY = 10L;
+    /** 兼容: 旧静态常量 · 实际值通过 {@link AnonQuotaProperties} 注入. 不再使用 · 保留
+     *  让外部引用者 (如老脚本) 不立即崩 · 后续 task 可删 · 用 -1L 显式标识 "use injected props". */
+    public static final long DEVICE_LIMIT_PER_DAY = -1L;
+    public static final long IP_LIMIT_PER_DAY = -1L;
 
     /** Redis key prefixes — public for IT assertions (no magic strings in tests). */
     public static final String KEY_DEVICE_PREFIX = "rate:guest:device:";
     public static final String KEY_IP_PREFIX = "rate:guest:ip:";
 
     private final StringRedisTemplate redis;
+    private final AnonQuotaProperties props;
 
-    public AnonQuotaService(StringRedisTemplate redis) {
+    public AnonQuotaService(StringRedisTemplate redis, AnonQuotaProperties props) {
         this.redis = redis;
+        this.props = props;
     }
 
     /**
@@ -119,14 +121,14 @@ public class AnonQuotaService {
             // Device bucket checked first — gives the FE a more actionable
             // 429 code (the user knows it's a per-device limit, not a network
             // limit) when both buckets are exhausted at once.
-            if (deviceCount >= DEVICE_LIMIT_PER_DAY) {
-                LOG.info("quota_exhausted_device deviceFp={} count={} retryAfter={}s",
-                        deviceFp, deviceCount, retryAfterSec);
+            if (deviceCount >= props.getDeviceLimitPerDay()) {
+                LOG.info("quota_exhausted_device deviceFp={} count={} limit={} retryAfter={}s",
+                        deviceFp, deviceCount, props.getDeviceLimitPerDay(), retryAfterSec);
                 return new QuotaCheckResult(QuotaCheckResult.Kind.DEVICE_EXHAUSTED, retryAfterSec);
             }
-            if (ipCount >= IP_LIMIT_PER_DAY) {
-                LOG.info("quota_exhausted_ip ipHash={} count={} retryAfter={}s",
-                        ipHash, ipCount, retryAfterSec);
+            if (ipCount >= props.getIpLimitPerDay()) {
+                LOG.info("quota_exhausted_ip ipHash={} count={} limit={} retryAfter={}s",
+                        ipHash, ipCount, props.getIpLimitPerDay(), retryAfterSec);
                 return new QuotaCheckResult(QuotaCheckResult.Kind.IP_EXHAUSTED, retryAfterSec);
             }
             return new QuotaCheckResult(QuotaCheckResult.Kind.OK, 0L);
