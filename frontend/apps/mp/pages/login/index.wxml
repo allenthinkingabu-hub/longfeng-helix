@@ -4,14 +4,22 @@
   状态机: IDLE → VERIFYING → SUCCESS (跳 /pages/home/index) / FAILED (error-banner)
 -->
 <view class="root" data-test-id="p00-root">
+  <!-- Logo zone · mockup line 39-51 · 92×92 蓝渐变日历 SVG (Playwright 渲染 PNG) -->
   <view class="hero" data-test-id="p00-logo-zone">
-    <view class="logo">日</view>
+    <image
+      class="logo"
+      data-test-id="p00-logo-zone-logo"
+      src="/images/icons/p00-logo.png"
+      mode="aspectFit"
+    ></image>
     <view class="title">日历</view>
-    <view class="subtitle">统一 学习 · 任务 · 提醒 · 备忘</view>
+    <view class="subtitle">统一 <text class="subtitle-em">学习 · 任务 · 提醒 · 备忘</text></view>
   </view>
 
+  <!-- 凭据卡 · mockup line 53-57 · radius 22 + 半透明白 (玻璃质感) + shadow -->
   <view class="card">
     <view class="field {{errorMsg ? 'field-error' : ''}}">
+      <image class="field-icon" src="/images/icons/p00-env.png" mode="aspectFit"></image>
       <input
         class="input phone-input"
         data-test-id="p00-phone-input"
@@ -24,6 +32,7 @@
       />
     </view>
     <view class="field {{errorMsg ? 'field-error' : ''}}">
+      <image class="field-icon" src="/images/icons/p00-lock.png" mode="aspectFit"></image>
       <input
         class="input password-input"
         data-test-id="p00-password-input"
@@ -41,27 +50,32 @@
       data-test-id="p00-error-banner"
       role="alert"
     >{{errorMsg}}</view>
-
-    <button
-      class="login-cta {{loading ? 'is-loading' : ''}}"
-      data-test-id="p00-login-submit-btn"
-      bindtap="onLogin"
-      disabled="{{loading}}"
-    >{{loading ? '登录中…' : '登录'}}</button>
   </view>
+
+  <!-- 主 CTA · mockup line 71-76 · 50px 蓝渐变 + box-shadow -->
+  <button
+    class="login-cta {{loading ? 'is-loading' : ''}}"
+    data-test-id="p00-login-submit-btn"
+    bindtap="onLogin"
+    disabled="{{loading}}"
+  >{{loading ? '登录中…' : '登录'}}</button>
 
   <view class="divider" data-test-id="p00-divider">
     <view class="divider-line"></view>
-    <view class="divider-text">或</view>
+    <view class="divider-text">或使用</view>
     <view class="divider-line"></view>
   </view>
 
+  <!-- 微信按钮 · mockup line 78-79 · 白底 + 微信绿 icon -->
   <button
     class="wechat-cta"
     data-test-id="p00-wechat-cta-btn"
     bindtap="onWechatLogin"
     disabled="{{loading}}"
-  >使用微信一键登录</button>
+  >
+    <image class="wechat-icon" src="/images/icons/p00-wx.png" mode="aspectFit"></image>
+    <text>使用微信登录</text>
+  </button>
 
   <view class="foot" data-test-id="p00-consent-bar">
     <text class="foot-text">登录即表示同意</text>

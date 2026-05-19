@@ -1,147 +1,224 @@
-/* P00 login · MP · 沿 design/mockups/wrongbook/00_login.html 简化版
- * 移动端居中卡片 + 蓝紫主色 (#7B6FE8)
- */
+/* P00 login · 严格按 mockup design/mockups/wrongbook/00_login.html 视觉对齐 (2026-05-19)
+   重写 · 蓝色主题 (mockup --blue:#007AFF / #0A84FF) + glass card + apple HIG 风格
+   rpx scale 2x (mockup 393px → 750rpx) */
+
+page {
+  background:
+    radial-gradient(120% 60% at 50% -10%, #E8F1FF 0%, transparent 60%),
+    linear-gradient(180deg, #FFFFFF 0%, #F7F7FB 100%);
+}
 
 .root {
   min-height: 100vh;
-  padding: 80rpx 48rpx 48rpx;
+  padding: 60rpx 0 100rpx;
   box-sizing: border-box;
-  background: linear-gradient(180deg, #f7f5ff 0%, #ffffff 100%);
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  align-items: center;
+  background:
+    radial-gradient(120% 60% at 50% -10%, #E8F1FF 0%, transparent 60%),
+    linear-gradient(180deg, #FFFFFF 0%, #F7F7FB 100%);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
 }
 
+/* ── Logo zone · mockup line 39-52 ────────────────────────────────────── */
 .hero {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 40rpx;
-  margin-bottom: 56rpx;
+  margin-top: 124rpx;
+  margin-bottom: 60rpx;
 }
 
 .logo {
-  width: 120rpx;
-  height: 120rpx;
-  border-radius: 28rpx;
-  background: linear-gradient(135deg, #7B6FE8, #6155cd);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 56rpx;
-  font-weight: 700;
-  box-shadow: 0 12rpx 32rpx rgba(123, 111, 232, 0.32);
+  width: 184rpx;
+  height: 184rpx;
+  /* PNG 自带渐变底 + 内嵌日历 SVG · radius 通过 image 直接出 (PNG 有 24px ≈ 48rpx) */
 }
 
 .title {
+  margin-top: 44rpx;
   font-size: 56rpx;
   font-weight: 700;
-  color: #1c1c1e;
-  margin-top: 28rpx;
+  color: #000000D9;
+  letter-spacing: -0.8rpx;
 }
 
 .subtitle {
-  font-size: 26rpx;
-  color: #8e8e93;
   margin-top: 12rpx;
+  font-size: 30rpx;
+  font-weight: 400;
+  color: #3C3C4399;
+  letter-spacing: 0;
 }
 
+.subtitle-em {
+  color: #0A84FF;
+  font-weight: 500;
+}
+
+/* ── Credential card · mockup line 53-57 (glass) ──────────────────────── */
 .card {
+  width: 666rpx;
+  margin-top: 60rpx;
+  padding: 28rpx;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1rpx solid rgba(60, 60, 67, 0.08);
+  border-radius: 44rpx;
+  box-shadow:
+    0 2rpx 6rpx rgba(0, 0, 0, 0.04),
+    0 24rpx 80rpx rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
 }
 
+/* ── Field row · mockup line 58-65 ────────────────────────────────────── */
 .field {
-  background: #fff;
-  border: 2rpx solid #e5e5ea;
-  border-radius: 16rpx;
-  padding: 0 32rpx;
-  height: 96rpx;
   display: flex;
   align-items: center;
+  gap: 20rpx;
+  padding: 26rpx 28rpx;
+  background: #F2F2F7;
+  border-radius: 24rpx;
+  margin-bottom: 16rpx;
+  border: 2rpx solid transparent;
   transition: border-color 0.2s ease;
 }
 
 .field-error {
-  border-color: #ff3b30;
+  border-color: #FF3B30;
+  background: rgba(255, 59, 48, 0.06);
+}
+
+.field-icon {
+  width: 36rpx;
+  height: 36rpx;
+  flex: 0 0 36rpx;
 }
 
 .input {
   flex: 1;
-  font-size: 30rpx;
-  color: #1c1c1e;
-  height: 100%;
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #000;
+  letter-spacing: -0.2rpx;
+  height: 48rpx;
+  line-height: 48rpx;
+}
+
+/* placeholder 灰阶 · mockup line 65 */
+.input-placeholder {
+  color: #8E8E9399;
+  font-weight: 400;
 }
 
 .error-banner {
-  background: #ffeceb;
-  color: #d70015;
-  font-size: 26rpx;
+  margin-top: 8rpx;
+  background: rgba(255, 59, 48, 0.08);
+  color: #D70015;
+  font-size: 24rpx;
   padding: 16rpx 24rpx;
-  border-radius: 12rpx;
-  border-left: 6rpx solid #ff3b30;
+  border-radius: 16rpx;
+  border-left: 6rpx solid #FF3B30;
 }
 
+/* ── 主登录 CTA · mockup line 71-76 · 蓝渐变 + shadow ─────────────────── */
 .login-cta {
-  margin-top: 8rpx;
-  height: 96rpx;
-  background: linear-gradient(135deg, #7B6FE8, #6155cd);
+  width: 666rpx;
+  height: 100rpx;
+  margin-top: 28rpx;
+  background: linear-gradient(180deg, #1E94FF 0%, #0A84FF 100%);
   color: #fff;
   font-size: 32rpx;
   font-weight: 600;
-  border-radius: 16rpx;
-  line-height: 96rpx;
-  box-shadow: 0 12rpx 24rpx rgba(123, 111, 232, 0.28);
+  border-radius: 28rpx;
+  line-height: 100rpx;
+  letter-spacing: -0.2rpx;
+  box-shadow:
+    0 20rpx 48rpx -16rpx rgba(10, 132, 255, 0.5),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.25);
+  border: none;
+  padding: 0;
+}
+
+.login-cta::after {
+  border: none;
 }
 
 .login-cta.is-loading {
   opacity: 0.6;
 }
 
+/* ── Divider 或使用 · mockup line 80-81 ───────────────────────────────── */
 .divider {
+  width: 666rpx;
   display: flex;
   align-items: center;
-  margin: 56rpx 0 32rpx;
+  gap: 20rpx;
+  margin: 44rpx 0 0;
+  color: #8E8E9399;
+  font-size: 24rpx;
+  letter-spacing: 1rpx;
 }
 
 .divider-line {
   flex: 1;
-  height: 2rpx;
-  background: #e5e5ea;
+  height: 1rpx;
+  background: rgba(60, 60, 67, 0.18);
 }
 
 .divider-text {
-  margin: 0 24rpx;
   font-size: 24rpx;
-  color: #8e8e93;
+  color: #8E8E9399;
+  letter-spacing: 1rpx;
 }
 
+/* ── 微信按钮 · mockup line 78-79 · 白底 + 绿 icon ───────────────────── */
 .wechat-cta {
-  height: 96rpx;
+  width: 666rpx;
+  height: 100rpx;
+  margin-top: 20rpx;
   background: #fff;
-  color: #07c160;
-  font-size: 30rpx;
+  color: #1F1F1F;
+  font-size: 32rpx;
   font-weight: 600;
-  border: 2rpx solid #07c160;
-  border-radius: 16rpx;
-  line-height: 92rpx;
+  border: 1rpx solid rgba(60, 60, 67, 0.12);
+  border-radius: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  padding: 0;
+  letter-spacing: -0.2rpx;
 }
 
+.wechat-cta::after {
+  border: none;
+}
+
+.wechat-icon {
+  width: 36rpx;
+  height: 36rpx;
+  flex: 0 0 36rpx;
+}
+
+/* ── footer 同意条款 · mockup line 82-86 ─────────────────────────────── */
 .foot {
-  margin-top: auto;
-  padding-top: 48rpx;
+  position: fixed;
+  bottom: 88rpx;
+  left: 0;
+  right: 0;
   text-align: center;
-  font-size: 22rpx;
-  color: #8e8e93;
+  font-size: 24rpx;
+  color: #8E8E93;
+  letter-spacing: 0.2rpx;
 }
 
 .foot-text {
-  color: #8e8e93;
+  color: #8E8E93;
 }
 
 .foot-link {
-  color: #7B6FE8;
+  color: #0A84FF;
   margin: 0 6rpx;
 }
