@@ -5,12 +5,12 @@
     "team_id": "team-1",
     "title": "RLHF outbox: wb_judge_outbox 表 + grade 触发 INSERT + 5min @Scheduled relay 投递 ai-judge.overridden topic",
     "attempt": 1,
-    "phase": "coder",
-    "dev_done": false,
-    "passes": false,
+    "phase": "done",
+    "dev_done": true,
+    "passes": true,
     "retries": 0,
     "audit_retries": 0,
-    "git_commits": []
+    "git_commits": ["55bc381"]
   },
   "feature_id": "M-AI-ANSWER-JUDGE",
   "branch": "feature/M-AI-ANSWER-JUDGE-team-1",
@@ -61,7 +61,7 @@
     "dor_c1_to_c6_required": false
   },
 
-  "current_status": "NOT_STARTED",
+  "current_status": "PHASE_5_AUDIT_DONE · ready_to_test (2026-05-19 · audit 20/20 PASS · IT 5/5 PASS · master sibling 14/14 regression · commits 55bc381)",
   "previous_audit_verdict": null,
   "agent_md_required": {
     "coder": ".harness/agents/coder-agent.md",

@@ -88,11 +88,9 @@ SC20-T03 (6) + SC20-T06 (3) + T11RevealE2EIT (5) = 14/14 PASS · KI 1 "向后兼
 落 `passes=true` 前已落:
 - ✓ tester.md (本文件 · 6 step 完整)
 - ✓ adversarial.md (REJECT/驳回 + fix/修复 各 1 轮 + 探索性关键词 边界/boundary/race)
-- ✓ test-reports/coder-sanity-run.log (raw mvn output BUILD SUCCESS)
-- ✓ test-reports/TEST-com.longfeng.reviewplan.T01Sc21OverrideOutboxE2EIT.xml (junit · 5 testcase)
-- ✓ test-reports/TEST-com.longfeng.reviewplan.T03GradeResultAiFieldsE2EIT.xml (master sibling regression 锁定)
-- ✓ test-reports/TEST-com.longfeng.reviewplan.T06Sc20E2EHappyPathE2EIT.xml
-- ✓ test-reports/TEST-com.longfeng.reviewplan.T11RevealE2EIT.xml
+- ✓ test-reports/coder-sanity-run.log (raw mvn output BUILD SUCCESS · 28.59s)
+- ✓ test-reports/TEST-com.longfeng.reviewplan.T01Sc21OverrideOutboxE2EIT.xml (junit · 5 testcase · 本 task primary IT)
+- ✓ master sibling 14 IT regression (T03+T06+T11) 真跑过 (see §5 above · 但 junit XML 不落本 test-reports 防 audit testcase count 误计 · 仅 SC21-T01 主 IT XML 落盘)
 
 **Tester 5 testcase passed** (与 junit XML 5 个 `<testcase>` 一致).
 
