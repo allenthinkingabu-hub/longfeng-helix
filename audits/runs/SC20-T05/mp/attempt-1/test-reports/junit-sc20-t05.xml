@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="24" failures="0" errors="0" time="0.218">
+    <testsuite name="test/unit/sc20-t05-ai-judge-helpers.spec.ts" timestamp="2026-05-19T05:31:25.662Z" hostname="Wangs-MacBook-Pro.local" tests="24" failures="0" errors="0" skipped="0" time="0.004">
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · computeFinalGradeSource (spec §6.3 A.2 三态) &gt; aiJudge === null → self" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · computeFinalGradeSource (spec §6.3 A.2 三态) &gt; aiJudge.status !== DONE → self" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · computeFinalGradeSource (spec §6.3 A.2 三态) &gt; verdict === grade → ai_accepted" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · computeFinalGradeSource (spec §6.3 A.2 三态) &gt; verdict !== grade → ai_overridden (含中间值 PARTIAL · spec TC-21.03)" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · deriveAiJudgeBannerViewModel (AC1 主区 + fallback 退化) &gt; DONE + verdict 非 null → showMain=true · 主区渲染" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · deriveAiJudgeBannerViewModel (AC1 主区 + fallback 退化) &gt; TIMEOUT → showFallback=true · 退化态" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · deriveAiJudgeBannerViewModel (AC1 主区 + fallback 退化) &gt; LOW_CONFIDENCE → showFallback=true + fallbackKey lowConfidence" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · deriveAiJudgeBannerViewModel (AC1 主区 + fallback 退化) &gt; SERVICE_UNAVAILABLE → showFallback=true + fallbackKey banner.fallback" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · deriveAiJudgeBannerViewModel (AC1 主区 + fallback 退化) &gt; IDLE / PENDING → 都不显示 (showMain=false, showFallback=false · banner skeleton 由 page wxml 单独处理)" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · deriveAiJudgeBannerViewModel (AC1 主区 + fallback 退化) &gt; confidence NaN / Infinity → 0" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · shouldShowAiFlag + deriveAiMetaChip + deriveAiHintRibbon (AC2) &gt; shouldShowAiFlag · 仅 DONE 显示" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · shouldShowAiFlag + deriveAiMetaChip + deriveAiHintRibbon (AC2) &gt; deriveAiMetaChip · 仅 DONE 显示 · pct 整数" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · shouldShowAiFlag + deriveAiMetaChip + deriveAiHintRibbon (AC2) &gt; deriveAiHintRibbon · 仅 DONE + verdict 非 null 显示" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · deriveGradeButtonsViewModel (AC3 preselected ring + aria-label) &gt; preselected === PARTIAL · 只 partial 按钮带 preselected cls + showMark + aria-label 含 &quot;AI 建议&quot;" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · deriveGradeButtonsViewModel (AC3 preselected ring + aria-label) &gt; preselected === null → 无 ring · 无 mark · aria-label 不含 AI 建议" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · deriveGradeButtonsViewModel (AC3 preselected ring + aria-label) &gt; revealed=false → 全 disabled + 含 rbtn-disabled class" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · deriveGradeButtonsViewModel (AC3 preselected ring + aria-label) &gt; isGrading=true → 全 disabled" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · deriveGradeButtonsViewModel (AC3 preselected ring + aria-label) &gt; color-blind safety (TI2): aria-label 不仅靠颜色 · &quot;AI 建议&quot; 字面必出" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · i18n locale 14 + 1 模板 key 完整 (AC5) &gt; zh.json 覆盖全部 SC20_T05_REQUIRED_KEYS" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · i18n locale 14 + 1 模板 key 完整 (AC5) &gt; en.json 覆盖全部 SC20_T05_REQUIRED_KEYS · 双语必齐" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · i18n locale 14 + 1 模板 key 完整 (AC5) &gt; SC20_T05_REQUIRED_KEYS = 15 项 (14 spec §14 + 1 模板)" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · i18n locale 14 + 1 模板 key 完整 (AC5) &gt; translate · 模板插值 + missing fallback" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · TI1 reverse · tap CTA = tap 对应按钮 (body 字面 diff = 0) &gt; aiVerdict=PARTIAL · tap accept CTA 等价 tap PARTIAL 按钮 → 都算 ai_accepted" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t05-ai-judge-helpers.spec.ts" name="SC20-T05 · TI1 reverse · tap CTA = tap 对应按钮 (body 字面 diff = 0) &gt; aiVerdict=MASTERED · tap accept CTA = tap MASTERED 按钮 → ai_accepted" time="0">
+        </testcase>
+    </testsuite>
+</testsuites>

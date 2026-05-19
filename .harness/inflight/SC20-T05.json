@@ -10,7 +10,7 @@
     "passes": true,
     "retries": 0,
     "audit_retries": 0,
-    "git_commits": ["6be5722"]
+    "git_commits": ["6be5722", "9ece007"]
   },
   "feature_id": "M-AI-ANSWER-JUDGE",
   "branch": "feature/M-AI-ANSWER-JUDGE-team-1",
