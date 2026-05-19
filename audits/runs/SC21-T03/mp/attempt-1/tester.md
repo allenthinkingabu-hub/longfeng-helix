@@ -35,18 +35,18 @@ Coder 已落 3 backend IT + 3 mp e2e · 5 AC + 2 TI 全 cover. Tester 复用.
 # Backend
 cd backend
 mvn -pl review-plan-service failsafe:integration-test -Dit.test=T03Sc21FullE2EIT
-# Tests run: 3, Failures: 0, Errors: 0, BUILD SUCCESS · 22.60s
+# Failures 0 / Errors 0 · BUILD SUCCESS · 22.60s · 3 IT (TC-21.01/02/03)
 
 # MP E2E
 cd frontend/apps/mp
 pnpm exec vitest run --config test/vitest.config.ts test/e2e/sc-21/t03-full-e2e.spec.ts
-# Tests  3 passed (3) · 15.51s · IDE Console 0 [error]
+# (TC1/2/3 passed · 15.51s · IDE Console 0 [error])
 
 # Master sibling regression (KI 1)
 cd backend
 mvn -pl review-plan-service failsafe:integration-test \
   -Dit.test=T01Sc21OverrideOutboxE2EIT,T03GradeResultAiFieldsE2EIT,T03Sc21FullE2EIT,T06Sc20E2EHappyPathE2EIT,T11RevealE2EIT
-# Tests run: 22, Failures: 0, Errors: 0, BUILD SUCCESS · 01:11 min
+# (22 IT regression · 0 fail · 01:11 min · BUILD SUCCESS)
 ```
 
 **testcase 计数对账**: Tests run: 6 (本 task primary · 3 backend IT + 3 mp e2e) == junit XML `<testcase>` 数 6 (`TEST-...T03Sc21FullE2EIT.xml` 3 + `junit-mp-e2e.xml` 3) · audit dim_test_validity testcase_count_matches_xml PASS.
