@@ -251,11 +251,13 @@ Page({
       this.setData({ uploadPct: 80, anonQid: qResp.anon_qid });
 
       // 4) analyzeByUrl · 检查 429
+      //    NOTE: 不传 imageUrl · 让后端 mintPresignedGet 拼出能用的 HTTP URL ·
+      //    FE 自造 `minio://...` 是非法 scheme · AI service (DashScope) 拉失败 →
+      //    AI_INFERENCE_FAILED. 见 backend AnonAnalyzeService.java:188.
       try {
         await analyzeByUrl(this.data.anonToken, {
           anonQid: qResp.anon_qid,
           subject: this.data.subject,
-          imageUrl: `minio://${presignResp.bucket || 'anon-tmp'}/${presignResp.file_key}`,
         });
       } catch (e) {
         if (isHttpStatus(e, 429)) {

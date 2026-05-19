@@ -191,15 +191,18 @@
       <view class="gc-sidebtn" bindtap="onSettingsTap">
         <image src="/images/icons/gc-gear.png" mode="aspectFit" class="gc-sidebtn-icon"></image>
       </view>
-      <button
-        class="gc-shutter {{consent.checked ? '' : 'gc-shutter-disabled'}}"
-        data-test-id="capture-shutter"
-        disabled="{{!consent.checked}}"
-        bindtap="onShutterTap"
-      >
+      <!-- shutter wrap · 把 REC 徽标移出 button (MP button 默认 overflow:hidden 会裁顶部 -28rpx 徽标) -->
+      <view class="gc-shutter-wrap">
         <view class="gc-shutter-rec" wx:if="{{consent.checked}}" data-test-id="guest-shutter-rec-badge">● Analyze</view>
-        <view class="gc-shutter-inner"></view>
-      </button>
+        <button
+          class="gc-shutter {{consent.checked ? '' : 'gc-shutter-disabled'}}"
+          data-test-id="capture-shutter"
+          disabled="{{!consent.checked}}"
+          bindtap="onShutterTap"
+        >
+          <view class="gc-shutter-inner"></view>
+        </button>
+      </view>
       <view class="gc-sidebtn" bindtap="onFlipCameraTap">
         <image src="/images/icons/gc-flip.png" mode="aspectFit" class="gc-sidebtn-icon"></image>
       </view>
