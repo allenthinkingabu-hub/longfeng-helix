@@ -168,8 +168,12 @@ Page({
 
       // Step 3: create question record. Backend QuestionDetailController.create
       // requires X-Idempotency-Key + snake_case body (see api/wrongbook.ts).
+      // studentId 从 wx.getStorageSync('userId') 取真登录态 · 之前硬编码 1
+      // 导致所有用户拍的题都写进 student#1 行 · 数据隔离失效.
+      const rawUid = wx.getStorageSync('userId');
+      const studentId = rawUid ? Number(rawUid) : 0;
       const created = await createQuestion({
-        studentId: 1,
+        studentId,
         subject: this.data.subject,
         image_key: presignResp.file_key,
         mime: 'image/jpeg',
