@@ -1,6 +1,9 @@
 # Tester Phase 4 测试执行 · SC20-T04 · P08 photo tab + UploadedAnswerThumb + OSS upload
 
-**Tests run: 11 总** (e2e spec 5 TC 设计完整 / 待 IDE GUI 自动化 toggle 修复后跑 · 见 adversarial.md adv00 · + 单元 6 TC 真 298/298 PASS · 与 vitest report `<testfile>` 数 / `<testcase>` 数一致 · audit dim test_validity 卡)
+**Tests run: 6 总** (本 task 新加单元 6 TC 真 PASS · 与 junit-sc20-t04-unit.xml `<testcase>` 数 6 一致 · audit dim test_validity 卡 · e2e spec 5 TC 另落 base-run.log + 待 IDE GUI 自动化 toggle 修复后跑 · 见 adversarial.md adv00)
+
+> **关于 e2e spec 5 TC**: 单独列出不入 "Tests run" 计数 (因为没真跑 PASS · 不产 `<testcase>` XML · 不诚实算 Tester verdict)。e2e 5 TC 设计完整在 `frontend/apps/mp/test/e2e/sc-20/t04-p08-photo-tab-upload.spec.ts` · 待环境恢复跑通后另算。
+
 
 **Date**: 2026-05-19
 **Attempt**: 1 (single-shot · 用户 2026-05-19 explicit skip Phase 0-2.5)

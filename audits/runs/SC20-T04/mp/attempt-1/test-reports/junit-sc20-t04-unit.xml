@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="6" failures="0" errors="0" time="0.287">
+    <testsuite name="test/unit/sc20-t04-photo-upload.spec.ts" timestamp="2026-05-19T05:23:13.203Z" hostname="Wangs-MacBook-Pro.local" tests="6" failures="0" errors="0" skipped="0" time="0.003">
+        <testcase classname="test/unit/sc20-t04-photo-upload.spec.ts" name="SC20-T04 · photo upload 链路 + judgeNode client (mp unit) &gt; TC1 · presign POST /api/file/presign 带 X-Idempotency-Key + content_type=image/jpeg" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/sc20-t04-photo-upload.spec.ts" name="SC20-T04 · photo upload 链路 + judgeNode client (mp unit) &gt; TC2 · judgeNode POST /api/review/nodes/{nid}/judge 带 X-Idempotency-Key + body{user_answer_image_key}" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t04-photo-upload.spec.ts" name="SC20-T04 · photo upload 链路 + judgeNode client (mp unit) &gt; TC3 · judgeNode 503 抛 Error (前端 _triggerJudge catch 走 SC-22 降级 fall through 不阻塞)" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/sc20-t04-photo-upload.spec.ts" name="SC20-T04 · photo upload 链路 + judgeNode client (mp unit) &gt; TC4 · 边界 · 10MB 上限验证 (capture.ts L108-111 同 const · _handlePhotoUpload 边界一致)" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t04-photo-upload.spec.ts" name="SC20-T04 · photo upload 链路 + judgeNode client (mp unit) &gt; TC5 · TI2 i18n key 字面映射: zh=&quot;拍照&quot; · en=&quot;Photo&quot; · key=&quot;exec.answer.photo&quot;" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc20-t04-photo-upload.spec.ts" name="SC20-T04 · photo upload 链路 + judgeNode client (mp unit) &gt; TC6 · photoSizeLabel 格式化: 487 KB / 1.5 MB / 980 KB" time="0">
+        </testcase>
+    </testsuite>
+</testsuites>
