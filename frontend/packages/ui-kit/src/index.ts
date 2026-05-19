@@ -26,3 +26,7 @@ export { computeGradeButtonAriaLabel } from './AiMark';
 
 export type { GradeButtonsProps, GradeButtonViewModel } from './GradeButtons';
 export { deriveGradeButtonsViewModel } from './GradeButtons';
+
+// SC21-T02 · Override ack CTA helper (banner ack 行 · 学生 tap 非 AI 建议时 visible)
+export type { OverrideAckProps, OverrideAckViewModel } from './OverrideAck';
+export { deriveOverrideAckViewModel } from './OverrideAck';

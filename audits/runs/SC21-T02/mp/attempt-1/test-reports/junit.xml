@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="19" failures="0" errors="0" time="0.254">
+    <testsuite name="test/unit/sc21-t02-override-flow.spec.ts" timestamp="2026-05-19T06:19:30.906Z" hostname="Wangs-MacBook-Pro.local" tests="19" failures="0" errors="0" skipped="0" time="0.003">
+        <testcase classname="test/unit/sc21-t02-override-flow.spec.ts" name="SC21-T02 AC1 回归 · computeFinalGradeSource override 三态 &gt; AI MASTERED · 学生 FORGOT (TC-21.01 happy override) → ai_overridden" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc21-t02-override-flow.spec.ts" name="SC21-T02 AC1 回归 · computeFinalGradeSource override 三态 &gt; AI MASTERED · 学生 PARTIAL (TC-21.03 中间值 override) → ai_overridden" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/sc21-t02-override-flow.spec.ts" name="SC21-T02 AC1 回归 · computeFinalGradeSource override 三态 &gt; AI PARTIAL · 学生 FORGOT → ai_overridden" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc21-t02-override-flow.spec.ts" name="SC21-T02 AC1 回归 · computeFinalGradeSource override 三态 &gt; AI MASTERED · 学生 MASTERED (同 = 采纳) → ai_accepted (反向边界)" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc21-t02-override-flow.spec.ts" name="SC21-T02 AC1 回归 · computeFinalGradeSource override 三态 &gt; AI 退化态 (LOW_CONFIDENCE) → 任何 grade 都 self · 无 override 语义" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc21-t02-override-flow.spec.ts" name="SC21-T02 AC2 · deriveOverrideAckViewModel · ack visible 三态规则 &gt; ai_overridden + DONE + 非 null verdict → visible=true · grade=userGrade 字面" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc21-t02-override-flow.spec.ts" name="SC21-T02 AC2 · deriveOverrideAckViewModel · ack visible 三态规则 &gt; ai_accepted → visible=false (采纳无 ack)" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc21-t02-override-flow.spec.ts" name="SC21-T02 AC2 · deriveOverrideAckViewModel · ack visible 三态规则 &gt; self · 退化态 LOW_CONFIDENCE → visible=false (无 AI 信源对比)" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc21-t02-override-flow.spec.ts" name="SC21-T02 AC2 · deriveOverrideAckViewModel · ack visible 三态规则 &gt; aiStatus 非 DONE 但 finalGradeSource 标 ai_overridden (理论不可能 · 防御) → visible=false" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc21-t02-override-flow.spec.ts" name="SC21-T02 AC2 · deriveOverrideAckViewModel · ack visible 三态规则 &gt; aiVerdict null 但 status DONE (理论不可能 · 防御) → visible=false" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc21-t02-override-flow.spec.ts" name="SC21-T02 AC5 · i18n exec.judge.cta.overrideAck 双语模板插值 &gt; zh.json · key 存在" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc21-t02-override-flow.spec.ts" name="SC21-T02 AC5 · i18n exec.judge.cta.overrideAck 双语模板插值 &gt; en.json · key 存在 · 含模板占位 + AI 差异语义" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc21-t02-override-flow.spec.ts" name="SC21-T02 AC5 · i18n exec.judge.cta.overrideAck 双语模板插值 &gt; translate zh · {grade}=未掌握 → &quot;你选择了 未掌握 · 与 AI 不同...&quot;" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc21-t02-override-flow.spec.ts" name="SC21-T02 AC5 · i18n exec.judge.cta.overrideAck 双语模板插值 &gt; translate en · {grade}=Forgot → &quot;You chose Forgot · differs from AI...&quot;" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc21-t02-override-flow.spec.ts" name="SC21-T02 AC5 · i18n exec.judge.cta.overrideAck 双语模板插值 &gt; assertSC21T02Coverage zh + en 双语完整 (无 missing)" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/sc21-t02-override-flow.spec.ts" name="SC21-T02 AC3 · telemetry wb_judge_user_override · confidence 字段补全 (TI2 防抖) &gt; 单次 track 调用 · 4 props (nid/ai/user/confidence) 完整入 buffer" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc21-t02-override-flow.spec.ts" name="SC21-T02 AC3 · telemetry wb_judge_user_override · confidence 字段补全 (TI2 防抖) &gt; TI2 · 模拟同 nid 同 verdict 2 次 tap (前端 isGrading debounce 防抖 · SC20-T05 已实装)" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/sc21-t02-override-flow.spec.ts" name="SC21-T02 AC4 视觉回归 · gradeBtnsVm preselected ring 切换 &gt; AI MASTERED + 学生 tap FORGOT 后 isGrading=true → FORGOT btn 走 grading 态" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc21-t02-override-flow.spec.ts" name="SC21-T02 AC4 视觉回归 · gradeBtnsVm preselected ring 切换 &gt; grade 结束 isGrading=false · revealed=false (GRADED 后) → 所有 btn disabled" time="0">
+        </testcase>
+    </testsuite>
+</testsuites>

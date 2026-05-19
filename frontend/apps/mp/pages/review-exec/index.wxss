@@ -1040,6 +1040,18 @@ page {
   opacity: 0.5;
 }
 
+/* SC21-T02 · override ack CTA (学生 tap 非 AI 建议按钮后 banner 出现 ack 行) */
+.aijb-override-ack {
+  margin-top: 16rpx;
+  padding: 12rpx 18rpx;
+  background: rgba(175, 82, 222, 0.08); /* purple #AF52DE 8% bg · A.2 双信源溯源紫主题 */
+  border-left: 4rpx solid #AF52DE;
+  border-radius: 8rpx;
+  color: #5856D6;
+  font-size: 24rpx;
+  line-height: 1.5;
+}
+
 /* AiJudgeBanner fallback 退化态 (TIMEOUT / LOW_CONFIDENCE / SERVICE_UNAVAILABLE) */
 .aijb-fallback {
   text-align: center;

@@ -508,6 +508,8 @@ export const TEST_IDS = {
     fallback:          'ai-judge-fallback',            // 退化 fallback 容器 (TIMEOUT/LOW_CONF/503)
     hintRibbon:        'ai-judge-hint-ribbon',         // <AiHintRibbon> rating 上方紫 (mockup L401)
     aiMark:            'ai-judge-ai-mark',             // <AiMark> grade preselected 角标 (mockup L417)
+    // ── SC21-T02 (本 task) append 1 个 · override ack CTA (学生 tap 非 AI 建议按钮后显示)
+    overrideAckCta:    'ai-judge-override-ack-cta',    // 「你选择了 X · 与 AI 不同」ack 文案 (biz §2B.21 步 2)
   },
 
   // P09 · ReviewDone · AC-P09-001 ~ 011

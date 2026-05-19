@@ -13,5 +13,6 @@
   "exec.judge.lowConfidence": "🤔 AI unsure · please self-rate",
   "exec.judge.timeout": "AI timeout · please self-rate",
   "exec.banner.fallback": "AI unavailable · please self-rate",
-  "exec.banner.modelUsed": "{model} · {latency}s"
+  "exec.banner.modelUsed": "{model} · {latency}s",
+  "exec.judge.cta.overrideAck": "You chose {grade} · differs from AI (helps us improve AI)"
 }

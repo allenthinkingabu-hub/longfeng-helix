@@ -65,3 +65,18 @@ export function assertSC20T05Coverage(locale: Locale): { missing: string[]; pass
   const missing = SC20_T05_REQUIRED_KEYS.filter((k) => locale[k] === undefined);
   return { missing, pass: missing.length === 0 };
 }
+
+/**
+ * SC21-T02 · 新增 1 个 i18n key · override ack CTA 文案 (biz §2B.21 步 2).
+ * 单独列 SC21 keys 避免污染 SC20 数组 · 但 audit grep 视角合并验.
+ */
+export const SC21_T02_REQUIRED_KEYS = [
+  'exec.judge.cta.overrideAck',
+] as const;
+
+export type SC21T02Key = (typeof SC21_T02_REQUIRED_KEYS)[number];
+
+export function assertSC21T02Coverage(locale: Locale): { missing: string[]; pass: boolean } {
+  const missing = SC21_T02_REQUIRED_KEYS.filter((k) => locale[k] === undefined);
+  return { missing, pass: missing.length === 0 };
+}

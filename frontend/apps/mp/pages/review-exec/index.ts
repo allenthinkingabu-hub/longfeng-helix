@@ -27,6 +27,7 @@ import {
   deriveAiMetaChip,
   deriveAiHintRibbon,
   deriveGradeButtonsViewModel,
+  deriveOverrideAckViewModel,
   type AiJudgeVerdict,
   type AiJudgeStatus,
 } from '@longfeng/ui-kit';
@@ -179,6 +180,11 @@ Page({
 
     // SC20-T05: AI judge final_grade_source (派生 · onGradeTap 算 + 写 grade body)
     finalGradeSource: null as 'self' | 'ai_accepted' | 'ai_overridden' | null,
+
+    // SC21-T02: override ack CTA view-model (学生 tap override 按钮后渲染 banner ack 行)
+    // biz §2B.21 步 2 文案 "你选择了 {grade} · 与 AI 不同 (这有助于我们改进 AI)"
+    // i18n key: exec.judge.cta.overrideAck (zh + en 双语 · 模板插值 {grade})
+    overrideAckVm: { visible: false, text: '' } as { visible: boolean; text: string },
 
     // derived
     isRevealed: false,
@@ -721,17 +727,36 @@ Page({
         ai_verdict: this.data.aiJudgeVerdict,
       });
     } else if (finalGradeSource === 'ai_overridden') {
+      // SC21-T02 AC3: 加 confidence 字段 (沿 SC20-T05 pattern · A.2 双信源溯源完整 props)
       track(TRACK_EVENTS.userOverride, {
         nid: this.data.node.nid,
         ai_verdict: this.data.aiJudgeVerdict,
         user_verdict: grade,
+        confidence: this.data.aiJudgeConfidence,
       });
+    }
+
+    // SC21-T02 AC2: 派生 override ack vm · 仅 ai_overridden 触发 visible=true
+    // 文案 = translate('exec.judge.cta.overrideAck', { grade: verdictLabel })
+    // verdictLabel = translate('exec.judge.verdict.<userGrade.toLowerCase()>')
+    const ackRaw = deriveOverrideAckViewModel({
+      userGrade: grade as AiJudgeVerdict,
+      aiVerdict: this.data.aiJudgeVerdict,
+      aiStatus: this.data.aiJudgeStatus,
+      finalGradeSource,
+    });
+    let ackText = '';
+    if (ackRaw.visible) {
+      const gradeKey = `exec.judge.verdict.${grade.toLowerCase()}`;
+      const gradeLabel = translate(zhLocale, gradeKey);
+      ackText = translate(zhLocale, ackRaw.i18nKey, { grade: gradeLabel });
     }
 
     this.setData({
       execState: 'GRADED' as ExecState,
       isGrading: false,
       isRevealed: false, // 连点防护: GRADED 后禁止重复评分
+      overrideAckVm: { visible: ackRaw.visible, text: ackText },
     });
 
     // T12: GRADED → P09 transition (mirrors H5 ReviewExec handleGrade)
