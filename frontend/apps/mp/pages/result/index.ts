@@ -60,6 +60,10 @@ interface PageData {
   topicChain: string;
   /** thumbnail 题干摘要 · 1 行截断 · 替代硬编码 "已知 f(x)=x²−4x+3" */
   stemSnippet: string;
+  /** 游客态 (spec line 216 + biz §F05) · true 时 hide T1-T6 + 显 24h 黄条 */
+  isGuest: boolean;
+  /** 黄条文案 · isGuest=true 时显示 */
+  guestClaimHint: string;
 }
 
 Page<PageData, WechatMiniprogram.IAnyObject>({
