@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "SC21-T03",
+    "team_id": "mp",
+    "title": "SC-21 全链 TC-21.01/02/03 · 双栈 mp E2E + backend IT (override happy + RLHF retry + 中间值)",
+    "attempt": 1,
+    "phase": "coder",
+    "dev_done": false,
+    "passes": false,
+    "retries": 0,
+    "audit_retries": 0,
+    "git_commits": []
+  },
+  "feature_id": "M-AI-ANSWER-JUDGE",
+  "branch": "feature/M-AI-ANSWER-JUDGE-team-1",
+  "work_log_dir": "audits/runs/SC21-T03/mp/attempt-1",
+  "log_requirements": {
+    "must_write": ["coder.md", "bugs-found.md"],
+    "coder": ["coder.md", "bugs-found.md"],
+    "tester": ["tester.md", "adversarial.md", "test-reports/"]
+  },
+  "audit_gate": ".harness/audit.js 7 维度全过 (test_cases_alignment 整维跳)",
+
+  "test_case_first_required": false,
+  "platform_priority": "mp_only",
+  "phase_2_5_skipped_by_user": true,
+  "user_approval_verdict": "SKIP (user 2026-05-19 explicit '不用设计测试用例 · 直接进入交付阶段')",
+
+  "biz_refs": [
+    "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §2B.21 SC-21 完整 5 步 + TC-21.01/02/03 三 QA 用例",
+    "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §2B.21 关键断言点 4 条 (final_grade_source / master §7 重排 / 双 verdict 埋点 / RLHF outbox)"
+  ],
+  "spec_refs": [
+    "design/system/pages/P08-review-exec-ai-judge.spec.md §10 TC-21.01/02/03 字面"
+  ],
+  "primary_services": ["backend/review-plan-service", "frontend/apps/mp/pages/review-exec"],
+  "primary_apis": [
+    "POST /api/review/nodes/{nid}/judge",
+    "POST /api/review/nodes/{nid}/grade (body 含 final_grade_source)",
+    "GET /api/review/nodes/{nid}/result (resp 含 aiJudge)"
+  ],
+
+  "acceptance_criteria": [
+    {"id": "AC1", "text": "TC-21.01 happy override · backend IT: AI MASTERED → 学生 FORGOT grade · DB: final_grade_source='ai_overridden' + ai_judge_verdict='MASTERED' + grade='FORGOT' + outbox+1 行 + master §7 FORGOT 重排 (4 下游 ACTIVE node next_due_at 重锚)"},
+    {"id": "AC2", "text": "TC-21.02 outbox RLHF 失败重试 · backend IT: RocketMQ 不可用 → grade 200 OK + outbox 表 retry_count=1 + last_retry_at 更新 · 第 5 次失败 → status='FAILED' (沿 SC21-T01 IT case3+case4 校验路径)"},
+    {"id": "AC3", "text": "TC-21.03 部分 override · backend IT: AI MASTERED → 学生 PARTIAL grade (中间值) → final_grade_source='ai_overridden' + ai_verdict != grade (MASTERED != PARTIAL) · 仍入 outbox"},
+    {"id": "AC4", "text": "mp E2E 串联 · TC-21.01 happy override: P08 → tap FORGOT 按钮 (AI preselected MASTERED 的对面) → :grade body{final_grade_source:'ai_overridden'} → ack CTA 渲染 + telemetry wb_judge_user_override · IDE console 0 [error]"},
+    {"id": "AC5", "text": "master sibling regression 全绿 · backend: SC20-T03 6 IT + SC20-T06 3 IT + T11 5 IT + SC21-T01 5 IT = 19 IT PASS · mp: 326/326 unit · 0 regression"}
+  ],
+  "test_invariants": [
+    "TI1: master sibling SC-01-T11/T06 + SC20-T03 IT 全绿 (向后兼容硬性)",
+    "TI2: outbox 表 SELECT 全字段非空 + ts 在 grade 时间 ± 5s · DB 真断言不走 JPA 影子"
+  ],
+  "key_invariants": [
+    "TC-21.01/02/03 三 QA 用例字面 1:1 翻译为 IT @Test method · 不偏离 biz §2B.21 措辞",
+    "SC-21 全链不破坏 SC-20 任何 IT / e2e (任何一行红 → REJECT)"
+  ],
+  "physical_verification": {
+    "frontend_e2e": "frontend/apps/mp/test/e2e/sc-21/t03-full-e2e.spec.ts (mp 端 IDE 真渲染 · 验 ack CTA + telemetry)",
+    "backend_e2e_it": "backend/review-plan-service/src/test/java/com/longfeng/reviewplan/T03Sc21FullE2EIT.java (TC-21.01/02/03 三 IT @Test)",
+    "dor_c1_to_c6_required": false
+  },
+
+  "current_status": "NOT_STARTED",
+  "previous_audit_verdict": null,
+  "agent_md_required": {
+    "coder": ".harness/agents/coder-agent.md",
+    "tester": ".harness/agents/test-agent.md",
+    "tl": ".harness/agents/tl-agent.md"
+  },
+  "written_by": "TL agent (M-AI-ANSWER-JUDGE SC21-T03 kickoff · 2026-05-19 · skip Phase 0-2.5 · TL+Coder+Tester 单 sub-agent)"
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="3" failures="0" errors="0" time="13.603">
+    <testsuite name="test/e2e/sc-21/t03-full-e2e.spec.ts" timestamp="2026-05-19T06:36:52.514Z" hostname="Wangs-MacBook-Pro.local" tests="3" failures="0" errors="0" skipped="0" time="13.179">
+        <testcase classname="test/e2e/sc-21/t03-full-e2e.spec.ts" name="SC21-T03 · SC-21 全链 mp E2E · TC-21.01/02/03 &gt; TC1 · TC-21.01 happy override · P08 渲染 + IDE Console 干净" time="5.486">
+        </testcase>
+        <testcase classname="test/e2e/sc-21/t03-full-e2e.spec.ts" name="SC21-T03 · SC-21 全链 mp E2E · TC-21.01/02/03 &gt; TC2 · TC-21.02 grade 失败 toast · banner state 不崩 · console 干净" time="3.856">
+        </testcase>
+        <testcase classname="test/e2e/sc-21/t03-full-e2e.spec.ts" name="SC21-T03 · SC-21 全链 mp E2E · TC-21.01/02/03 &gt; TC3 · TC-21.03 中间值 PARTIAL override · render 不崩 · console 干净" time="3.818">
+        </testcase>
+    </testsuite>
+</testsuites>
