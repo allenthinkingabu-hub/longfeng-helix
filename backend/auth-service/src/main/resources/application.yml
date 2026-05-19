@@ -43,3 +43,11 @@ auth:
   lockout:
     max-failed-attempts: 5
     lock-duration-seconds: 300         # 5 minutes
+
+# SC-12 / P00 §5 #3 · WeChat OAuth 微信登录配置
+# secret 必走 env var · 不入仓 · 空则 endpoint 503 WECHAT_NOT_CONFIGURED
+wechat:
+  appid: ${WECHAT_APPID:wxf1ebf7730c8df0fa}
+  secret: ${WECHAT_SECRET:}
+  jscode-session-url: https://api.weixin.qq.com/sns/jscode2session
+  timeout-ms: 3000

@@ -26,11 +26,23 @@ public class AuthUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "email", nullable = false, unique = true, length = 255)
+    // email 改 nullable · V20260519_01 加微信 OAuth · 纯微信用户没 email
+    @Column(name = "email", unique = true, length = 255)
     private String email;
 
-    @Column(name = "password_hash", nullable = false, length = 72)
+    // phone 新加 · V20260519_01 · 11 位 PRC 手机号字符串 (BE 不做格式校验 · FE 已做)
+    @Column(name = "phone", unique = true, length = 20)
+    private String phone;
+
+    // password_hash 改 nullable · 微信 OAuth 用户没 password
+    @Column(name = "password_hash", length = 72)
     private String passwordHash;
+
+    // SC-12 P00 §5 #3 · 微信 OAuth 登录凭证
+    @Column(name = "wx_openid", unique = true, length = 64)
+    private String wxOpenid;
+    @Column(name = "wx_unionid", length = 64)
+    private String wxUnionid;
 
     @Column(name = "status", nullable = false, length = 16)
     private String status = "ACTIVE";
@@ -51,8 +63,14 @@ public class AuthUser {
     public void setId(Long id) { this.id = id; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
     public String getPasswordHash() { return passwordHash; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+    public String getWxOpenid() { return wxOpenid; }
+    public void setWxOpenid(String wxOpenid) { this.wxOpenid = wxOpenid; }
+    public String getWxUnionid() { return wxUnionid; }
+    public void setWxUnionid(String wxUnionid) { this.wxUnionid = wxUnionid; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public int getFailedAttempts() { return failedAttempts; }

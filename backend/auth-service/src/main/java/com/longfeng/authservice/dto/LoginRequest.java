@@ -12,12 +12,16 @@ import jakarta.validation.constraints.Size;
  */
 public class LoginRequest {
 
-    private String provider;       // 'EMAIL' (other providers reject with 400 in this task)
+    private String provider;       // 'EMAIL' / 'PHONE' (others reject with 400 in this task)
 
-    @NotBlank
+    // email 改 optional · 与 phone 二选一 · LoginService 校验
     @Email
     @Size(max = 255)
     private String email;
+
+    // phone 新加 (V20260519_01 schema) · 11 位 PRC 手机号 · 与 email 二选一
+    @Size(min = 11, max = 20)
+    private String phone;
 
     @NotBlank
     @Size(min = 6, max = 128)
@@ -37,6 +41,8 @@ public class LoginRequest {
     public void setProvider(String provider) { this.provider = provider; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
     public Boolean getRememberMe() { return rememberMe; }

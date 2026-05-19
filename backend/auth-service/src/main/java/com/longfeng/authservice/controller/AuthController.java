@@ -4,6 +4,8 @@ import com.longfeng.authservice.dto.AuthErrorResponse;
 import com.longfeng.authservice.dto.LoginRequest;
 import com.longfeng.authservice.dto.LoginResponse;
 import com.longfeng.authservice.dto.RefreshResponse;
+import com.longfeng.authservice.dto.WechatLoginRequest;
+import com.longfeng.authservice.dto.WechatLoginResponse;
 import com.longfeng.authservice.entity.AuthUser;
 import com.longfeng.authservice.facade.AccountDeviceFacade;
 import com.longfeng.authservice.service.JwtService;
@@ -11,6 +13,9 @@ import com.longfeng.authservice.service.LoginService;
 import com.longfeng.authservice.service.LoginService.AccountLockedException;
 import com.longfeng.authservice.service.LoginService.InvalidCredentialsException;
 import com.longfeng.authservice.service.RefreshTokenService;
+import com.longfeng.authservice.service.WechatLoginService;
+import com.longfeng.authservice.service.WechatLoginService.WechatLoginResult;
+import com.longfeng.authservice.service.WechatOpenIdService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -46,28 +51,37 @@ public class AuthController {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final AccountDeviceFacade accountDeviceFacade;
+    private final WechatLoginService wechatLoginService;
 
     public AuthController(LoginService loginService,
                           JwtService jwtService,
                           RefreshTokenService refreshTokenService,
-                          AccountDeviceFacade accountDeviceFacade) {
+                          AccountDeviceFacade accountDeviceFacade,
+                          WechatLoginService wechatLoginService) {
         this.loginService = loginService;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
         this.accountDeviceFacade = accountDeviceFacade;
+        this.wechatLoginService = wechatLoginService;
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest req,
                                                HttpServletRequest httpReq) {
-        // provider currently only supports EMAIL — others SC-12 / iOS scope_out.
+        // provider 接 EMAIL 或 PHONE · WECHAT 走单独 /wechat-login endpoint
         String provider = req.getProvider() == null ? "EMAIL" : req.getProvider();
-        if (!"EMAIL".equalsIgnoreCase(provider)) {
+        if (!"EMAIL".equalsIgnoreCase(provider) && !"PHONE".equalsIgnoreCase(provider)) {
             LOG.warn("login_unsupported_provider provider={}", provider);
             throw new InvalidCredentialsException();
         }
+        // 必须给 email 或 phone (至少一个非空) · @Valid 不能跨字段校验 · 这里硬校
+        if ((req.getEmail() == null || req.getEmail().isBlank())
+                && (req.getPhone() == null || req.getPhone().isBlank())) {
+            throw new InvalidCredentialsException();
+        }
 
-        AuthUser user = loginService.verifyCredentials(req.getEmail(), req.getPassword());
+        AuthUser user = loginService.verifyCredentials(
+                req.getEmail(), req.getPhone(), req.getPassword());
 
         String jwt = jwtService.signAccessToken(user.getId());
         String refresh = refreshTokenService.issue(user.getId());
@@ -88,6 +102,71 @@ public class AuthController {
                 user.getId(),
                 maskNick(user.getEmail()));
         return ResponseEntity.ok(new LoginResponse(jwt, refresh, expiresIn, student));
+    }
+
+    /**
+     * P00 §5 #3 · POST /api/auth/wechat-login · MP wx.login() code → JWT.
+     * 真实接 Tencent jscode2session · 不走 mock.
+     *
+     * Wire (SR):
+     *   200 {jwt, refreshToken, expiresIn, isNew, student:{id, nickMasked}}
+     *   401 {code:"INVALID_WECHAT_CODE"}   · code 过期 / 重复 / 假
+     *   502 {code:"WECHAT_UPSTREAM"}        · Tencent 网络 / 5xx
+     *   503 {code:"WECHAT_NOT_CONFIGURED"}  · backend 没配 WECHAT_SECRET env
+     */
+    @PostMapping("/wechat-login")
+    public ResponseEntity<WechatLoginResponse> wechatLogin(
+            @Valid @RequestBody WechatLoginRequest req,
+            HttpServletRequest httpReq) {
+        WechatLoginResult result = wechatLoginService.login(req.getCode());
+        AuthUser user = result.user();
+
+        String jwt = jwtService.signAccessToken(user.getId());
+        String refresh = refreshTokenService.issue(user.getId());
+        long expiresIn = jwtService.getAccessTokenTtlSeconds();
+
+        // 微信用户没 email · maskNick 已兜底 "用户"
+        LoginResponse.Student student = new LoginResponse.Student(
+                user.getId(),
+                maskNick(user.getEmail()));
+
+        // device_fp upsert (同 /login)
+        String deviceFp = req.getDeviceFp();
+        if (deviceFp != null && !deviceFp.isBlank()) {
+            String platform = req.getPlatform() == null ? "MINIP" : req.getPlatform();
+            String ua = httpReq.getHeader("User-Agent");
+            accountDeviceFacade.silentUpsert(user.getId(), deviceFp, platform, ua);
+        }
+
+        return ResponseEntity.ok(new WechatLoginResponse(
+                jwt, refresh, expiresIn, result.isNew(), student));
+    }
+
+    @ExceptionHandler(WechatOpenIdService.NotConfiguredException.class)
+    public ResponseEntity<AuthErrorResponse> handleWechatNotConfigured(
+            WechatOpenIdService.NotConfiguredException e) {
+        LOG.warn("wechat_login_not_configured · set env WECHAT_SECRET");
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(new AuthErrorResponse("WECHAT_NOT_CONFIGURED",
+                        "微信登录暂未配置, 请联系管理员"));
+    }
+
+    @ExceptionHandler(WechatOpenIdService.InvalidCodeException.class)
+    public ResponseEntity<AuthErrorResponse> handleWechatInvalidCode(
+            WechatOpenIdService.InvalidCodeException e) {
+        LOG.info("wechat_login_invalid_code msg={}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new AuthErrorResponse("INVALID_WECHAT_CODE",
+                        "微信授权失败, 请重新尝试"));
+    }
+
+    @ExceptionHandler(WechatOpenIdService.UpstreamException.class)
+    public ResponseEntity<AuthErrorResponse> handleWechatUpstream(
+            WechatOpenIdService.UpstreamException e) {
+        LOG.warn("wechat_login_upstream_failed msg={}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(new AuthErrorResponse("WECHAT_UPSTREAM",
+                        "微信服务暂不可达, 请稍后重试"));
     }
 
     @PostMapping("/refresh")

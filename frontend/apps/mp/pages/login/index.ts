@@ -71,10 +71,12 @@ Page<LoginPageData, WechatMiniprogram.IAnyObject>({
 
     this.setData({ loading: true, errorMsg: '' });
     try {
-      const resp = await login({ phone, password });
-      // JWT 持久化 (沿 H5 localStorage('jwt') 风格 · MP 等价 wx.setStorageSync)
-      wx.setStorageSync('jwt', resp.token);
-      wx.setStorageSync('userId', resp.userId);
+      const resp = await login({ phone, password, provider: 'PHONE' });
+      // JWT 持久化 (spec §5 #2 wire: resp.jwt + resp.student.id)
+      wx.setStorageSync('jwt', resp.jwt);
+      wx.setStorageSync('studentJwt', resp.jwt); // P-GUEST-CAPTURE claim 流程用
+      if (resp.student) wx.setStorageSync('userId', resp.student.id);
+      if (resp.refreshToken) wx.setStorageSync('refreshToken', resp.refreshToken);
       const expiresAt = Date.now() + resp.expiresIn * 1000;
       wx.setStorageSync('expiresAt', expiresAt);
 
@@ -83,6 +85,17 @@ Page<LoginPageData, WechatMiniprogram.IAnyObject>({
     } catch (err) {
       this.setData({ errorMsg: this.mapError(err), loading: false });
     }
+  },
+
+  /** Map WeChat-specific HTTP codes · 503/401/502 各自映射用户友好文案. */
+  mapWechatError(err: unknown): string {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (/HTTP\s*503/.test(msg)) return '微信登录暂未配置（后台未就绪），请暂用手机号';
+    if (/HTTP\s*401/.test(msg)) return '微信授权码已失效，请重试';
+    if (/HTTP\s*502/.test(msg)) return '微信服务暂不可达，请稍后重试';
+    if (/HTTP\s*4\d\d/.test(msg)) return '微信登录失败，请重试';
+    if (/HTTP\s*5\d\d/.test(msg)) return '服务暂不可用，请稍后重试';
+    return '网络异常，请检查后重试';
   },
 
   onWechatLogin() {
@@ -97,13 +110,20 @@ Page<LoginPageData, WechatMiniprogram.IAnyObject>({
         }
         try {
           const resp = await wechatLogin({ code: loginRes.code });
-          wx.setStorageSync('jwt', resp.token);
-          wx.setStorageSync('userId', resp.userId);
+          wx.setStorageSync('jwt', resp.jwt);
+          wx.setStorageSync('studentJwt', resp.jwt);
+          if (resp.student) wx.setStorageSync('userId', resp.student.id);
+          if (resp.refreshToken) wx.setStorageSync('refreshToken', resp.refreshToken);
           const expiresAt = Date.now() + resp.expiresIn * 1000;
           wx.setStorageSync('expiresAt', expiresAt);
-          wx.reLaunch({ url: '/pages/home/index' });
+          if (resp.isNew) {
+            wx.showToast({ title: '欢迎新用户 · 已为你创建账号', icon: 'success', duration: 1200 });
+            setTimeout(() => wx.reLaunch({ url: '/pages/home/index' }), 1200);
+          } else {
+            wx.reLaunch({ url: '/pages/home/index' });
+          }
         } catch (err) {
-          this.setData({ errorMsg: this.mapError(err), loading: false });
+          this.setData({ errorMsg: this.mapWechatError(err), loading: false });
         }
       },
       fail: () => {

@@ -59,6 +59,19 @@ public class LoginService {
             AccountLockedException.class
     })
     public AuthUser verifyCredentials(String email, String password) {
+        return verifyCredentials(email, null, password);
+    }
+
+    /**
+     * Dual-format login · email OR phone · spec P00 §5 #2 line 24 "邮箱/手机号".
+     * 任一非空即作为 lookup key (email 优先 · 同时给两个时按 email 查).
+     * 都为空 → InvalidCredentialsException (与 not-found 同一错误防 enumeration).
+     */
+    @Transactional(noRollbackFor = {
+            InvalidCredentialsException.class,
+            AccountLockedException.class
+    })
+    public AuthUser verifyCredentials(String email, String phone, String password) {
         // P1 drift fix (2026-05-17): emails are case-insensitive identifiers
         // (RFC 5321 local-part is technically case-sensitive but every major
         // provider normalizes; users typing TEST@example.com expect to log
@@ -68,20 +81,33 @@ public class LoginService {
         String normalizedEmail = email == null
                 ? null
                 : email.trim().toLowerCase(Locale.ROOT);
+        String normalizedPhone = phone == null ? null : phone.trim();
 
-        Optional<AuthUser> opt = normalizedEmail == null
-                ? Optional.empty()
-                : repo.findByEmail(normalizedEmail);
+        Optional<AuthUser> opt;
+        if (normalizedEmail != null && !normalizedEmail.isBlank()) {
+            opt = repo.findByEmail(normalizedEmail);
+        } else if (normalizedPhone != null && !normalizedPhone.isBlank()) {
+            opt = repo.findByPhone(normalizedPhone);
+        } else {
+            opt = Optional.empty();
+        }
         if (opt.isEmpty()) {
-            // Unified error to prevent enumeration · do NOT reveal that email is unknown.
-            LOG.debug("login_fail email_not_found email={}", maskEmail(normalizedEmail));
+            // Unified error to prevent enumeration · do NOT reveal which identifier is unknown.
+            LOG.debug("login_fail user_not_found email={} phone={}",
+                    maskEmail(normalizedEmail), maskPhone(normalizedPhone));
             throw new InvalidCredentialsException();
         }
         AuthUser user = opt.get();
 
         // Soft-deleted account
         if ("DELETED".equals(user.getStatus())) {
-            LOG.debug("login_fail deleted email={}", maskEmail(email));
+            LOG.debug("login_fail deleted id={}", user.getId());
+            throw new InvalidCredentialsException();
+        }
+
+        // 微信 OAuth 用户 · password_hash 为 NULL · 不允许走 password 登录
+        if (user.getPasswordHash() == null || user.getPasswordHash().isBlank()) {
+            LOG.debug("login_fail password_disabled id={} (wechat-only user)", user.getId());
             throw new InvalidCredentialsException();
         }
 
@@ -131,6 +157,13 @@ public class LoginService {
         int at = email.indexOf('@');
         if (at <= 1) return "***" + email.substring(Math.max(0, at));
         return email.charAt(0) + "***" + email.substring(at);
+    }
+
+    /** Mask middle 4 digits of 11-digit phone · 138****8000. */
+    private static String maskPhone(String phone) {
+        if (phone == null) return "<null>";
+        if (phone.length() < 7) return "***";
+        return phone.substring(0, 3) + "****" + phone.substring(phone.length() - 4);
     }
 
     /** 401 INVALID_CREDENTIALS — unified for wrong-email and wrong-password. */

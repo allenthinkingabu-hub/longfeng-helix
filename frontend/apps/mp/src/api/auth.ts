@@ -16,36 +16,53 @@
 import { httpJSON, apiBase } from './_http';
 
 export interface LoginRequest {
-  phone: string;
+  /** 邮箱 OR 手机号 二选一 · 后端 LoginRequest 接受任一非空 */
+  phone?: string;
+  email?: string;
   password: string;
+  /** 'EMAIL' | 'PHONE' · 默认 EMAIL · 与 spec §5 #2 一致 */
+  provider?: 'EMAIL' | 'PHONE';
 }
 
+/** Spec §5 #2 · 后端真实响应 shape (jwt + refreshToken + student) */
 export interface LoginResponse {
-  token: string;
-  userId: number;
+  jwt: string;
+  refreshToken?: string;
   expiresIn: number;
+  student?: { id: number; nickMasked: string };
 }
 
 export interface WechatLoginRequest {
   code: string;
 }
 
+/** Spec §5 #3 · 后端真实响应 shape */
 export interface WechatLoginResponse {
-  token: string;
-  userId: number;
+  jwt: string;
+  refreshToken?: string;
   expiresIn: number;
-  isNewUser: boolean;
+  isNew: boolean;
+  student?: { id: number; nickMasked: string };
 }
 
-/** POST /api/auth/login · 手机号 + 密码 */
+/**
+ * POST /api/auth/login · 邮箱 OR 手机号 + 密码 (spec §5 #2).
+ * provider 缺省按 phone/email 是否提供决定 (phone 优先 PHONE · 否则 EMAIL).
+ */
 export async function login(req: LoginRequest): Promise<LoginResponse> {
+  const provider = req.provider || (req.phone ? 'PHONE' : 'EMAIL');
   return httpJSON<LoginResponse>(`${apiBase('auth')}/api/auth/login`, {
     method: 'POST',
-    body: { phone: req.phone, password: req.password },
+    body: {
+      provider,
+      email: req.email,
+      phone: req.phone,
+      password: req.password,
+    },
   });
 }
 
-/** POST /api/auth/wechat-login · 微信 code 一键登录 */
+/** POST /api/auth/wechat-login · 微信 code 一键登录 (spec §5 #3) */
 export async function wechatLogin(req: WechatLoginRequest): Promise<WechatLoginResponse> {
   return httpJSON<WechatLoginResponse>(`${apiBase('auth')}/api/auth/wechat-login`, {
     method: 'POST',
