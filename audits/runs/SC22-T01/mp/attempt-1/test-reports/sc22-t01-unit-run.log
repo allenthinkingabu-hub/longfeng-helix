@@ -1,0 +1,36 @@
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v1.6.1 /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/frontend/apps/mp
+
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC1 LOW_CONFIDENCE 退化策略 (biz §2B.22 step 2) > LOW_CONFIDENCE · showMain=false (不显 verdict chip + reason + CTA)
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC1 LOW_CONFIDENCE 退化策略 (biz §2B.22 step 2) > LOW_CONFIDENCE · fallbackI18nKey === "exec.judge.lowConfidence"
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC1 LOW_CONFIDENCE 退化策略 (biz §2B.22 step 2) > LOW_CONFIDENCE · fallbackKind === "lowConfidence" (wxss class · 灰色文案)
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC1 LOW_CONFIDENCE 退化策略 (biz §2B.22 step 2) > LOW_CONFIDENCE · GradeButtons preselected=null · 3 按钮无 ring (KI 学生主体性)
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC2 TIMEOUT 退化策略 (biz §2B.22 TC-22.02) > TIMEOUT · showMain=false · showFallback=true
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC2 TIMEOUT 退化策略 (biz §2B.22 TC-22.02) > TIMEOUT · fallbackI18nKey === "exec.judge.timeout"
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC2 TIMEOUT 退化策略 (biz §2B.22 TC-22.02) > TIMEOUT · fallbackKind === "timeout" (wxss class · 红色 + ⏱)
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC2 TIMEOUT 退化策略 (biz §2B.22 TC-22.02) > TIMEOUT · GradeButtons preselected=null (与 LOW_CONFIDENCE 同 · A.3 优雅降级)
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · SERVICE_UNAVAILABLE 退化策略 (sibling SC22-T02 503 路径) > SERVICE_UNAVAILABLE · fallbackKind === "unavailable" (wxss class · 灰色 + ⚠)
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · SERVICE_UNAVAILABLE 退化策略 (sibling SC22-T02 503 路径) > SERVICE_UNAVAILABLE · fallbackI18nKey === "exec.banner.fallback"
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC3 + TI3 · final_grade_source 退化态 (学生 tap = self) > LOW_CONFIDENCE + grade=PARTIAL → final_grade_source=self (biz §2B.22 line 213 关键断言)
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC3 + TI3 · final_grade_source 退化态 (学生 tap = self) > TIMEOUT + grade=PARTIAL → final_grade_source=self (biz §2B.22 TC-22.02 关键断言)
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC3 + TI3 · final_grade_source 退化态 (学生 tap = self) > SERVICE_UNAVAILABLE + grade=FORGOT → final_grade_source=self (sibling SC22-T02 503 路径)
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC3 + TI3 · final_grade_source 退化态 (学生 tap = self) > DONE base case · 验确 sibling SC20-T05 ai_accepted 路径未破坏 (向后兼容)
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC4 · 视觉 polish fallbackKind 3 态独立 + flag/chip/hint 退化 > 退化态 (LOW_CONFIDENCE) · aiFlag 不显 · metaChip 不显 · hintRibbon 不显 (sibling SC20-T05 已实装)
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC4 · 视觉 polish fallbackKind 3 态独立 + flag/chip/hint 退化 > 退化态 (TIMEOUT) · aiFlag 不显 · metaChip 不显 · hintRibbon 不显
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC4 · 视觉 polish fallbackKind 3 态独立 + flag/chip/hint 退化 > DONE base case · aiFlag 显 · metaChip 显 · hintRibbon 显 (向后兼容 SC20-T05)
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC4 · 视觉 polish fallbackKind 3 态独立 + flag/chip/hint 退化 > 3 个 fallbackKind 与 status 1:1 映射 (穷举校验 · 防 silent fork)
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC5 · i18n 2 新 key (lowConfidence.hint + timeout.icon) 双语 + assert > zh.json 含 SC22-T01 2 key
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC5 · i18n 2 新 key (lowConfidence.hint + timeout.icon) 双语 + assert > en.json 含 SC22-T01 2 key
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC5 · i18n 2 新 key (lowConfidence.hint + timeout.icon) 双语 + assert > SC22_T01_REQUIRED_KEYS 字面锁 2 key (biz §2B.22 视觉 polish)
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC5 · i18n 2 新 key (lowConfidence.hint + timeout.icon) 双语 + assert > zh lowConfidence.hint 字面非空 + 含 "AI"
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · AC5 · i18n 2 新 key (lowConfidence.hint + timeout.icon) 双语 + assert > zh timeout.icon === "⏱"
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · KI 学生主体性 · aria-label 不含 "AI 建议" 当 preselected=null > preselected=null 时 GradeButtons aria-label 不含 AI 建议字面 (色盲友好)
+ ✓ test/unit/sc22-t01-banner-fallback-polish.spec.ts > SC22-T01 · KI 学生主体性 · aria-label 不含 "AI 建议" 当 preselected=null > computeGradeButtonAriaLabel 退化态 (preselected=null) 不含 "AI 建议"
+
+ Test Files  1 passed (1)
+      Tests  25 passed (25)
+   Start at  11:23:17
+   Duration  216ms (transform 47ms, setup 0ms, collect 50ms, tests 4ms, environment 0ms, prepare 57ms)
+
+JUNIT report written to /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/frontend/apps/mp/test-results/sc22-t01-unit.xml

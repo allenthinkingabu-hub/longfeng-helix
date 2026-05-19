@@ -11,7 +11,9 @@
   "exec.judge.matchedSteps": "已完成步骤",
   "exec.judge.missedSteps": "缺失步骤",
   "exec.judge.lowConfidence": "🤔 AI 不太确定 · 请按你的理解自评",
+  "exec.judge.lowConfidence.hint": "可能题型复杂或字迹模糊 · AI 暂未判定",
   "exec.judge.timeout": "AI 判超时 · 请用自评",
+  "exec.judge.timeout.icon": "⏱",
   "exec.banner.fallback": "AI 暂不可用 · 请用自评",
   "exec.banner.modelUsed": "{model} · {latency}s",
   "exec.judge.cta.overrideAck": "你选择了 {grade} · 与 AI 不同 (这有助于我们改进 AI)"

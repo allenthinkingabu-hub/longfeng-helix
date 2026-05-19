@@ -551,6 +551,9 @@ Page({
       verdictText: bannerRaw.verdictI18nKey
         ? translate(zhLocale, bannerRaw.verdictI18nKey)
         : '',
+      // SC22-T01 · fallback 视觉差 kind ('lowConfidence' | 'timeout' | 'unavailable' | null)
+      // wxml 用 'aijb-fallback-{{fallbackKind}}' 选 wxss class
+      fallbackKind: bannerRaw.fallbackKind,
     };
 
     const aiFlagVisible = shouldShowAiFlag({ status: d.aiJudgeStatus });

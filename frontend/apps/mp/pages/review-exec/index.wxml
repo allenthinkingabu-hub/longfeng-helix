@@ -317,9 +317,13 @@
         <text>{{overrideAckVm.text}}</text>
       </view>
     </view>
-    <!-- SC20-T05 AC1 退化态 · fallback (banner 主区不渲染时显示) -->
-    <view wx:if="{{bannerVm.showFallback}}" class="aijb aijb-fallback" data-test-id="{{aiJudgeIds.fallback}}">
-      <text class="aijb-fallback-text">🤔 {{bannerVm.fallbackText}}</text>
+    <!-- SC20-T05 AC1 退化态 · fallback (banner 主区不渲染时显示) ·
+         SC22-T01 视觉 polish: fallbackKind 决定 class (lowConfidence 灰 · timeout 红 + ⏱ · unavailable 灰 + ⚠) -->
+    <view wx:if="{{bannerVm.showFallback}}" class="aijb aijb-fallback aijb-fallback-{{bannerVm.fallbackKind}}" data-test-id="{{aiJudgeIds.fallback}}">
+      <text wx:if="{{bannerVm.fallbackKind === 'timeout'}}" class="aijb-fallback-icon aijb-fallback-icon-timeout">⏱</text>
+      <text wx:elif="{{bannerVm.fallbackKind === 'unavailable'}}" class="aijb-fallback-icon aijb-fallback-icon-unavailable">⚠</text>
+      <text wx:else class="aijb-fallback-icon aijb-fallback-icon-lowConfidence">🤔</text>
+      <text class="aijb-fallback-text">{{bannerVm.fallbackText}}</text>
     </view>
 
     <!-- ── Node timeline ──────────────────────────────── -->

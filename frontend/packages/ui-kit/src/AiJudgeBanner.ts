@@ -57,6 +57,13 @@ export interface AiJudgeBannerViewModel {
   modelSubtitle: string;
   /** verdict label i18n key · DONE 时根据 verdict 选 */
   verdictI18nKey: string | null;
+  /**
+   * SC22-T01 · fallback 视觉差 (wxss 选不同 class) · null = 主区 DONE 不退化:
+   * - 'lowConfidence': 灰色文案 (区分 confidence ≥ 0.5 紫色 banner)
+   * - 'timeout': 红色 + 超时图标 (biz §2B.22 TC-22.02)
+   * - 'unavailable': 灰色 + 服务不可用图标 (SERVICE_UNAVAILABLE)
+   */
+  fallbackKind: 'lowConfidence' | 'timeout' | 'unavailable' | null;
 }
 
 const VERDICT_KEY: Record<AiJudgeVerdict, string> = {
@@ -69,6 +76,13 @@ const FALLBACK_KEY: Partial<Record<AiJudgeStatus, string>> = {
   TIMEOUT: 'exec.judge.timeout',
   LOW_CONFIDENCE: 'exec.judge.lowConfidence',
   SERVICE_UNAVAILABLE: 'exec.banner.fallback',
+};
+
+/** SC22-T01 · fallback 状态 → 视觉 kind 映射 (wxss class 选择 · biz §2B.22 视觉 polish) */
+const FALLBACK_KIND: Partial<Record<AiJudgeStatus, 'lowConfidence' | 'timeout' | 'unavailable'>> = {
+  TIMEOUT: 'timeout',
+  LOW_CONFIDENCE: 'lowConfidence',
+  SERVICE_UNAVAILABLE: 'unavailable',
 };
 
 const MODEL_DISPLAY: Record<string, string> = {
@@ -96,6 +110,7 @@ export function deriveAiJudgeBannerViewModel(props: AiJudgeBannerProps): AiJudge
     confidencePct: confPct,
     modelSubtitle,
     verdictI18nKey: showMain && props.verdict ? VERDICT_KEY[props.verdict] : null,
+    fallbackKind: showFallback ? (FALLBACK_KIND[props.status] || 'unavailable') : null,
   };
 }
 

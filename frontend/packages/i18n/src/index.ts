@@ -80,3 +80,20 @@ export function assertSC21T02Coverage(locale: Locale): { missing: string[]; pass
   const missing = SC21_T02_REQUIRED_KEYS.filter((k) => locale[k] === undefined);
   return { missing, pass: missing.length === 0 };
 }
+
+/**
+ * SC22-T01 · 新增 2 个 i18n key · 退化态视觉 polish (biz §2B.22 视觉 polish):
+ * - exec.judge.lowConfidence.hint (LOW_CONFIDENCE 详细 hint 文案 · 灰色文案下方可显)
+ * - exec.judge.timeout.icon (TIMEOUT 红色超时图标字面 ⏱ · 可在 wxss font-family 不渲 emoji 时 fallback)
+ */
+export const SC22_T01_REQUIRED_KEYS = [
+  'exec.judge.lowConfidence.hint',
+  'exec.judge.timeout.icon',
+] as const;
+
+export type SC22T01Key = (typeof SC22_T01_REQUIRED_KEYS)[number];
+
+export function assertSC22T01Coverage(locale: Locale): { missing: string[]; pass: boolean } {
+  const missing = SC22_T01_REQUIRED_KEYS.filter((k) => locale[k] === undefined);
+  return { missing, pass: missing.length === 0 };
+}

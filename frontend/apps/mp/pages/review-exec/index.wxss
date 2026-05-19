@@ -1052,15 +1052,46 @@ page {
   line-height: 1.5;
 }
 
-/* AiJudgeBanner fallback 退化态 (TIMEOUT / LOW_CONFIDENCE / SERVICE_UNAVAILABLE) */
+/* AiJudgeBanner fallback 退化态 (TIMEOUT / LOW_CONFIDENCE / SERVICE_UNAVAILABLE)
+ * SC22-T01 视觉 polish: fallbackKind 决定文案颜色 + 图标颜色
+ *   - lowConfidence 灰色文案 + 灰色 🤔 (区分 ≥ 0.5 紫色 banner)
+ *   - timeout 红色文案 + 红色 ⏱ (高优先级警示)
+ *   - unavailable 灰色文案 + 灰色 ⚠
+ */
 .aijb-fallback {
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+.aijb-fallback-icon {
+  font-size: 28rpx;
+  font-weight: 700;
 }
 
 .aijb-fallback-text {
-  color: #636366;
   font-size: 26rpx;
   font-weight: 600;
+}
+
+/* lowConfidence: 灰色文案 + 灰色图标 (KI 学生主体性 · 色盲友好) */
+.aijb-fallback-lowConfidence .aijb-fallback-text,
+.aijb-fallback-lowConfidence .aijb-fallback-icon-lowConfidence {
+  color: #636366;
+}
+
+/* timeout: 红色文案 + 红色 ⏱ (高优先级警示 · biz §2B.22 TC-22.02) */
+.aijb-fallback-timeout .aijb-fallback-text,
+.aijb-fallback-timeout .aijb-fallback-icon-timeout {
+  color: #FF3B30;
+}
+
+/* unavailable: 灰色文案 + 灰色 ⚠ (服务全失败 · SC22-T02 503 路径) */
+.aijb-fallback-unavailable .aijb-fallback-text,
+.aijb-fallback-unavailable .aijb-fallback-icon-unavailable {
+  color: #636366;
 }
 
 /* AiHintRibbon · rating 上方紫色 hint banner (mockup L401-L404) */
