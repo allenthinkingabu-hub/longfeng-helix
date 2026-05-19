@@ -55,9 +55,13 @@
     </view>
 
     <!-- ── Work area ──────────────────────────────────── -->
+    <!-- SC20-T04: photo mode 切到时 block-title 跟随 answerMode 切文案 (testid namespace 仅 4 必加 · 不在此挂) -->
     <view class="block-title">
       <view class="block-title-dot"></view>
-      <text>你的解答 · 手写</text>
+      <text wx:if="{{answerMode === 'photo'}}">你的作答 · 拍照</text>
+      <text wx:elif="{{answerMode === 'keyboard'}}">你的解答 · 键盘</text>
+      <text wx:elif="{{answerMode === 'formula'}}">你的解答 · 公式</text>
+      <text wx:else>你的解答 · 手写</text>
     </view>
     <view class="work" data-test-id="p08-answer-area" bind:touchstart="onCanvasTouch">
       <!-- ── Mode: handwrite ──
@@ -88,7 +92,7 @@
       </view>
 
       <!-- ── Mode: formula (符号面板) ── -->
-      <view wx:else class="paper paper-input">
+      <view wx:elif="{{answerMode === 'formula'}}" class="paper paper-input">
         <view class="fm-display" data-test-id="p08-answer-formula-display">
           <text wx:if="{{userAnswer}}">{{userAnswer}}</text>
           <text wx:else class="fm-placeholder">点下方符号拼接你的解答…</text>
@@ -104,6 +108,41 @@
           <view class="fm-key fm-key-util" bind:tap="onFormulaBackspace">⌫</view>
           <view class="fm-key fm-key-util" bind:tap="onFormulaClear">清空</view>
         </view>
+      </view>
+
+      <!-- ── Mode: photo (SC20-T04 · 第 4 input tab) ── -->
+      <!-- 已上传: UploadedAnswerThumb (mockup L243-L271 视觉 · 120px 高 + 绿 badge + 元数据)
+           上传中: progress placeholder (TI4 uploading 50% 态)
+           IDLE / FAILED: 占位 + 提示文案 -->
+      <view wx:elif="{{answerMode === 'photo'}}" class="paper paper-photo" data-test-id="{{aiJudgeIds.photoThumb}}">
+        <block wx:if="{{photoState === 'UPLOADED' && userAnswerImageKey}}">
+          <view class="photo-thumb">
+            <view class="photo-thumb-placeholder">
+              <text class="photo-thumb-glyph">📷</text>
+              <text class="photo-thumb-key">{{userAnswerImageKey}}</text>
+            </view>
+            <view class="photo-badge-uploaded" data-test-id="{{aiJudgeIds.uploadBadge}}">
+              <text>✓ 上传成功</text>
+            </view>
+            <view class="photo-meta" data-test-id="{{aiJudgeIds.photoMeta}}">
+              <text>{{photoSizeLabel}} · {{photoCapturedAt}}</text>
+            </view>
+          </view>
+        </block>
+        <block wx:elif="{{photoState === 'UPLOADING'}}">
+          <view class="photo-uploading">
+            <text class="photo-uploading-text">上传中... {{photoUploadPct}}%</text>
+            <view class="photo-progress-track">
+              <view class="photo-progress-bar" style="width: {{photoUploadPct}}%;"></view>
+            </view>
+          </view>
+        </block>
+        <block wx:else>
+          <view class="photo-placeholder">
+            <text class="photo-placeholder-glyph">📷</text>
+            <text class="photo-placeholder-text">点击下方「拍照」拍下你的草稿纸作答</text>
+          </view>
+        </block>
       </view>
 
       <view class="tools">
@@ -133,6 +172,16 @@
         >
           <van-icon name="star" size="14px" color="{{answerMode === 'formula' ? '#007AFF' : '#636366'}}" />
           <text>公式面板</text>
+        </view>
+        <!-- SC20-T04: 第 4 input tab · active 时蓝色 prime 高亮 (mockup L295) -->
+        <view
+          class="tool {{answerMode === 'photo' ? 'tool-prime' : ''}}"
+          data-mode="photo"
+          data-test-id="{{aiJudgeIds.inputTabPhoto}}"
+          bind:tap="onToolTap"
+        >
+          <van-icon name="photograph" size="14px" color="{{answerMode === 'photo' ? '#007AFF' : '#636366'}}" />
+          <text>{{photoTabLabel}}</text>
         </view>
       </view>
     </view>

@@ -198,3 +198,32 @@ export async function nodeResult(nid: number | string): Promise<NodeResultResp> 
     `${BASE}/api/review/nodes/${nid}/result`,
   );
 }
+
+// ── SC20-T04 · M-AI-ANSWER-JUDGE §10.17 · POST /api/review/nodes/{nid}/judge ──
+// trace: biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §10.17 + spec §5 #1
+//        SC20-T02 backend AnswerJudgeService 已实装 · 接收 user_answer_image_key 返 verdict/confidence/reason
+// 5-8s sync REST · Sonnet 主 · GPT-4o 备 · 503 AI_SERVICE_UNAVAILABLE 时前端走 banner 降级
+// 本 task (SC20-T04 mp frontend photo tab) 只调本接口 · 不解析 verdict 字段 (那是 T05 banner 的事)
+export interface JudgeReq {
+  user_answer_image_key: string;
+}
+
+export interface JudgeResp {
+  verdict: 'MASTERED' | 'PARTIAL' | 'FORGOT';
+  confidence: number;
+  reason: string;
+  status: 'DONE' | 'LOW_CONFIDENCE' | 'TIMEOUT';
+  matched_steps?: string[];
+  missed_steps?: string[];
+}
+
+export async function judgeNode(
+  nid: number | string,
+  req: JudgeReq,
+  idempotencyKey: string,
+): Promise<JudgeResp> {
+  return httpJSON<JudgeResp>(
+    `${BASE}/api/review/nodes/${nid}/judge`,
+    { method: 'POST', body: req, headers: { 'X-Idempotency-Key': idempotencyKey } },
+  );
+}

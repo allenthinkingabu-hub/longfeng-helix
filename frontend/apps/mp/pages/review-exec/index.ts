@@ -2,10 +2,22 @@
 // trace: design/mockups/wrongbook/08_review_exec.html · @longfeng/testids p08
 // 状态机: READING → ANSWERING → REVEALED → GRADED (mirrors H5 ReviewExec)
 // API: src/api/review.ts · getNode + revealNode + gradeNode · 真 API · 0 mock
+//
+// SC20-T04 (M-AI-ANSWER-JUDGE satellite · 方案 A 辅助式) 加第 4 input tab 'photo':
+// - 标杆模板: frontend/apps/mp/pages/capture/index.ts handleCapture()
+//   复用 master §10.1 presign + wx.request PUT 二进制 OSS 直传
+//   (不能用 wx.uploadFile · 会包 multipart 破签名)
+// - mockup: design/mockups/wrongbook/20_review_exec_ai_judge.html L243-L302
+// - spec: design/system/pages/P08-review-exec-ai-judge.spec.md §3 + §4.1 + §5
+// - testid: @longfeng/testids TEST_IDS.p08AiJudge.* 4 必加 (T05 团队加另外 6)
+// - 现有 3 mode tab (handwrite/keyboard/formula) 100% 保留 (KI2)
+// - OSS 失败时 (TC-20.03 边界) toast '上传失败 · 请重试' + 自动切回 handwrite + 0 副作用 (AC5)
+// - userAnswerImageKey 写 page state · 切回 handwrite/keyboard/formula 时不清 (TI1)
 
 import { TEST_IDS, p08Ids } from '@longfeng/testids';
-import { getNode, revealNode, gradeNode } from '../../src/api/review';
+import { getNode, revealNode, gradeNode, judgeNode } from '../../src/api/review';
 import { getQuestionById } from '../../src/api/wrongbook';
+import { presign } from '../../src/api/file';
 
 // BE wrong_item.subject 是 enum 小写串 (math/physics/...) · 渲染要中文标签
 const SUBJECT_LABEL_MAP: Record<string, string> = {
@@ -15,7 +27,14 @@ const SUBJECT_LABEL_MAP: Record<string, string> = {
 // ─── Types ──────────────────────────────────────────────────────
 type ExecState = 'READING' | 'ANSWERING' | 'REVEALED' | 'GRADED';
 type GradeValue = 'FORGOT' | 'PARTIAL' | 'MASTERED';
-type AnswerMode = 'handwrite' | 'keyboard' | 'formula';
+// SC20-T04: AnswerMode 加第 4 值 'photo' (satellite §0.2 + spec §4.1)
+type AnswerMode = 'handwrite' | 'keyboard' | 'formula' | 'photo';
+// SC20-T04: photo tab 上传子状态 (capture → uploading → uploaded · 失败回退 IDLE)
+type PhotoState = 'IDLE' | 'UPLOADING' | 'UPLOADED' | 'FAILED';
+
+// SC20-T04: photo tab i18n (zh / en · 用户当前 locale 后续接 i18n 包再切 · 此处先 zh)
+const I18N_PHOTO_TAB_ZH = '拍照';
+// (en 'Photo' 字面留作单测 · 不在 UI 里直接渲染 zh+en)
 
 // spec §3 答题区 3 mode tab · 公式面板常用符号集 (高中数学覆盖度优先)
 const FORMULA_SYMBOLS = [
@@ -86,7 +105,11 @@ Page({
   data: {
     // test ids
     testIds: TEST_IDS.p08,
+    // SC20-T04: 第 4 input tab + UploadedAnswerThumb 子组件 testid (4 必加)
+    aiJudgeIds: TEST_IDS.p08AiJudge,
     p08Ids: null as unknown,
+    // SC20-T04 i18n key 兜底 (zh) · 渲染 photo tab 文案 · TI2 'exec.answer.photo'
+    photoTabLabel: I18N_PHOTO_TAB_ZH,
 
     // state machine
     execState: 'READING' as ExecState,
@@ -94,10 +117,21 @@ Page({
     isGrading: false,
     showExitSheet: false,
 
-    // spec §4.1 answerDraft · 3 mode tab (handwrite/keyboard/formula)
+    // spec §4.1 answerDraft · SC20-T04 加第 4 mode 'photo'
     answerMode: 'handwrite' as AnswerMode,
     userAnswer: '',                          // keyboard / formula 累积输入
     formulaSymbols: FORMULA_SYMBOLS,
+
+    // SC20-T04 photo 路径专属 page state (TI1 切回 handwrite 不清)
+    // null 时显示 placeholder + 「拍照」按钮 · 非 null 时显示 UploadedAnswerThumb
+    userAnswerImageKey: '' as string,         // OSS object key · empty = 未上传
+    photoState: 'IDLE' as PhotoState,
+    photoSizeBytes: 0 as number,              // UploadedAnswerThumb props
+    photoCapturedAt: '' as string,            // ISO time string · 渲染 "9:41:23"
+    photoSizeLabel: '' as string,             // 渲染 "487 KB" (人类友好)
+    photoUploadPct: 0 as number,              // 进度 0..100 (TI4 uploading 50% 态)
+    // AC4: judge resp 落 page state · 详细 banner UI 由 T05 团队 + 其他 task 渲染
+    aiJudgeStatus: 'IDLE' as string,
 
     // derived
     isRevealed: false,
@@ -229,13 +263,159 @@ Page({
     }
   },
 
-  // ── Answer mode tabs (spec §3 AnswerArea 3-mode) ──────────
-  // 切换答题输入方式 · 不直接进入 ANSWERING (要真敲键盘 / 点公式 / 触摸 canvas 才进)
+  // ── Answer mode tabs (spec §3 AnswerArea 4-mode · SC20-T04 加 photo) ──
+  // 切换答题输入方式 · 切回 handwrite/keyboard/formula 时 userAnswerImageKey 不清 (TI1)
+  // 切到 'photo' 且没已上传图: 自动唤起 wx.chooseMedia (用户可在 sheet 取消 · 不进 ANSWERING)
   onToolTap(e: WechatMiniprogram.TouchEvent) {
     const mode = e.currentTarget.dataset.mode as AnswerMode;
     if (!mode || mode === this.data.answerMode) return;
     try { wx.vibrateShort({ type: 'light' }); } catch { /* noop */ }
     this.setData({ answerMode: mode });
+    // SC20-T04: 切到 photo 且未上传过 → 唤相册/相机 sheet (capture/index.ts 同 pattern)
+    // 已上传过 (userAnswerImageKey 非空) → 不重唤 · 显示现有缩略图 (TI1 真值不丢)
+    if (mode === 'photo' && !this.data.userAnswerImageKey && this.data.photoState !== 'UPLOADING') {
+      this._openPhotoSheet();
+    }
+  },
+
+  // ── SC20-T04 · 拍照作答 ───────────────────────────────────────
+  // 标杆: pages/capture/index.ts onShutterTap() · wx.chooseMedia 二合一 (拍照 / 相册)
+  _openPhotoSheet() {
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['camera', 'album'], // 真用户优先拍 · album 兜底 (e.g. 之前拍过的草稿)
+      sizeType: ['compressed'],         // 微信自动压 ≈ 500KB · 满足 §11 P95 ≤ 2s
+      camera: 'back',
+      success: (res) => {
+        const file = res.tempFiles?.[0];
+        if (file && file.tempFilePath) {
+          this._handlePhotoUpload(file.tempFilePath, file.size);
+        }
+      },
+      fail: (err) => {
+        // 用户主动取消 · 不报错 · 静默切回 handwrite (UX 友好)
+        console.warn('[P08] wx.chooseMedia cancel / fail:', err?.errMsg);
+        this.setData({ answerMode: 'handwrite' as AnswerMode });
+      },
+    });
+  },
+
+  // OSS upload (presign + PUT 二进制 · 不能 wx.uploadFile · 会包 multipart 破签名)
+  // 标杆: pages/capture/index.ts handleCapture() L107-194 · 复用 master §10.1 通道
+  async _handlePhotoUpload(tempFilePath: string, size: number) {
+    // 边界: > 10MB 拒上传 (与 capture.ts 一致 · 防 OSS 大对象拖慢 5G 网络)
+    const MAX_BYTES = 10 * 1024 * 1024;
+    if (size > MAX_BYTES) {
+      wx.showToast({ title: '图片过大（最大 10MB）', icon: 'none' });
+      this.setData({ answerMode: 'handwrite' as AnswerMode });
+      return;
+    }
+
+    this.setData({
+      photoState: 'UPLOADING' as PhotoState,
+      photoUploadPct: 0,
+      // 不立刻 set userAnswerImageKey · 等 PUT 成功才落值 (失败时不污染 page state · AC5 0 副作用)
+    });
+
+    const idempotencyKey = `judge-${this.data.node.nid}-${Date.now()}`;
+
+    try {
+      // Step 1: presign (master §10.1 现役接口 · 复用 capture.ts pattern)
+      const presignResp = await presign({
+        mime: 'image/jpeg',
+        size,
+        filename: `answer-${this.data.node.nid}-${Date.now()}.jpg`,
+        idempotencyKey,
+      });
+      this.setData({ photoUploadPct: 20 });
+
+      // Step 2: 读 tempFile → ArrayBuffer · PUT 原始字节
+      const fileBuffer = await new Promise<ArrayBuffer>((resolve, reject) => {
+        wx.getFileSystemManager().readFile({
+          filePath: tempFilePath,
+          success: (res) => resolve(res.data as ArrayBuffer),
+          fail: (err) => reject(new Error(`readFile failed: ${err.errMsg}`)),
+        });
+      });
+
+      this.setData({ photoUploadPct: 50 }); // TI4 uploading 50% 态 (VRT 截图点)
+
+      await new Promise<void>((resolve, reject) => {
+        wx.request({
+          url: presignResp.upload_url,
+          method: 'PUT',
+          data: fileBuffer,
+          header: { 'Content-Type': 'image/jpeg' },
+          success: (res: WechatMiniprogram.RequestSuccessCallbackResult) => {
+            if (res.statusCode >= 200 && res.statusCode < 400) {
+              resolve();
+            } else {
+              reject(new Error(`PUT failed: ${res.statusCode}`));
+            }
+          },
+          fail: (err: WechatMiniprogram.GeneralCallbackResult) => {
+            reject(new Error(err.errMsg));
+          },
+        });
+      });
+
+      // PUT 成功 · 落 userAnswerImageKey 到 page state (TI1 切回 handwrite 仍保留)
+      const sizeKb = Math.round(size / 1024);
+      const sizeLabel = sizeKb >= 1024
+        ? `${(sizeKb / 1024).toFixed(1)} MB`
+        : `${sizeKb} KB`;
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const ss = String(now.getSeconds()).padStart(2, '0');
+      const capturedAtLabel = `${hh}:${mm}:${ss}`;
+
+      this.setData({
+        photoState: 'UPLOADED' as PhotoState,
+        photoUploadPct: 100,
+        userAnswerImageKey: presignResp.file_key,
+        photoSizeBytes: size,
+        photoSizeLabel: sizeLabel,
+        photoCapturedAt: capturedAtLabel,
+        // 进入 ANSWERING 状态 (满足"先做再揭"的 state machine · spec §6)
+        execState: 'ANSWERING' as ExecState,
+        isAnswering: true,
+      });
+
+      // Step 3 (AC4): 自动调 POST :judge (T02 接口已实装)
+      // 注: 本 task scope 仅 fire-and-forget 落 aiJudge.status · 详细 banner 渲染由 T05 加
+      this._triggerJudge(this.data.node.nid, presignResp.file_key, idempotencyKey);
+    } catch (err) {
+      // AC5 / TC-20.03: OSS 失败 → toast + 自动切回 handwrite + 0 wb_review_node 字段被改
+      console.error('[P08 SC20-T04] photo upload failed:', err);
+      wx.showToast({ title: '上传失败 · 请重试', icon: 'none', duration: 2000 });
+      this.setData({
+        photoState: 'FAILED' as PhotoState,
+        photoUploadPct: 0,
+        userAnswerImageKey: '',          // 不落键 · 防后续 :judge 拿空 key 调坏
+        photoSizeBytes: 0,
+        photoSizeLabel: '',
+        photoCapturedAt: '',
+        answerMode: 'handwrite' as AnswerMode,  // 自动切回 (AC5 字面)
+      });
+    }
+  },
+
+  // AC4: photo 上传成功后自动调 POST /api/review/nodes/{nid}/judge
+  // 本 task scope 仅落 aiJudge.status · banner 渲染 / verdict 展示由 sibling team T05 完成
+  async _triggerJudge(nid: string, imageKey: string, idempotencyKey: string) {
+    this.setData({ aiJudgeStatus: 'PENDING' });
+    try {
+      const resp = await judgeNode(nid, { user_answer_image_key: imageKey }, idempotencyKey);
+      // 本 task 不解析 verdict / confidence (留给 T05 banner) · 仅落 status
+      this.setData({ aiJudgeStatus: resp.status || 'DONE' });
+    } catch (err) {
+      // SC-22 降级: AI 503 / 超时 → status SERVICE_UNAVAILABLE · 不阻塞学生自评 (A.3 优雅降级)
+      console.warn('[P08 SC20-T04] judge call failed (banner will show fallback):', err);
+      this.setData({ aiJudgeStatus: 'SERVICE_UNAVAILABLE' });
+      // 注: 不 reset photoState · 已上传图仍在 OSS · 学生可继续自评
+    }
   },
 
   // keyboard mode · <textarea> input

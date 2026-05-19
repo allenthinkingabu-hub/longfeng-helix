@@ -353,6 +353,137 @@ page {
   font-size: 24rpx;
 }
 
+/* ── SC20-T04 · Photo input tab (第 4 mode) ─────────── */
+/* trace: design/mockups/wrongbook/20_review_exec_ai_judge.html L243-L302
+   UploadedAnswerThumb: 120px (≈ 240rpx) 高 + 绿色「上传成功」badge + 元数据 (487 KB · 9:41:23)
+   spec §3 (核心组件 第 3 行) + AC3 字面: 120px 高 · 绿 badge · 元数据 */
+
+.paper-photo {
+  background: #FBF7EF;                         /* 草稿纸纹理基色 (mockup L222) */
+  border-radius: 24rpx;
+  border: 2rpx solid rgba(120,120,128,0.16);
+  padding: 0;                                  /* photo-thumb 自带 padding */
+  min-height: 240rpx;                          /* AC3 字面 120px ≈ 240rpx 高 */
+  position: relative;
+  overflow: hidden;
+}
+
+.photo-thumb {
+  position: relative;
+  width: 100%;
+  min-height: 240rpx;
+  padding: 24rpx 28rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: repeating-linear-gradient(180deg, #FBF7EF 0, #FBF7EF 47rpx, rgba(0,0,0,.04) 47rpx, rgba(0,0,0,.04) 48rpx);
+}
+
+.photo-thumb-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  color: #1F4FD6;                              /* 学生手写 蓝笔色 (mockup L228) */
+  font-family: cursive;
+  font-size: 28rpx;
+  font-style: italic;
+}
+
+.photo-thumb-glyph {
+  font-size: 48rpx;
+  line-height: 1;
+}
+
+.photo-thumb-key {
+  font-size: 20rpx;
+  color: #8E8E93;
+  word-break: break-all;
+  text-align: center;
+  max-width: 480rpx;
+}
+
+/* 绿色「上传成功」badge (mockup L233-L236) */
+.photo-badge-uploaded {
+  position: absolute;
+  top: 16rpx;
+  right: 16rpx;
+  background: linear-gradient(135deg, #34C759, #2AA84A);
+  color: #fff;
+  font-size: 20rpx;
+  font-weight: 700;
+  letter-spacing: 0.4rpx;
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+  box-shadow: 0 2rpx 4rpx rgba(52,199,89,0.24);
+}
+
+/* 元数据 (mockup L237) */
+.photo-meta {
+  position: absolute;
+  bottom: 12rpx;
+  right: 18rpx;
+  color: #8E8E93;
+  font-size: 20rpx;
+  font-weight: 600;
+  letter-spacing: 0.4rpx;
+}
+
+/* uploading 态 · TI4 50% 进度截图点 */
+.photo-uploading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20rpx;
+  padding: 48rpx 32rpx;
+}
+
+.photo-uploading-text {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #007AFF;
+  letter-spacing: 0.4rpx;
+}
+
+.photo-progress-track {
+  width: 80%;
+  height: 8rpx;
+  border-radius: 4rpx;
+  background: rgba(120,120,128,0.18);
+  overflow: hidden;
+}
+
+.photo-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #34C759, #007AFF);
+  border-radius: 4rpx;
+  transition: width 240ms ease;
+}
+
+.photo-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  padding: 48rpx 32rpx;
+  min-height: 240rpx;
+}
+
+.photo-placeholder-glyph {
+  font-size: 64rpx;
+  line-height: 1;
+  opacity: 0.5;
+}
+
+.photo-placeholder-text {
+  font-size: 26rpx;
+  color: #8E8E93;
+  letter-spacing: 0.4rpx;
+  text-align: center;
+}
+
 /* ── Reveal button ──────────────────────────────────── */
 .reveal-btn-wrap {
   margin: 24rpx 0;
