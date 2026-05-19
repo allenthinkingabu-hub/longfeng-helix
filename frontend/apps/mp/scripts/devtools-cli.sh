@@ -52,6 +52,12 @@ case "${1:-}" in
     echo "[devtools-cli] esbuild workspace 内部包 → miniprogram_npm/"
     REPO_ROOT="$(cd ../../.. && pwd)"
     ESBUILD="$REPO_ROOT/frontend/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/bin/esbuild"
+    # SC20-T05: worktree 下 frontend/node_modules 可能没装 esbuild (pnpm install 只在 main repo 跑)
+    # 兜底用 main repo 的 esbuild · 路径相对 worktree → /Users/allen/workspace/longfeng/frontend/node_modules
+    if [ ! -x "$ESBUILD" ] && [ -x "/Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/bin/esbuild" ]; then
+      ESBUILD="/Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/bin/esbuild"
+      echo "[devtools-cli] worktree esbuild missing · 用 main repo fallback"
+    fi
     if [ -x "$ESBUILD" ]; then
       # SC20-T05 (2026-05-19): 加 ui-kit + i18n 进 esbuild 循环
       # ui-kit · pure-TS view-model helpers (AiJudgeBanner + 4 配套 + GradeButtons preselected)

@@ -1,0 +1,29 @@
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v1.6.1 /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/frontend/apps/mp
+
+ ❯ test/e2e/sc-20/t05-ai-judge-banner-components.spec.ts  (6 tests) 15ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  test/e2e/sc-20/t05-ai-judge-banner-components.spec.ts > SC20-T05 · <AiJudgeBanner> + 4 配套 + GradeButtons preselected (MP E2E)
+Error: Failed connecting to ws://127.0.0.1:9420, check if target project window is opened with automation enabled
+ ❯ Launcher.connectTool ../../../../../../frontend/node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:3020
+ ❯ Launcher.connect ../../../../../../frontend/node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Launcher.js:1:2600
+ ❯ Automator.connect ../../../../../../frontend/node_modules/.pnpm/miniprogram-automator@0.12.1/node_modules/miniprogram-automator/out/Automator.js:1:1352
+ ❯ Module.connectMp test/e2e/_helpers.ts:45:14
+     43|   errors: string[];
+     44| }> {
+     45|   const mp = await Promise.race([
+       |              ^
+     46|     automator.connect({ wsEndpoint: WS_ENDPOINT }),
+     47|     new Promise<never>((_, reject) =>
+ ❯ test/e2e/sc-20/t05-ai-judge-banner-components.spec.ts:106:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests   (6)
+   Start at  09:23:45
+   Duration  318ms (transform 37ms, setup 0ms, collect 144ms, tests 15ms, environment 0ms, prepare 43ms)
+

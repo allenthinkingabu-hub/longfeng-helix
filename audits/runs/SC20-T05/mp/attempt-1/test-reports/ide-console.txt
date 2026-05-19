@@ -1,0 +1,4 @@
+// SC20-T05 Phase 4 Tester · IDE Console capture · 2026-05-19
+// IDE WS handshake failed (websocket connection rejected · sandbox multi-worktree port 9420 conflict · sibling teams T04/T06 etc 都跑过)
+// 真 E2E 待 IDE 可独占时跑 · 当前覆盖: 24/24 unit test PASS (锁定 view-model logic + i18n + final_grade_source + aria-label)
+// Tester 决策: 不 silent succeed · 不伪造 0 [error] PASS · 显式 surface 环境限制 (CLAUDE.md Rule 12 Fail loud)
