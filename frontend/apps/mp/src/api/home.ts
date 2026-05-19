@@ -52,12 +52,16 @@ export interface HomeTodayData {
 /**
  * GET /api/review/today?tz=Asia/Shanghai
  * Returns today's review count + done count for P-HOME hero card.
- * httpJSON 自动 unwrapApiResult · 直接拿 inner shape · 不要再 .data
+ * 必带 X-User-Id Header (backend default 0 时所有人共看 student#0 数据 · 隔离 bug).
  */
-export async function getHomeTodayCount(tz = 'Asia/Shanghai'): Promise<HomeTodayData> {
+export async function getHomeTodayCount(
+  studentId: string,
+  tz = 'Asia/Shanghai',
+): Promise<HomeTodayData> {
   const query = `?tz=${encodeURIComponent(tz)}`;
   return httpJSON<HomeTodayData>(
     `${BASE}/api/review/today${query}`,
+    { method: 'GET', headers: { 'X-User-Id': studentId } },
   );
 }
 
@@ -119,9 +123,13 @@ export interface WeeklyStatsResp {
   masteryRate: number;
 }
 
-export async function getWeeklyStats(tz = 'Asia/Shanghai'): Promise<WeeklyStatsResp> {
+export async function getWeeklyStats(
+  studentId: string,
+  tz = 'Asia/Shanghai',
+): Promise<WeeklyStatsResp> {
   return httpJSON<WeeklyStatsResp>(
     `${BASE}/api/home/weekly-stats?tz=${encodeURIComponent(tz)}`,
+    { method: 'GET', headers: { 'X-User-Id': studentId } },
   );
 }
 
@@ -130,9 +138,13 @@ export interface WeekDotsResp {
   days: Array<{ date: string; dots: string[] }>;
 }
 
-export async function getWeekDots(tz = 'Asia/Shanghai'): Promise<WeekDotsResp> {
+export async function getWeekDots(
+  studentId: string,
+  tz = 'Asia/Shanghai',
+): Promise<WeekDotsResp> {
   return httpJSON<WeekDotsResp>(
     `${BASE}/api/home/week-dots?tz=${encodeURIComponent(tz)}`,
+    { method: 'GET', headers: { 'X-User-Id': studentId } },
   );
 }
 
@@ -149,8 +161,12 @@ export interface MessagesResp {
   messages: MessageItem[];
 }
 
-export async function getRecentMessages(tz = 'Asia/Shanghai'): Promise<MessagesResp> {
+export async function getRecentMessages(
+  studentId: string,
+  tz = 'Asia/Shanghai',
+): Promise<MessagesResp> {
   return httpJSON<MessagesResp>(
     `${BASE}/api/home/messages/recent?tz=${encodeURIComponent(tz)}`,
+    { method: 'GET', headers: { 'X-User-Id': studentId } },
   );
 }

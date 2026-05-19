@@ -215,20 +215,21 @@ Page({
     type FailableDots = Awaited<ReturnType<typeof getWeekDots>> | undefined;
     type FailableMsg = Awaited<ReturnType<typeof getRecentMessages>> | undefined;
 
+    const sid = currentStudentId();
     const [todayData, weeklyData, dotsData, msgData] = await Promise.all([
-      getHomeTodayCount().catch((err: unknown): FailableTodayData => {
+      getHomeTodayCount(sid).catch((err: unknown): FailableTodayData => {
         console.error('[P-HOME] getHomeTodayCount failed:', err);
         return undefined;
       }),
-      getWeeklyStats().catch((err: unknown): FailableWeekly => {
+      getWeeklyStats(sid).catch((err: unknown): FailableWeekly => {
         console.error('[P-HOME] getWeeklyStats failed:', err);
         return undefined;
       }),
-      getWeekDots().catch((err: unknown): FailableDots => {
+      getWeekDots(sid).catch((err: unknown): FailableDots => {
         console.error('[P-HOME] getWeekDots failed:', err);
         return undefined;
       }),
-      getRecentMessages().catch((err: unknown): FailableMsg => {
+      getRecentMessages(sid).catch((err: unknown): FailableMsg => {
         console.error('[P-HOME] getRecentMessages failed:', err);
         return undefined;
       }),
