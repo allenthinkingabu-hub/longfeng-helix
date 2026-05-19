@@ -492,6 +492,22 @@ export const TEST_IDS = {
     photoBlockTitle:   'ai-judge-photo-block-title',   // 你的作答 · 拍照 [已上传] 段标
     photoUploading:    'ai-judge-photo-uploading',     // OSS PUT 上传中遮罩 (P95 ≤ 100ms 渲染)
     photoUploadRetry:  'ai-judge-photo-upload-retry',  // 上传失败 toast 重试入口 (TC-20.03 AC5)
+    // ── SC20-T05 (本 task) append 12 个 ⭐ AiJudgeBanner + 4 配套 + GradeButtons preselected
+    //    sibling T04 不会动这 12 个 · 共享 p08AiJudge namespace 不冲突 (用户 2026-05-19 平行多 team 拆分约束)
+    flag:              'ai-judge-flag',                // <AiFlag> · nav center 紫 chip (mockup L189)
+    metaChip:          'ai-judge-meta-chip',           // <AiMetaChip> · metarow 第 4 chip (mockup L220)
+    banner:            'ai-judge-banner',              // ⭐ <AiJudgeBanner> 主容器 (mockup L322)
+    bannerHead:        'ai-judge-banner-head',         // head (avatar+ttl+conf-pill)
+    confidence:        'ai-judge-confidence',          // "75% 把握" (mockup L338)
+    verdictChip:       'ai-judge-verdict-chip',        // ◐ PARTIAL 主区 (mockup L344)
+    reason:            'ai-judge-reason',              // 诊断文本 (mockup L353)
+    matchedStepsLi:    'ai-judge-matched-step',        // 配方/顶点 ok chip (wx:for · 1 testid 多次出)
+    missedStepsLi:     'ai-judge-missed-step',         // 对称轴 miss chip (wx:for · 1 testid 多次出)
+    ctaAccept:         'ai-judge-cta-accept',          // 紫色 "采纳建议" CTA (mockup L373)
+    ctaOverride:       'ai-judge-cta-override',        // 灰 "我有不同看法" CTA (mockup L376)
+    fallback:          'ai-judge-fallback',            // 退化 fallback 容器 (TIMEOUT/LOW_CONF/503)
+    hintRibbon:        'ai-judge-hint-ribbon',         // <AiHintRibbon> rating 上方紫 (mockup L401)
+    aiMark:            'ai-judge-ai-mark',             // <AiMark> grade preselected 角标 (mockup L417)
   },
 
   // P09 · ReviewDone · AC-P09-001 ~ 011

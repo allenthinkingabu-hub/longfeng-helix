@@ -18,6 +18,20 @@ import { TEST_IDS, p08Ids } from '@longfeng/testids';
 import { getNode, revealNode, gradeNode, judgeNode } from '../../src/api/review';
 import { getQuestionById } from '../../src/api/wrongbook';
 import { presign } from '../../src/api/file';
+import { track } from '@longfeng/telemetry';
+// SC20-T05: ui-kit pure-TS view-model helpers (banner + flag + chip + ribbon + grade preselected)
+import {
+  computeFinalGradeSource,
+  deriveAiJudgeBannerViewModel,
+  shouldShowAiFlag,
+  deriveAiMetaChip,
+  deriveAiHintRibbon,
+  deriveGradeButtonsViewModel,
+  type AiJudgeVerdict,
+  type AiJudgeStatus,
+} from '@longfeng/ui-kit';
+import { translate } from '@longfeng/i18n';
+import zhLocale from '@longfeng/i18n/locales/zh.json';
 
 // BE wrong_item.subject 是 enum 小写串 (math/physics/...) · 渲染要中文标签
 const SUBJECT_LABEL_MAP: Record<string, string> = {
@@ -35,6 +49,15 @@ type PhotoState = 'IDLE' | 'UPLOADING' | 'UPLOADED' | 'FAILED';
 // SC20-T04: photo tab i18n (zh / en · 用户当前 locale 后续接 i18n 包再切 · 此处先 zh)
 const I18N_PHOTO_TAB_ZH = '拍照';
 // (en 'Photo' 字面留作单测 · 不在 UI 里直接渲染 zh+en)
+
+// SC20-T05 · AI judge events (telemetry · satellite §2A.4 + spec §12 satellite 8 行 8 个新事件)
+const TRACK_EVENTS = {
+  aiDone:    'wb_judge_ai_done',     // banner 渲染时 (resp 200 + status==DONE)
+  userAccept: 'wb_judge_user_accept', // tap accept CTA 或 与 AI 同的自评按钮
+  userOverride: 'wb_judge_user_override', // tap 与 AI 不同的按钮 (含中间值 PARTIAL)
+  aiTimeout: 'wb_judge_ai_timeout',   // 双模型超时 18s
+  aiLowConf: 'wb_judge_ai_low_confidence', // confidence<0.5
+} as const;
 
 // spec §3 答题区 3 mode tab · 公式面板常用符号集 (高中数学覆盖度优先)
 const FORMULA_SYMBOLS = [
@@ -131,7 +154,31 @@ Page({
     photoSizeLabel: '' as string,             // 渲染 "487 KB" (人类友好)
     photoUploadPct: 0 as number,              // 进度 0..100 (TI4 uploading 50% 态)
     // AC4: judge resp 落 page state · 详细 banner UI 由 T05 团队 + 其他 task 渲染
-    aiJudgeStatus: 'IDLE' as string,
+    // SC20-T05 (完整 aiJudge object · spec §4.1 satellite state 字段 7 个 + status)
+    aiJudgeStatus: 'IDLE' as AiJudgeStatus,
+    aiJudgeVerdict: null as AiJudgeVerdict | null,
+    aiJudgeConfidence: 0,
+    aiJudgeReason: '',
+    aiJudgeMatchedSteps: [] as string[],
+    aiJudgeMissedSteps: [] as string[],
+    aiJudgeModelUsed: '',
+    aiJudgeLatencyMs: 0,
+
+    // SC20-T05 banner / flag / chip / hint / preselected view models (派生 · 用 ui-kit helpers)
+    // 渲染端读 banner.showMain / showFallback / verdictI18nText 等 · 0 复杂 wxml logic
+    bannerVm: { showMain: false, showFallback: false, fallbackText: '', confidencePct: 0, modelSubtitle: '', verdictText: '' },
+    aiFlagVisible: false,
+    metaChipVm: { visible: false, pct: 0 },
+    hintRibbonVm: { visible: false, verdictText: '' },
+    // SC20-T05 derived: 3 grade button vm (cls + ariaLabel + showMark + disabled)
+    gradeBtnsVm: [] as Array<{ grade: string; cls: string; ariaLabel: string; showMark: boolean; disabled: boolean }>,
+    // 直接给 wxml 文案 (i18n.t 算好)
+    acceptCtaText: '采纳建议',
+    overrideCtaText: '我有不同看法',
+    thinkingText: 'AI 正在判题...',
+
+    // SC20-T05: AI judge final_grade_source (派生 · onGradeTap 算 + 写 grade body)
+    finalGradeSource: null as 'self' | 'ai_accepted' | 'ai_overridden' | null,
 
     // derived
     isRevealed: false,
@@ -178,6 +225,19 @@ Page({
     if (this._nid) {
       this._fetchNodeAndQuestion(this._nid);
     }
+
+    // SC20-T05: init derived view-models (preselected vm 需要 ai-flag/banner/chip/hint/buttons 全有初值)
+    this._recomputeAiViewModels();
+  },
+
+  // SC20-T05 AC4 override CTA: 学生 dismiss banner 建议但还没 tap 自评按钮
+  //  → 不 grade · 也不改 state · 仅静默 dismiss (preselected 仍在 · 学生可继续选)
+  // 设计决策 (spec §6.2 行 5): override CTA 不直接 grade · 等学生 tap 任一自评按钮才 grade
+  // (与 mockup L376 href="20_review_exec_ai_judge.html" 自指 = "停留原页" 语义一致)
+  onOverrideCtaTap() {
+    if (!this.data.isRevealed) return;
+    // 仅震动反馈 · 不修 aiJudge state (state 仍 DONE) · 不发埋点 (等真 grade 时算 ai_overridden)
+    try { wx.vibrateShort({ type: 'light' }); } catch { /* noop */ }
   },
 
   _buildNodeDots(currentNodeIndex: number) {
@@ -403,19 +463,129 @@ Page({
   },
 
   // AC4: photo 上传成功后自动调 POST /api/review/nodes/{nid}/judge
-  // 本 task scope 仅落 aiJudge.status · banner 渲染 / verdict 展示由 sibling team T05 完成
+  // SC20-T04 (T04 落地 status only) · SC20-T05 扩展: 落完整 verdict / confidence / reason /
+  //   matchedSteps / missedSteps / modelUsed / latencyMs · 算 banner view-model + 埋点 wb_judge_ai_done
   async _triggerJudge(nid: string, imageKey: string, idempotencyKey: string) {
-    this.setData({ aiJudgeStatus: 'PENDING' });
+    const judgeStartedAt = Date.now();
+    this.setData({ aiJudgeStatus: 'PENDING' as AiJudgeStatus });
+    this._recomputeAiViewModels();
+
     try {
       const resp = await judgeNode(nid, { user_answer_image_key: imageKey }, idempotencyKey);
-      // 本 task 不解析 verdict / confidence (留给 T05 banner) · 仅落 status
-      this.setData({ aiJudgeStatus: resp.status || 'DONE' });
+      const latencyMs = Date.now() - judgeStartedAt;
+      // SC20-T05 · 完整字段落 page state (spec §4.1 aiJudge 7 字段 + status)
+      const status = (resp.status || 'DONE') as AiJudgeStatus;
+      this.setData({
+        aiJudgeStatus: status,
+        aiJudgeVerdict: (status === 'DONE' ? (resp.verdict as AiJudgeVerdict) : null),
+        aiJudgeConfidence: typeof resp.confidence === 'number' ? resp.confidence : 0,
+        aiJudgeReason: resp.reason || '',
+        aiJudgeMatchedSteps: Array.isArray(resp.matched_steps) ? resp.matched_steps : [],
+        aiJudgeMissedSteps: Array.isArray(resp.missed_steps) ? resp.missed_steps : [],
+        aiJudgeModelUsed: 'claude-3.5-sonnet', // 默认主模型 · 后端 fallback 后续可 propagate
+        aiJudgeLatencyMs: latencyMs,
+      });
+      this._recomputeAiViewModels();
+
+      // AC6 · 埋点 wb_judge_ai_done (banner 渲染时 · status='DONE' 或退化 status 都发 · 用 status 字段区分)
+      track(TRACK_EVENTS.aiDone, {
+        nid,
+        verdict: resp.verdict || null,
+        confidence: typeof resp.confidence === 'number' ? resp.confidence : 0,
+        ms: latencyMs,
+        model_used: 'claude-3.5-sonnet',
+        status,
+      });
+
+      // §9 异常路径 · LOW_CONFIDENCE 额外埋点
+      if (status === 'LOW_CONFIDENCE') {
+        track(TRACK_EVENTS.aiLowConf, { nid, confidence: resp.confidence });
+      }
+      // §9 异常路径 · TIMEOUT 额外埋点
+      if (status === 'TIMEOUT') {
+        track(TRACK_EVENTS.aiTimeout, { nid, ms: latencyMs });
+      }
     } catch (err) {
       // SC-22 降级: AI 503 / 超时 → status SERVICE_UNAVAILABLE · 不阻塞学生自评 (A.3 优雅降级)
-      console.warn('[P08 SC20-T04] judge call failed (banner will show fallback):', err);
-      this.setData({ aiJudgeStatus: 'SERVICE_UNAVAILABLE' });
+      console.warn('[P08 SC20-T05] judge call failed (banner will show fallback):', err);
+      this.setData({
+        aiJudgeStatus: 'SERVICE_UNAVAILABLE' as AiJudgeStatus,
+        aiJudgeVerdict: null,
+        aiJudgeConfidence: 0,
+      });
+      this._recomputeAiViewModels();
       // 注: 不 reset photoState · 已上传图仍在 OSS · 学生可继续自评
     }
+  },
+
+  // SC20-T05: 把 aiJudge state + revealed 翻成 derived view-models · wxml 直接绑 ·
+  //   0 复杂 wxml logic · 所有 i18n 字符串在这里 translate() 算好后塞进 page data.
+  _recomputeAiViewModels() {
+    const d = this.data;
+    const bannerProps = {
+      verdict: d.aiJudgeVerdict,
+      confidence: d.aiJudgeConfidence,
+      reason: d.aiJudgeReason,
+      matchedSteps: d.aiJudgeMatchedSteps,
+      missedSteps: d.aiJudgeMissedSteps,
+      status: d.aiJudgeStatus,
+      modelUsed: d.aiJudgeModelUsed,
+      latencyMs: d.aiJudgeLatencyMs,
+    };
+    const bannerRaw = deriveAiJudgeBannerViewModel(bannerProps);
+
+    const bannerVm = {
+      showMain: bannerRaw.showMain,
+      showFallback: bannerRaw.showFallback,
+      fallbackText: bannerRaw.fallbackI18nKey
+        ? translate(zhLocale, bannerRaw.fallbackI18nKey)
+        : '',
+      confidencePct: bannerRaw.confidencePct,
+      modelSubtitle: bannerRaw.modelSubtitle,
+      verdictText: bannerRaw.verdictI18nKey
+        ? translate(zhLocale, bannerRaw.verdictI18nKey)
+        : '',
+    };
+
+    const aiFlagVisible = shouldShowAiFlag({ status: d.aiJudgeStatus });
+    const metaChipRaw = deriveAiMetaChip({ status: d.aiJudgeStatus, confidence: d.aiJudgeConfidence });
+    const metaChipVm = { visible: metaChipRaw.visible, pct: metaChipRaw.pct };
+
+    const hintRaw = deriveAiHintRibbon({ aiVerdict: d.aiJudgeVerdict, status: d.aiJudgeStatus });
+    const hintRibbonVm = {
+      visible: hintRaw.visible,
+      verdictText: hintRaw.verdictI18nKey
+        ? translate(zhLocale, hintRaw.verdictI18nKey)
+        : '',
+    };
+
+    // grade buttons preselected (只 DONE 时预选 · 退化态不预选 = A.3 + spec §6.2 字面)
+    const preselected: AiJudgeVerdict | null =
+      d.aiJudgeStatus === 'DONE' && d.aiJudgeVerdict ? d.aiJudgeVerdict : null;
+    const gradeBtnsRaw = deriveGradeButtonsViewModel({
+      revealed: d.isRevealed,
+      preselected,
+      masteredEnabled: true,
+      isGrading: d.isGrading,
+    });
+    const gradeBtnsVm = gradeBtnsRaw.map((b) => ({
+      grade: b.grade,
+      cls: b.cls,
+      ariaLabel: b.ariaLabel,
+      showMark: b.showMark,
+      disabled: b.disabled,
+    }));
+
+    this.setData({
+      bannerVm,
+      aiFlagVisible,
+      metaChipVm,
+      hintRibbonVm,
+      gradeBtnsVm,
+      acceptCtaText: translate(zhLocale, 'exec.judge.cta.accept'),
+      overrideCtaText: translate(zhLocale, 'exec.judge.cta.override'),
+      thinkingText: translate(zhLocale, 'exec.judge.thinking'),
+    });
   },
 
   // keyboard mode · <textarea> input
@@ -483,6 +653,9 @@ Page({
       isAnswering: false,
     });
 
+    // SC20-T05: revealed 翻成 grade buttons preselected ring 可见 · recompute vm
+    this._recomputeAiViewModels();
+
     // Update node dots with pulse on current
     const nodeDots = this.data.nodeDots.map((dot) => {
       if (dot.idx === this.data.node.nodeIndex) {
@@ -491,6 +664,19 @@ Page({
       return dot;
     });
     this.setData({ nodeDots });
+  },
+
+  // SC20-T05 AC4: tap accept CTA = tap 对应 (aiVerdict 同名) 的自评按钮
+  //   body 字面 diff = 0 · 满足 TI1
+  // Synthesize touch event-like object · 直走 onGradeTap 不重复 grade logic
+  async onAcceptCtaTap() {
+    if (!this.data.isRevealed || this.data.isGrading) return;
+    const aiV = this.data.aiJudgeVerdict;
+    if (!aiV || this.data.aiJudgeStatus !== 'DONE') return;
+    // 等价于 tap 对应自评按钮 · 走 onGradeTap (单一入口 · body 字面对齐 · A.2 双信源溯源)
+    await this.onGradeTap({
+      currentTarget: { dataset: { grade: aiV } },
+    } as unknown as WechatMiniprogram.TouchEvent);
   },
 
   async onGradeTap(e: WechatMiniprogram.TouchEvent) {
@@ -504,13 +690,42 @@ Page({
 
     const timeSpentMs = Date.now() - (this._openedAt || Date.now());
 
+    // SC20-T05 AC4: 算 final_grade_source · 满足 §6.3 三态规则 (A.2 双信源溯源)
+    const aiJudgeSnap = this.data.aiJudgeStatus === 'IDLE'
+      ? null
+      : { status: this.data.aiJudgeStatus, verdict: this.data.aiJudgeVerdict };
+    const finalGradeSource = computeFinalGradeSource(grade as AiJudgeVerdict, aiJudgeSnap);
+    this.setData({ finalGradeSource });
+
+    // SC20-T05 AC4: idempotency key (tap CTA / tap 按钮 反复都用同 key · TI1 idempotent 用 nid)
+    const idempotencyKey = `grade-${this.data.node.nid}`;
+
     try {
-      // AC2: POST /api/review/nodes/{nid}/grade (真 API)
-      await gradeNode(this.data.node.nid, { grade, timeSpentMs });
+      // AC2 + SC20-T05 AC4: POST /grade body 携 final_grade_source (后端 SC20-T03 已落地)
+      await gradeNode(
+        this.data.node.nid,
+        { grade, timeSpentMs, final_grade_source: finalGradeSource },
+        idempotencyKey,
+      );
       wx.showToast({ title: `已评: ${grade}`, icon: 'none' });
     } catch {
       // spec §9: 失败 toast 提示
       wx.showToast({ title: '评分提交失败', icon: 'none' });
+    }
+
+    // SC20-T05 AC6 埋点 · 按 final_grade_source 区分 accept / override
+    // (self 不发 · master 现有埋点 wb_exec_grade 已覆盖纯自评)
+    if (finalGradeSource === 'ai_accepted') {
+      track(TRACK_EVENTS.userAccept, {
+        nid: this.data.node.nid,
+        ai_verdict: this.data.aiJudgeVerdict,
+      });
+    } else if (finalGradeSource === 'ai_overridden') {
+      track(TRACK_EVENTS.userOverride, {
+        nid: this.data.node.nid,
+        ai_verdict: this.data.aiJudgeVerdict,
+        user_verdict: grade,
+      });
     }
 
     this.setData({

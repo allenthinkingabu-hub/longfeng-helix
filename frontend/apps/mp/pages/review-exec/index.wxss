@@ -805,3 +805,301 @@ page {
 .sheet-actions van-button {
   flex: 1;
 }
+
+/* ── SC20-T05 · AI Judge Banner + 4 配套 + GradeButtons preselected ─────────── */
+/* trace: design/mockups/wrongbook/20_review_exec_ai_judge.html L43-L105 + L84-L160 */
+
+/* AiFlag · nav center 紫色 "AI 已判" chip */
+.ai-flag {
+  margin-top: 8rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+  background: linear-gradient(135deg, rgba(88,86,214,0.16), rgba(175,82,222,0.16));
+  color: #AF52DE;
+  font-size: 20rpx;
+  font-weight: 700;
+  border: 1rpx solid rgba(175,82,222,0.22);
+  display: inline-flex;
+  align-items: center;
+}
+
+/* AiMetaChip · metarow 第 4 紫色 chip (复用现役 .chip 模式 · 加紫色变体) */
+.chip-purple {
+  background: linear-gradient(135deg, rgba(88,86,214,0.16), rgba(175,82,222,0.16));
+  color: #AF52DE;
+  border: 1rpx solid rgba(175,82,222,0.22);
+}
+
+/* AiJudgeBanner · 5 子区主容器 (mockup L84 .aijb) */
+.aijb {
+  margin: 16rpx 32rpx;
+  background: linear-gradient(135deg, #FFFFFF 0%, #F7F4FF 100%);
+  border: 3rpx solid rgba(175,82,222,0.22);
+  border-radius: 28rpx;
+  padding: 28rpx;
+  box-shadow: 0 8rpx 32rpx rgba(88,86,214,0.10);
+  position: relative;
+  overflow: hidden;
+}
+
+.aijb-skeleton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120rpx;
+}
+
+.aijb-thinking {
+  color: #AF52DE;
+  font-size: 26rpx;
+  font-weight: 700;
+}
+
+/* Sub-zone 1 · head */
+.aijb-head {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+  position: relative;
+  z-index: 2;
+}
+
+.aijb-avatar {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 16rpx;
+  background: linear-gradient(135deg, #5856D6, #AF52DE);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  box-shadow: 0 4rpx 12rpx rgba(88,86,214,0.32);
+}
+
+.aijb-head-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.aijb-ttl {
+  font-size: 26rpx;
+  font-weight: 800;
+  color: #1C1C1E;
+}
+
+.aijb-sub {
+  font-size: 20rpx;
+  color: #8E8E93;
+  font-weight: 600;
+  letter-spacing: 0.6rpx;
+  text-transform: uppercase;
+}
+
+.aijb-conf-pill {
+  padding: 8rpx 16rpx;
+  border-radius: 16rpx;
+  background: rgba(255,149,0,0.14);
+  color: #FF9500;
+  font-size: 22rpx;
+  font-weight: 800;
+}
+
+/* Sub-zone 2 · verdict 主区 (橙色 badge + label + hint) */
+.aijb-verdict {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-bottom: 20rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 20rpx;
+  background: rgba(255,149,0,0.08);
+  border: 1rpx solid rgba(255,149,0,0.22);
+  position: relative;
+  z-index: 2;
+}
+
+.aijb-verdict-badge {
+  flex: none;
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 20rpx;
+  background: linear-gradient(135deg, #FF9500, #FF7700);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  font-weight: 800;
+  box-shadow: 0 4rpx 16rpx rgba(255,149,0,0.32);
+}
+
+.aijb-verdict-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.aijb-verdict-label {
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #FF9500;
+  display: block;
+}
+
+.aijb-verdict-hint {
+  font-size: 22rpx;
+  color: #636366;
+  font-weight: 600;
+  margin-top: 2rpx;
+  display: block;
+}
+
+/* Sub-zone 3 · reason 文本 (诊断 + matched/missed 高亮) */
+.aijb-reason {
+  font-size: 24rpx;
+  line-height: 1.6;
+  color: #1C1C1E;
+  background: rgba(120,120,128,0.06);
+  padding: 20rpx 24rpx;
+  border-radius: 20rpx;
+  position: relative;
+  z-index: 2;
+}
+
+.aijb-reason-label {
+  color: #FF9500;
+  font-weight: 700;
+}
+
+/* Sub-zone 4 · step chips */
+.aijb-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 16rpx;
+  font-size: 20rpx;
+  font-weight: 700;
+  position: relative;
+  z-index: 2;
+}
+
+.aijb-step {
+  padding: 10rpx 16rpx;
+  border-radius: 14rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.aijb-step-ok {
+  background: rgba(52,199,89,0.10);
+  color: #1E7F3C;
+  border: 1rpx solid rgba(52,199,89,0.22);
+}
+
+.aijb-step-miss {
+  background: rgba(255,59,48,0.10);
+  color: #FF3B30;
+  border: 1rpx solid rgba(255,59,48,0.22);
+}
+
+/* Sub-zone 5 · actions (accept 紫色主 + override 灰次) */
+.aijb-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 24rpx;
+  position: relative;
+  z-index: 2;
+}
+
+.aijb-cta {
+  flex: 1;
+  padding: 22rpx 24rpx;
+  border-radius: 20rpx;
+  font-size: 26rpx;
+  font-weight: 800;
+  text-align: center;
+}
+
+.aijb-cta-accept {
+  background: linear-gradient(135deg, #5856D6, #AF52DE);
+  color: #fff;
+  box-shadow: 0 4rpx 14rpx rgba(88,86,214,0.32);
+}
+
+.aijb-cta-override {
+  background: rgba(120,120,128,0.10);
+  color: #636366;
+  border: 1rpx solid rgba(120,120,128,0.22);
+}
+
+.aijb-cta-disabled {
+  opacity: 0.5;
+}
+
+/* AiJudgeBanner fallback 退化态 (TIMEOUT / LOW_CONFIDENCE / SERVICE_UNAVAILABLE) */
+.aijb-fallback {
+  text-align: center;
+}
+
+.aijb-fallback-text {
+  color: #636366;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+/* AiHintRibbon · rating 上方紫色 hint banner (mockup L401-L404) */
+.ai-hint {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 14rpx 24rpx;
+  margin-bottom: 16rpx;
+  background: linear-gradient(135deg, rgba(88,86,214,0.06), rgba(175,82,222,0.10));
+  border: 1rpx solid rgba(175,82,222,0.20);
+  border-radius: 16rpx;
+  color: #5856D6;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.ai-hint-mark {
+  color: #AF52DE;
+  font-weight: 800;
+}
+
+.ai-hint-text {
+  flex: 1;
+  color: #1C1C1E;
+}
+
+.ai-hint-emp {
+  color: #AF52DE;
+  font-weight: 800;
+}
+
+/* GradeButtons preselected ring · 双 border + box-shadow (mockup L156-L160) */
+.rbtn-preselected {
+  border: 4rpx solid #AF52DE;
+  box-shadow: 0 0 0 4rpx rgba(175,82,222,0.18), 0 8rpx 24rpx rgba(88,86,214,0.18);
+  position: relative;
+}
+
+/* AiMark · grade 按钮右上角 "AI★" 角标 (mockup L353 + L417) */
+.ai-mark {
+  position: absolute;
+  top: -10rpx;
+  right: -10rpx;
+  padding: 4rpx 10rpx;
+  border-radius: 12rpx;
+  background: linear-gradient(135deg, #5856D6, #AF52DE);
+  color: #fff;
+  font-size: 18rpx;
+  font-weight: 800;
+  box-shadow: 0 2rpx 8rpx rgba(88,86,214,0.32);
+  z-index: 5;
+}
+

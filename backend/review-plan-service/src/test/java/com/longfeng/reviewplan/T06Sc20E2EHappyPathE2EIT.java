@@ -286,12 +286,20 @@ class T06Sc20E2EHappyPathE2EIT extends IntegrationTestBase {
             .as("system_invariant (a): :judge 不动 wb_review_node.status · A.1 学生主体性")
             .isEqualTo(0);
 
-        // (后置) AI 判已落 5 列 (T02 已覆盖 · 这里只验存在)
+        // (后置) AI 判已落 5 列全非 null (Tester Round 1 REJECT fix · 完整验 5 列 不是仅 3 列)
+        // 关键断言: user_answer_image_key 非 null → ai_judge_* 4 列必同时非 null (事务边界 · spec §4 字段约束)
+        assertThat(selectString("SELECT user_answer_image_key FROM wb_review_node WHERE id=" + nid))
+            .as("Tester adv R1 fix: user_answer_image_key 非 null · 事务边界")
+            .isEqualTo(IMAGE_KEY_HAPPY);
         assertThat(selectString("SELECT ai_judge_verdict FROM wb_review_node WHERE id=" + nid))
             .isEqualTo("PARTIAL");
         assertThat(new BigDecimal(selectString(
             "SELECT ai_judge_confidence FROM wb_review_node WHERE id=" + nid)))
             .isEqualByComparingTo("0.75");
+        assertThat(selectString("SELECT ai_judge_reason FROM wb_review_node WHERE id=" + nid))
+            .as("Tester adv R1 fix: ai_judge_reason 非 blank · 5 列同时非 null 事务边界")
+            .isNotNull()
+            .contains("步骤");
         // (e) system_invariant: ai_judge_metadata.status 真值 'DONE'
         String metadataJson = selectString("SELECT ai_judge_metadata FROM wb_review_node WHERE id=" + nid);
         assertThat(metadataJson).isNotNull();
@@ -477,6 +485,10 @@ class T06Sc20E2EHappyPathE2EIT extends IntegrationTestBase {
                 + planId))
             .as("OSS 失败 · 0 graded outbox 行")
             .isEqualTo(0);
+        // Tester Round 1 REJECT fix: 显式验 plan.completed_at 仍 null (system_invariant (b) negative)
+        assertThat(isNotNull("SELECT completed_at FROM review_plan WHERE id=" + planId))
+            .as("Tester adv R1 fix: OSS 失败 · plan.completed_at 仍 null · system_invariant (b) negative")
+            .isFalse();
 
         // === When (2) · 学生重试 OSS 成功 → 走 happy path (完整 :judge + :grade + :result) ===
         when(qianwenJudgeClient.judge(anyString(), anyString(), any())).thenReturn(

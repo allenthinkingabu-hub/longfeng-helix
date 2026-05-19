@@ -12,6 +12,11 @@
     <view class="center">
       <text class="title" data-test-id="p08-topbar-cursor">复习执行 · 第 {{cursor}} 题</text>
       <text class="sub">{{cursor}} / {{total}} · 剩余 {{total - cursor}} 题</text>
+      <!-- SC20-T05 AC2: <AiFlag> · nav center 紫色 "AI 已判" chip ·
+           仅 aiJudgeStatus === 'DONE' 时显示 (helper: shouldShowAiFlag) -->
+      <view wx:if="{{aiFlagVisible}}" class="ai-flag" data-test-id="{{aiJudgeIds.flag}}">
+        <text>★ AI 已判</text>
+      </view>
     </view>
     <view class="close" bind:tap="onCloseTap" data-test-id="p08-close-btn">
       <van-icon name="cross" color="#636366" size="14px" />
@@ -37,6 +42,11 @@
       </view>
       <view class="chip chip-orange">
         <text>{{difficultyLabel}} {{starsLabel}}</text>
+      </view>
+      <!-- SC20-T05 AC2: <AiMetaChip> · metarow 第 4 紫色 chip "AI 已判 {pct}%" ·
+           仅 aiJudgeStatus === 'DONE' 时显示 (helper: deriveAiMetaChip) -->
+      <view wx:if="{{metaChipVm.visible}}" class="chip chip-purple" data-test-id="{{aiJudgeIds.metaChip}}">
+        <text>AI 已判 {{metaChipVm.pct}}%</text>
       </view>
     </view>
 
@@ -232,6 +242,77 @@
       </view>
     </view>
 
+<!-- ── SC20-T05 AC1: <AiJudgeBanner> ⭐ 核心新组件 ────
+         5 子区 (head / verdict / reason / steps / actions) · 紫色 linear-gradient
+         视觉 1:1 mockup design/mockups/wrongbook/20_review_exec_ai_judge.html L322-L385
+         showMain · status === 'DONE' & verdict 非 null
+         showFallback · status ∈ {TIMEOUT, LOW_CONFIDENCE, SERVICE_UNAVAILABLE} -->
+    <view wx:if="{{aiJudgeStatus === 'PENDING'}}" class="aijb aijb-skeleton" data-test-id="{{aiJudgeIds.banner}}">
+      <text class="aijb-thinking">{{thinkingText}}</text>
+    </view>
+    <view wx:if="{{bannerVm.showMain}}" class="aijb" data-test-id="{{aiJudgeIds.banner}}">
+      <!-- Sub-zone 1 · head (avatar + title + sub + conf-pill) -->
+      <view class="aijb-head" data-test-id="{{aiJudgeIds.bannerHead}}">
+        <view class="aijb-avatar">
+          <text>★</text>
+        </view>
+        <view class="aijb-head-col">
+          <text class="aijb-ttl">AI 判定: {{bannerVm.verdictText}}</text>
+          <text class="aijb-sub">{{bannerVm.modelSubtitle}}</text>
+        </view>
+        <view class="aijb-conf-pill" data-test-id="{{aiJudgeIds.confidence}}">
+          <text>{{bannerVm.confidencePct}}% 把握</text>
+        </view>
+      </view>
+      <!-- Sub-zone 2 · verdict 主区 (橙色 badge + label + hint) -->
+      <view class="aijb-verdict" data-test-id="{{aiJudgeIds.verdictChip}}">
+        <view class="aijb-verdict-badge">
+          <text>◐</text>
+        </view>
+        <view class="aijb-verdict-col">
+          <text class="aijb-verdict-label">{{aiJudgeVerdict}} · {{bannerVm.verdictText}}</text>
+          <text class="aijb-verdict-hint">答案分析 · 步骤完成度 {{aiJudgeMatchedSteps.length}}/{{aiJudgeMatchedSteps.length + aiJudgeMissedSteps.length}}</text>
+        </view>
+      </view>
+      <!-- Sub-zone 3 · reason 文本 -->
+      <view class="aijb-reason" data-test-id="{{aiJudgeIds.reason}}">
+        <text class="aijb-reason-label">诊断: </text>
+        <text>{{aiJudgeReason}}</text>
+      </view>
+      <!-- Sub-zone 4 · step chips (ok + miss) -->
+      <view class="aijb-steps">
+        <view wx:for="{{aiJudgeMatchedSteps}}" wx:key="*this" class="aijb-step aijb-step-ok" data-test-id="{{aiJudgeIds.matchedStepsLi}}">
+          <text>✓ {{item}}</text>
+        </view>
+        <view wx:for="{{aiJudgeMissedSteps}}" wx:key="*this" class="aijb-step aijb-step-miss" data-test-id="{{aiJudgeIds.missedStepsLi}}">
+          <text>✗ {{item}}</text>
+        </view>
+      </view>
+      <!-- Sub-zone 5 · actions (accept CTA + override CTA) -->
+      <view class="aijb-actions">
+        <view
+          class="aijb-cta aijb-cta-accept {{!isRevealed ? 'aijb-cta-disabled' : ''}}"
+          data-test-id="{{aiJudgeIds.ctaAccept}}"
+          aria-label="采纳 AI 建议 · {{bannerVm.verdictText}}"
+          bind:tap="onAcceptCtaTap"
+        >
+          <text>✓ {{acceptCtaText}}</text>
+        </view>
+        <view
+          class="aijb-cta aijb-cta-override"
+          data-test-id="{{aiJudgeIds.ctaOverride}}"
+          aria-label="不采纳 · 我有不同看法"
+          bind:tap="onOverrideCtaTap"
+        >
+          <text>{{overrideCtaText}}</text>
+        </view>
+      </view>
+    </view>
+    <!-- SC20-T05 AC1 退化态 · fallback (banner 主区不渲染时显示) -->
+    <view wx:if="{{bannerVm.showFallback}}" class="aijb aijb-fallback" data-test-id="{{aiJudgeIds.fallback}}">
+      <text class="aijb-fallback-text">🤔 {{bannerVm.fallbackText}}</text>
+    </view>
+
     <!-- ── Node timeline ──────────────────────────────── -->
     <view class="nodes" data-test-id="memory-curve">
       <block wx:for="{{nodeDots}}" wx:key="idx">
@@ -245,41 +326,39 @@
 
   <!-- ── Rating bar (fixed bottom) ────────────────────── -->
   <view class="rating" data-test-id="p08-grade-buttons">
+    <!-- SC20-T05 AC2: <AiHintRibbon> · rating 上方紫色 hint banner ·
+         仅 aiJudgeStatus === 'DONE' 时显示 (helper: deriveAiHintRibbon) -->
+    <view wx:if="{{hintRibbonVm.visible}}" class="ai-hint" data-test-id="{{aiJudgeIds.hintRibbon}}">
+      <text class="ai-hint-mark">★</text>
+      <text class="ai-hint-text">AI 建议: <text class="ai-hint-emp">{{hintRibbonVm.verdictText}}</text> · 1 tap 即采纳 · 或选其他 override</text>
+    </view>
     <view class="rtitle">
       <text class="rtitle-l">本次复习你的自评？</text>
       <text class="rtitle-r">将用于更新记忆曲线</text>
     </view>
+    <!-- SC20-T05 AC3: GradeButtons preselected ring + AiMark · 用 gradeBtnsVm 渲染
+         - preselected 对应按钮: cls 含 rbtn-preselected (双 border + box-shadow)
+         - 角标: showMark=true 时渲染 .ai-mark (AI★)
+         - 色盲友好: aria-label 含 "· AI 建议" 后缀 (不仅靠颜色 · 满足 TI2 + A.1)
+         注: wx:for 必须保持 mockup 顺序 (FORGOT → PARTIAL → MASTERED) -->
     <view class="ractions">
-      <view
-        class="rbtn rbtn-forgot {{!isRevealed || isGrading ? 'rbtn-disabled' : ''}}"
-        data-grade="FORGOT"
-        data-test-id="p08-grade-buttons-forgot"
-        bind:tap="onGradeTap"
-      >
-        <view class="ri ri-red">✗</view>
-        <text class="rl">未掌握</text>
-        <text class="rs">回到 T0</text>
-      </view>
-      <view
-        class="rbtn rbtn-partial {{!isRevealed || isGrading ? 'rbtn-disabled' : ''}}"
-        data-grade="PARTIAL"
-        data-test-id="p08-grade-buttons-partial"
-        bind:tap="onGradeTap"
-      >
-        <view class="ri ri-orange">◐</view>
-        <text class="rl">部分</text>
-        <text class="rs">原计划不变</text>
-      </view>
-      <view
-        class="rbtn rbtn-master {{!isRevealed || isGrading ? 'rbtn-disabled' : ''}}"
-        data-grade="MASTERED"
-        data-test-id="p08-grade-buttons-mastered"
-        bind:tap="onGradeTap"
-      >
-        <view class="ri ri-green">✓</view>
-        <text class="rl">已掌握</text>
-        <text class="rs">推进到 T3</text>
-      </view>
+      <block wx:for="{{gradeBtnsVm}}" wx:key="grade">
+        <view
+          class="{{item.cls}}"
+          data-grade="{{item.grade}}"
+          data-test-id="p08-grade-buttons-{{item.grade === 'FORGOT' ? 'forgot' : item.grade === 'PARTIAL' ? 'partial' : 'mastered'}}"
+          aria-label="{{item.ariaLabel}}"
+          bind:tap="onGradeTap"
+        >
+          <!-- AiMark · preselected 才显示 · 视觉角标 (mockup L353 + L417) -->
+          <view wx:if="{{item.showMark}}" class="ai-mark" data-test-id="{{aiJudgeIds.aiMark}}">
+            <text>AI★</text>
+          </view>
+          <view class="ri ri-{{item.grade === 'FORGOT' ? 'red' : item.grade === 'PARTIAL' ? 'orange' : 'green'}}">{{item.grade === 'FORGOT' ? '✗' : item.grade === 'PARTIAL' ? '◐' : '✓'}}</view>
+          <text class="rl">{{item.grade === 'FORGOT' ? '未掌握' : item.grade === 'PARTIAL' ? '部分' : '已掌握'}}</text>
+          <text class="rs">{{item.grade === 'FORGOT' ? '回到 T0' : item.grade === 'PARTIAL' ? '原计划不变' : '推进到 T3'}}</text>
+        </view>
+      </block>
     </view>
   </view>
 

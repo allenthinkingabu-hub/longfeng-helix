@@ -184,4 +184,4 @@ Raw output 摘录:
 
 | Hash (短) | 描述 |
 |---|---|
-| (待 Step 7) | T06 backend IT + frontend spec + work log |
+| `a8c1c9b` | feat(SC20-T06 phase-3): E2E happy path · backend IT 3/3 PASS + 前端 spec 落盘 |

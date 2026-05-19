@@ -171,16 +171,29 @@ export async function revealNode(nid: number | string): Promise<RevealResp> {
   );
 }
 
-// ── SC-01-C05 #6 · gradeNode ────────────────────────────────
+// ── SC-01-C05 #6 · gradeNode (SC20-T05 · 加 finalGradeSource 字段 · 向后兼容) ──
+// 后端 SC20-T03 已落地: ReviewPlanController.java POST :grade body 接受 final_grade_source
+// (default 'self' · 旧客户端不传行为 100% 一致 · spec §5 改 2 字面)
+// satellite §10.18 + design/system/pages/P08-review-exec-ai-judge.spec.md §5 改 2
 export interface GradeReq {
   grade: 'MASTERED' | 'PARTIAL' | 'FORGOT';
   timeSpentMs?: number;
+  /** SC20-T05 · A.2 双信源溯源宪法 · 缺省 'self' · 见 P08-ai-judge spec §6.3 */
+  final_grade_source?: 'self' | 'ai_accepted' | 'ai_overridden';
 }
 
-export async function gradeNode(nid: number | string, req: GradeReq): Promise<CompleteResult> {
+export async function gradeNode(
+  nid: number | string,
+  req: GradeReq,
+  idempotencyKey?: string,
+): Promise<CompleteResult> {
   return httpJSON<CompleteResult>(
     `${BASE}/api/review/nodes/${nid}/grade`,
-    { method: 'POST', body: req },
+    {
+      method: 'POST',
+      body: req,
+      headers: idempotencyKey ? { 'X-Idempotency-Key': idempotencyKey } : undefined,
+    },
   );
 }
 
