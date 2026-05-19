@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "SC20-T05",
+    "team_id": "mp",
+    "title": "<AiJudgeBanner> + 4 配套 (AiFlag/AiMetaChip/AiHintRibbon) + GradeButtons preselected prop",
+    "attempt": 1,
+    "phase": "done",
+    "dev_done": true,
+    "passes": true,
+    "retries": 0,
+    "audit_retries": 0,
+    "git_commits": ["6be5722", "9ece007", "4bb031f", "30009e2"]
+  },
+  "feature_id": "M-AI-ANSWER-JUDGE",
+  "branch": "feature/M-AI-ANSWER-JUDGE-team-1",
+  "work_log_dir": "audits/runs/SC20-T05/mp/attempt-1",
+  "log_requirements": {
+    "must_write": ["coder.md", "bugs-found.md"],
+    "coder": ["coder.md", "bugs-found.md"],
+    "tester": ["tester.md", "adversarial.md", "test-reports/", "test-reports/ide-console.txt"]
+  },
+  "audit_gate": ".harness/audit.js 7 维度全过 (test_cases_alignment 跳 · ide_smoke 强制) · frontend mp AiJudgeBanner + 4 配套",
+
+  "test_case_first_required": false,
+  "platform_priority": "mp_only",
+
+  "biz_refs": [
+    "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §2A.4 P08 差量卡 [核心组件] AiJudgeBanner + AiFlag + AiMetaChip + AiHintRibbon",
+    "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §2B.20 步 5 (banner 渲染 verdict/confidence/reason/CTA · 自评 PARTIAL 按钮预选高亮)",
+    "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §2B.20 步 6 (tap 采纳 = tap PARTIAL 等价)",
+    "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §1.4 A.1 学生主体性铁律 (preselected ring 必须色盲友好 + 不误导)",
+    "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §1.4 A.2 双信源溯源宪法 (tap accept CTA = body{final_grade_source:'ai_accepted'})"
+  ],
+  "spec_refs": [
+    "design/system/pages/P08-review-exec-ai-judge.spec.md §3 核心组件 (7 新组件)",
+    "design/mockups/wrongbook/20_review_exec_ai_judge.html L322-L385 (aijb 容器 + 5 子区) + L189 (AiFlag) + L220 (AiMetaChip) + L401 (AiHintRibbon)"
+  ],
+  "primary_services": [
+    "frontend/apps/mp/src/pages/review-exec",
+    "frontend/packages/ui-kit",
+    "frontend/packages/i18n"
+  ],
+  "primary_apis": [
+    "POST /api/review/nodes/{nid}/grade (调时带 final_grade_source='ai_accepted' · 复用 SC20-T03 实装)"
+  ],
+
+  "acceptance_criteria": [
+    {"id": "AC1", "text": "新建 <AiJudgeBanner> 组件 (frontend/packages/ui-kit) · 接 {verdict, confidence, reason, matchedSteps, missedSteps, status, modelUsed, latencyMs} props · 5 子区 (nav 紫色 chip / hint ribbon / verdict 主区 / metarow chip / fallback) · 视觉与 mockup L322-L385 一致"},
+    {"id": "AC2", "text": "新建 4 配套组件: <AiFlag> (nav center 紫色 chip · L189) · <AiMetaChip> (metarow 第 4 chip · L220) · <AiHintRibbon> (rating 上方紫色 hint · L401) · <AiMark> (角标 · L353)"},
+    {"id": "AC3", "text": "扩展 <GradeButtons> 加 preselected prop ('MASTERED'|'PARTIAL'|'FORGOT'|null) · preselected 对应按钮渲染双 border + box-shadow + <AiMark> 角标 · aria-label '当前选择: PARTIAL · AI 建议'"},
+    {"id": "AC4", "text": "P08 page state 加 aiJudge object + finalGradeSource · JUDGED_DONE 时 banner 渲染 + GradeButtons preselected=aiJudge.verdict · 学生 tap 采纳 CTA = tap 对应自评按钮 (调 :grade body{final_grade_source:'ai_accepted'}) · 学生 tap 其他按钮 = body{final_grade_source:'ai_overridden'}"},
+    {"id": "AC5", "text": "i18n 加 14 key (exec.flag.aiJudged / exec.chip.aiConfidence / exec.judge.thinking / exec.judge.verdict.{mastered,partial,forgot} / exec.judge.cta.accept / exec.judge.cta.override / exec.judge.reason / exec.judge.matchedSteps / exec.judge.missedSteps / exec.judge.lowConfidence / exec.judge.timeout / exec.banner.fallback / exec.banner.modelUsed) · 中英双语"},
+    {"id": "AC6", "text": "埋点: wb_judge_ai_done{nid, verdict, confidence, ms, model_used} 在 banner 渲染时上报 · wb_judge_user_accept{nid, ai_verdict} 在 tap CTA/对应按钮时上报 (沿 master sibling tracker pattern)"}
+  ],
+  "test_invariants": [
+    "TI1: tap CTA 与 tap 对应自评按钮调相同 :grade 请求 (body 字面 diff = 0 · idempotency_key 一致)",
+    "TI2: preselected 视觉 ring 必须满足色盲友好 (aria-label '当前选择: PARTIAL · AI 建议' · 不仅靠颜色)",
+    "TI3: VRT 4 态: confidence=0.95 (双层 ring 强烈) / 0.55 (普通 ring) / null (无预选) / status='LOW_CONFIDENCE' (banner 退化)",
+    "TI4: banner 渲染 ≤ 150ms P95 (从 :judge 200 到完整可见 · 含 5 子区)"
+  ],
+  "key_invariants": [
+    "tap accept CTA = tap 对应自评按钮 (满足 satellite §2B.20 关键断言 · final_grade_source='ai_accepted')",
+    "preselected ring 不允许误导学生 (色盲友好 + 明确 aria-label · A.1 学生主体性)"
+  ],
+
+  "physical_verification": {
+    "frontend_e2e": "frontend/apps/mp/tests/e2e/sc-20/t05-ai-judge-banner-components.spec.ts",
+    "backend_e2e_it": "(无)",
+    "dor_c1_to_c6_required": false
+  },
+
+  "current_status": "PHASE_5_AUDIT_DONE · ready_to_test (2026-05-19 · audit 7 dim PASS · 24 unit PASS · E2E spec drafted (IDE 受限 caveat))",
+  "test_cases_drafted": false,
+  "test_cases_reviewed_by_coder": false,
+  "test_cases_reviewed_by_tester": false,
+  "user_approval_verdict": "SKIP (user explicit 2026-05-19 · '不用设计测试用例 · 直接邀请 ai team 进入交付阶段 · 可以平行多个 ai team' · test_case_first_required=false · audit dim_test_cases_alignment 整个维度跳过)",
+  "phase_2_5_skipped_by_user": true,
+  "previous_audit_verdict": null,
+  "agent_md_required": {
+    "coder": ".harness/agents/coder-agent.md",
+    "tester": ".harness/agents/test-agent.md",
+    "tl": ".harness/agents/tl-agent.md"
+  },
+  "written_by": "TL agent (M-AI-ANSWER-JUDGE SC20-T05 kickoff · 2026-05-19 · user explicit skip Phase 0-2.5 · 平行多 team · team_id=mp 强制 audit ide_smoke · branch per-feature 沿 T01-T04 precedent)"
+}

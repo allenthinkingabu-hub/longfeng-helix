@@ -171,16 +171,29 @@ export async function revealNode(nid: number | string): Promise<RevealResp> {
   );
 }
 
-// ── SC-01-C05 #6 · gradeNode ────────────────────────────────
+// ── SC-01-C05 #6 · gradeNode (SC20-T05 · 加 finalGradeSource 字段 · 向后兼容) ──
+// 后端 SC20-T03 已落地: ReviewPlanController.java POST :grade body 接受 final_grade_source
+// (default 'self' · 旧客户端不传行为 100% 一致 · spec §5 改 2 字面)
+// satellite §10.18 + design/system/pages/P08-review-exec-ai-judge.spec.md §5 改 2
 export interface GradeReq {
   grade: 'MASTERED' | 'PARTIAL' | 'FORGOT';
   timeSpentMs?: number;
+  /** SC20-T05 · A.2 双信源溯源宪法 · 缺省 'self' · 见 P08-ai-judge spec §6.3 */
+  final_grade_source?: 'self' | 'ai_accepted' | 'ai_overridden';
 }
 
-export async function gradeNode(nid: number | string, req: GradeReq): Promise<CompleteResult> {
+export async function gradeNode(
+  nid: number | string,
+  req: GradeReq,
+  idempotencyKey?: string,
+): Promise<CompleteResult> {
   return httpJSON<CompleteResult>(
     `${BASE}/api/review/nodes/${nid}/grade`,
-    { method: 'POST', body: req },
+    {
+      method: 'POST',
+      body: req,
+      headers: idempotencyKey ? { 'X-Idempotency-Key': idempotencyKey } : undefined,
+    },
   );
 }
 
@@ -196,5 +209,34 @@ export async function nextInSession(sid: string): Promise<NextInSessionResp> {
 export async function nodeResult(nid: number | string): Promise<NodeResultResp> {
   return httpJSON<NodeResultResp>(
     `${BASE}/api/review/nodes/${nid}/result`,
+  );
+}
+
+// ── SC20-T04 · M-AI-ANSWER-JUDGE §10.17 · POST /api/review/nodes/{nid}/judge ──
+// trace: biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §10.17 + spec §5 #1
+//        SC20-T02 backend AnswerJudgeService 已实装 · 接收 user_answer_image_key 返 verdict/confidence/reason
+// 5-8s sync REST · Sonnet 主 · GPT-4o 备 · 503 AI_SERVICE_UNAVAILABLE 时前端走 banner 降级
+// 本 task (SC20-T04 mp frontend photo tab) 只调本接口 · 不解析 verdict 字段 (那是 T05 banner 的事)
+export interface JudgeReq {
+  user_answer_image_key: string;
+}
+
+export interface JudgeResp {
+  verdict: 'MASTERED' | 'PARTIAL' | 'FORGOT';
+  confidence: number;
+  reason: string;
+  status: 'DONE' | 'LOW_CONFIDENCE' | 'TIMEOUT';
+  matched_steps?: string[];
+  missed_steps?: string[];
+}
+
+export async function judgeNode(
+  nid: number | string,
+  req: JudgeReq,
+  idempotencyKey: string,
+): Promise<JudgeResp> {
+  return httpJSON<JudgeResp>(
+    `${BASE}/api/review/nodes/${nid}/judge`,
+    { method: 'POST', body: req, headers: { 'X-Idempotency-Key': idempotencyKey } },
   );
 }

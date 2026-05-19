@@ -1,0 +1,16 @@
+题目: {stem}
+标准答案: {canonical_answer}
+知识点: {kp_name} (难度 {difficulty}/5)
+关键步骤: {steps}
+
+学生作答 (mode={mode}):
+{answer_content}
+
+请判定学生作答 · 严格按 JSON schema 输出:
+{
+  "verdict":       "MASTERED" | "PARTIAL" | "FORGOT",
+  "confidence":    0.0-1.0,
+  "reason":        "≤100 字中文",
+  "matched_steps": ["..."],
+  "missed_steps":  ["..."]
+}

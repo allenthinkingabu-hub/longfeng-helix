@@ -1,0 +1,60 @@
+
+> @longfeng/mp@0.1.0 test:unit /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/frontend/apps/mp
+> vitest run --config test/vitest.config.ts test/unit
+
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v1.6.1 /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/frontend/apps/mp
+
+stderr | test/unit/result-ai-merge.spec.ts > P04 result · AI merge / fallback / error isolation · test-cases.md Round 2 (6 用例) > TC#2 AI 404 · _http throws HTTP 404 · main wrongbook still renders · stepper-fallback visible
+[P04] AI fetch failed (continuing with fallback) Error: HTTP 404
+    at /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/frontend/apps/mp/test/unit/result-ai-merge.spec.ts:168:49
+    at file:///Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/@vitest+runner@1.6.1/node_modules/@vitest/runner/dist/index.js:135:14
+    at file:///Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/@vitest+runner@1.6.1/node_modules/@vitest/runner/dist/index.js:60:26
+    at runTest (file:///Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/@vitest+runner@1.6.1/node_modules/@vitest/runner/dist/index.js:781:17)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at runSuite (file:///Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/@vitest+runner@1.6.1/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/@vitest+runner@1.6.1/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runFiles (file:///Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/@vitest+runner@1.6.1/node_modules/@vitest/runner/dist/index.js:958:5)
+    at startTests (file:///Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/@vitest+runner@1.6.1/node_modules/@vitest/runner/dist/index.js:967:3)
+    at file:///Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/vitest@1.6.1_@types+node@25.6.0_jsdom@24.1.3/node_modules/vitest/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:116:7
+
+ ✓ test/unit/result-ai-merge.spec.ts  (6 tests) 24ms
+ ✓ test/unit/home.spec.ts  (35 tests) 5ms
+ ✓ test/unit/review-today.spec.ts  (37 tests) 14ms
+ ✓ test/unit/home.tester.spec.ts  (18 tests) 51ms
+ ✓ test/unit/api-presign.spec.ts  (15 tests) 3ms
+ ✓ test/unit/calendar-month-helpers.spec.ts  (22 tests) 2ms
+ ✓ test/unit/weekly/helpers.spec.ts  (36 tests) 2ms
+ ✓ test/unit/wrongbook-list.spec.ts  (19 tests) 2ms
+ ✓ test/unit/weekly/home-weeksummary.spec.ts  (12 tests) 1ms
+ ✓ test/unit/review-done-end.spec.ts  (5 tests) 1ms
+ ✓ test/unit/analyzing-p03-fixes.static.spec.ts  (7 tests) 1ms
+ ✓ test/unit/analyzing-step-descs.spec.ts  (4 tests)
+ ✓ test/unit/result-save-question.spec.ts  (4 tests) 1ms
+stderr | test/unit/result-save-question.spec.ts > P04 onSaveTap · 真 save · 不再是假 toast > shows failure toast when BE save throws (no navigation)
+[P04] save error: Error: HTTP 500
+    at /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/frontend/apps/mp/test/unit/result-save-question.spec.ts:72:34
+    at file:///Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/@vitest+runner@1.6.1/node_modules/@vitest/runner/dist/index.js:135:14
+    at file:///Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/@vitest+runner@1.6.1/node_modules/@vitest/runner/dist/index.js:60:26
+    at runTest (file:///Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/@vitest+runner@1.6.1/node_modules/@vitest/runner/dist/index.js:781:17)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at runSuite (file:///Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/@vitest+runner@1.6.1/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/@vitest+runner@1.6.1/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runFiles (file:///Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/@vitest+runner@1.6.1/node_modules/@vitest/runner/dist/index.js:958:5)
+    at startTests (file:///Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/@vitest+runner@1.6.1/node_modules/@vitest/runner/dist/index.js:967:3)
+    at file:///Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/vitest@1.6.1_@types+node@25.6.0_jsdom@24.1.3/node_modules/vitest/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:116:7
+
+ ✓ test/unit/review-today-tap.spec.ts  (11 tests)
+ ✓ test/unit/wrongbook-question-normalize.spec.ts  (5 tests) 1ms
+ ✓ test/unit/ai-start-analyze.spec.ts  (3 tests)
+ ✓ test/unit/api-modules.spec.ts  (17 tests) 1ms
+ ✓ test/unit/analyzing-onload-decode.spec.ts  (3 tests)
+ ✓ test/unit/result-timeline.spec.ts  (3 tests)
+ ✓ test/unit/_http.spec.ts  (6 tests) 1ms
+
+ Test Files  20 passed (20)
+      Tests  268 passed (268)
+   Start at  08:58:03
+   Duration  627ms (transform 187ms, setup 0ms, collect 264ms, tests 110ms, environment 0ms, prepare 78ms)
+

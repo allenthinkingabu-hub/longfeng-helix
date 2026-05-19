@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "task": {
+    "id": "SC21-T02",
+    "team_id": "mp",
+    "title": "Override flow polish · ack CTA 动态文案 + 埋点验证 + 新增 overrideAckCta testid + i18n",
+    "attempt": 1,
+    "phase": "done",
+    "dev_done": true,
+    "passes": true,
+    "retries": 0,
+    "audit_retries": 0,
+    "git_commits": ["9715738"]
+  },
+  "feature_id": "M-AI-ANSWER-JUDGE",
+  "branch": "feature/M-AI-ANSWER-JUDGE-team-1",
+  "work_log_dir": "audits/runs/SC21-T02/mp/attempt-1",
+  "log_requirements": {
+    "must_write": ["coder.md", "bugs-found.md"],
+    "coder": ["coder.md", "bugs-found.md"],
+    "tester": ["tester.md", "adversarial.md", "test-reports/"]
+  },
+  "audit_gate": ".harness/audit.js 7 维度全过 (test_cases_alignment 整维跳)",
+
+  "test_case_first_required": false,
+  "platform_priority": "mp_only",
+  "phase_2_5_skipped_by_user": true,
+  "user_approval_verdict": "SKIP (user 2026-05-19 explicit '不用设计测试用例 · 直接进入交付阶段')",
+
+  "biz_refs": [
+    "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §2B.21 SC-21 步 2 (banner CTA 文案变 '你选择了 FORGOT · 与 AI 不同 (这有助于我们改进 AI)')",
+    "biz/features/M-AI-ANSWER-JUDGE__ai-answer-judge.md §2B.21 步 2 (埋点 wb_judge_user_override{nid, ai_verdict, user_verdict})"
+  ],
+  "spec_refs": [
+    "design/system/pages/P08-review-exec-ai-judge.spec.md §13 testid 表 (加 overrideAckCta)"
+  ],
+  "primary_services": ["frontend/apps/mp/pages/review-exec", "frontend/packages/testids", "frontend/packages/i18n"],
+  "primary_apis": [],
+
+  "acceptance_criteria": [
+    {"id": "AC1", "text": "确认 SC20-T05 已实装 tap 非 preselected 按钮 → body{final_grade_source:'ai_overridden'} (回归测试)"},
+    {"id": "AC2", "text": "加 banner ack CTA · 学生 tap override 按钮后 banner 出现新行: '你选择了 {grade} · 与 AI 不同 (这有助于我们改进 AI)' · i18n key exec.judge.cta.overrideAck"},
+    {"id": "AC3", "text": "埋点 wb_judge_user_override{nid, ai_verdict, user_verdict, confidence} 在 tap override 按钮时上报 (已 SC20-T05 wired · confidence 字段加补 · 验回归)"},
+    {"id": "AC4", "text": "视觉确认: override 按钮 selected + AI verdict 按钮取消 preselected ring (SC20-T05 gradeBtnsVm 已实装 · 验回归)"},
+    {"id": "AC5", "text": "testids 加 TEST_IDS.p08AiJudge.overrideAckCta + i18n zh/en 各加 exec.judge.cta.overrideAck 模板字符串 (双语完整 · 模板插值 {grade})"}
+  ],
+  "test_invariants": [
+    "TI1: tap override 按钮 → 同时触发 (a) ack CTA 文案出现 (b) 埋点 wb_judge_user_override 上报 (c) gradeBtnsVm selected=override",
+    "TI2: 同 override 重复 tap 不重复埋点 (沿 SC20-T05 isGrading debounce · 已实装防抖)"
+  ],
+  "key_invariants": [
+    "不破坏 SC20-T04/T05 已落地的 photo / banner / preselected 现役实装 (向后兼容)",
+    "i18n 模板插值正确 · {grade} 替换为 verdict 文案 (MASTERED → 已掌握 · PARTIAL → 部分掌握 · FORGOT → 未掌握)"
+  ],
+  "physical_verification": {
+    "frontend_e2e": "frontend/apps/mp/test/unit/sc21-t02-override-flow.spec.ts (unit · view-model 派生 + i18n 模板插值 + telemetry 触发)",
+    "backend_e2e_it": "(无 · 前端 task)",
+    "dor_c1_to_c6_required": false
+  },
+
+  "current_status": "PHASE_5_AUDIT_DONE · ready_to_test (2026-05-19 · audit 21/21 PASS · 19 unit + 3 e2e · IDE console 0 [error] · commit 9715738)",
+  "previous_audit_verdict": null,
+  "agent_md_required": {
+    "coder": ".harness/agents/coder-agent.md",
+    "tester": ".harness/agents/test-agent.md",
+    "tl": ".harness/agents/tl-agent.md"
+  },
+  "written_by": "TL agent (M-AI-ANSWER-JUDGE SC21-T02 kickoff · 2026-05-19 · skip Phase 0-2.5)"
+}

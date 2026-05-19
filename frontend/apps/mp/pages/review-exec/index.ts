@@ -2,10 +2,37 @@
 // trace: design/mockups/wrongbook/08_review_exec.html · @longfeng/testids p08
 // 状态机: READING → ANSWERING → REVEALED → GRADED (mirrors H5 ReviewExec)
 // API: src/api/review.ts · getNode + revealNode + gradeNode · 真 API · 0 mock
+//
+// SC20-T04 (M-AI-ANSWER-JUDGE satellite · 方案 A 辅助式) 加第 4 input tab 'photo':
+// - 标杆模板: frontend/apps/mp/pages/capture/index.ts handleCapture()
+//   复用 master §10.1 presign + wx.request PUT 二进制 OSS 直传
+//   (不能用 wx.uploadFile · 会包 multipart 破签名)
+// - mockup: design/mockups/wrongbook/20_review_exec_ai_judge.html L243-L302
+// - spec: design/system/pages/P08-review-exec-ai-judge.spec.md §3 + §4.1 + §5
+// - testid: @longfeng/testids TEST_IDS.p08AiJudge.* 4 必加 (T05 团队加另外 6)
+// - 现有 3 mode tab (handwrite/keyboard/formula) 100% 保留 (KI2)
+// - OSS 失败时 (TC-20.03 边界) toast '上传失败 · 请重试' + 自动切回 handwrite + 0 副作用 (AC5)
+// - userAnswerImageKey 写 page state · 切回 handwrite/keyboard/formula 时不清 (TI1)
 
 import { TEST_IDS, p08Ids } from '@longfeng/testids';
-import { getNode, revealNode, gradeNode } from '../../src/api/review';
+import { getNode, revealNode, gradeNode, judgeNode } from '../../src/api/review';
 import { getQuestionById } from '../../src/api/wrongbook';
+import { presign } from '../../src/api/file';
+import { track } from '@longfeng/telemetry';
+// SC20-T05: ui-kit pure-TS view-model helpers (banner + flag + chip + ribbon + grade preselected)
+import {
+  computeFinalGradeSource,
+  deriveAiJudgeBannerViewModel,
+  shouldShowAiFlag,
+  deriveAiMetaChip,
+  deriveAiHintRibbon,
+  deriveGradeButtonsViewModel,
+  deriveOverrideAckViewModel,
+  type AiJudgeVerdict,
+  type AiJudgeStatus,
+} from '@longfeng/ui-kit';
+import { translate } from '@longfeng/i18n';
+import zhLocale from '@longfeng/i18n/locales/zh.json';
 
 // BE wrong_item.subject 是 enum 小写串 (math/physics/...) · 渲染要中文标签
 const SUBJECT_LABEL_MAP: Record<string, string> = {
@@ -15,7 +42,23 @@ const SUBJECT_LABEL_MAP: Record<string, string> = {
 // ─── Types ──────────────────────────────────────────────────────
 type ExecState = 'READING' | 'ANSWERING' | 'REVEALED' | 'GRADED';
 type GradeValue = 'FORGOT' | 'PARTIAL' | 'MASTERED';
-type AnswerMode = 'handwrite' | 'keyboard' | 'formula';
+// SC20-T04: AnswerMode 加第 4 值 'photo' (satellite §0.2 + spec §4.1)
+type AnswerMode = 'handwrite' | 'keyboard' | 'formula' | 'photo';
+// SC20-T04: photo tab 上传子状态 (capture → uploading → uploaded · 失败回退 IDLE)
+type PhotoState = 'IDLE' | 'UPLOADING' | 'UPLOADED' | 'FAILED';
+
+// SC20-T04: photo tab i18n (zh / en · 用户当前 locale 后续接 i18n 包再切 · 此处先 zh)
+const I18N_PHOTO_TAB_ZH = '拍照';
+// (en 'Photo' 字面留作单测 · 不在 UI 里直接渲染 zh+en)
+
+// SC20-T05 · AI judge events (telemetry · satellite §2A.4 + spec §12 satellite 8 行 8 个新事件)
+const TRACK_EVENTS = {
+  aiDone:    'wb_judge_ai_done',     // banner 渲染时 (resp 200 + status==DONE)
+  userAccept: 'wb_judge_user_accept', // tap accept CTA 或 与 AI 同的自评按钮
+  userOverride: 'wb_judge_user_override', // tap 与 AI 不同的按钮 (含中间值 PARTIAL)
+  aiTimeout: 'wb_judge_ai_timeout',   // 双模型超时 18s
+  aiLowConf: 'wb_judge_ai_low_confidence', // confidence<0.5
+} as const;
 
 // spec §3 答题区 3 mode tab · 公式面板常用符号集 (高中数学覆盖度优先)
 const FORMULA_SYMBOLS = [
@@ -86,7 +129,11 @@ Page({
   data: {
     // test ids
     testIds: TEST_IDS.p08,
+    // SC20-T04: 第 4 input tab + UploadedAnswerThumb 子组件 testid (4 必加)
+    aiJudgeIds: TEST_IDS.p08AiJudge,
     p08Ids: null as unknown,
+    // SC20-T04 i18n key 兜底 (zh) · 渲染 photo tab 文案 · TI2 'exec.answer.photo'
+    photoTabLabel: I18N_PHOTO_TAB_ZH,
 
     // state machine
     execState: 'READING' as ExecState,
@@ -94,10 +141,50 @@ Page({
     isGrading: false,
     showExitSheet: false,
 
-    // spec §4.1 answerDraft · 3 mode tab (handwrite/keyboard/formula)
+    // spec §4.1 answerDraft · SC20-T04 加第 4 mode 'photo'
     answerMode: 'handwrite' as AnswerMode,
     userAnswer: '',                          // keyboard / formula 累积输入
     formulaSymbols: FORMULA_SYMBOLS,
+
+    // SC20-T04 photo 路径专属 page state (TI1 切回 handwrite 不清)
+    // null 时显示 placeholder + 「拍照」按钮 · 非 null 时显示 UploadedAnswerThumb
+    userAnswerImageKey: '' as string,         // OSS object key · empty = 未上传
+    photoState: 'IDLE' as PhotoState,
+    photoSizeBytes: 0 as number,              // UploadedAnswerThumb props
+    photoCapturedAt: '' as string,            // ISO time string · 渲染 "9:41:23"
+    photoSizeLabel: '' as string,             // 渲染 "487 KB" (人类友好)
+    photoUploadPct: 0 as number,              // 进度 0..100 (TI4 uploading 50% 态)
+    // AC4: judge resp 落 page state · 详细 banner UI 由 T05 团队 + 其他 task 渲染
+    // SC20-T05 (完整 aiJudge object · spec §4.1 satellite state 字段 7 个 + status)
+    aiJudgeStatus: 'IDLE' as AiJudgeStatus,
+    aiJudgeVerdict: null as AiJudgeVerdict | null,
+    aiJudgeConfidence: 0,
+    aiJudgeReason: '',
+    aiJudgeMatchedSteps: [] as string[],
+    aiJudgeMissedSteps: [] as string[],
+    aiJudgeModelUsed: '',
+    aiJudgeLatencyMs: 0,
+
+    // SC20-T05 banner / flag / chip / hint / preselected view models (派生 · 用 ui-kit helpers)
+    // 渲染端读 banner.showMain / showFallback / verdictI18nText 等 · 0 复杂 wxml logic
+    bannerVm: { showMain: false, showFallback: false, fallbackText: '', confidencePct: 0, modelSubtitle: '', verdictText: '' },
+    aiFlagVisible: false,
+    metaChipVm: { visible: false, pct: 0 },
+    hintRibbonVm: { visible: false, verdictText: '' },
+    // SC20-T05 derived: 3 grade button vm (cls + ariaLabel + showMark + disabled)
+    gradeBtnsVm: [] as Array<{ grade: string; cls: string; ariaLabel: string; showMark: boolean; disabled: boolean }>,
+    // 直接给 wxml 文案 (i18n.t 算好)
+    acceptCtaText: '采纳建议',
+    overrideCtaText: '我有不同看法',
+    thinkingText: 'AI 正在判题...',
+
+    // SC20-T05: AI judge final_grade_source (派生 · onGradeTap 算 + 写 grade body)
+    finalGradeSource: null as 'self' | 'ai_accepted' | 'ai_overridden' | null,
+
+    // SC21-T02: override ack CTA view-model (学生 tap override 按钮后渲染 banner ack 行)
+    // biz §2B.21 步 2 文案 "你选择了 {grade} · 与 AI 不同 (这有助于我们改进 AI)"
+    // i18n key: exec.judge.cta.overrideAck (zh + en 双语 · 模板插值 {grade})
+    overrideAckVm: { visible: false, text: '' } as { visible: boolean; text: string },
 
     // derived
     isRevealed: false,
@@ -144,6 +231,19 @@ Page({
     if (this._nid) {
       this._fetchNodeAndQuestion(this._nid);
     }
+
+    // SC20-T05: init derived view-models (preselected vm 需要 ai-flag/banner/chip/hint/buttons 全有初值)
+    this._recomputeAiViewModels();
+  },
+
+  // SC20-T05 AC4 override CTA: 学生 dismiss banner 建议但还没 tap 自评按钮
+  //  → 不 grade · 也不改 state · 仅静默 dismiss (preselected 仍在 · 学生可继续选)
+  // 设计决策 (spec §6.2 行 5): override CTA 不直接 grade · 等学生 tap 任一自评按钮才 grade
+  // (与 mockup L376 href="20_review_exec_ai_judge.html" 自指 = "停留原页" 语义一致)
+  onOverrideCtaTap() {
+    if (!this.data.isRevealed) return;
+    // 仅震动反馈 · 不修 aiJudge state (state 仍 DONE) · 不发埋点 (等真 grade 时算 ai_overridden)
+    try { wx.vibrateShort({ type: 'light' }); } catch { /* noop */ }
   },
 
   _buildNodeDots(currentNodeIndex: number) {
@@ -229,13 +329,272 @@ Page({
     }
   },
 
-  // ── Answer mode tabs (spec §3 AnswerArea 3-mode) ──────────
-  // 切换答题输入方式 · 不直接进入 ANSWERING (要真敲键盘 / 点公式 / 触摸 canvas 才进)
+  // ── Answer mode tabs (spec §3 AnswerArea 4-mode · SC20-T04 加 photo) ──
+  // 切换答题输入方式 · 切回 handwrite/keyboard/formula 时 userAnswerImageKey 不清 (TI1)
+  // 切到 'photo' 且没已上传图: 自动唤起 wx.chooseMedia (用户可在 sheet 取消 · 不进 ANSWERING)
   onToolTap(e: WechatMiniprogram.TouchEvent) {
     const mode = e.currentTarget.dataset.mode as AnswerMode;
     if (!mode || mode === this.data.answerMode) return;
     try { wx.vibrateShort({ type: 'light' }); } catch { /* noop */ }
     this.setData({ answerMode: mode });
+    // SC20-T04: 切到 photo 且未上传过 → 唤相册/相机 sheet (capture/index.ts 同 pattern)
+    // 已上传过 (userAnswerImageKey 非空) → 不重唤 · 显示现有缩略图 (TI1 真值不丢)
+    if (mode === 'photo' && !this.data.userAnswerImageKey && this.data.photoState !== 'UPLOADING') {
+      this._openPhotoSheet();
+    }
+  },
+
+  // ── SC20-T04 · 拍照作答 ───────────────────────────────────────
+  // 标杆: pages/capture/index.ts onShutterTap() · wx.chooseMedia 二合一 (拍照 / 相册)
+  _openPhotoSheet() {
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['camera', 'album'], // 真用户优先拍 · album 兜底 (e.g. 之前拍过的草稿)
+      sizeType: ['compressed'],         // 微信自动压 ≈ 500KB · 满足 §11 P95 ≤ 2s
+      camera: 'back',
+      success: (res) => {
+        const file = res.tempFiles?.[0];
+        if (file && file.tempFilePath) {
+          this._handlePhotoUpload(file.tempFilePath, file.size);
+        }
+      },
+      fail: (err) => {
+        // 用户主动取消 · 不报错 · 静默切回 handwrite (UX 友好)
+        console.warn('[P08] wx.chooseMedia cancel / fail:', err?.errMsg);
+        this.setData({ answerMode: 'handwrite' as AnswerMode });
+      },
+    });
+  },
+
+  // OSS upload (presign + PUT 二进制 · 不能 wx.uploadFile · 会包 multipart 破签名)
+  // 标杆: pages/capture/index.ts handleCapture() L107-194 · 复用 master §10.1 通道
+  async _handlePhotoUpload(tempFilePath: string, size: number) {
+    // 边界: > 10MB 拒上传 (与 capture.ts 一致 · 防 OSS 大对象拖慢 5G 网络)
+    const MAX_BYTES = 10 * 1024 * 1024;
+    if (size > MAX_BYTES) {
+      wx.showToast({ title: '图片过大（最大 10MB）', icon: 'none' });
+      this.setData({ answerMode: 'handwrite' as AnswerMode });
+      return;
+    }
+
+    this.setData({
+      photoState: 'UPLOADING' as PhotoState,
+      photoUploadPct: 0,
+      // 不立刻 set userAnswerImageKey · 等 PUT 成功才落值 (失败时不污染 page state · AC5 0 副作用)
+    });
+
+    const idempotencyKey = `judge-${this.data.node.nid}-${Date.now()}`;
+
+    try {
+      // Step 1: presign (master §10.1 现役接口 · 复用 capture.ts pattern)
+      const presignResp = await presign({
+        mime: 'image/jpeg',
+        size,
+        filename: `answer-${this.data.node.nid}-${Date.now()}.jpg`,
+        idempotencyKey,
+      });
+      this.setData({ photoUploadPct: 20 });
+
+      // Step 2: 读 tempFile → ArrayBuffer · PUT 原始字节
+      const fileBuffer = await new Promise<ArrayBuffer>((resolve, reject) => {
+        wx.getFileSystemManager().readFile({
+          filePath: tempFilePath,
+          success: (res) => resolve(res.data as ArrayBuffer),
+          fail: (err) => reject(new Error(`readFile failed: ${err.errMsg}`)),
+        });
+      });
+
+      this.setData({ photoUploadPct: 50 }); // TI4 uploading 50% 态 (VRT 截图点)
+
+      await new Promise<void>((resolve, reject) => {
+        wx.request({
+          url: presignResp.upload_url,
+          method: 'PUT',
+          data: fileBuffer,
+          header: { 'Content-Type': 'image/jpeg' },
+          success: (res: WechatMiniprogram.RequestSuccessCallbackResult) => {
+            if (res.statusCode >= 200 && res.statusCode < 400) {
+              resolve();
+            } else {
+              reject(new Error(`PUT failed: ${res.statusCode}`));
+            }
+          },
+          fail: (err: WechatMiniprogram.GeneralCallbackResult) => {
+            reject(new Error(err.errMsg));
+          },
+        });
+      });
+
+      // PUT 成功 · 落 userAnswerImageKey 到 page state (TI1 切回 handwrite 仍保留)
+      const sizeKb = Math.round(size / 1024);
+      const sizeLabel = sizeKb >= 1024
+        ? `${(sizeKb / 1024).toFixed(1)} MB`
+        : `${sizeKb} KB`;
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const ss = String(now.getSeconds()).padStart(2, '0');
+      const capturedAtLabel = `${hh}:${mm}:${ss}`;
+
+      this.setData({
+        photoState: 'UPLOADED' as PhotoState,
+        photoUploadPct: 100,
+        userAnswerImageKey: presignResp.file_key,
+        photoSizeBytes: size,
+        photoSizeLabel: sizeLabel,
+        photoCapturedAt: capturedAtLabel,
+        // 进入 ANSWERING 状态 (满足"先做再揭"的 state machine · spec §6)
+        execState: 'ANSWERING' as ExecState,
+        isAnswering: true,
+      });
+
+      // Step 3 (AC4): 自动调 POST :judge (T02 接口已实装)
+      // 注: 本 task scope 仅 fire-and-forget 落 aiJudge.status · 详细 banner 渲染由 T05 加
+      this._triggerJudge(this.data.node.nid, presignResp.file_key, idempotencyKey);
+    } catch (err) {
+      // AC5 / TC-20.03: OSS 失败 → toast + 自动切回 handwrite + 0 wb_review_node 字段被改
+      console.error('[P08 SC20-T04] photo upload failed:', err);
+      wx.showToast({ title: '上传失败 · 请重试', icon: 'none', duration: 2000 });
+      this.setData({
+        photoState: 'FAILED' as PhotoState,
+        photoUploadPct: 0,
+        userAnswerImageKey: '',          // 不落键 · 防后续 :judge 拿空 key 调坏
+        photoSizeBytes: 0,
+        photoSizeLabel: '',
+        photoCapturedAt: '',
+        answerMode: 'handwrite' as AnswerMode,  // 自动切回 (AC5 字面)
+      });
+    }
+  },
+
+  // AC4: photo 上传成功后自动调 POST /api/review/nodes/{nid}/judge
+  // SC20-T04 (T04 落地 status only) · SC20-T05 扩展: 落完整 verdict / confidence / reason /
+  //   matchedSteps / missedSteps / modelUsed / latencyMs · 算 banner view-model + 埋点 wb_judge_ai_done
+  async _triggerJudge(nid: string, imageKey: string, idempotencyKey: string) {
+    const judgeStartedAt = Date.now();
+    this.setData({ aiJudgeStatus: 'PENDING' as AiJudgeStatus });
+    this._recomputeAiViewModels();
+
+    try {
+      const resp = await judgeNode(nid, { user_answer_image_key: imageKey }, idempotencyKey);
+      const latencyMs = Date.now() - judgeStartedAt;
+      // SC20-T05 · 完整字段落 page state (spec §4.1 aiJudge 7 字段 + status)
+      const status = (resp.status || 'DONE') as AiJudgeStatus;
+      this.setData({
+        aiJudgeStatus: status,
+        aiJudgeVerdict: (status === 'DONE' ? (resp.verdict as AiJudgeVerdict) : null),
+        aiJudgeConfidence: typeof resp.confidence === 'number' ? resp.confidence : 0,
+        aiJudgeReason: resp.reason || '',
+        aiJudgeMatchedSteps: Array.isArray(resp.matched_steps) ? resp.matched_steps : [],
+        aiJudgeMissedSteps: Array.isArray(resp.missed_steps) ? resp.missed_steps : [],
+        aiJudgeModelUsed: 'claude-3.5-sonnet', // 默认主模型 · 后端 fallback 后续可 propagate
+        aiJudgeLatencyMs: latencyMs,
+      });
+      this._recomputeAiViewModels();
+
+      // AC6 · 埋点 wb_judge_ai_done (banner 渲染时 · status='DONE' 或退化 status 都发 · 用 status 字段区分)
+      track(TRACK_EVENTS.aiDone, {
+        nid,
+        verdict: resp.verdict || null,
+        confidence: typeof resp.confidence === 'number' ? resp.confidence : 0,
+        ms: latencyMs,
+        model_used: 'claude-3.5-sonnet',
+        status,
+      });
+
+      // §9 异常路径 · LOW_CONFIDENCE 额外埋点
+      if (status === 'LOW_CONFIDENCE') {
+        track(TRACK_EVENTS.aiLowConf, { nid, confidence: resp.confidence });
+      }
+      // §9 异常路径 · TIMEOUT 额外埋点
+      if (status === 'TIMEOUT') {
+        track(TRACK_EVENTS.aiTimeout, { nid, ms: latencyMs });
+      }
+    } catch (err) {
+      // SC-22 降级: AI 503 / 超时 → status SERVICE_UNAVAILABLE · 不阻塞学生自评 (A.3 优雅降级)
+      console.warn('[P08 SC20-T05] judge call failed (banner will show fallback):', err);
+      this.setData({
+        aiJudgeStatus: 'SERVICE_UNAVAILABLE' as AiJudgeStatus,
+        aiJudgeVerdict: null,
+        aiJudgeConfidence: 0,
+      });
+      this._recomputeAiViewModels();
+      // 注: 不 reset photoState · 已上传图仍在 OSS · 学生可继续自评
+    }
+  },
+
+  // SC20-T05: 把 aiJudge state + revealed 翻成 derived view-models · wxml 直接绑 ·
+  //   0 复杂 wxml logic · 所有 i18n 字符串在这里 translate() 算好后塞进 page data.
+  _recomputeAiViewModels() {
+    const d = this.data;
+    const bannerProps = {
+      verdict: d.aiJudgeVerdict,
+      confidence: d.aiJudgeConfidence,
+      reason: d.aiJudgeReason,
+      matchedSteps: d.aiJudgeMatchedSteps,
+      missedSteps: d.aiJudgeMissedSteps,
+      status: d.aiJudgeStatus,
+      modelUsed: d.aiJudgeModelUsed,
+      latencyMs: d.aiJudgeLatencyMs,
+    };
+    const bannerRaw = deriveAiJudgeBannerViewModel(bannerProps);
+
+    const bannerVm = {
+      showMain: bannerRaw.showMain,
+      showFallback: bannerRaw.showFallback,
+      fallbackText: bannerRaw.fallbackI18nKey
+        ? translate(zhLocale, bannerRaw.fallbackI18nKey)
+        : '',
+      confidencePct: bannerRaw.confidencePct,
+      modelSubtitle: bannerRaw.modelSubtitle,
+      verdictText: bannerRaw.verdictI18nKey
+        ? translate(zhLocale, bannerRaw.verdictI18nKey)
+        : '',
+      // SC22-T01 · fallback 视觉差 kind ('lowConfidence' | 'timeout' | 'unavailable' | null)
+      // wxml 用 'aijb-fallback-{{fallbackKind}}' 选 wxss class
+      fallbackKind: bannerRaw.fallbackKind,
+    };
+
+    const aiFlagVisible = shouldShowAiFlag({ status: d.aiJudgeStatus });
+    const metaChipRaw = deriveAiMetaChip({ status: d.aiJudgeStatus, confidence: d.aiJudgeConfidence });
+    const metaChipVm = { visible: metaChipRaw.visible, pct: metaChipRaw.pct };
+
+    const hintRaw = deriveAiHintRibbon({ aiVerdict: d.aiJudgeVerdict, status: d.aiJudgeStatus });
+    const hintRibbonVm = {
+      visible: hintRaw.visible,
+      verdictText: hintRaw.verdictI18nKey
+        ? translate(zhLocale, hintRaw.verdictI18nKey)
+        : '',
+    };
+
+    // grade buttons preselected (只 DONE 时预选 · 退化态不预选 = A.3 + spec §6.2 字面)
+    const preselected: AiJudgeVerdict | null =
+      d.aiJudgeStatus === 'DONE' && d.aiJudgeVerdict ? d.aiJudgeVerdict : null;
+    const gradeBtnsRaw = deriveGradeButtonsViewModel({
+      revealed: d.isRevealed,
+      preselected,
+      masteredEnabled: true,
+      isGrading: d.isGrading,
+    });
+    const gradeBtnsVm = gradeBtnsRaw.map((b) => ({
+      grade: b.grade,
+      cls: b.cls,
+      ariaLabel: b.ariaLabel,
+      showMark: b.showMark,
+      disabled: b.disabled,
+    }));
+
+    this.setData({
+      bannerVm,
+      aiFlagVisible,
+      metaChipVm,
+      hintRibbonVm,
+      gradeBtnsVm,
+      acceptCtaText: translate(zhLocale, 'exec.judge.cta.accept'),
+      overrideCtaText: translate(zhLocale, 'exec.judge.cta.override'),
+      thinkingText: translate(zhLocale, 'exec.judge.thinking'),
+    });
   },
 
   // keyboard mode · <textarea> input
@@ -303,6 +662,9 @@ Page({
       isAnswering: false,
     });
 
+    // SC20-T05: revealed 翻成 grade buttons preselected ring 可见 · recompute vm
+    this._recomputeAiViewModels();
+
     // Update node dots with pulse on current
     const nodeDots = this.data.nodeDots.map((dot) => {
       if (dot.idx === this.data.node.nodeIndex) {
@@ -311,6 +673,19 @@ Page({
       return dot;
     });
     this.setData({ nodeDots });
+  },
+
+  // SC20-T05 AC4: tap accept CTA = tap 对应 (aiVerdict 同名) 的自评按钮
+  //   body 字面 diff = 0 · 满足 TI1
+  // Synthesize touch event-like object · 直走 onGradeTap 不重复 grade logic
+  async onAcceptCtaTap() {
+    if (!this.data.isRevealed || this.data.isGrading) return;
+    const aiV = this.data.aiJudgeVerdict;
+    if (!aiV || this.data.aiJudgeStatus !== 'DONE') return;
+    // 等价于 tap 对应自评按钮 · 走 onGradeTap (单一入口 · body 字面对齐 · A.2 双信源溯源)
+    await this.onGradeTap({
+      currentTarget: { dataset: { grade: aiV } },
+    } as unknown as WechatMiniprogram.TouchEvent);
   },
 
   async onGradeTap(e: WechatMiniprogram.TouchEvent) {
@@ -324,19 +699,67 @@ Page({
 
     const timeSpentMs = Date.now() - (this._openedAt || Date.now());
 
+    // SC20-T05 AC4: 算 final_grade_source · 满足 §6.3 三态规则 (A.2 双信源溯源)
+    const aiJudgeSnap = this.data.aiJudgeStatus === 'IDLE'
+      ? null
+      : { status: this.data.aiJudgeStatus, verdict: this.data.aiJudgeVerdict };
+    const finalGradeSource = computeFinalGradeSource(grade as AiJudgeVerdict, aiJudgeSnap);
+    this.setData({ finalGradeSource });
+
+    // SC20-T05 AC4: idempotency key (tap CTA / tap 按钮 反复都用同 key · TI1 idempotent 用 nid)
+    const idempotencyKey = `grade-${this.data.node.nid}`;
+
     try {
-      // AC2: POST /api/review/nodes/{nid}/grade (真 API)
-      await gradeNode(this.data.node.nid, { grade, timeSpentMs });
+      // AC2 + SC20-T05 AC4: POST /grade body 携 final_grade_source (后端 SC20-T03 已落地)
+      await gradeNode(
+        this.data.node.nid,
+        { grade, timeSpentMs, final_grade_source: finalGradeSource },
+        idempotencyKey,
+      );
       wx.showToast({ title: `已评: ${grade}`, icon: 'none' });
     } catch {
       // spec §9: 失败 toast 提示
       wx.showToast({ title: '评分提交失败', icon: 'none' });
     }
 
+    // SC20-T05 AC6 埋点 · 按 final_grade_source 区分 accept / override
+    // (self 不发 · master 现有埋点 wb_exec_grade 已覆盖纯自评)
+    if (finalGradeSource === 'ai_accepted') {
+      track(TRACK_EVENTS.userAccept, {
+        nid: this.data.node.nid,
+        ai_verdict: this.data.aiJudgeVerdict,
+      });
+    } else if (finalGradeSource === 'ai_overridden') {
+      // SC21-T02 AC3: 加 confidence 字段 (沿 SC20-T05 pattern · A.2 双信源溯源完整 props)
+      track(TRACK_EVENTS.userOverride, {
+        nid: this.data.node.nid,
+        ai_verdict: this.data.aiJudgeVerdict,
+        user_verdict: grade,
+        confidence: this.data.aiJudgeConfidence,
+      });
+    }
+
+    // SC21-T02 AC2: 派生 override ack vm · 仅 ai_overridden 触发 visible=true
+    // 文案 = translate('exec.judge.cta.overrideAck', { grade: verdictLabel })
+    // verdictLabel = translate('exec.judge.verdict.<userGrade.toLowerCase()>')
+    const ackRaw = deriveOverrideAckViewModel({
+      userGrade: grade as AiJudgeVerdict,
+      aiVerdict: this.data.aiJudgeVerdict,
+      aiStatus: this.data.aiJudgeStatus,
+      finalGradeSource,
+    });
+    let ackText = '';
+    if (ackRaw.visible) {
+      const gradeKey = `exec.judge.verdict.${grade.toLowerCase()}`;
+      const gradeLabel = translate(zhLocale, gradeKey);
+      ackText = translate(zhLocale, ackRaw.i18nKey, { grade: gradeLabel });
+    }
+
     this.setData({
       execState: 'GRADED' as ExecState,
       isGrading: false,
       isRevealed: false, // 连点防护: GRADED 后禁止重复评分
+      overrideAckVm: { visible: ackRaw.visible, text: ackText },
     });
 
     // T12: GRADED → P09 transition (mirrors H5 ReviewExec handleGrade)

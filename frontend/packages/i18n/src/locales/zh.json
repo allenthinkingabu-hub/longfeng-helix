@@ -1,0 +1,20 @@
+{
+  "exec.flag.aiJudged": "AI 已判",
+  "exec.chip.aiConfidence": "AI 已判 {pct}%",
+  "exec.judge.thinking": "AI 正在判题...",
+  "exec.judge.verdict.mastered": "已掌握",
+  "exec.judge.verdict.partial": "部分掌握",
+  "exec.judge.verdict.forgot": "未掌握",
+  "exec.judge.cta.accept": "采纳建议",
+  "exec.judge.cta.override": "我有不同看法",
+  "exec.judge.reason": "诊断",
+  "exec.judge.matchedSteps": "已完成步骤",
+  "exec.judge.missedSteps": "缺失步骤",
+  "exec.judge.lowConfidence": "🤔 AI 不太确定 · 请按你的理解自评",
+  "exec.judge.lowConfidence.hint": "可能题型复杂或字迹模糊 · AI 暂未判定",
+  "exec.judge.timeout": "AI 判超时 · 请用自评",
+  "exec.judge.timeout.icon": "⏱",
+  "exec.banner.fallback": "AI 暂不可用 · 请用自评",
+  "exec.banner.modelUsed": "{model} · {latency}s",
+  "exec.judge.cta.overrideAck": "你选择了 {grade} · 与 AI 不同 (这有助于我们改进 AI)"
+}

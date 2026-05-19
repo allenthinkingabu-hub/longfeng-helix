@@ -1,6 +1,6 @@
 # M-AI-ANSWER-JUDGE · 拍照作答 + AI 辅助判题 — Satellite Biz Doc
 
-**Status**: Draft (v1 · 等用户拍 §17 决策表后进 Reviewed)
+**Status**: Draft (v1.1 · 2026-05-18 §4.16 改 B 路径 · 等用户拍 §17 决策表后进 Reviewed)
 **Owner**: full-stack (backend AnswerJudgeService + AI prompt + frontend P08 第 4 input tab + DB schema)
 **Created**: 2026-05-16
 **Priority**: **P1** (MVP 14 天不做 · P1 启动 · 建议与 M-MULTI satellite 同周期跑 · 共享 §6 AI Backend 基建)
@@ -38,7 +38,7 @@
 | 新 SC | SC-20 | 拍照作答 → AI 辅助判 → 学生采纳 (happy path) | P1 | full-stack |
 | 新 SC | SC-21 | AI 判错 · 学生 override · 后端记 `final_grade_source='ai_overridden'` | P1 | full-stack |
 | 新 SC | SC-22 | AI 不确定 (`confidence < 0.5`) · banner 退化为 "AI 不确定 · 请用自评" · 不阻塞 | P1 | full-stack |
-| **新 DB 列** | `wb_review_node` 加 6 列 (`user_answer_image_key`, `ai_judge_verdict`, `ai_judge_confidence`, `ai_judge_reason`, `ai_judge_metadata`, `final_grade_source`) | 持久化拍照作答 + AI 判结果 + 来源溯源 | P1 | backend |
+| **DB 表落地** (v1.1 升级 · 原 "加 6 列") | `wb_review_node` 一次 CREATE 14 master base 列 + 6 satellite 增量列 = 共 20 列 (含 4 indexes · master 原 2 + satellite 新 2) · master §4.5 paper-only 现 satellite V20260516_03 首次实装 (2026-05-18 用户决策 B) | P1 | backend |
 | 新 API | `POST /api/review/nodes/{nid}/judge` | 触发 AI 判题 · req `{user_answer_image_key}` · resp `{verdict, confidence, reason}` · sync REST (不上 SSE · 单题判 ≤ 8s) | P1 | backend |
 | 改造 API | `POST /api/review/nodes/{nid}/grade` | 现有 master §10.5 grade 接口 req body 加 `final_grade_source` 字段 (向后兼容: 缺省 'self') | P1 | backend |
 | 改造 API | `GET /api/review/nodes/{nid}/result` | resp 加 `aiJudge: {verdict, confidence, reason, source} \| null` 字段 (向后兼容: AI 未判时为 null) | P1 | backend |
@@ -226,20 +226,49 @@
 
 ## §4 DB 增量 [REQUIRED]
 
-### 4.16 `wb_review_node` 加 6 列 (master §4.5 L1559-L1580 表加列 · 不新建表)
+### 4.16 `wb_review_node` 一次落地 14 base + 6 satellite 共 20 列 (用户 2026-05-18 决策 B)
+
+> **⚠️ 决策记录 (2026-05-18 · 用户拍板 B 路径)**：
+> SC20-T01 Coder Phase 2 review 发现：master §4.5 wb_review_node 表设计 paper-only · backend repo 无对应 Flyway migration (`grep -rln "wb_review_node" backend/` 0 hit)。原 §4.16 假设"加列于既存表"前提断裂。
+> **决策 B**：本 V20260516_03 migration 一次性 **CREATE TABLE wb_review_node 14 base 列 (master §4.5 字面) + ALTER ADD 6 satellite 列 = 共 20 列 · 含 master §4.5 原 2 indexes + satellite 新 2 partial indexes = 共 4 indexes**。
+> **归属变更**：wb_review_node 表 owner 自 master §4.5 (paper-only) 变 satellite M-AI-ANSWER-JUDGE V20260516_03 (实装)。后续 master 自己再加列时须先 grep 本 migration 确认表已落地 · 不可重复 CREATE。
+> **拒绝路径**：A (拆前置 task 给 master 单建表) — 阻塞 SC-20 启动 · 改 feature_list 总数。C (fixture-only) — 生产部署不可行。
 
 ```sql
--- V20260516_03__wb_review_node_add_ai_judge_columns.sql
-ALTER TABLE wb_review_node
-  ADD COLUMN user_answer_image_key VARCHAR(512),                  -- OSS object key · null = 学生未走拍照路径
-  ADD COLUMN ai_judge_verdict      VARCHAR(16),                    -- 'MASTERED' | 'PARTIAL' | 'FORGOT' · null = AI 未判
-  ADD COLUMN ai_judge_confidence   DECIMAL(3,2),                   -- 0.00-1.00 · null = AI 未判
-  ADD COLUMN ai_judge_reason       TEXT,                            -- AI 解释 · 100 字内 · 中文 · null = AI 未判
-  ADD COLUMN ai_judge_metadata     JSONB,                           -- {model_used, prompt_version, token_cost_usd, latency_ms, status:'DONE'|'TIMEOUT'|'LOW_CONFIDENCE'}
-  ADD COLUMN final_grade_source    VARCHAR(16) NOT NULL DEFAULT 'self';  -- 'self' | 'ai_accepted' | 'ai_overridden'
-
-CREATE INDEX idx_wrn_judge_source ON wb_review_node(final_grade_source) WHERE final_grade_source != 'self';
-CREATE INDEX idx_wrn_low_confidence ON wb_review_node(ai_judge_confidence) WHERE ai_judge_confidence < 0.5;
+-- V20260516_03__wb_review_node_create_with_ai_judge_columns.sql
+-- 注：master §4.5 (L1559-L1580) 原 paper-only · 本 migration 首次实装 · 14 base 列字面与 master §4.5 一致 · 末尾 6 列为 satellite 增量
+CREATE TABLE wb_review_node (
+  -- master §4.5 base 14 列 (字面与 master L1562-L1577 一致)
+  id                BIGINT PRIMARY KEY,
+  plan_id           BIGINT NOT NULL,
+  student_id        BIGINT NOT NULL,
+  level             SMALLINT NOT NULL,             -- 0..6 对应 T0..T6
+  level_code        VARCHAR(8) NOT NULL,           -- INITIAL/H1/D1/D3/D7/D15/D30
+  due_at            TIMESTAMPTZ NOT NULL,          -- 艾宾浩斯计算得到
+  window_end_at     TIMESTAMPTZ NOT NULL,          -- due_at + 24h
+  ready_at          TIMESTAMPTZ,                   -- due_at - 30min (预生成任务时刻)
+  status            SMALLINT NOT NULL DEFAULT 0,   -- 0 SCHEDULED 1 READY 2 PUSHED 3 REVIEWED 4 FORGOTTEN 9 FAILED
+  pushed_at         TIMESTAMPTZ,
+  reviewed_at       TIMESTAMPTZ,
+  effect            SMALLINT,                       -- 1 掌握 2 部分 3 未掌握
+  calendar_event_id BIGINT,                         -- 关联日历事件 ID (外挂到 calendar_event.relation_id)
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  -- satellite M-AI-ANSWER-JUDGE 增量 6 列
+  user_answer_image_key VARCHAR(512),               -- OSS object key · null = 学生未走拍照路径
+  ai_judge_verdict      VARCHAR(16),                -- 'MASTERED' | 'PARTIAL' | 'FORGOT' · null = AI 未判
+  ai_judge_confidence   DECIMAL(3,2),               -- 0.00-1.00 · null = AI 未判
+  ai_judge_reason       TEXT,                        -- AI 解释 · 100 字内 · 中文 · null = AI 未判
+  ai_judge_metadata     JSONB,                       -- {model_used, prompt_version, token_cost_usd, latency_ms, status:'DONE'|'TIMEOUT'|'LOW_CONFIDENCE'}
+  final_grade_source    VARCHAR(16) NOT NULL DEFAULT 'self',  -- 'self' | 'ai_accepted' | 'ai_overridden'
+  -- master §4.5 base 约束
+  UNIQUE(plan_id, level)
+);
+-- master §4.5 base 2 indexes (字面与 master L1579-L1580 一致)
+CREATE INDEX idx_wb_node_due_status    ON wb_review_node(status, due_at);
+CREATE INDEX idx_wb_node_student_due   ON wb_review_node(student_id, due_at) WHERE status IN (0,1,2);
+-- satellite 增量 2 partial indexes
+CREATE INDEX idx_wrn_judge_source      ON wb_review_node(final_grade_source) WHERE final_grade_source != 'self';
+CREATE INDEX idx_wrn_low_confidence    ON wb_review_node(ai_judge_confidence) WHERE ai_judge_confidence < 0.5;
 ```
 
 **字段约束**:
@@ -248,7 +277,7 @@ CREATE INDEX idx_wrn_low_confidence ON wb_review_node(ai_judge_confidence) WHERE
 - `user_answer_image_key` 非 null → `ai_judge_*` 4 列必同时非 null (事务边界 · 见 SC-20 关键断言)
 - 30 天 retention 由 OSS lifecycle rule 自动清理 (见 §17 决策 #2) · DB 字段保留 `user_answer_image_key` 但 OSS 已删 · 前端读时 404 静默处理
 
-**复用说明**: 本 satellite **不新建表** · 仅在 master §4.5 `wb_review_node` (L1559-L1580) 表加列 · 完全复用 master §4.4 `wb_review_plan` + §4.6 calendar_event 联动 + master §7 艾宾浩斯引擎不变。
+**复用说明**: 本 satellite **首次落地 wb_review_node 表** (master §4.5 原 paper-only) · 落地后完全复用 master §4.4 `wb_review_plan` + §4.6 calendar_event 联动 + master §7 艾宾浩斯引擎不变 · 14 base 列字面严格匹配 master §4.5 L1562-L1580 · 不允许偏离。
 
 ---
 
@@ -466,3 +495,4 @@ Resp 加字段: {
 | 版本 | 日期 | owner | 摘要 |
 |---|---|---|---|
 | v1 | 2026-05-16 | user (gen-biz-doc 第 3 次实战 · P-WEEKLY-REVIEW + M-MULTI 之后) | 首版 · 方案 A 辅助式 (用户 2026-05-16 对话拍板 · vs 方案 B 替代 / C 试点) · 1 改造页 (P08 差量卡) · 3 SC (SC-20/21/22) · 1 DB 加列 (wb_review_node 加 6 列) · 1 新 API (POST :judge) + 2 改造 API (:grade 加 final_grade_source / :result 加 aiJudge) · §6 复用 M-MULTI §6.1 ChatModel + §6.4 阈值 yml 模式 · §6.2 judge prompt 完全新写 (任务不同) · §1.4 三大设计宪法 (A.1 学生主体性 / A.2 双信源溯源 / A.3 优雅降级) · §17 5 决策点 (1 个 P1 spike · 4 个 sane default · 等用户 review 修) · 借落地一并治理 P08 mockup testid drift |
+| v1.1 | 2026-05-18 | user (SC20-T01 kickoff 时 Coder Phase 2 review 发现 master §4.5 paper-only · 用户拍板 B 路径) | §4.16 改: 由 "ALTER 加 6 列" 改为 "CREATE TABLE 一次落 14 master base + 6 satellite 增量 = 20 列 · 含 master 原 2 + satellite 新 2 = 4 indexes" · wb_review_node 表 owner 自 master §4.5 (paper-only) 变本 satellite V20260516_03 (实装) · 文件名 `V20260516_03__wb_review_node_create_with_ai_judge_columns.sql` · 加 §4.16 顶部决策记录 box 字面说明拒绝路径 A/C 理由 |

@@ -1,5 +1,9 @@
 # dependencies
 node_modules/
+node_modules
+# mp 构建产物 (本地 DevTools build npm 生成 · CI/别机器无效)
+miniprogram_npm/
+miniprogram_npm
 
 # Playwright runtime artifacts (regenerated per run · per SHARED-E2E-PROTOCOL.md §1 "产物 ignored")
 playwright-report/

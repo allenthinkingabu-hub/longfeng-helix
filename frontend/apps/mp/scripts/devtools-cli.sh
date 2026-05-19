@@ -52,15 +52,36 @@ case "${1:-}" in
     echo "[devtools-cli] esbuild workspace 内部包 → miniprogram_npm/"
     REPO_ROOT="$(cd ../../.. && pwd)"
     ESBUILD="$REPO_ROOT/frontend/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/bin/esbuild"
+    # SC20-T05: worktree 下 frontend/node_modules 可能没装 esbuild (pnpm install 只在 main repo 跑)
+    # 兜底用 main repo 的 esbuild · 路径相对 worktree → /Users/allen/workspace/longfeng/frontend/node_modules
+    if [ ! -x "$ESBUILD" ] && [ -x "/Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/bin/esbuild" ]; then
+      ESBUILD="/Users/allen/workspace/longfeng/frontend/node_modules/.pnpm/esbuild@0.21.5/node_modules/esbuild/bin/esbuild"
+      echo "[devtools-cli] worktree esbuild missing · 用 main repo fallback"
+    fi
     if [ -x "$ESBUILD" ]; then
-      for ws_pkg in testids api-contracts telemetry; do
+      # SC20-T05 (2026-05-19): 加 ui-kit + i18n 进 esbuild 循环
+      # ui-kit · pure-TS view-model helpers (AiJudgeBanner + 4 配套 + GradeButtons preselected)
+      # i18n  · zero-runtime translate() + locales/zh.json + en.json (14 key for P08 AI judge)
+      for ws_pkg in testids api-contracts telemetry ui-kit i18n; do
         src_dir="$REPO_ROOT/frontend/packages/$ws_pkg"
         if [ -f "$src_dir/src/index.ts" ]; then
           dst_dir="miniprogram_npm/@longfeng/$ws_pkg"
           mkdir -p "$dst_dir"
-          "$ESBUILD" "$src_dir/src/index.ts" --bundle --format=cjs --platform=neutral --target=es2017 --outfile="$dst_dir/index.js" 2>/dev/null
+          "$ESBUILD" "$src_dir/src/index.ts" --bundle --format=cjs --platform=neutral --target=es2017 --outfile="$dst_dir/index.js" --loader:.json=json 2>/dev/null
           echo "{\"name\":\"@longfeng/$ws_pkg\",\"version\":\"0.1.0\",\"main\":\"index.js\"}" > "$dst_dir/package.json"
           echo "  ✓ @longfeng/$ws_pkg (esbuild bundled)"
+        fi
+      done
+      # SC20-T05: i18n locales 也单独 ship 让 mp page 可以 import '@longfeng/i18n/locales/zh.json'
+      for locale in zh en; do
+        src_json="$REPO_ROOT/frontend/packages/i18n/src/locales/$locale.json"
+        if [ -f "$src_json" ]; then
+          dst_dir="miniprogram_npm/@longfeng/i18n/locales"
+          mkdir -p "$dst_dir"
+          cp "$src_json" "$dst_dir/$locale.json"
+          # mp runtime CommonJS · 再生成 .js wrapper 让 require('@longfeng/i18n/locales/zh') 取到 obj
+          echo "module.exports = $(cat "$src_json");" > "$dst_dir/$locale.js"
+          echo "  ✓ @longfeng/i18n/locales/$locale.{json,js}"
         fi
       done
     else

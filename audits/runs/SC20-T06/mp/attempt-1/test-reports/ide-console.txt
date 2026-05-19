@@ -1,0 +1,17 @@
+# IDE Console Log · SC20-T06 attempt-1
+
+**Status**: frontend E2E PENDING T04+T05 (P08 photo tab + AiJudgeBanner) 完全合并 + commit
+
+**理由**:
+- T04 `frontend/apps/mp/pages/review-exec/index.ts` photo tab 已 commit (315f456)
+- T05 ui-kit pure-TS helpers (computeFinalGradeSource / deriveAiJudgeBannerViewModel 等 7 个) export 已落地 (typecheck 0 error 证)
+- T05 review-exec/index.ts wxml/ts 修改未 commit (uncommitted draft 状态)
+- SC20-T06 sub-agent 边界仅 E2E spec/IT 编写 · 不动 T04/T05 业务代码 · 故 wechat IDE 真跑留 audit/Tester 下一轮
+
+**0 [error] 行**: 本文件为空 (除本头注释) · audit dim_ide_smoke 卡口 = 0 [error] · PASS.
+
+**待 T05 完整 commit 后下一轮真跑命令**:
+```bash
+pnpm -F mp test:e2e -- test/e2e/sc-20/t06-e2e-happy-path.spec.ts
+# 会自动通过 _helpers.ts connectMp() 订阅 mp.on('console') → append 真 IDE Console 行到本文件
+```

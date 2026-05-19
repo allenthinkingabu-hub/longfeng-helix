@@ -502,6 +502,43 @@ export const TEST_IDS = {
     exitConfirmSheet:  'p08-exit-confirm-sheet',
   },
 
+  // P08 AI judge satellite · M-AI-ANSWER-JUDGE SC-20 · 22 testid total (spec §13)
+  // SC20-T04 (本 task · mp team) append 10 keys: 4 必加 (photoThumb/inputTabPhoto/uploadBadge/photoMeta)
+  //                                            + 3 sibling input tab (handwrite/keyboard/formula 在 ai-judge 命名空间内)
+  //                                            + 3 photo path 专属 (photoBlockTitle/photoUploading/photoUploadRetry)
+  // 其余 12 (AiJudgeBanner / verdict chip / reason / CTA / hint ribbon / nav AI flag …) 留给 sibling team SC20-T05
+  // (用户 2026-05-19 平行多 team 拆分约束 · 共享 namespace 不冲突 · 各自只 append 自己的 key)
+  p08AiJudge: {
+    photoThumb:        'ai-judge-photo-thumb',     // UploadedAnswerThumb 容器 (mockup L243-L271)
+    inputTabPhoto:     'ai-judge-input-tab-photo', // 第 4 input tab (mockup L295)
+    uploadBadge:       'ai-judge-upload-badge',    // 「上传成功」绿色 badge (mockup L233-L236)
+    photoMeta:         'ai-judge-photo-meta',      // 「487 KB · 9:41:23」元数据 (mockup L237)
+    inputTabHandwrite: 'ai-judge-input-tab-handwrite', // 第 1 input tab (mockup L292)
+    inputTabKeyboard:  'ai-judge-input-tab-keyboard',  // 第 2 input tab (mockup L293)
+    inputTabFormula:   'ai-judge-input-tab-formula',   // 第 3 input tab (mockup L294)
+    photoBlockTitle:   'ai-judge-photo-block-title',   // 你的作答 · 拍照 [已上传] 段标
+    photoUploading:    'ai-judge-photo-uploading',     // OSS PUT 上传中遮罩 (P95 ≤ 100ms 渲染)
+    photoUploadRetry:  'ai-judge-photo-upload-retry',  // 上传失败 toast 重试入口 (TC-20.03 AC5)
+    // ── SC20-T05 (本 task) append 12 个 ⭐ AiJudgeBanner + 4 配套 + GradeButtons preselected
+    //    sibling T04 不会动这 12 个 · 共享 p08AiJudge namespace 不冲突 (用户 2026-05-19 平行多 team 拆分约束)
+    flag:              'ai-judge-flag',                // <AiFlag> · nav center 紫 chip (mockup L189)
+    metaChip:          'ai-judge-meta-chip',           // <AiMetaChip> · metarow 第 4 chip (mockup L220)
+    banner:            'ai-judge-banner',              // ⭐ <AiJudgeBanner> 主容器 (mockup L322)
+    bannerHead:        'ai-judge-banner-head',         // head (avatar+ttl+conf-pill)
+    confidence:        'ai-judge-confidence',          // "75% 把握" (mockup L338)
+    verdictChip:       'ai-judge-verdict-chip',        // ◐ PARTIAL 主区 (mockup L344)
+    reason:            'ai-judge-reason',              // 诊断文本 (mockup L353)
+    matchedStepsLi:    'ai-judge-matched-step',        // 配方/顶点 ok chip (wx:for · 1 testid 多次出)
+    missedStepsLi:     'ai-judge-missed-step',         // 对称轴 miss chip (wx:for · 1 testid 多次出)
+    ctaAccept:         'ai-judge-cta-accept',          // 紫色 "采纳建议" CTA (mockup L373)
+    ctaOverride:       'ai-judge-cta-override',        // 灰 "我有不同看法" CTA (mockup L376)
+    fallback:          'ai-judge-fallback',            // 退化 fallback 容器 (TIMEOUT/LOW_CONF/503)
+    hintRibbon:        'ai-judge-hint-ribbon',         // <AiHintRibbon> rating 上方紫 (mockup L401)
+    aiMark:            'ai-judge-ai-mark',             // <AiMark> grade preselected 角标 (mockup L417)
+    // ── SC21-T02 (本 task) append 1 个 · override ack CTA (学生 tap 非 AI 建议按钮后显示)
+    overrideAckCta:    'ai-judge-override-ack-cta',    // 「你选择了 X · 与 AI 不同」ack 文案 (biz §2B.21 步 2)
+  },
+
   // P09 · ReviewDone · AC-P09-001 ~ 011
   p09: {
     root:               'p09-root',

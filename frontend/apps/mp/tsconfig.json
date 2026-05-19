@@ -13,7 +13,11 @@
     "paths": {
       "@longfeng/testids": ["../../packages/testids/src/index.ts"],
       "@longfeng/api-contracts": ["../../packages/api-contracts/src/index.ts"],
-      "@longfeng/telemetry": ["../../packages/telemetry/src/index.ts"]
+      "@longfeng/telemetry": ["../../packages/telemetry/src/index.ts"],
+      "@longfeng/ui-kit": ["../../packages/ui-kit/src/index.ts"],
+      "@longfeng/i18n": ["../../packages/i18n/src/index.ts"],
+      "@longfeng/i18n/locales/zh.json": ["../../packages/i18n/src/locales/zh.json"],
+      "@longfeng/i18n/locales/en.json": ["../../packages/i18n/src/locales/en.json"]
     },
     "baseUrl": "."
   },

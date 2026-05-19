@@ -1,0 +1,143 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< com.longfeng:review-plan-service >------------------
+[INFO] Building review-plan-service 1.0.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-failsafe-plugin:3.1.2:integration-test (default-cli) @ review-plan-service ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.longfeng.reviewplan.T03GradeResultAdversarialIT
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+21:31:16.085 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.longfeng.reviewplan.T03GradeResultAdversarialIT]: T03GradeResultAdversarialIT does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+21:31:16.459 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.longfeng.reviewplan.Application for test class com.longfeng.reviewplan.T03GradeResultAdversarialIT
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-05-18T21:31:18.138+04:00  INFO 62620 --- [review-plan-service] [           main] c.l.r.T03GradeResultAdversarialIT        : Starting T03GradeResultAdversarialIT using Java 17.0.13 with PID 62620 (started by allen in /Users/allen/workspace/longfeng/.claude/worktrees/laughing-brown-e8ffb5/backend/review-plan-service)
+2026-05-18T21:31:18.144+04:00  INFO 62620 --- [review-plan-service] [           main] c.l.r.T03GradeResultAdversarialIT        : No active profile set, falling back to 1 default profile: "default"
+2026-05-18T21:31:20.907+04:00  INFO 62620 --- [review-plan-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-18T21:31:20.998+04:00  INFO 62620 --- [review-plan-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 81 ms. Found 5 JPA repository interfaces.
+2026-05-18T21:31:22.730+04:00  INFO 62620 --- [review-plan-service] [           main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=01c3adb4-ef73-3540-8c8b-614308fb2f37
+2026-05-18T21:31:23.624+04:00  WARN 62620 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.apache.rocketmq.spring.autoconfigure.ListenerContainerConfiguration' of type [org.apache.rocketmq.spring.autoconfigure.ListenerContainerConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T21:31:23.638+04:00  WARN 62620 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.apache.rocketmq.spring.autoconfigure.MessageConverterConfiguration' of type [org.apache.rocketmq.spring.autoconfigure.MessageConverterConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T21:31:23.722+04:00  WARN 62620 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'createRocketMQMessageConverter' of type [org.apache.rocketmq.spring.support.RocketMQMessageConverter] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T21:31:23.742+04:00  WARN 62620 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration' of type [org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T21:31:23.776+04:00  WARN 62620 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T21:31:23.782+04:00  WARN 62620 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'loadBalancerClientsDefaultsMappingsProvider' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration$$Lambda$1104/0x000000013a5f0350] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T21:31:23.791+04:00  WARN 62620 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'defaultsBindHandlerAdvisor' of type [org.springframework.cloud.commons.config.DefaultsBindHandlerAdvisor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T21:31:23.801+04:00  WARN 62620 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration' of type [org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T21:31:23.809+04:00  WARN 62620 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'stringOrNumberMigrationVersionConverter' of type [org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration$StringOrNumberToMigrationVersionConverter] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T21:31:23.844+04:00  WARN 62620 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'rocketmq-org.apache.rocketmq.spring.autoconfigure.RocketMQProperties' of type [org.apache.rocketmq.spring.autoconfigure.RocketMQProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T21:31:23.852+04:00  WARN 62620 --- [review-plan-service] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'rocketMQMessageListenerContainerRegistrar' of type [org.apache.rocketmq.spring.support.RocketMQMessageListenerContainerRegistrar] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [org.apache.rocketmq.spring.annotation.RocketMQMessageListenerBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-18T21:31:24.532+04:00  INFO 62620 --- [review-plan-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+2026-05-18T21:31:24.550+04:00  INFO 62620 --- [review-plan-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-18T21:31:24.551+04:00  INFO 62620 --- [review-plan-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-05-18T21:31:24.683+04:00  INFO 62620 --- [review-plan-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-18T21:31:24.687+04:00  INFO 62620 --- [review-plan-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 5794 ms
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+2026-05-18T21:31:25.874+04:00  INFO 62620 --- [review-plan-service] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://127.0.0.1:15436/wrongbook (PostgreSQL 15.17)
+2026-05-18T21:31:26.049+04:00  INFO 62620 --- [review-plan-service] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 1.0.084
+2026-05-18T21:31:26.051+04:00  WARN 62620 --- [review-plan-service] [           main] o.f.core.internal.command.DbMigrate      : outOfOrder mode is active. Migration of schema "public" may not be reproducible.
+2026-05-18T21:31:26.053+04:00  WARN 62620 --- [review-plan-service] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" has a version (1.0.084) that is newer than the latest available migration (1.0.082) !
+2026-05-18T21:31:26.063+04:00  INFO 62620 --- [review-plan-service] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-05-18T21:31:26.321+04:00  INFO 62620 --- [review-plan-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-18T21:31:26.395+04:00  INFO 62620 --- [review-plan-service] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-05-18T21:31:26.438+04:00  INFO 62620 --- [review-plan-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-18T21:31:26.701+04:00  INFO 62620 --- [review-plan-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-18T21:31:26.735+04:00  INFO 62620 --- [review-plan-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-18T21:31:26.794+04:00  INFO 62620 --- [review-plan-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@6c2a33af
+2026-05-18T21:31:26.797+04:00  INFO 62620 --- [review-plan-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-18T21:31:28.553+04:00  INFO 62620 --- [review-plan-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-18T21:31:28.560+04:00  INFO 62620 --- [review-plan-service] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-18T21:31:30.116+04:00  INFO 62620 --- [review-plan-service] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-05-18T21:31:32.898+04:00  INFO 62620 --- [review-plan-service] [           main] c.a.c.sentinel.SentinelWebMvcConfigurer  : [Sentinel Starter] register SentinelWebInterceptor with urlPatterns: [/**].
+2026-05-18T21:31:35.323+04:00  INFO 62620 --- [review-plan-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring TestDispatcherServlet ''
+2026-05-18T21:31:35.325+04:00  INFO 62620 --- [review-plan-service] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-05-18T21:31:35.345+04:00  INFO 62620 --- [review-plan-service] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2026-05-18T21:31:35.401+04:00  INFO 62620 --- [review-plan-service] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 76 ms
+2026-05-18T21:31:35.750+04:00  INFO 62620 --- [review-plan-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 54600 (http) with context path ''
+2026-05-18T21:31:35.796+04:00  INFO 62620 --- [review-plan-service] [           main] c.l.r.T03GradeResultAdversarialIT        : Started T03GradeResultAdversarialIT in 18.519 seconds (process running for 21.594)
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+INFO: Sentinel log output type is: file
+INFO: Sentinel log charset is: utf-8
+INFO: Sentinel log base directory is: /Users/allen/logs/csp/
+INFO: Sentinel log name use pid is: false
+INFO: Sentinel log level is: INFO
+
+MockHttpServletRequest:
+      HTTP Method = POST
+      Request URI = /api/review/nodes/314817315726184448/grade
+       Parameters = {}
+          Headers = [Content-Type:"application/json;charset=UTF-8", Content-Length:"19"]
+             Body = {"grade":"PARTIAL"}
+    Session Attrs = {}
+
+Handler:
+             Type = com.longfeng.reviewplan.controller.ReviewPlanController
+           Method = com.longfeng.reviewplan.controller.ReviewPlanController#gradeNode(Long, GradeReq, Long)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Content-Type:"application/json"]
+     Content type = application/json
+             Body = {"code":0,"message":"ok","data":{"planId":"314817315726184448","nextReviewAt":"2026-05-20T17:31:37.938033Z","easeFactorAfter":2.360,"mastered":false}}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+[ERROR] Tests run: 4, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 23.93 s <<< FAILURE! -- in com.longfeng.reviewplan.T03GradeResultAdversarialIT
+[ERROR] com.longfeng.reviewplan.T03GradeResultAdversarialIT.adv00_missing_user_header_must_reject_403 -- Time elapsed: 2.479 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+[A.1 学生主体性 · header 缺失时必须 403 NODE_NOT_OWNED · 实装返 200 body={"code":0,"message":"ok","data":{"planId":"314817315726184448","nextReviewAt":"2026-05-20T17:31:37.938033Z","easeFactorAfter":2.360,"mastered":false}}] 
+expected: 403
+ but was: 200
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:500)
+	at com.longfeng.reviewplan.T03GradeResultAdversarialIT.adv00_missing_user_header_must_reject_403(T03GradeResultAdversarialIT.java:207)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   T03GradeResultAdversarialIT.adv00_missing_user_header_must_reject_403:207 [A.1 学生主体性 · header 缺失时必须 403 NODE_NOT_OWNED · 实装返 200 body={"code":0,"message":"ok","data":{"planId":"314817315726184448","nextReviewAt":"2026-05-20T17:31:37.938033Z","easeFactorAfter":2.360,"mastered":false}}] 
+expected: 403
+ but was: 200
+[INFO] 
+[ERROR] Tests run: 4, Failures: 1, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  42.464 s
+[INFO] Finished at: 2026-05-18T21:31:51+04:00
+[INFO] ------------------------------------------------------------------------

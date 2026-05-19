@@ -31,6 +31,26 @@ public interface WrongItemRepository extends JpaRepository<WrongItem, Long> {
     List<WrongItem> findByStudentIdAndSubject(Long studentId, String subject);
 
     /**
+     * P-HOME hero "掌握 N 题" chip · 累计已掌握题数.
+     *
+     * <p>语义对齐 master biz "学生的'已掌握题数'" (L1203):
+     * <ul>
+     *   <li>{@code mastery = 2} (学生自评已掌握 · 最终态)
+     *   <li>{@code status = 8} (ARCHIVED · 主动归档视为掌握)
+     * </ul>
+     * 两者 OR 取并集 · 软删 ({@code deleted_at IS NOT NULL}) 不计.
+     *
+     * <p>调用方: review-plan-service HomeAggregatorController via internal endpoint
+     * {@code GET /internal/students/{id}/mastered-count}.
+     */
+    @Query(value = "SELECT COUNT(*) FROM wrong_item w "
+                 + "WHERE w.deleted_at IS NULL "
+                 + "AND w.student_id = :studentId "
+                 + "AND (w.mastery = 2 OR w.status = 8)",
+           nativeQuery = true)
+    long countMasteredByStudent(@Param("studentId") Long studentId);
+
+    /**
      * P08-RENDER · 单库迁移后 (2026-05-17 用户拍板) analysis_task + analysis_result 同库.
      * AI OCR 输出 stem 落 analysis_result.stem · 从来没回写 wrong_item.stem_text ·
      * 导致 wrongbook GET 返空. 这里 LEFT JOIN 拿最新 analysis_result.stem 兜底.

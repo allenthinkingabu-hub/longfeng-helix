@@ -1,0 +1,20 @@
+{
+  "exec.flag.aiJudged": "AI Judged",
+  "exec.chip.aiConfidence": "AI {pct}% sure",
+  "exec.judge.thinking": "AI thinking...",
+  "exec.judge.verdict.mastered": "Mastered",
+  "exec.judge.verdict.partial": "Partial",
+  "exec.judge.verdict.forgot": "Forgot",
+  "exec.judge.cta.accept": "Accept",
+  "exec.judge.cta.override": "I disagree",
+  "exec.judge.reason": "Diagnosis",
+  "exec.judge.matchedSteps": "Completed steps",
+  "exec.judge.missedSteps": "Missing steps",
+  "exec.judge.lowConfidence": "🤔 AI unsure · please self-rate",
+  "exec.judge.lowConfidence.hint": "Complex question or unclear writing · AI cannot judge",
+  "exec.judge.timeout": "AI timeout · please self-rate",
+  "exec.judge.timeout.icon": "⏱",
+  "exec.banner.fallback": "AI unavailable · please self-rate",
+  "exec.banner.modelUsed": "{model} · {latency}s",
+  "exec.judge.cta.overrideAck": "You chose {grade} · differs from AI (helps us improve AI)"
+}

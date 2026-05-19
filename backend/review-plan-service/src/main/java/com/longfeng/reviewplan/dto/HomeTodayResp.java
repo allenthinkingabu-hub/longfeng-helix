@@ -28,11 +28,13 @@ public record HomeTodayResp(
     @Schema(description = "本周 Bento 4 字段投影 (SC-16-T01)") @JsonProperty("weekSummary")
         WeekSummaryDto weekSummary) {
 
-  @Schema(description = "今日大卡: total/done/circleProgress")
+  @Schema(description = "今日大卡: total/done/circleProgress + masteredTotal (P-HOME hero chip)")
   public record TodayCard(
       @Schema(description = "今日待复习节点总数") @JsonProperty("total") int total,
       @Schema(description = "今日已完成节点数") @JsonProperty("done") int done,
-      @Schema(description = "圆环进度 0..1") @JsonProperty("circleProgress") double circleProgress) {}
+      @Schema(description = "圆环进度 0..1") @JsonProperty("circleProgress") double circleProgress,
+      @Schema(description = "学生累计已掌握题数 (mastery=2 OR status=ARCHIVED · 跨服务聚合自 wrongbook-service)")
+          @JsonProperty("masteredTotal") long masteredTotal) {}
 
   @Schema(description = "Resume Banner 元数据 · 当前阶段恒 null")
   public record Resume(

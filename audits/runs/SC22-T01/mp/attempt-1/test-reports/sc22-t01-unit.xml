@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="25" failures="0" errors="0" time="0.216">
+    <testsuite name="test/unit/sc22-t01-banner-fallback-polish.spec.ts" timestamp="2026-05-19T07:23:17.396Z" hostname="Wangs-MacBook-Pro.local" tests="25" failures="0" errors="0" skipped="0" time="0.004">
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC1 LOW_CONFIDENCE 退化策略 (biz §2B.22 step 2) &gt; LOW_CONFIDENCE · showMain=false (不显 verdict chip + reason + CTA)" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC1 LOW_CONFIDENCE 退化策略 (biz §2B.22 step 2) &gt; LOW_CONFIDENCE · fallbackI18nKey === &quot;exec.judge.lowConfidence&quot;" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC1 LOW_CONFIDENCE 退化策略 (biz §2B.22 step 2) &gt; LOW_CONFIDENCE · fallbackKind === &quot;lowConfidence&quot; (wxss class · 灰色文案)" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC1 LOW_CONFIDENCE 退化策略 (biz §2B.22 step 2) &gt; LOW_CONFIDENCE · GradeButtons preselected=null · 3 按钮无 ring (KI 学生主体性)" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC2 TIMEOUT 退化策略 (biz §2B.22 TC-22.02) &gt; TIMEOUT · showMain=false · showFallback=true" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC2 TIMEOUT 退化策略 (biz §2B.22 TC-22.02) &gt; TIMEOUT · fallbackI18nKey === &quot;exec.judge.timeout&quot;" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC2 TIMEOUT 退化策略 (biz §2B.22 TC-22.02) &gt; TIMEOUT · fallbackKind === &quot;timeout&quot; (wxss class · 红色 + ⏱)" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC2 TIMEOUT 退化策略 (biz §2B.22 TC-22.02) &gt; TIMEOUT · GradeButtons preselected=null (与 LOW_CONFIDENCE 同 · A.3 优雅降级)" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · SERVICE_UNAVAILABLE 退化策略 (sibling SC22-T02 503 路径) &gt; SERVICE_UNAVAILABLE · fallbackKind === &quot;unavailable&quot; (wxss class · 灰色 + ⚠)" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · SERVICE_UNAVAILABLE 退化策略 (sibling SC22-T02 503 路径) &gt; SERVICE_UNAVAILABLE · fallbackI18nKey === &quot;exec.banner.fallback&quot;" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC3 + TI3 · final_grade_source 退化态 (学生 tap = self) &gt; LOW_CONFIDENCE + grade=PARTIAL → final_grade_source=self (biz §2B.22 line 213 关键断言)" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC3 + TI3 · final_grade_source 退化态 (学生 tap = self) &gt; TIMEOUT + grade=PARTIAL → final_grade_source=self (biz §2B.22 TC-22.02 关键断言)" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC3 + TI3 · final_grade_source 退化态 (学生 tap = self) &gt; SERVICE_UNAVAILABLE + grade=FORGOT → final_grade_source=self (sibling SC22-T02 503 路径)" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC3 + TI3 · final_grade_source 退化态 (学生 tap = self) &gt; DONE base case · 验确 sibling SC20-T05 ai_accepted 路径未破坏 (向后兼容)" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC4 · 视觉 polish fallbackKind 3 态独立 + flag/chip/hint 退化 &gt; 退化态 (LOW_CONFIDENCE) · aiFlag 不显 · metaChip 不显 · hintRibbon 不显 (sibling SC20-T05 已实装)" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC4 · 视觉 polish fallbackKind 3 态独立 + flag/chip/hint 退化 &gt; 退化态 (TIMEOUT) · aiFlag 不显 · metaChip 不显 · hintRibbon 不显" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC4 · 视觉 polish fallbackKind 3 态独立 + flag/chip/hint 退化 &gt; DONE base case · aiFlag 显 · metaChip 显 · hintRibbon 显 (向后兼容 SC20-T05)" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC4 · 视觉 polish fallbackKind 3 态独立 + flag/chip/hint 退化 &gt; 3 个 fallbackKind 与 status 1:1 映射 (穷举校验 · 防 silent fork)" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC5 · i18n 2 新 key (lowConfidence.hint + timeout.icon) 双语 + assert &gt; zh.json 含 SC22-T01 2 key" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC5 · i18n 2 新 key (lowConfidence.hint + timeout.icon) 双语 + assert &gt; en.json 含 SC22-T01 2 key" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC5 · i18n 2 新 key (lowConfidence.hint + timeout.icon) 双语 + assert &gt; SC22_T01_REQUIRED_KEYS 字面锁 2 key (biz §2B.22 视觉 polish)" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC5 · i18n 2 新 key (lowConfidence.hint + timeout.icon) 双语 + assert &gt; zh lowConfidence.hint 字面非空 + 含 &quot;AI&quot;" time="0.001">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · AC5 · i18n 2 新 key (lowConfidence.hint + timeout.icon) 双语 + assert &gt; zh timeout.icon === &quot;⏱&quot;" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · KI 学生主体性 · aria-label 不含 &quot;AI 建议&quot; 当 preselected=null &gt; preselected=null 时 GradeButtons aria-label 不含 AI 建议字面 (色盲友好)" time="0">
+        </testcase>
+        <testcase classname="test/unit/sc22-t01-banner-fallback-polish.spec.ts" name="SC22-T01 · KI 学生主体性 · aria-label 不含 &quot;AI 建议&quot; 当 preselected=null &gt; computeGradeButtonAriaLabel 退化态 (preselected=null) 不含 &quot;AI 建议&quot;" time="0">
+        </testcase>
+    </testsuite>
+</testsuites>

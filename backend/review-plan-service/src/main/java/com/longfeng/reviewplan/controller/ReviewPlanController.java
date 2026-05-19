@@ -1,6 +1,9 @@
 package com.longfeng.reviewplan.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.longfeng.common.dto.ApiResult;
+import com.longfeng.reviewplan.dto.AiJudgeDto;
 import com.longfeng.reviewplan.dto.CreateSessionReq;
 import com.longfeng.reviewplan.dto.CreateSessionResp;
 import com.longfeng.reviewplan.dto.GradeReq;
@@ -10,10 +13,14 @@ import com.longfeng.reviewplan.dto.ReviewPlanDto;
 import com.longfeng.reviewplan.dto.TodayResp;
 import com.longfeng.reviewplan.entity.ReviewOutcome;
 import com.longfeng.reviewplan.entity.ReviewPlan;
+import com.longfeng.reviewplan.entity.WbReviewNode;
+import com.longfeng.reviewplan.exception.GradeExceptions;
 import com.longfeng.reviewplan.exception.PlanMasteredException;
 import com.longfeng.reviewplan.exception.PlanNotFoundException;
 import com.longfeng.reviewplan.repo.ReviewOutcomeRepository;
 import com.longfeng.reviewplan.repo.ReviewPlanRepository;
+import com.longfeng.reviewplan.repo.WbReviewNodeRepository;
+import com.longfeng.reviewplan.service.JudgeOutboxService;
 import com.longfeng.reviewplan.service.NodeLifecycleTracker;
 import com.longfeng.reviewplan.service.ReviewPlanService;
 import com.longfeng.reviewplan.service.ReviewPlanService.CompleteResult;
@@ -25,8 +32,11 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,18 +66,34 @@ public class ReviewPlanController {
     private final NodeLifecycleTracker lifecycleTracker;
     private final ReviewPlanRepository planRepo;
     private final ReviewOutcomeRepository outcomeRepo;
+    // SC20-T03 · wb_review_node 5 satellite 列读 + final_grade_source 列写
+    private final WbReviewNodeRepository wbNodeRepo;
+    private final ObjectMapper jsonMapper;
+    // SC21-T01 · RLHF override outbox 写入 (final_grade_source='ai_overridden' 时同事务 INSERT)
+    private final JudgeOutboxService judgeOutboxService;
+
+    // SC20-T03 §4.16 · final_grade_source 枚举值 (Round 2 用例 #6 子断言 #a 4 子情况 422 校验)
+    private static final Set<String> VALID_FINAL_GRADE_SOURCES =
+        Set.of("self", "ai_accepted", "ai_overridden");
+    private static final int FINAL_GRADE_SOURCE_MAX_LEN = 16;
 
     public ReviewPlanController(
             ReviewPlanService planService,
             ReviewSessionService sessionService,
             NodeLifecycleTracker lifecycleTracker,
             ReviewPlanRepository planRepo,
-            ReviewOutcomeRepository outcomeRepo) {
+            ReviewOutcomeRepository outcomeRepo,
+            WbReviewNodeRepository wbNodeRepo,
+            ObjectMapper jsonMapper,
+            JudgeOutboxService judgeOutboxService) {
         this.planService = planService;
         this.sessionService = sessionService;
         this.lifecycleTracker = lifecycleTracker;
         this.planRepo = planRepo;
         this.outcomeRepo = outcomeRepo;
+        this.wbNodeRepo = wbNodeRepo;
+        this.jsonMapper = jsonMapper;
+        this.judgeOutboxService = judgeOutboxService;
     }
 
     // =======================================================================
@@ -377,26 +403,141 @@ public class ReviewPlanController {
      * SC-01-C05 #6 · POST /api/review/nodes/{nid}/grade.
      * MASTERED→5 / PARTIAL→3 / FORGOT→0 三态映射 + SM-2 compute + outbox graded event.
      * FORGOT 路径走 SC-01-C08 级联重排.
+     *
+     * <p>SC20-T03 (M-AI-ANSWER-JUDGE §10.18 + §4.16) 改造:
+     * <ol>
+     *   <li>req.finalGradeSource (新字段) 缺省 'self' (旧客户端不传 = 兼容)</li>
+     *   <li>应用层 CHECK (Controller-first-line · CHECK 在 planService.complete() 调用前置):
+     *     <ul>
+     *       <li>enum 校验 final_grade_source ∈ {'self','ai_accepted','ai_overridden'} · 失败 → 422 INVALID_FINAL_GRADE_SOURCE</li>
+     *       <li>'ai_accepted' ⟹ wb_review_node.ai_judge_verdict === grade · 不等 → 422 GRADE_SOURCE_MISMATCH</li>
+     *       <li>'ai_overridden' ⟹ wb_review_node.ai_judge_verdict != grade · 相等 → 422 GRADE_SOURCE_MISMATCH</li>
+     *       <li>'self' 不校验 (向后兼容)</li>
+     *     </ul>
+     *   </li>
+     *   <li>跨用户检查: plan.studentId != X-User-Id → 403 NODE_NOT_OWNED (A.1 学生主体性宪法)</li>
+     *   <li>幂等检查: plan.completedAt != null → 409 NODE_ALREADY_GRADED (master §10.5 不允许重复 grade)</li>
+     *   <li>落 wb_review_node.final_grade_source 列 (UPSERT 决策不采用 · 仅 wb_review_node 行已存在时更新此列 ·
+     *       wb_review_node-row-not-created 选 INSERT-only 路径 · 沿 master §10.5 现役无 :grade 创建 wb_review_node 行)</li>
+     * </ol>
+     *
+     * <p>@Transactional 整方法 · CHECK 抛 GradeExceptions 时整事务 rollback · partial write 禁
+     * (RuntimeException 子类默认 rollback · 无需显式 rollbackFor).
      */
-    @Operation(summary = "SC-01-C05 grade node")
+    @Operation(summary = "SC-01-C05 grade node · SC20-T03 加 finalGradeSource")
     @PostMapping("/api/review/nodes/{nid}/grade")
+    @Transactional
     public ApiResult<CompleteResult> gradeNode(
             @PathVariable Long nid,
-            @RequestBody GradeReq req) {
+            @RequestBody GradeReq req,
+            @RequestHeader(value = USER_ID_HEADER, defaultValue = "0") Long userId) {
+
+        // === Controller-first-line CHECK (test-cases.md Round 2 #3 · Service-first-line 替代位置) ===
+
+        // CHECK 1: final_grade_source enum 校验 (Round 2 #6 子断言 #a · 422 INVALID_FINAL_GRADE_SOURCE)
+        //   - null → 兜底 'self' (向后兼容)
+        //   - 长度超 16 / 非 enum 内 → 422 INVALID_FINAL_GRADE_SOURCE (不让 PostgreSQL string-too-long 抛 5xx)
+        String finalGradeSource = req.toFinalGradeSource();
+        if (req.finalGradeSource() != null) {
+            // 用户字面传了 finalGradeSource 字段 (空串 / 大小写错 / 超长 / 非 enum 都要拒)
+            if (req.finalGradeSource().length() > FINAL_GRADE_SOURCE_MAX_LEN
+                    || !VALID_FINAL_GRADE_SOURCES.contains(req.finalGradeSource())) {
+                throw new GradeExceptions.InvalidFinalGradeSource(
+                    "INVALID_FINAL_GRADE_SOURCE: '" + req.finalGradeSource()
+                        + "' not in {self, ai_accepted, ai_overridden}");
+            }
+        }
+
+        // 加载 plan · 验授权 + 幂等 (CHECK 在 SM-2 调用前)
+        Optional<ReviewPlan> planOpt = planRepo.findById(nid);
+        if (planOpt.isEmpty()) {
+            throw new PlanNotFoundException(nid);
+        }
+        ReviewPlan plan = planOpt.get();
+
+        // CHECK 2: 跨用户访问 (Round 2 #6 子断言 #c · A.1 学生主体性 · 403 NODE_NOT_OWNED)
+        //   - X-User-Id default 0 (header 缺失) · 与真实 plan.studentId != 时拒
+        //   - **Tester Round 1 REJECT fix · 2026-05-18** (audits/.../adversarial.md adv00):
+        //     之前实装 `userId != 0L && ...` 短路导致 header 缺失时跳过 CHECK · 任何客户端可 grade 任何 node
+        //     (A.1 学生主体性宪法严重违反)。修复: 移除 `userId != 0L` 守护 · 仅 plan.studentId != userId 时拒。
+        //     header 缺失 userId=0 与 plan.studentId (任何合法 student) 必然不等 → 拒 403 NODE_NOT_OWNED.
+        if (userId != null && plan.getStudentId() != null
+                && !userId.equals(plan.getStudentId())) {
+            throw new GradeExceptions.NodeNotOwned(
+                "NODE_NOT_OWNED: plan.studentId=" + plan.getStudentId() + " != userId=" + userId);
+        }
+
+        // CHECK 3: 幂等 · 已 grade (plan.completedAt != null) → 409 NODE_ALREADY_GRADED
+        //   - master §10.5 idempotency 现役行为 · :grade 不允许重复 grade
+        //   - Round 2 #6 子断言 #d-1
+        if (plan.getCompletedAt() != null) {
+            throw new GradeExceptions.NodeAlreadyGraded(
+                "NODE_ALREADY_GRADED: nid=" + nid + " already completed at " + plan.getCompletedAt());
+        }
+
+        // CHECK 4: ai_accepted / ai_overridden 字段约束 (Round 2 #3 · §4.16 字面)
+        //   - 'ai_accepted' ⟹ wb_review_node.ai_judge_verdict === grade
+        //   - 'ai_overridden' ⟹ ai_judge_verdict != grade
+        //   - 'self' 不校验
+        String grade = req.grade() != null ? req.grade().toUpperCase() : "PARTIAL";
+        if ("ai_accepted".equals(finalGradeSource) || "ai_overridden".equals(finalGradeSource)) {
+            Optional<WbReviewNode> wbOpt = wbNodeRepo.findById(nid);
+            if (wbOpt.isEmpty() || wbOpt.get().getAiJudgeVerdict() == null) {
+                // 无 AI 判结果 · 不能声明 ai_accepted / ai_overridden
+                throw new GradeExceptions.GradeSourceMismatch(
+                    "GRADE_SOURCE_MISMATCH: final_grade_source='" + finalGradeSource
+                        + "' but no ai_judge_verdict for nid=" + nid);
+            }
+            String aiVerdict = wbOpt.get().getAiJudgeVerdict();
+            if ("ai_accepted".equals(finalGradeSource) && !aiVerdict.equals(grade)) {
+                throw new GradeExceptions.GradeSourceMismatch(
+                    "GRADE_SOURCE_MISMATCH: ai_accepted requires ai_judge_verdict='" + aiVerdict
+                        + "' === grade='" + grade + "' but they differ");
+            }
+            if ("ai_overridden".equals(finalGradeSource) && aiVerdict.equals(grade)) {
+                throw new GradeExceptions.GradeSourceMismatch(
+                    "GRADE_SOURCE_MISMATCH: ai_overridden requires ai_judge_verdict='" + aiVerdict
+                        + "' != grade='" + grade + "' but they match");
+            }
+        }
+
+        // === CHECK 全过 · 走 master §10.5 现役 SM-2 路径 ===
+
         int quality = req.toQuality();
         CompleteResult result = planService.complete(nid, quality);
 
         // 补发 review.node.graded outbox event
-        ReviewPlan plan = planService.getById(nid);
-        String grade = req.grade() != null ? req.grade().toUpperCase() : "PARTIAL";
+        ReviewPlan refreshed = planService.getById(nid);
         planService.writeGradedEvent(
             nid, grade, quality,
-            plan.getWrongItemId(), plan.getStudentId(), plan.getNodeIndex());
+            refreshed.getWrongItemId(), refreshed.getStudentId(), refreshed.getNodeIndex());
 
-        // FORGOT 路径: 级联重排 downstream nodes
+        // FORGOT 路径: 级联重排 downstream nodes (master §10.5 现役 · 不动)
         if (quality == 0) {
-            int nodeIndex = plan.getNodeIndex() == null ? 0 : plan.getNodeIndex();
-            planService.rescheduleDownstreamForForgot(plan.getWrongItemId(), nodeIndex);
+            int nodeIndex = refreshed.getNodeIndex() == null ? 0 : refreshed.getNodeIndex();
+            planService.rescheduleDownstreamForForgot(refreshed.getWrongItemId(), nodeIndex);
+        }
+
+        // === SC20-T03 落 wb_review_node.final_grade_source 列 (INSERT-only 决策 · 行存在才 UPDATE) ===
+        // 决策: wb_review_node-row-not-created · 沿 master §10.5 现役行为 · :grade endpoint 不创建 wb_review_node 行
+        // 仅在 wb_review_node 行已存在时 (e.g. SC20-T02 judge 已落 5 satellite 列) · UPDATE final_grade_source 列
+        Optional<WbReviewNode> updatedWbOpt = wbNodeRepo.findById(nid);
+        updatedWbOpt.ifPresent(wbNode -> {
+            wbNode.setFinalGradeSource(finalGradeSource);
+            wbNodeRepo.save(wbNode);
+        });
+
+        // === SC21-T01 · RLHF override outbox INSERT (同事务 · TI2 grade 抛错时一起回滚) ===
+        // biz §2B.21 步 5 + §12 S5.6.5 · final_grade_source='ai_overridden' 时入 outbox 表
+        // 字段 snapshot 自 wb_review_node 6 satellite 列 (TC-21.03 中间值 PARTIAL 也入 · 任何 ai_verdict != grade)
+        if ("ai_overridden".equals(finalGradeSource) && updatedWbOpt.isPresent()) {
+            WbReviewNode wb = updatedWbOpt.get();
+            judgeOutboxService.enqueueOverride(
+                nid,
+                wb.getAiJudgeVerdict(),
+                grade,
+                wb.getUserAnswerImageKey(),
+                wb.getAiJudgeReason());
         }
 
         return ApiResult.ok(result);
@@ -411,8 +552,26 @@ public class ReviewPlanController {
             peek.nextNid(), peek.completed(), peek.total(), peek.done()));
     }
 
-    /** SC-01-C05 #8 · GET /api/review/nodes/{nid}/result · 完成结果聚合. */
-    @Operation(summary = "SC-01-C05 node result")
+    /**
+     * SC-01-C05 #8 · GET /api/review/nodes/{nid}/result · 完成结果聚合.
+     *
+     * <p>SC20-T03 (M-AI-ANSWER-JUDGE §10.19) 改造: 加 aiJudge 字段拼装.
+     * <ul>
+     *   <li>从 wb_review_node 6 satellite 列拼 aiJudge object</li>
+     *   <li>AC4 字面: 5 列 (verdict / confidence / reason / status / final_grade_source) **任一** 为 null
+     *       时 aiJudge 整体 null (向后兼容 P09 旧逻辑)</li>
+     *   <li>aiJudge.status 由 ai_judge_metadata JSONB 提取 · 三态降级:
+     *     <ul>
+     *       <li>metadata 整列 SQL NULL → aiJudge.status = null</li>
+     *       <li>metadata JSON parse 失败 → aiJudge.status = null (log warn · 不抛 5xx)</li>
+     *       <li>metadata 有效 JSON 但缺 status key → aiJudge.status = null</li>
+     *     </ul>
+     *   </li>
+     *   <li>matched_steps / missed_steps · §10.19 字面 `?` 可选 · 本实装态 A "不返 key"
+     *       (DTO @JsonInclude(NON_NULL) · pass null → 不序列化)</li>
+     * </ul>
+     */
+    @Operation(summary = "SC-01-C05 node result · SC20-T03 加 aiJudge")
     @GetMapping("/api/review/nodes/{nid}/result")
     public ApiResult<NodeResultResp> nodeResult(@PathVariable Long nid) {
         ReviewPlan plan = planService.getById(nid);
@@ -421,6 +580,8 @@ public class ReviewPlanController {
 
         String nodeState = plan.isMastered() ? "MASTERED"
             : plan.getCompletedAt() != null ? "COMPLETED" : "ACTIVE";
+
+        AiJudgeDto aiJudge = buildAiJudgeDto(nid);
 
         return ApiResult.ok(new NodeResultResp(
             plan.getId(),
@@ -435,7 +596,81 @@ public class ReviewPlanController {
             plan.getNextDueAt(),
             durationMs,
             plan.isMastered(),
-            plan.getMasteryScore()));
+            plan.getMasteryScore(),
+            aiJudge));
+    }
+
+    /**
+     * SC20-T03 · 从 wb_review_node 6 satellite 列拼 AiJudgeDto.
+     *
+     * <p>AC4 字面: 5 列 (verdict / confidence / reason / status / final_grade_source) **任一** null
+     * 时返 null (不返 partial object · 防 mp 端 destructure TypeError).
+     *
+     * <p>aiJudge.status 三态降级 (用例 #5 fold 进 Round 2 字面):
+     * 整 metadata NULL / parse 失败 / 缺 status key → status = null.
+     */
+    private AiJudgeDto buildAiJudgeDto(Long nid) {
+        Optional<WbReviewNode> wbOpt = wbNodeRepo.findById(nid);
+        if (wbOpt.isEmpty()) {
+            return null; // wb_review_node 行不存在 = AI 未判 (向后兼容 master sibling 无 wb_review_node)
+        }
+        WbReviewNode wb = wbOpt.get();
+
+        // 5 列任一 null → 整 aiJudge null (AC4 严)
+        // verdict / confidence / reason 任一 null → AI 未判
+        if (wb.getAiJudgeVerdict() == null
+                || wb.getAiJudgeConfidence() == null
+                || wb.getAiJudgeReason() == null) {
+            return null;
+        }
+        // ai_judge_metadata 整列 NULL → 整 aiJudge null (用例 #6 子断言 #b 字面: metadata=SQL NULL 触发 aiJudge=null)
+        if (wb.getAiJudgeMetadata() == null) {
+            return null;
+        }
+        // final_grade_source NOT NULL DEFAULT 'self' (V1.0.084) · 但防御性 check
+        if (wb.getFinalGradeSource() == null) {
+            return null;
+        }
+
+        // 提取 metadata.status (三态降级: parse fail / 缺 key → null · 不抛 5xx)
+        String status = extractMetadataStatus(wb.getAiJudgeMetadata());
+        // status 也是 5 列之一 (用例 #5 字面 "5 必有字段 verdict / confidence / reason / status / final_grade_source")
+        // 但 status 来自 metadata 内部字段 · 不是独立列 · 故 status==null 时不触发整 aiJudge null
+        // (避免与 metadata=NULL 双重触发) · 而是返 status=null + 其他 4 字段非空 · 由 mp 端处理
+        // **修正决策**: status 在 metadata 内部 · null 时不触发整 aiJudge null · 而 metadata 整列 NULL 触发
+        // (用例 #6 子断言 #b 严: metadata 整列 NULL → aiJudge=null · 上面已 cover)
+
+        // matched_steps / missed_steps · 本实装态 A "不返 key" (pass null · DTO @JsonInclude.NON_NULL)
+        return new AiJudgeDto(
+            wb.getAiJudgeVerdict(),
+            wb.getAiJudgeConfidence(),
+            wb.getAiJudgeReason(),
+            status,
+            null,   // matched_steps · 态 A "不返 key"
+            null,   // missed_steps · 态 A "不返 key"
+            wb.getFinalGradeSource());
+    }
+
+    /**
+     * SC20-T03 · JSONB metadata 提取 status 字段 · 三态降级 null.
+     *
+     * <p>实装路径: Java 层 ObjectMapper.readTree (alternative: SQL `metadata->>'status'`).
+     */
+    private String extractMetadataStatus(String metadataJson) {
+        if (metadataJson == null || metadataJson.isBlank()) {
+            return null;
+        }
+        try {
+            JsonNode node = jsonMapper.readTree(metadataJson);
+            JsonNode statusNode = node.get("status");
+            if (statusNode == null || statusNode.isNull()) {
+                return null; // 缺 status key
+            }
+            return statusNode.asText();
+        } catch (Exception e) {
+            // JSON parse 失败 · log warn · 不抛 5xx (用例 #5 三态降级)
+            return null;
+        }
     }
 
     // =======================================================================
@@ -451,6 +686,31 @@ public class ReviewPlanController {
     @ExceptionHandler(PlanMasteredException.class)
     public ResponseEntity<ApiResult<?>> handleMastered(PlanMasteredException e) {
         return ResponseEntity.status(409).body(ApiResult.fail(40901, e.getMessage()));
+    }
+
+    // SC20-T03 · 4 个 grade 错误码 (Round 2 用例 #3 / #6 子断言 #a / #c / #d-1)
+
+    @ExceptionHandler(GradeExceptions.InvalidFinalGradeSource.class)
+    public ResponseEntity<ApiResult<?>> handleInvalidFinalGradeSource(
+            GradeExceptions.InvalidFinalGradeSource e) {
+        return ResponseEntity.status(422).body(ApiResult.fail(42210, e.getMessage()));
+    }
+
+    @ExceptionHandler(GradeExceptions.GradeSourceMismatch.class)
+    public ResponseEntity<ApiResult<?>> handleGradeSourceMismatch(
+            GradeExceptions.GradeSourceMismatch e) {
+        return ResponseEntity.status(422).body(ApiResult.fail(42211, e.getMessage()));
+    }
+
+    @ExceptionHandler(GradeExceptions.NodeAlreadyGraded.class)
+    public ResponseEntity<ApiResult<?>> handleNodeAlreadyGraded(
+            GradeExceptions.NodeAlreadyGraded e) {
+        return ResponseEntity.status(409).body(ApiResult.fail(40902, e.getMessage()));
+    }
+
+    @ExceptionHandler(GradeExceptions.NodeNotOwned.class)
+    public ResponseEntity<ApiResult<?>> handleNodeNotOwned(GradeExceptions.NodeNotOwned e) {
+        return ResponseEntity.status(403).body(ApiResult.fail(40301, e.getMessage()));
     }
 
     // =======================================================================
