@@ -148,7 +148,8 @@ Page({
 
     // SC20-T04 photo 路径专属 page state (TI1 切回 handwrite 不清)
     // null 时显示 placeholder + 「拍照」按钮 · 非 null 时显示 UploadedAnswerThumb
-    userAnswerImageKey: '' as string,         // OSS object key · empty = 未上传
+    userAnswerImageKey: '' as string,         // OSS object key · 给 :judge body 用 · empty = 未上传
+    userAnswerImageUrl: '' as string,         // OSS CDN URL · 给 <image src=> 渲染 thumb 用 · empty = 未上传
     photoState: 'IDLE' as PhotoState,
     photoSizeBytes: 0 as number,              // UploadedAnswerThumb props
     photoCapturedAt: '' as string,            // ISO time string · 渲染 "9:41:23"
@@ -441,6 +442,9 @@ Page({
         photoState: 'UPLOADED' as PhotoState,
         photoUploadPct: 100,
         userAnswerImageKey: presignResp.file_key,
+        // CDN URL · 单独存 page state 给 thumb 渲染. file_key (object_key) 是给 :judge body 用的.
+        // 之前 wxml 错把 file_key 当 URL 渲染成文本 · 显示一长串 OSS path · 是 hot-fix 修的 bug 1.
+        userAnswerImageUrl: presignResp.image_url,
         photoSizeBytes: size,
         photoSizeLabel: sizeLabel,
         photoCapturedAt: capturedAtLabel,
@@ -460,6 +464,7 @@ Page({
         photoState: 'FAILED' as PhotoState,
         photoUploadPct: 0,
         userAnswerImageKey: '',          // 不落键 · 防后续 :judge 拿空 key 调坏
+        userAnswerImageUrl: '',          // 同步清 CDN URL · thumb 不渲染残影
         photoSizeBytes: 0,
         photoSizeLabel: '',
         photoCapturedAt: '',

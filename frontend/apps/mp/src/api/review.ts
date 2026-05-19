@@ -8,6 +8,9 @@
 
 import { apiBase, httpJSON } from './_http';
 
+// 跟 _http.ts 一致 · MP runtime wx · 在 Node test runtime 不存在 (用 typeof guard).
+declare const wx: { getStorageSync(key: string): unknown } | undefined;
+
 const BASE = apiBase('review');
 
 // ── Envelope ─────────────────────────────────────────────────
@@ -235,8 +238,28 @@ export async function judgeNode(
   req: JudgeReq,
   idempotencyKey: string,
 ): Promise<JudgeResp> {
+  // biz §10.17 字面要求 Authorization: Bearer <studentJwt> · JudgeController.java
+  // 在 controller 层 fail-fast (Auth missing → 401 UNAUTHENTICATED · 沿现役 review-plan-service
+  // 无 Security 链).
+  //
+  // _http.ts 默认 baseHeaders 只注入 X-Student-Id + X-User-Id · 不带 Authorization · 所以本端点
+  // 必须显式取 wx.setStorageSync('studentJwt', ...) 写的 token 拼 Bearer header.
+  // 之前缺这步 → 上传图片后 :judge 立刻 401 → 前端 catch fallback → 错显 "AI 暂不可用" banner
+  // (即 2026-05-19 hot-fix bug 2 修的 RC).
+  //
+  // 未登录 / 没 token 时省略 Authorization · backend 仍会 401 · 走 SC-22 降级 banner
+  // (符合 spec §9 降级口径).
+  const headers: Record<string, string> = { 'X-Idempotency-Key': idempotencyKey };
+  let studentJwt = '';
+  if (typeof wx !== 'undefined' && wx.getStorageSync) {
+    try { studentJwt = String(wx.getStorageSync('studentJwt') || ''); }
+    catch { studentJwt = ''; }
+  }
+  if (studentJwt) {
+    headers.Authorization = `Bearer ${studentJwt}`;
+  }
   return httpJSON<JudgeResp>(
     `${BASE}/api/review/nodes/${nid}/judge`,
-    { method: 'POST', body: req, headers: { 'X-Idempotency-Key': idempotencyKey } },
+    { method: 'POST', body: req, headers },
   );
 }

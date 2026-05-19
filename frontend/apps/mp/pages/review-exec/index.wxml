@@ -127,10 +127,15 @@
       <view wx:elif="{{answerMode === 'photo'}}" class="paper paper-photo" data-test-id="{{aiJudgeIds.photoThumb}}">
         <block wx:if="{{photoState === 'UPLOADED' && userAnswerImageKey}}">
           <view class="photo-thumb">
-            <view class="photo-thumb-placeholder">
-              <text class="photo-thumb-glyph">📷</text>
-              <text class="photo-thumb-key">{{userAnswerImageKey}}</text>
-            </view>
+            <!-- 真实图片缩略图 (spec §3 + L82 + L104 · 120px 高 + aspectFit · mockup L218-L237 视觉)
+                 之前用 .photo-thumb-placeholder text 渲染 OSS path 字符串 · hot-fix bug 1 修.
+                 userAnswerImageUrl 来自 presignResp.image_url (CDN URL) · 跟 file_key 配对存 page state. -->
+            <image
+              class="photo-thumb-img"
+              src="{{userAnswerImageUrl}}"
+              mode="aspectFit"
+              lazy-load="false"
+            />
             <view class="photo-badge-uploaded" data-test-id="{{aiJudgeIds.uploadBadge}}">
               <text>✓ 上传成功</text>
             </view>

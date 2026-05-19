@@ -379,6 +379,17 @@ page {
   background: repeating-linear-gradient(180deg, #FBF7EF 0, #FBF7EF 47rpx, rgba(0,0,0,.04) 47rpx, rgba(0,0,0,.04) 48rpx);
 }
 
+/* 真实图片缩略图 (spec §3 + L82 · 120px 高 · mockup L218-L237 视觉)
+   2026-05-19 hot-fix bug 1: 之前 .photo-thumb-placeholder 用 text 渲 OSS path · 现在用真 <image>. */
+.photo-thumb-img {
+  width: 100%;
+  height: 240rpx;                              /* spec §3 "120px 高" · WeChat MP 用 rpx 2x */
+  border-radius: 12rpx;
+  background: #FBF7EF;
+  display: block;
+}
+
+/* legacy placeholder · 已被 .photo-thumb-img 取代 · 保留以防回退 */
 .photo-thumb-placeholder {
   display: flex;
   flex-direction: column;
