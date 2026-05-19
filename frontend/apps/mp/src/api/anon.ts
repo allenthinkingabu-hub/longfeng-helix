@@ -69,6 +69,12 @@ export interface AnalyzeResponse {
   status: string;
 }
 
+export interface AnonResultStep {
+  step_no: number | null;
+  text: string;
+  title?: string | null;
+  formula?: string | null;
+}
 export interface ResultResponse {
   status: 'ANALYZING' | 'READY' | 'FAILED' | 'NOT_FOUND' | 'DONE';
   result?: {
@@ -76,6 +82,13 @@ export interface ResultResponse {
     stem_length: number;
     chat_model: string;
     ocr_model: string;
+    // Extended 2026-05-19 for P04 游客态 (spec line 216 + biz §F05) ·
+    // anon-service 在 DONE 时调 ai-service /answer 拉完整数据合并.
+    // 若 /answer 调用降级 (ai-service 暂不可达) 这些字段缺省字符串.
+    stem?: string;
+    reason_markdown?: string;
+    steps?: AnonResultStep[];
+    correction?: string;
   };
   error_code?: string;
 }

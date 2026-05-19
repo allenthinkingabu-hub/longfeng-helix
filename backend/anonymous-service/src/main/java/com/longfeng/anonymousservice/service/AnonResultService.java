@@ -227,6 +227,48 @@ public class AnonResultService {
 
         LOG.info("anon_result session_id={} kind={} upstream_status={}",
                 anonSessionId, kind, upstreamStatus);
+
+        // P04 游客态 (spec line 216 + biz §F05) 需 stem/reasonMarkdown/steps/correction
+        // 渲染结果详情. DONE 时多调一次 ai-service /api/ai/{taskId}/answer 拉完整 ·
+        // 失败时降级返 5 字段版 (不卡 polling).
+        if (kind == ResultOutcome.Kind.READY) {
+            try {
+                String answerUrl = aiProps.getBaseUrl() + "/api/ai/" + taskId + "/answer";
+                @SuppressWarnings("rawtypes")
+                ResponseEntity<Map> ansResp = restTemplate.getForEntity(answerUrl, Map.class);
+                if (ansResp.getStatusCode().value() == 200 && ansResp.getBody() != null) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> ans = (Map<String, Object>) ansResp.getBody();
+                    String stem = ans.get("stem") instanceof String s ? s : "";
+                    String reason = ans.get("reasonMarkdown") instanceof String r ? r : "";
+                    @SuppressWarnings("unchecked")
+                    java.util.List<java.util.Map<String, Object>> steps =
+                            ans.get("steps") instanceof java.util.List<?> l
+                                    ? (java.util.List<java.util.Map<String, Object>>) (java.util.List<?>) l
+                                    : java.util.Collections.emptyList();
+                    // correction 取最后一步的 formula > text 兜底
+                    String correction = "";
+                    if (!steps.isEmpty()) {
+                        java.util.Map<String, Object> last = steps.get(steps.size() - 1);
+                        if (last != null) {
+                            Object f = last.get("formula");
+                            Object t = last.get("text");
+                            if (f instanceof String fs && !fs.isBlank()) correction = fs;
+                            else if (t instanceof String ts) correction = ts;
+                        }
+                    }
+                    return new ResultOutcome(kind, subject, stemLength, chatModel, ocrModel,
+                            stem, reason, steps, correction);
+                }
+                LOG.info("anon_result answer_fetch_non200 session_id={} status={}",
+                        anonSessionId, ansResp.getStatusCode());
+            } catch (RestClientException e) {
+                // 降级 · /answer 拉失败不阻塞 status=READY · FE 收到 5 字段也能渲染基本信息
+                LOG.warn("anon_result answer_fetch_failed session_id={} err={}",
+                        anonSessionId, e.toString());
+            }
+        }
+
         return new ResultOutcome(kind, subject, stemLength, chatModel, ocrModel);
     }
 
@@ -254,25 +296,47 @@ public class AnonResultService {
         private final Integer stemLength;
         private final String chatModel;
         private final String ocrModel;
+        /** Full AI answer fields · DONE 时由 AnonResultService 额外拉 ai-service /answer 填充. */
+        private final String stem;
+        private final String reasonMarkdown;
+        private final java.util.List<java.util.Map<String, Object>> steps;
+        private final String correction;
 
         public ResultOutcome(Kind kind, String subject, Integer stemLength,
-                             String chatModel, String ocrModel) {
+                             String chatModel, String ocrModel,
+                             String stem, String reasonMarkdown,
+                             java.util.List<java.util.Map<String, Object>> steps,
+                             String correction) {
             this.kind = kind;
             this.subject = subject;
             this.stemLength = stemLength;
             this.chatModel = chatModel;
             this.ocrModel = ocrModel;
+            this.stem = stem;
+            this.reasonMarkdown = reasonMarkdown;
+            this.steps = steps;
+            this.correction = correction;
+        }
+
+        /** 兼容: 老 5 字段构造 · 仍可用 · 新字段全 null. */
+        public ResultOutcome(Kind kind, String subject, Integer stemLength,
+                             String chatModel, String ocrModel) {
+            this(kind, subject, stemLength, chatModel, ocrModel, null, null, null, null);
         }
 
         static ResultOutcome empty(Kind kind) {
             return new ResultOutcome(kind, null, null, null, null);
         }
 
-        public Kind getKind()         { return kind; }
-        public String getSubject()    { return subject; }
-        public Integer getStemLength() { return stemLength; }
-        public String getChatModel()  { return chatModel; }
-        public String getOcrModel()   { return ocrModel; }
+        public Kind getKind()              { return kind; }
+        public String getSubject()         { return subject; }
+        public Integer getStemLength()     { return stemLength; }
+        public String getChatModel()       { return chatModel; }
+        public String getOcrModel()        { return ocrModel; }
+        public String getStem()            { return stem; }
+        public String getReasonMarkdown()  { return reasonMarkdown; }
+        public java.util.List<java.util.Map<String, Object>> getSteps() { return steps; }
+        public String getCorrection()      { return correction; }
     }
 
 }

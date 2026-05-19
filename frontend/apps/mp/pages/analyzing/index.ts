@@ -2,9 +2,11 @@
 // trace: H5 sibling → frontend/apps/h5/src/pages/Analyzing/index.tsx
 // State machine: init → analyzing → success | error
 // API: src/api/ai.ts (startAnalyze + pollAnalyzeStatus via httpJSON · apiBase('ai'))
+// Guest mode (spec P-GUEST-CAPTURE.spec.md line 215): src/api/anon.ts (getResult)
 
 import { startAnalyze, pollAnalyzeStatus } from '../../src/api/ai';
 import type { PollAnalyzeStatusResponse } from '../../src/api/ai';
+import { getResult as getAnonResult } from '../../src/api/anon';
 
 type StepState = 'wait' | 'now' | 'done' | 'fail';
 type PageState = 'init' | 'analyzing' | 'success' | 'error';
@@ -148,6 +150,32 @@ Page({
   _qid: '',
 
   onLoad(options: Record<string, string | undefined>) {
+    const subject = options.subject || 'math';
+    const subjectLabel = SUBJECT_LABELS[subject] || subject;
+    this.setData({ subjectLabel, timeChip: formatTimeChip(new Date()) });
+
+    // ── 游客态分支 (spec line 215 · /analyzing/{anonQid}?guest=1) ──
+    if (options.guest === '1') {
+      const anonQid = options.anonQid || '';
+      const anonToken = options.anonToken ? decodeURIComponent(options.anonToken) : '';
+      if (!anonQid || !anonToken) {
+        this.setData({
+          pageState: 'error',
+          statusText: '参数缺失',
+          errorMsg: '游客分析会话参数不全, 请回上一页重试',
+          showBanner: true,
+          steps: buildSteps(1, 'error'),
+        });
+        return;
+      }
+      this._qid = anonQid;
+      this._isGuest = true;
+      this._anonToken = anonToken;
+      this._startGuestFlow(anonQid, anonToken, subject);
+      return;
+    }
+
+    // ── 登录态原逻辑 (维持不变) ──
     // capture page does encodeURIComponent(presignResp.image_url) before navigateTo so
     // the embedded MinIO `?X-Amz-...&sig=...` doesn't collide with the route's own
     // query string. WeChat's options parser does NOT auto-decode here, so we get the
@@ -155,13 +183,7 @@ Page({
     // a malformed URL → DashScope returns "URL does not appear to be valid" → OCR fails.
     const rawImageUrl = options.imageUrl || '';
     const imageUrl = rawImageUrl ? decodeURIComponent(rawImageUrl) : '';
-    const subject = options.subject || 'math';
-    // subjectLabel is the *display* form ("数学"); subject stays as the wire code ("math")
-    // since BE / capture pass the code. Look up via SUBJECT_LABELS, fall through to the
-    // raw value when capture supplied a Chinese label directly (legacy callers).
-    const subjectLabel = SUBJECT_LABELS[subject] || subject;
     this._qid = options.qid || '';
-    this.setData({ subjectLabel, timeChip: formatTimeChip(new Date()) });
 
     if (imageUrl) {
       this._startAnalysis(imageUrl, subject);
@@ -178,8 +200,113 @@ Page({
     }
   },
 
+  // ── Guest 态实例字段 ──
+  _isGuest: false,
+  _anonToken: '' as string,
+  _guestFakeStepTimer: 0 as ReturnType<typeof setInterval> | 0,
+  _guestPollTimer: 0 as ReturnType<typeof setInterval> | 0,
+  _guestPollStart: 0,
+
+  /**
+   * 游客态分析流程 (spec line 215 · biz §F04).
+   * - 假装 4 步动画 (前端定时器 · 每 1.5s 推进 1 步) · UX 与登录态一致
+   * - 真后端 polling anon-service /api/anon/result/{qid} (1Hz · 30s 上限)
+   * - DONE → navigateTo /pages/result/index?guest=1&qid=...
+   * - FAILED / timeout → 显错误条
+   */
+  _startGuestFlow(anonQid: string, anonToken: string, subject: string) {
+    this.setData({
+      pageState: 'analyzing',
+      statusText: 'AI 正在分析…',
+      steps: buildSteps(1, 'analyzing'),
+      doneCount: 0,
+      previewTitle: PREVIEW_TITLE_BY_STEP[1],
+      previewSubtitle: '正在与 AI 模型通信中',
+    });
+
+    // 假步动画 · 每 1.5s 推一步, 上限到 step 4 hold 住
+    let fakeStep = 1;
+    this._guestFakeStepTimer = setInterval(() => {
+      if (fakeStep >= 4) return;
+      fakeStep++;
+      const previewTitle = PREVIEW_TITLE_BY_STEP[fakeStep] || 'AI 分析中…';
+      this.setData({
+        steps: buildSteps(fakeStep, 'analyzing'),
+        doneCount: Math.max(0, fakeStep - 1),
+        previewTitle,
+      });
+    }, 1500);
+
+    // 真 polling · 1Hz, 30s 上限
+    this._guestPollStart = Date.now();
+    this._guestPollTimer = setInterval(async () => {
+      const elapsed = Math.floor((Date.now() - this._guestPollStart) / 1000);
+      if (elapsed > 30) {
+        this._clearGuestTimers();
+        this.setData({
+          pageState: 'error',
+          statusText: 'AI 分析超时',
+          errorMsg: '分析超时（30s），请重试',
+          showBanner: true,
+          steps: buildSteps(fakeStep, 'error'),
+        });
+        return;
+      }
+      try {
+        const r = await getAnonResult(anonToken, Number(anonQid));
+        if (r.status === 'READY' || r.status === 'DONE') {
+          this._clearGuestTimers();
+          // 推到 step 4 完成态 + 短停顿后跳 P04
+          this.setData({
+            pageState: 'success',
+            statusText: 'AI 分析完成',
+            doneCount: 4,
+            steps: buildSteps(5, 'analyzing'),
+            previewTitle: r.result?.stem
+              ? (r.result.stem.length > 20 ? r.result.stem.slice(0, 20) + '…' : r.result.stem)
+              : 'AI 分析完成',
+            previewSubtitle: `${SUBJECT_LABELS[subject] || subject} · ${r.result?.ocr_model || ''}`,
+          });
+          setTimeout(() => {
+            wx.navigateTo({
+              url: `/pages/result/index?guest=1`
+                + `&qid=${anonQid}`
+                + `&anonToken=${encodeURIComponent(anonToken)}`
+                + `&subject=${subject}`,
+            });
+          }, 300);
+        } else if (r.status === 'FAILED') {
+          this._clearGuestTimers();
+          this.setData({
+            pageState: 'error',
+            statusText: 'AI 分析失败',
+            errorMsg: r.error_code || 'AI 暂时帮不上忙，请稍后重试',
+            showBanner: true,
+            steps: buildSteps(fakeStep, 'error'),
+          });
+        }
+        // ANALYZING · 不动 · 假步动画继续
+      } catch (e) {
+        // 单次轮询失败不立即终结 · 等下一轮 · timeout 兜底
+        console.warn('[P03 guest] poll error · will retry', e);
+      }
+    }, 1000);
+  },
+
+  _clearGuestTimers() {
+    if (this._guestFakeStepTimer) {
+      clearInterval(this._guestFakeStepTimer);
+      this._guestFakeStepTimer = 0;
+    }
+    if (this._guestPollTimer) {
+      clearInterval(this._guestPollTimer);
+      this._guestPollTimer = 0;
+    }
+  },
+
   onUnload() {
     this._clearPoll();
+    this._clearGuestTimers();
   },
 
   async _startAnalysis(imageUrl: string, subject: string) {

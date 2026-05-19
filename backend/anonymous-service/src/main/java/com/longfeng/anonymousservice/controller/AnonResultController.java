@@ -135,10 +135,30 @@ public class AnonResultController {
                             outcome.getSubject(),
                             outcome.getStemLength(),
                             outcome.getChatModel(),
-                            outcome.getOcrModel()),
+                            outcome.getOcrModel(),
+                            outcome.getStem(),
+                            outcome.getReasonMarkdown(),
+                            mapStepsToDto(outcome.getSteps()),
+                            outcome.getCorrection()),
                     null));
             case FAILED -> ResponseEntity.ok(new AnonResultResponse(
                     STATUS_FAILED, null, AI_INFERENCE_FAILED_CODE));
         };
+    }
+
+    /** Map raw ai-service /answer steps[{stepNo,text,title?,formula?}] to Result.Step DTO list. */
+    private static java.util.List<AnonResultResponse.Result.Step> mapStepsToDto(
+            java.util.List<java.util.Map<String, Object>> raw) {
+        if (raw == null || raw.isEmpty()) return java.util.Collections.emptyList();
+        java.util.List<AnonResultResponse.Result.Step> out = new java.util.ArrayList<>(raw.size());
+        for (java.util.Map<String, Object> m : raw) {
+            if (m == null) continue;
+            Integer stepNo = m.get("stepNo") instanceof Number n ? n.intValue() : null;
+            String text = m.get("text") instanceof String t ? t : "";
+            String title = m.get("title") instanceof String t ? t : null;
+            String formula = m.get("formula") instanceof String f ? f : null;
+            out.add(new AnonResultResponse.Result.Step(stepNo, text, title, formula));
+        }
+        return out;
     }
 }

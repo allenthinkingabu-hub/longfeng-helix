@@ -148,8 +148,13 @@
       </view>
     </view>
 
-    <!-- Ebbinghaus preview -->
-    <view class="ebbing" data-test-id="p04-memory-curve">
+    <!-- 游客态 24h 黄条 (spec line 216 + biz §F05) -->
+    <view wx:if="{{isGuest}}" class="guest-claim-hint" data-test-id="p04-guest-claim-hint">
+      <text>⏱ {{guestClaimHint}}</text>
+    </view>
+
+    <!-- Ebbinghaus preview · biz §3.6 游客禁用 T0/T1 节点生成 · wx:if hide for guest -->
+    <view wx:if="{{!isGuest}}" class="ebbing" data-test-id="p04-memory-curve">
       <view class="ebbing-t">
         <van-icon name="clock-o" size="14px" color="#5856D6" />
         <text>艾宾浩斯复习计划预览</text>

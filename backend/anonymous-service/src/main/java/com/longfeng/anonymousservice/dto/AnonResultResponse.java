@@ -36,10 +36,27 @@ public record AnonResultResponse(
     /**
      * Nested record carrying the result payload — only populated when the
      * upstream returned {@code DONE} (mapped to {@code READY} on this hop).
+     *
+     * <p>Extended 2026-05-19: P04 游客态 (spec P-GUEST-CAPTURE.spec.md line 216 +
+     * biz §F05) 需要题干/错因/纠正字段渲染同样的结果详情卡. anon-service 在
+     * DONE 时额外调 ai-service GET /api/ai/{taskId}/answer 拿完整数据合并.
+     * KP (知识点) 暂留 null · ai-service /answer 当前未暴露 · 后续 task 补.
      */
     public record Result(
             @JsonProperty("subject") String subject,
             @JsonProperty("stem_length") Integer stemLength,
             @JsonProperty("chat_model") String chatModel,
-            @JsonProperty("ocr_model") String ocrModel) {}
+            @JsonProperty("ocr_model") String ocrModel,
+            @JsonProperty("stem") String stem,
+            @JsonProperty("reason_markdown") String reasonMarkdown,
+            @JsonProperty("steps") java.util.List<Step> steps,
+            @JsonProperty("correction") String correction) {
+
+        /** AI 解答步骤 · 与 ai-service AiAnswer.steps 同结构. */
+        public record Step(
+                @JsonProperty("step_no") Integer stepNo,
+                @JsonProperty("text") String text,
+                @JsonProperty("title") String title,
+                @JsonProperty("formula") String formula) {}
+    }
 }

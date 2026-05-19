@@ -613,3 +613,16 @@ page {
   color: #8E8E93;
   letter-spacing: 0.4rpx;
 }
+
+/* 游客态 24h claim 黄条 (spec P-GUEST-CAPTURE line 216 + biz §F05) */
+.guest-claim-hint {
+  margin: 24rpx 0;
+  padding: 20rpx 28rpx;
+  background: linear-gradient(135deg, rgba(255, 180, 84, 0.12), rgba(255, 209, 102, 0.15));
+  border: 2rpx solid rgba(255, 180, 84, 0.4);
+  border-radius: 20rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #B25E00;
+  letter-spacing: 0.2rpx;
+}

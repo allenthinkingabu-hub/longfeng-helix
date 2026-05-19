@@ -274,14 +274,17 @@ Page({
         throw e;
       }
 
-      // 5) ANALYZING + 1Hz polling
-      this.setData({
-        uploadPct: 100,
-        phase: 'ANALYZING',
-        pollSecs: 0,
-        shutterLabel: shutterLabelFor('ANALYZING'),
+      // 5) analyze 202 ok → 按 spec P-GUEST-CAPTURE.spec.md line 215
+      //    跳 P03 游客态 · 该页 polling getResult + 显 4 步动画 · 替原 inline polling.
+      //    带 anonToken (重启页面后 wx storage 可能为空 · 直接 query 传)
+      this.setData({ uploadPct: 100 });
+      wx.navigateTo({
+        url: `/pages/analyzing/index?guest=1`
+          + `&anonQid=${qResp.anon_qid}`
+          + `&anonToken=${encodeURIComponent(this.data.anonToken)}`
+          + `&subject=${this.data.subject}`,
       });
-      this.startPolling();
+      return;
     } catch (err) {
       // 用 warn 不用 error: uploadFlow 失败是 recoverable 用户态 · ERROR phase 已经
       // 在 UI 显示 + retry CTA 可见; 用 console.error 会污染 IDE console 让 audit

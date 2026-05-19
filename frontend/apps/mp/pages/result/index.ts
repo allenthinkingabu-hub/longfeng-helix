@@ -8,6 +8,7 @@
  */
 import { getQuestionById, saveQuestion } from '../../src/api/wrongbook';
 import { getAnswerByQid } from '../../src/api/ai';
+import { getResult as getAnonResult, claim as anonClaim } from '../../src/api/anon';
 import type { AiAnswer, AiStep } from '../../src/api/ai';
 import type { QuestionDetail, PlannedNode, QuestionStep } from '../../src/api/wrongbook';
 
@@ -87,10 +88,20 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
     aiFallback: { reasonShown: false, stepsShown: false, text: '' },
     topicChain: '',
     stemSnippet: '',
+    // ── 游客态 (spec line 216 + biz §F05) ──
+    // isGuest=true 时 hide T1-T6 timeline (biz §3.6 禁用 T0/T1 节点) +
+    // 显「24h 内可保存」黄条 + 保存按钮文案改 "保存到我的错题本 →注册"
+    isGuest: false,
+    guestClaimHint: '本次结果 24 小时内可保存到错题本',
   },
 
   /** cached raw question for save mutation */
   _questionRaw: null as QuestionDetail | null,
+  /** Guest mode 实例字段 · 注册后 claim 用 */
+  _isGuest: false,
+  _anonToken: '' as string,
+  _anonQid: '' as string,
+  _guestSubject: 'math' as string,
   /** persisted qid for retry after error */
   _qid: '',
 
@@ -101,7 +112,83 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
       this.setData({ pageState: 'EMPTY' });
       return;
     }
+    // ── 游客态分支 (spec line 216 · /result/{anonQid}?guest=1) ──
+    if (options.guest === '1') {
+      const anonToken = options.anonToken ? decodeURIComponent(options.anonToken) : '';
+      const subject = options.subject || 'math';
+      if (!anonToken) {
+        this.setData({ pageState: 'EMPTY' });
+        return;
+      }
+      this._isGuest = true;
+      this._anonToken = anonToken;
+      this._anonQid = qid;
+      this._guestSubject = subject;
+      this.setData({ isGuest: true });
+      this._fetchGuestResult(qid, anonToken, subject);
+      return;
+    }
+    // ── 登录态原逻辑 (维持不变) ──
     this._fetchQuestion(qid);
+  },
+
+  /**
+   * 游客态 · 调 anon-service GET /api/anon/result/{qid} 拿 enriched result
+   * (含 stem/reason/steps/correction) · 渲染同 P04 UI · 隐藏 T1-T6.
+   */
+  async _fetchGuestResult(qid: string, anonToken: string, subject: string) {
+    this.setData({ pageState: 'LOADING' });
+    try {
+      const r = await getAnonResult(anonToken, Number(qid));
+      if (r.status !== 'READY' && r.status !== 'DONE') {
+        // FAILED / ANALYZING (本不应到 P04) · 显错误
+        this.setData({ pageState: 'ERROR' });
+        return;
+      }
+      const result = r.result || ({} as NonNullable<typeof r.result>);
+      const subjectLabel = SUBJECT_LABEL[subject] || subject;
+      const stem = result.stem || '';
+      const reason = result.reason_markdown || FALLBACK_REASON_PENDING;
+      const steps: QuestionStep[] = (result.steps || []).map((s, i) => ({
+        idx: typeof s.step_no === 'number' ? s.step_no : i + 1,
+        title: s.text || s.title || '',
+        formula: s.formula || undefined,
+      }));
+      const correctAnswer = result.correction || FALLBACK_CORRECT_PENDING;
+      const stemSnippet = stem.slice(0, 16);
+
+      // 构造虚拟 question 对象供 wxml 复用 · KP 暂留空 (ai-service 未暴露 · TODO follow-up)
+      this.setData({
+        pageState: 'DRAFT',
+        question: {
+          id: qid,
+          subject,
+          subjectLabel,
+          stem,
+          formula: '',
+          myAnswer: '',
+          correctAnswer,
+          reasonMarkdown: reason,
+          steps,
+          knowledgePoints: [],
+          difficulty: 3,
+          confidence: 0,
+        },
+        diffStars: [true, true, true, false, false],
+        diffLabel: '中等',
+        timelineNodes: [],  // biz §3.6 禁用 T0/T1 · 游客不显复习曲线
+        aiFallback: {
+          reasonShown: !result.reason_markdown,
+          stepsShown: steps.length === 0,
+          text: !result.reason_markdown ? FALLBACK_REASON_PENDING : '',
+        },
+        topicChain: subjectLabel,
+        stemSnippet,
+      });
+    } catch (err) {
+      console.error('[P04 guest] fetch failed', err);
+      this.setData({ pageState: 'ERROR' });
+    }
   },
 
   async _fetchQuestion(qid: string) {
@@ -266,6 +353,37 @@ Page<PageData, WechatMiniprogram.IAnyObject>({
 
   async onSaveTap() {
     if (this.data.isSaving) return;
+
+    // ── 游客态: spec line 217 + biz §F06 · 跳 P00 注册 + 登录后 claim ──
+    if (this._isGuest) {
+      const jwt = wx.getStorageSync('studentJwt') || wx.getStorageSync('jwt');
+      if (!jwt) {
+        // 未登录 · 跳注册 · 带 anonToken + returnTo=P04?guest=1&autoClaim=1
+        const returnTo = `/pages/result/index?guest=1&qid=${this._anonQid}`
+          + `&anonToken=${encodeURIComponent(this._anonToken)}&subject=${this._guestSubject}&autoClaim=1`;
+        wx.navigateTo({
+          url: `/pages/login/index?anonToken=${encodeURIComponent(this._anonToken)}`
+            + `&returnTo=${encodeURIComponent(returnTo)}`,
+        });
+        return;
+      }
+      // 已登录 · 直接 claim
+      this.setData({ isSaving: true });
+      try {
+        const c = await anonClaim(this._anonToken, jwt, { subject: this._guestSubject });
+        wx.showToast({ title: `已保存 qid=${c.claimed_question_id}`, icon: 'success', duration: 800 });
+        setTimeout(() => {
+          wx.switchTab({ url: '/pages/wrongbook-list/index' });
+        }, 800);
+      } catch (err) {
+        console.error('[P04 guest] claim failed', err);
+        wx.showToast({ title: '保存失败，请重试', icon: 'none' });
+      } finally {
+        this.setData({ isSaving: false });
+      }
+      return;
+    }
+
     const qid = this._questionRaw?.id || this._qid;
     if (!qid) {
       wx.showToast({ title: '题目缺失，无法保存', icon: 'none' });
