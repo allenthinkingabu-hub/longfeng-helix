@@ -21,13 +21,14 @@
          mastered 真值: backend HomeAggregatorController 跨服务调 wrongbook-service ·
                        GET /api/home/today.today.masteredTotal (mastery=2 OR status=ARCHIVED)
          spec §5 L166: streak=0 时 chip 隐藏 · mastered=0 同样隐藏 (无累计掌握不展示假数据) -->
-    <view class="streak-bar" wx:if="{{streak > 0 || mastered > 0}}">
-      <view class="flame" data-test-id="streak-bar-fire-icon" wx:if="{{streak > 0}}">
+    <!-- streak/mastered chips · 0 也渲染 (用户决策 2026-05-19 · 防"显空区"误以为坏) -->
+    <view class="streak-bar">
+      <view class="flame" data-test-id="streak-bar-fire-icon">
         <text class="flame-icon">🔥</text>
         <text data-test-id="streak-bar-days-number">连续 {{streak}} 天</text>
       </view>
-      <view class="dot" wx:if="{{streak > 0 && mastered > 0}}"></view>
-      <text wx:if="{{mastered > 0}}">掌握 <text class="mastered-num">{{mastered}}</text> 题</text>
+      <view class="dot"></view>
+      <text>掌握 <text class="mastered-num">{{mastered}}</text> 题</text>
     </view>
   </view>
 

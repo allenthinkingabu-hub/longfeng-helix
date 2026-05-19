@@ -54,24 +54,39 @@ export function unwrapApiResult<T>(raw: unknown): T {
   return raw as T;
 }
 
+/**
+ * 数据隔离 · 从 wx.getStorageSync('userId') 取真登录态 student id ·
+ * 之前硬编码 '1' 导致全用户共看 student#1 数据.
+ *
+ * 两套 header 共存 · 不同 BE 服务读不同 header 名:
+ *   - wrongbook-service (8082): @RequestHeader("X-Student-Id")
+ *   - review-plan-service (8085): @RequestHeader("X-User-Id")  (USER_ID_HEADER)
+ *   - file-service (8084): 不要 user 信息 (但带也无害)
+ *
+ * userId 缺失时返 '0' · BE 用 defaultValue=0 会查不到数据 · 显空状态 (而不是别人数据).
+ * 已登录态 (P00 onLogin 写入 'userId') 自动注入真 id.
+ * 调用方仍可在 options.headers 显式覆盖 (优先级最高).
+ */
+function _currentUserIdForHeader(): string {
+  if (typeof wx === 'undefined' || !wx.getStorageSync) return '0';
+  try {
+    const id = wx.getStorageSync('userId');
+    return id ? String(id) : '0';
+  } catch {
+    return '0';
+  }
+}
+
 export async function httpJSON<T = unknown>(
   url: string,
   options: HttpOptions = {},
 ): Promise<T> {
   const { method = 'GET', body, headers = {}, timeout = 10_000 } = options;
-  // MP 还没有真鉴权 · capture (P02) hardcode studentId:1 写入 · 但所有 GET 接口
-  // BE 用 @RequestHeader 默认 0L 取 user · 这就导致用户拍的题在 student=1 下入库,
-  // 但读时 BE 用 student=0 查, 结果永远空。
-  //
-  // 两套 header 共存 · BE 服务用的常量不同:
-  //   - wrongbook-service (8082): @RequestHeader("X-Student-Id")
-  //   - review-plan-service (8085): @RequestHeader("X-User-Id")  (USER_ID_HEADER)
-  //   - file-service (8084): 不要 user 信息
-  // 同时发两个 · 每个 BE 各取所需 · 真鉴权后再删此 fallback.
+  const sid = _currentUserIdForHeader();
   const baseHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
-    'X-Student-Id': '1',
-    'X-User-Id': '1',
+    'X-Student-Id': sid,
+    'X-User-Id': sid,
     ...headers,
   };
 
