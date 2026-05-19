@@ -26,6 +26,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -60,6 +64,8 @@ public class AnswerJudgeService {
     public static final String METRIC_PRIMARY = "longfeng_ai_judge_primary_calls_total";
     public static final String METRIC_FALLBACK = "longfeng_ai_judge_fallback_calls_total";
     public static final String METRIC_CHAT_MODEL = "longfeng_ai_judge_chat_model_calls_total";
+    // SC22-T02 · biz §2B.22 TC-22.02 line 222 字面 wb_judge_ai_timeout{nid, ms:18000} · 双 provider 双断 timeout 时 increment
+    public static final String METRIC_TIMEOUT = "wb_judge_ai_timeout";
 
     private final JudgeProperties props;
     private final List<AnswerJudgeAiClient> clients;
@@ -255,7 +261,11 @@ public class AnswerJudgeService {
                             .increment();
                     log.info("Fallback: {} -> {}", activeProvider, providerName);
                 }
-                String raw = client.judge(systemPrompt, userPrompt, imageKey);
+                // SC22-T02 · 18s 上限保护 (biz §10.17 SLA 字面 503 必在 18s 内返 · 主 8s + 备 10s = 18s)
+                // 用 CompletableFuture.get(timeoutMs) 包裹 client.judge() · 防止 HTTP 挂死 (e.g. DashScope socketTimeout 失效)
+                // 现役 SC20-T02 client.judge() 同步抛异常 (测试桩 path) · 真实 HTTP 时此 timeout 是第二道保险
+                long perProviderTimeoutMs = isPrimary ? props.getTimeoutPrimaryMs() : props.getTimeoutFallbackMs();
+                String raw = callWithTimeout(client, userPrompt, imageKey, perProviderTimeoutMs, providerName);
                 // JSON Schema 校验 · 不符走 LOW_CONFIDENCE
                 return parseAndFilter(raw, providerName);
             } catch (AnswerJudgeAiClient.AnswerJudgeAiException e) {
@@ -265,7 +275,50 @@ public class AnswerJudgeService {
         }
 
         // 全部 fallback chain 失败 → 503 outcome (落 wb_review_node 但抛 AiServiceUnavailable)
+        // SC22-T02 · METRIC_TIMEOUT counter increment (biz §2B.22 TC-22.02 line 222 字面 wb_judge_ai_timeout{nid, ms:18000})
+        Counter.builder(METRIC_TIMEOUT)
+                .tags(Tags.of("nid", String.valueOf(nid), "provider", activeProvider))
+                .register(meterRegistry)
+                .increment();
+        log.warn("wb_judge_ai_timeout · all providers failed · nid={} chain={} ms_budget≈{}",
+                nid, chain, props.getTimeoutPrimaryMs() + props.getTimeoutFallbackMs());
         return AiJudgeOutcome.timeout(activeProvider);
+    }
+
+    /**
+     * SC22-T02 · 单 provider 调用包裹 18s 上限超时保护 · 防 HTTP 挂死.
+     * 用 CompletableFuture.supplyAsync + get(timeout) · primary 8s · fallback 10s · 合计 18s.
+     * 真 timeout 时抛 AnswerJudgeAiException("timeout: ${provider} ${timeoutMs}ms") · 同步路径 (现役测试桩) 不受影响.
+     */
+    private String callWithTimeout(AnswerJudgeAiClient client, String userPrompt, String imageKey,
+                                   long timeoutMs, String providerName)
+            throws AnswerJudgeAiClient.AnswerJudgeAiException {
+        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+            try {
+                return client.judge(systemPrompt, userPrompt, imageKey);
+            } catch (AnswerJudgeAiClient.AnswerJudgeAiException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        try {
+            return future.get(timeoutMs, TimeUnit.MILLISECONDS);
+        } catch (TimeoutException te) {
+            future.cancel(true);
+            throw new AnswerJudgeAiClient.AnswerJudgeAiException(
+                    providerName + ": timeout after " + timeoutMs + "ms");
+        } catch (ExecutionException ee) {
+            Throwable cause = ee.getCause();
+            if (cause instanceof RuntimeException re
+                    && re.getCause() instanceof AnswerJudgeAiClient.AnswerJudgeAiException aje) {
+                throw aje;
+            }
+            throw new AnswerJudgeAiClient.AnswerJudgeAiException(
+                    providerName + ": unexpected error · " + cause.getMessage());
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            throw new AnswerJudgeAiClient.AnswerJudgeAiException(
+                    providerName + ": interrupted");
+        }
     }
 
     /**
