@@ -5,12 +5,12 @@
     "team_id": "mp",
     "title": "<AiJudgeBanner> + 4 配套 (AiFlag/AiMetaChip/AiHintRibbon) + GradeButtons preselected prop",
     "attempt": 1,
-    "phase": "audit",
+    "phase": "done",
     "dev_done": true,
     "passes": true,
     "retries": 0,
     "audit_retries": 0,
-    "git_commits": ["6be5722", "9ece007", "4bb031f"]
+    "git_commits": ["6be5722", "9ece007", "4bb031f", "30009e2"]
   },
   "feature_id": "M-AI-ANSWER-JUDGE",
   "branch": "feature/M-AI-ANSWER-JUDGE-team-1",
@@ -70,7 +70,7 @@
     "dor_c1_to_c6_required": false
   },
 
-  "current_status": "PHASE_5_AUDIT_PENDING",
+  "current_status": "PHASE_5_AUDIT_DONE · ready_to_test (2026-05-19 · audit 7 dim PASS · 24 unit PASS · E2E spec drafted (IDE 受限 caveat))",
   "test_cases_drafted": false,
   "test_cases_reviewed_by_coder": false,
   "test_cases_reviewed_by_tester": false,
