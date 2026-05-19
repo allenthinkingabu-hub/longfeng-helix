@@ -218,11 +218,22 @@ Page({
     this.setData({ phase: 'UPLOADING', uploadPct: 10, shutterLabel: shutterLabelFor('UPLOADING') });
 
     try {
+      // 0) 拿真实文件大小 · 后端 AnonPresignRequest.size 是 @Min(1) @Max(10MB) ·
+      //    不能传 0 (会 400 VALIDATION_FAILED) · 也不能超 10MB
+      const fileInfo = await new Promise<{ size: number }>((resolve, reject) => {
+        wx.getFileSystemManager().getFileInfo({
+          filePath: tempFilePath,
+          success: (res) => resolve({ size: res.size }),
+          fail: (err) => reject(err),
+        });
+      });
+      const size = Math.min(Math.max(fileInfo.size, 1), 10_485_760);
+
       // 1) presign
       const presignResp = await presign(this.data.anonToken, {
         filename: 'guest-capture.jpg',
         mime: 'image/jpeg',
-        size: 0,
+        size,
         purpose: 'GUEST_CAPTURE',
       });
       this.setData({ uploadPct: 30 });

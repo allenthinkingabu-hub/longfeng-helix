@@ -44,6 +44,7 @@ async function stubReadFileForTests(mpInst: Mp): Promise<void> {
       wx: {
         getFileSystemManager: () => {
           readFile: (opts: { filePath: string; success?: (res: { data: ArrayBuffer }) => void; fail?: (err: { errMsg: string }) => void }) => void;
+          getFileInfo: (opts: { filePath: string; success?: (res: { size: number }) => void; fail?: (err: { errMsg: string }) => void }) => void;
         };
       };
     };
@@ -56,9 +57,14 @@ async function stubReadFileForTests(mpInst: Mp): Promise<void> {
             if (opts.success) opts.success({ data: new ArrayBuffer(1) });
           }, 0);
         },
+        getFileInfo: function (opts) {
+          // 测试 stub: 立刻 success fake 1024-byte size · 满足后端 @Min(1)@Max(10MB)
+          setTimeout(function () {
+            if (opts.success) opts.success({ size: 1024 });
+          }, 0);
+        },
       };
     };
-    // Tag so we can detect double-patching (debug)
     (g.wx.getFileSystemManager as unknown as { __stubbed?: boolean }).__stubbed = true;
     void orig;
     return true;
