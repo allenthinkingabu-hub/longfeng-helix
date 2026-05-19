@@ -99,7 +99,7 @@
 
   <!-- ── Consent card · 玻璃态 (mockup line 166-181 · spec §3 ConsentBar) ── -->
   <view
-    class="gc-consent"
+    class="gc-consent {{consentShake ? 'gc-consent-shake' : ''}}"
     data-test-id="guest-consent-card"
     wx:if="{{phase === 'IDLE' || phase === 'CONSENT_PENDING' || phase === 'CAMERA_ACTIVE'}}"
   >

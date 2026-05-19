@@ -81,6 +81,8 @@ Page({
     anonQid: 0,
     statusBarHeight: 44,
     cameraPosition: 'back' as 'back' | 'front',
+    /** 未勾同意时 shake 一下 · 600ms 抖动动画 (设 true 立刻触发 · 自动 reset false) */
+    consentShake: false,
     subjects: [
       { value: 'math', label: '数学' },
       { value: 'physics', label: '物理' },
@@ -175,7 +177,7 @@ Page({
   onShutterTap() {
     const { phase } = this.data;
     if (!this.data.consent.checked) {
-      wx.showToast({ title: '请先勾选同意条款', icon: 'none' });
+      this._flashConsentShake();
       return;
     }
     if (phase === 'CONSENT_PENDING' || phase === 'IDLE') {
@@ -185,6 +187,18 @@ Page({
     if (phase === 'CAMERA_ACTIVE') {
       this.captureAndUpload();
     }
+  },
+
+  /** 未勾同意时统一反馈: 醒目 toast (带 ⚠️ + 2.5s + mask) + 同意框 shake 动画 */
+  _flashConsentShake() {
+    wx.showToast({
+      title: '⚠️ 请先勾选同意条款',
+      icon: 'none',
+      duration: 2500,
+      mask: true,
+    });
+    this.setData({ consentShake: true });
+    setTimeout(() => this.setData({ consentShake: false }), 600);
   },
 
   captureAndUpload() {
@@ -430,7 +444,7 @@ Page({
   /** 3 源 tab (相册/相机/文件) · 必须先勾同意 */
   onSourcePick(e: WechatMiniprogram.TouchEvent) {
     if (!this.data.consent.checked) {
-      wx.showToast({ title: '请先勾选同意条款', icon: 'none' });
+      this._flashConsentShake();
       return;
     }
     const source = e.currentTarget.dataset.source as 'album' | 'camera' | 'file';

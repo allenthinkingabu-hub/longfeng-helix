@@ -717,3 +717,17 @@ page {
 .gc-quota-blocker-cta::after {
   border: none;
 }
+
+/* 未勾同意时 shake 动画 (600ms · 双向晃 4 次) + 红框强调 */
+.gc-consent-shake {
+  animation: gc-shake 600ms cubic-bezier(.36,.07,.19,.97) both;
+  border-color: #FF3B30 !important;
+  box-shadow: 0 0 0 4rpx rgba(255, 59, 48, 0.25);
+}
+
+@keyframes gc-shake {
+  10%, 90% { transform: translateX(-4rpx); }
+  20%, 80% { transform: translateX(8rpx); }
+  30%, 50%, 70% { transform: translateX(-12rpx); }
+  40%, 60% { transform: translateX(12rpx); }
+}
