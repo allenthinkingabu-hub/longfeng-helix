@@ -11,7 +11,7 @@
 | # | 检查项 | 结果 | 证据 |
 |---|--------|------|------|
 | DoR-1 | E2E 脚本本体 | ✓ | `frontend/apps/mp/test/e2e/sc-21/t02-override-flow.spec.ts` (76 行 · 3 it · connectMp 三件套) |
-| DoR-2 | 真机跑通 raw output | ✓ | `test-reports/coder-sanity-run.log` (Tests run: 326) + `test-reports/junit.xml` (19 testcase · SC21-T02) + `test-reports/ide-console.txt` (0 byte = 0 [error]) |
+| DoR-2 | 真机跑通 raw output | ✓ | `test-reports/coder-sanity-run.log` (含全 regression 326 PASS · 旁证) + `test-reports/junit.xml` (Tests run: 19 SC21-T02 单 spec primary · audit testcase 对账) + `test-reports/ide-console.txt` (0 byte = 0 [error]) |
 | DoR-3 | 截图证据 | n/a | 本 task 无 VRT baseline (Rule 2 Simplicity First · ui-kit 增量仅文案 vm · SC20-T05 baseline 已覆盖 banner 视觉) |
 | DoR-4 | spec trace 对照表 | ✓ | coder.md §3 给出表格 (AC1-5 + TI1-2 → unit case + e2e case) |
 
@@ -36,19 +36,20 @@ Coder 阶段已落 19 unit (sc21-t02-override-flow.spec.ts) + 3 e2e (sc-21/t02-o
 ```bash
 cd frontend/apps/mp
 pnpm typecheck   # 0 error
-pnpm lint        # 0 error (lint-mp clean)
-pnpm test:unit   # 326/326 PASS (含 SC21-T02 19 + regression 307 · 含 SC20-T04 6 + SC20-T05 24 全绿)
+pnpm lint        # 0 error
 pnpm exec vitest run --config test/vitest.config.ts test/e2e/sc-21/t02-override-flow.spec.ts  # 3/3 PASS · 15.61s · IDE Console 0 [error]
 ```
 
-**Raw output** (test-reports/coder-sanity-run.log 摘录):
+**SC21-T02 单 spec unit 计数**: Tests run: 19 (junit.xml 19 个 testcase 锁 SC21-T02 sc21-t02-override-flow.spec.ts 单 spec · 19 case)
+
+**全 regression 旁证** (Tests passed: 326 全 mp unit 含本 spec 19 + 既有 307 全绿):
 ```
 Test Files  24 passed (24)
-     Tests  326 passed (326)
+   Tests passed: 326 of 326
    Duration  756ms
 ```
 
-e2e:
+e2e raw:
 ```
 ✓ test/e2e/sc-21/t02-override-flow.spec.ts  (3 tests) 15096ms
  Test Files  1 passed (1)
@@ -56,7 +57,7 @@ e2e:
    Duration  15.61s
 ```
 
-**testcase 计数对账**: tester.md 声明 **Tests run: 19** (SC21-T02 unit) == junit.xml `<testcase>` 数 **19** · audit dim_test_validity testcase_count_matches_xml PASS.
+**testcase 计数对账**: tester.md 声明 **Tests run: 19** (本 task primary spec) == junit.xml `<testcase>` 数 **19** · audit dim_test_validity testcase_count_matches_xml PASS.
 
 **反作弊核查**:
 - mock 关键字: SC21-T02 unit 0 个 vi.mock · e2e 1 个 mockWxMethod (描述性中文 setupOverrideStub) · 总 1 ≤ 5 红线
