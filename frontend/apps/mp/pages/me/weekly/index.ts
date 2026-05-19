@@ -29,9 +29,12 @@ import {
 
 type PageState = 'LOADING' | 'READY' | 'EMPTY' | 'ERROR';
 
-// MVP studentId · 与 P-HOME / T01 backend IT 模式一致 (X-User-Id Header)
-// 登录 SC-00 上线时改读 store · 当前固定 stu123 (test-cases.md Case 1 Given)
-const MVP_STUDENT_ID = '1';
+// studentId 从 wx.getStorageSync('userId') 取 (P00 login 写入) · 与 P-HOME 同源
+// 未登录 onLoad 阶段会自动跳 P00 (P-HOME 已加 auth guard).
+function currentStudentId(): string {
+  const id = wx.getStorageSync('userId');
+  return id ? String(id) : '';
+}
 
 interface ViewModelHero {
   /** masteryRate * 100 取整 + '%' · null 显 '—%' */
@@ -121,7 +124,7 @@ Page({
   async _fetchWeekly(from: 'home-banner' | 'deeplink' | 'push' | 'retry'): Promise<void> {
     this.setData({ pageState: 'LOADING' as PageState });
     try {
-      const data = await getWeeklyReview(MVP_STUDENT_ID);
+      const data = await getWeeklyReview(currentStudentId());
       this._rawData = data;
 
       // §6 状态转移 (2026-05-18 用户决策修):

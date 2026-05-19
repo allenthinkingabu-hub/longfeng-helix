@@ -29,8 +29,13 @@ import type { PageState, SubjectChip } from './helpers';
 // 跨页共享 "今日 grade" 判定 · P07 + P-HOME 同一 source · 防漂移
 import { isCompletedToday } from '../../src/utils/today';
 
-// SC-16-T02 · MVP studentId (登录上线时改读 store · 与 weekly 页同源)
-const MVP_STUDENT_ID = '1';
+// SC-16-T02 · studentId 从 wx.getStorageSync('userId') 取 · 登录态成功后 P00 写
+// (frontend/apps/mp/pages/login/index.ts onLogin/onWechatLogin 都写了 userId).
+// 未登录 → onLoad 阶段 reLaunch P00. 此函数仅在已登录上下文调用.
+function currentStudentId(): string {
+  const id = wx.getStorageSync('userId');
+  return id ? String(id) : '';
+}
 
 // ─── Mock/MVP data 已全部删除 (2026-05-18 用户选项 A 全修) ─────────
 // 之前 4 块 mock 现全清:
@@ -101,12 +106,26 @@ Page({
 
     // quick entries
     quickEntries: QUICK_ENTRIES,
+
+    // ── Onboarding 三步浮层 (spec P-HOME.spec.md line 264 + biz §2A.2 Onboard 阶段) ──
+    // 首次登录 (localStorage.onboardingDone !== true) 触发 · 3 步: 欢迎 / 拍照权限 / 完成
+    onboardingVisible: false,
+    onboardingStep: 1,  // 1 = welcome · 2 = camera permission · 3 = done
   },
 
   onLoad() {
+    // ── Auth guard · 未登录 → 跳 P00 · 防止显他人数据 ──
+    const jwt = wx.getStorageSync('jwt');
+    const uid = wx.getStorageSync('userId');
+    if (!jwt || !uid) {
+      wx.reLaunch({ url: '/pages/welcome/index' });
+      return;
+    }
     this._fetchTodayData();
     // SC-16-T02 · 并行拉 weekSummary (P-HOME 4 数字 wire · 不调 /api/home/weekly)
     this._fetchWeekSummary();
+    // 首次登录引导浮层 (spec P-HOME.spec.md line 264 · biz §2A.2 Onboard 阶段)
+    this._maybeShowOnboarding();
   },
 
   onShow() {
@@ -122,6 +141,61 @@ Page({
     // 从 P04 保存新题回来 · 必须重新拉今日复习 · 否则 hero "X 题待复习" 永远不更新
     this._fetchTodayData();
     // _syncReviewBadge 已在 _fetchTodayData 完成回调里调过 · 不重复
+  },
+
+  /**
+   * 首次登录引导浮层 · spec P-HOME.spec.md line 264:
+   *   "首次登录 | onboarding flag=true | onboarding 三步浮层 | flag 落 localStorage"
+   * biz §2A.2 line 184-186 · Onboard 阶段 = 权限授权 (取消硬要求 tmpl id ·
+   * 改为 camera 授权 + 引导拍第一题).
+   */
+  _maybeShowOnboarding() {
+    const done = wx.getStorageSync('onboardingDone');
+    if (done === true) return;
+    this.setData({ onboardingVisible: true, onboardingStep: 1 });
+  },
+
+  /** Step 1 「下一步」 → 进 step 2 (拍照权限) */
+  onboardingNext() {
+    const cur = (this.data as { onboardingStep: number }).onboardingStep;
+    if (cur === 1) {
+      this.setData({ onboardingStep: 2 });
+      return;
+    }
+    if (cur === 2) {
+      // 用 wx.authorize 触发系统级权限弹窗
+      wx.authorize({
+        scope: 'scope.camera',
+        success: () => {
+          this.setData({ onboardingStep: 3 });
+        },
+        fail: () => {
+          // 用户拒绝 · 不阻塞 · 进 step 3 · 后续拍照时再 fallback wx.openSetting
+          this.setData({ onboardingStep: 3 });
+        },
+      });
+      return;
+    }
+    if (cur === 3) {
+      this._finishOnboarding();
+    }
+  },
+
+  /** Step 「跳过」 → 直接关 + flag · 不再展示 */
+  onboardingSkip() {
+    this._finishOnboarding();
+  },
+
+  /** Step 3 「立即拍一题」 → 关浮层 + 跳 P02 capture */
+  onboardingGoCapture() {
+    this._finishOnboarding();
+    wx.switchTab({ url: '/pages/capture/index' });
+  },
+
+  /** 关闭浮层 + 持久化 flag · 防再次显示 */
+  _finishOnboarding() {
+    wx.setStorageSync('onboardingDone', true);
+    this.setData({ onboardingVisible: false });
   },
 
   _syncReviewBadge() {
@@ -224,7 +298,7 @@ Page({
    */
   async _fetchWeekSummary() {
     try {
-      const data = await getHomeTodayAggregate(MVP_STUDENT_ID);
+      const data = await getHomeTodayAggregate(currentStudentId());
       const ws = data.weekSummary || null;
       if (ws) {
         const sparklineUri = buildSparklineSvgFromWeekSummary(ws.sparkline);

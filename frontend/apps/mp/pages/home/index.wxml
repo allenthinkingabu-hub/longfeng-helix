@@ -274,4 +274,44 @@
 
   </view>
 
+  <!-- Onboarding 三步浮层 · spec P-HOME.spec.md line 264 + biz §2A.2 Onboard
+       触发: 首次登录 (localStorage.onboardingDone !== true)
+       3 步: 1 欢迎 · 2 拍照权限 · 3 引导拍第一题 -->
+  <view wx:if="{{onboardingVisible}}" class="onboard-backdrop" catchtap="onboardingSkip">
+    <view class="onboard-card" catchtap="">
+      <view class="onboard-progress">
+        <view class="onboard-dot {{onboardingStep >= 1 ? 'on' : ''}}"></view>
+        <view class="onboard-dot {{onboardingStep >= 2 ? 'on' : ''}}"></view>
+        <view class="onboard-dot {{onboardingStep >= 3 ? 'on' : ''}}"></view>
+      </view>
+
+      <!-- Step 1 · 欢迎 -->
+      <block wx:if="{{onboardingStep === 1}}">
+        <image class="onboard-logo" src="/images/icons/p00-logo.png" mode="aspectFit"></image>
+        <view class="onboard-title">欢迎来到 AI 错题本</view>
+        <view class="onboard-desc">拍一张错题 · AI 自动诊断 · 排好 6 次艾宾浩斯复习节点</view>
+        <button class="onboard-cta primary" bindtap="onboardingNext">下一步</button>
+        <view class="onboard-skip" bindtap="onboardingSkip">跳过引导</view>
+      </block>
+
+      <!-- Step 2 · 拍照权限 -->
+      <block wx:if="{{onboardingStep === 2}}">
+        <view class="onboard-icon-circle"><text class="onboard-emoji">📷</text></view>
+        <view class="onboard-title">开启拍照权限</view>
+        <view class="onboard-desc">拍题需要相机权限 · 上传的图片仅用于本次 AI 分析 · 24 小时后自动清理</view>
+        <button class="onboard-cta primary" bindtap="onboardingNext">允许使用相机</button>
+        <view class="onboard-skip" bindtap="onboardingNext">暂时跳过</view>
+      </block>
+
+      <!-- Step 3 · 完成 + 引导拍第一题 -->
+      <block wx:if="{{onboardingStep === 3}}">
+        <view class="onboard-icon-circle success"><text class="onboard-emoji">🎉</text></view>
+        <view class="onboard-title">一切就绪</view>
+        <view class="onboard-desc">现在去拍第一道错题 · 30 秒即可看到 AI 分析与复习曲线</view>
+        <button class="onboard-cta primary" bindtap="onboardingGoCapture">📸 立即拍一题</button>
+        <view class="onboard-skip" bindtap="onboardingSkip">先逛逛首页</view>
+      </block>
+    </view>
+  </view>
+
 </view>

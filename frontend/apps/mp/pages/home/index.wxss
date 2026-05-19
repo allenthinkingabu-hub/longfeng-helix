@@ -816,3 +816,126 @@ page {
   letter-spacing: 0.4rpx;
   margin-top: 4rpx;
 }
+
+/* ─── Onboarding 三步浮层 · spec P-HOME.spec.md line 264 ─── */
+.onboard-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 60rpx;
+  animation: onb-fade 0.2s ease;
+}
+
+@keyframes onb-fade { from { opacity: 0; } to { opacity: 1; } }
+
+.onboard-card {
+  width: 100%;
+  max-width: 620rpx;
+  background: #fff;
+  border-radius: 40rpx;
+  padding: 60rpx 48rpx 44rpx;
+  box-shadow: 0 40rpx 80rpx rgba(0, 0, 0, 0.25);
+  text-align: center;
+  position: relative;
+  animation: onb-pop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes onb-pop {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.onboard-progress {
+  display: flex;
+  justify-content: center;
+  gap: 16rpx;
+  margin-bottom: 40rpx;
+}
+
+.onboard-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #E5E5EA;
+  transition: background 0.2s ease;
+}
+
+.onboard-dot.on {
+  background: #0A84FF;
+}
+
+.onboard-logo {
+  width: 144rpx;
+  height: 144rpx;
+  margin: 0 auto 28rpx;
+}
+
+.onboard-icon-circle {
+  width: 144rpx;
+  height: 144rpx;
+  margin: 0 auto 28rpx;
+  border-radius: 36rpx;
+  background: linear-gradient(135deg, #E8F1FF 0%, #C7DAFF 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.onboard-icon-circle.success {
+  background: linear-gradient(135deg, #E4F7EA 0%, #BAE7C5 100%);
+}
+
+.onboard-emoji {
+  font-size: 80rpx;
+  line-height: 1;
+}
+
+.onboard-title {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #000000D9;
+  letter-spacing: -0.4rpx;
+  margin-bottom: 20rpx;
+}
+
+.onboard-desc {
+  font-size: 26rpx;
+  font-weight: 400;
+  color: #3C3C4399;
+  line-height: 1.55;
+  margin-bottom: 44rpx;
+}
+
+.onboard-cta {
+  width: 100%;
+  height: 100rpx;
+  border-radius: 28rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+  letter-spacing: -0.2rpx;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.onboard-cta::after { border: none; }
+
+.onboard-cta.primary {
+  background: linear-gradient(180deg, #1E94FF 0%, #0A84FF 100%);
+  color: #fff;
+  box-shadow: 0 16rpx 36rpx -10rpx rgba(10, 132, 255, 0.45);
+}
+
+.onboard-skip {
+  margin-top: 20rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  color: #8E8E93;
+  padding: 12rpx 0;
+}
